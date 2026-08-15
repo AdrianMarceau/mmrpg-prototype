@@ -62,6 +62,8 @@
 @habitats[] = bass-ds(subspace)
 @habitats[] = proto-man-ds(subspace)
 #---------------------------#
+@items[]     = void-mecha-whistle(21-15, mecha-whistle)
+#---------------------------#
 @blocks[]    = star-gate-west-b1(18-9, star-block, horz-down, x12)
 @gates[]     = star-gate-west-g1(19-9, star-gate, horizontal, x12)
 @blocks[]    = star-gate-west-b2(20-9, star-block, horz-down, x12)

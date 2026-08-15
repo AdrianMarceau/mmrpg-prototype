@@ -69,7 +69,8 @@
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
-@mechas[]    = light-runway-mecha(11-12, sniper-joe, 2)
+@mechas[]    = light-runway-mecha-1(11-12, met, 1)
+@mechas[]    = light-runway-mecha-2(11-11, sniper-joe, 2)
 #---------------------------#
 # MECHA PORTAL BOSSES
 #----------------------
@@ -109,6 +110,9 @@
 @actors[]     = helpless-stuck-npc(14-19, robot, heal-bot, -, helpless-stuck)
 #------------------------
 @abilities[]  = buster-shot-pickup(8-9, buster-shot)
+#------------------------
+@items[]      = first-mecha-whistle(16-9, mecha-whistle)
+@items[]      = second-mecha-whistle(5-27, mecha-whistle)
 #------------------------
 @blocks[]    = star-gate-02-b1(7-8, star-block, vert-right, x3)
 @gates[]     = star-gate-02-g1(7-9, star-gate, vertical, x3)
