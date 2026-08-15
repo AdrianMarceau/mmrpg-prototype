@@ -228,6 +228,22 @@ html, body {
     filter: brightness(0.0);
 }
 
+#world.ready #canvas #map:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(../images/assets/canvas-scanlines.png?20260814);
+    background-attachment: fixed;
+    background-repeat: repeat;
+    background-color: transparent;
+    pointer-events: none;
+    z-index: 9999;
+}
+
 #world #canvas #map .layer[data-layer="background"],
 #world #canvas #map .layer[data-layer="terrain"],
 #world #canvas #map .layer[data-layer^="sprites/"] {
@@ -3833,6 +3849,10 @@ html, body {
     background-color: #3b3b3b;
     border-color: #7b7b7b;
 }
+#robots-overview .storage-details[data-robot] .actions .button[data-action="release-robot"] {
+    background-color: #542525;
+    border-color: #b13435;
+}
 
 #robots-overview .storage-robots .bullets {
     display: block;
@@ -4384,6 +4404,7 @@ display: block;
     animation: robots-overview-avatar-zoom-in 0.9s ease-in-out forwards;
 }
 #world #canvas #robots-overview .team-robot.robot-removed,
+#world #canvas #robots-overview .team-robot.robot-released,
 #world #canvas #robots-overview .team-robot.ability-removed,
 #world #canvas #robots-overview .team-robot.item-taken {
     transform-origin: left center;
