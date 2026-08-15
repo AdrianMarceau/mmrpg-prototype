@@ -247,6 +247,7 @@ class rpg_reset {
                 }
             }
         }
+        // TODO: This entire section needs to be rewritten to hangle ID_TOKEN format robot strings too
         if (!empty($this->session_data['values']['battle_settings'])){
             foreach ($mmrpg_index_players as $ptoken => $pinfo){
                 if (!empty($this->session_data['values']['battle_settings'][$ptoken]['player_robots'])){
