@@ -364,6 +364,26 @@ class rpg_world {
                         //error_log('-> $robotSettings(after) = '. print_r($robotSettings, true));
                         //error_log('-> $robotRewards(after) = '. print_r($robotRewards, true));
                         // DEBUG DEBUG DEBUG
+                        // If this robot had the deleteMe flag, that means it was released into the wild
+                        if (!empty($data['deleteMe']) && $robotInfo['robot_class'] !== 'master'){
+                            //error_log('deleteMe '.$robotInfo['robot_class'].' detected ('.$string.'), time to delete it from memory!');
+                            $robotRewards = $lastPlayerRewards['player_robots'][$string];
+                            $robotSettings = $lastPlayerSettings['player_robots'][$string];
+                            unset($lastPlayerRewards['player_robots'][$string]);
+                            unset($lastPlayerSettings['player_robots'][$string]);
+                            unset($robotSessions[$string]);
+                            //error_log('unset($lastPlayerRewards[\'player_robots\']['.$string.']);');
+                            //error_log('unset($lastPlayerSettings[\'player_robots\']['.$string.']);');
+                            //error_log('unset($robotSessions['.$string.']);');
+                            $robotItem = !empty($robotSettings['robot_item']) ? $robotSettings['robot_item'] : '';
+                            if (!empty($robotItem)
+                                && !empty($GAME_SESSION['values']['battle_items'][$robotItem.'__equipped'])
+                                && $GAME_SESSION['values']['battle_items'][$robotItem.'__equipped'] >= 1){
+                                //error_log('restoring held item '.$robotItem.' that was being held by deleteMe '.$robotInfo['robot_class'].'...');
+                                $GAME_SESSION['values']['battle_items'][$robotItem.'__equipped'] -= 1;
+                                //error_log('-> '.$robotItem.'__equipped ='.print_r($GAME_SESSION['values']['battle_items'][$robotItem.'__equipped'], true));
+                            }
+                        }
                     }
                     //error_log('$lastPlayerSession = '. print_r($lastPlayerSession, true));
                     //error_log('$robotSessions = '. print_r($robotSessions, true));
