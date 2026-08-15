@@ -2,6 +2,9 @@
 
 // -- PROTOTYPE WORLD ACTION -- //
 
+// Collect any indexes we might need later
+$mmrpg_index_robots = rpg_robot::get_index(true);
+
 // Automatically empty all temporary battle variables
 $_SESSION['BATTLES'] = array();
 $_SESSION['FIELDS'] = array();
@@ -24,11 +27,12 @@ if (!empty($this_player->player_token)
     && empty($this_battle->flags['endless_battle'])){
 
     // Update this robot's summoned history in the battle session
-    $session_token = rpg_game::session_token();
+    $game_session_token = rpg_game::session_token();
+    $GAME_SESSION = &$_SESSION[$game_session_token];
     //error_log('debug in '.basename(__FILE__).' on line '.__LINE__.' : we should save this player\'s team data to the history');
     //error_log('$this_player->player_token = '.print_r($this_player->player_token, true));
     //error_log('$this_player->player_robots = '.print_r($this_player->player_robots, true));
-    $battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) ? $_SESSION[$session_token]['values']['battle_history'] : array();
+    $battle_history = !empty($GAME_SESSION['values']['battle_history']) ? $GAME_SESSION['values']['battle_history'] : array();
     if (!isset($battle_history[$this_player->player_token])){ $battle_history[$this_player->player_token] = array(); }
     if (!isset($battle_history[$this_player->player_token]['robots_summoned'])){ $battle_history[$this_player->player_token]['robots_summoned'] = array(); }
     $robots_summoned_history = $battle_history[$this_player->player_token]['robots_summoned'];
@@ -41,18 +45,18 @@ if (!empty($this_player->player_token)
         $battle_history[$this_player->player_token]['robots_summoned'] = $robots_summoned_history;
     }
     //error_log('(new) $battle_history = '.print_r($battle_history, true));
-    $_SESSION[$session_token]['values']['battle_history'] = $battle_history;
+    $GAME_SESSION['values']['battle_history'] = $battle_history;
 
     // We should also update the player's "last_robots" string in case order changed
     $last_robots = array_map(function($robot){
         if (empty($robot['robot_token'])){ return false; }
         $info = rpg_robot::get_index_info($robot['robot_token']);
         if (empty($info)){ return false; }
-        return $info['robot_id'].'_'.$robot['robot_token'];
+        return $robot['robot_base_id'].'_'.$robot['robot_token'];
         }, $this_player->player_robots);
     $last_robots_string = implode(',', array_filter($last_robots));
-    //error_log('$last_robots = '.print_r($last_robots, true));
-    //error_log('$last_robots_string = '.print_r($last_robots_string, true));
+    //error_log('(actions/world.php) $last_robots = '.print_r($last_robots, true));
+    //error_log('(actions/world.php) $last_robots_string = '.print_r($last_robots_string, true));
     $world_session_token = rpg_world::session_token();
     $WORLD_SESSION = &$_SESSION[$world_session_token];
     $WORLD_PLAYER_SESSION = &$WORLD_SESSION['player_sessions'][$this_player_token];
@@ -68,8 +72,11 @@ if (!empty($this_player->player_token)
         if (empty($robot_info['robot_base_id'])){ continue; }
         $robot_id = $robot_info['robot_base_id'];
         $robot_token = $robot_info['robot_token'];
+        $robot_item = $robot_info['robot_item'];
         if (empty($robot_id) || empty($robot_token)){ continue; }
         $robot_session_token = $robot_id.'_'.$robot_token;
+        if (empty($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_index_info = $mmrpg_index_robots[$robot_token];
         //error_log('-> now saving WORLD data for '.$robot_session_token.' ...');
         if (!isset($WORLD_ROBOT_SESSIONS[$robot_session_token])){ $WORLD_ROBOT_SESSIONS[$robot_session_token] = array(); }
         $is_disabled = empty($robot_info['robot_energy']) ? true : false;
@@ -88,8 +95,30 @@ if (!empty($this_player->player_token)
         else if ($robot_session['defense'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $robot_session['defense'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
         if ($robot_session['speed'] > MMRPG_SETTINGS_STATS_MOD_MAX){ $robot_session['speed'] = MMRPG_SETTINGS_STATS_MOD_MAX; }
         else if ($robot_session['speed'] < MMRPG_SETTINGS_STATS_MOD_MIN){ $robot_session['speed'] = MMRPG_SETTINGS_STATS_MOD_MIN; }
-        //error_log('Saving robot session for '.$robot_token.' : '.print_r($robot_session, true));
+        //error_log('-> now syncing robot session for '.$robot_token.' : '.print_r($robot_session, true));
         $WORLD_ROBOT_SESSIONS[$robot_session_token] = $robot_session;
+        // If this was not a master, and it's either disabled or transient, we should delete it completely
+        $robot_class = $robot_index_info['robot_class'];
+        $is_robot_master = $robot_class === 'master' ? true : false;
+        $remove_because_disabled = !$is_robot_master && $is_disabled ? true : false;
+        if ($remove_because_disabled){
+            //error_log('disabled '.$robot_class.' detected ('.$robot_session_token.'), time to delete it from memory!');
+            unset($GAME_SESSION['values']['battle_rewards'][$this_player->player_token]['player_robots'][$robot_session_token]);
+            unset($GAME_SESSION['values']['battle_settings'][$this_player->player_token]['player_robots'][$robot_session_token]);
+            unset($WORLD_ROBOT_SESSIONS[$robot_session_token]);
+            $last_robots_array = explode(',', $last_robots_string);
+            $disabled_robot_index = array_search($robot_session_token, $last_robots_array);
+            if ($disabled_robot_index !== -1){ unset($last_robots_array[$disabled_robot_index]); }
+            $last_robots_string = implode(',', $last_robots_array);
+            $WORLD_PLAYER_SESSION['last_robots'] = $last_robots_string;
+            if (!empty($robot_item)
+                && !empty($GAME_SESSION['values']['battle_items'][$robot_item.'__equipped'])
+                && $GAME_SESSION['values']['battle_items'][$robot_item.'__equipped'] >= 1){
+                //error_log('restoring held item '.$robot_item.' that was being held by  '.$robot_class.'...');
+                $GAME_SESSION['values']['battle_items'][$robot_item.'__equipped'] -= 1;
+                //error_log('-> '.$robot_item.'__equipped ='.print_r($GAME_SESSION['values']['battle_items'][$robot_item.'__equipped'], true));
+            }
+        }
     }
 
 }
