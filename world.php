@@ -87,11 +87,16 @@ if (!empty($existing_world_dirs)){
 //exit();
 
 // Define which player tokens are allowed to be used in the prototype world
+$player_token_order = mmrpg_prototype_unlockable_players();
 $allowed_player_tokens = mmrpg_prototype_players_unlocked(true);
+$allowed_player_tokens = array_values(array_intersect($player_token_order, $allowed_player_tokens));
 array_unshift($allowed_player_tokens, 'player'); // always allow the "player" token
 
 // Define which robot tokens are allowed to be used in the prototype world
 $allowed_robot_tokens = mmrpg_prototype_robots_unlocked('', true);
+//error_log('$allowed_robot_tokens (A) = '.print_r($allowed_robot_tokens, true));
+//$allowed_robot_tokens += mmrpg_prototype_robots_unlocked('', true, true);
+//error_log('$allowed_robot_tokens (B) = '.print_r($allowed_robot_tokens, true));
 
 // Define defaults for the prototype world data
 //$default_world_token = 'debug__debug-area-1';
@@ -220,6 +225,7 @@ if (!isset($WORLD_PLAYER_SESSION['last_robots'])){ $WORLD_PLAYER_SESSION['last_r
 // Collect the current player's robots and battle history
 $this_prototype_data['this_player_id'] = $this_player_info['player_id'];
 $this_prototype_data['this_player_token'] = $this_player_info['player_token'];
+$max_robots_perside = 8;
 $max_player_robots = mmrpg_prototype_limit_hearts_earned($this_player_token);
 $unlocked_robot_tokens = mmrpg_prototype_robots_unlocked($this_player_token, true);
 $allowed_player_robots = mmrpg_prototype_robots_unlocked($this_player_token, true, true);
@@ -280,9 +286,27 @@ if (!empty($allowed_player_robots)){
                 return in_array($string, $allowed_player_robots);
                 }));
     }
-    if (count($current_player_robots) > $max_player_robots){
+    if (count($current_player_robots) > $max_robots_perside){
         //error_log('Because too many $current_player_robots = '. print_r($current_player_robots, true));
-        $current_player_robots = array_slice(0, $max_player_robots);
+        $current_player_robots = array_slice($current_player_robots, 0, $max_robots_perside);
+        //error_log('-> new $current_player_robots = '. print_r($current_player_robots, true));
+    }
+    if (count($current_player_robots) > $max_player_robots){
+        //error_log('Because (maybe) too many $current_player_robots = '. print_r($current_player_robots, true));
+        $num_master_slots_used = 0;
+        $num_mecha_slots_used = 0;
+        $new_current_player_robots = array();
+        foreach ($current_player_robots AS $key => $robot){
+            $info = rpg_robot::get_index_info($robot);
+            $class = $info['robot_class'];
+            if ($class === 'master'){ $num_master_slots_used++; }
+            elseif ($class === 'mecha'){ $num_mecha_slots_used++; }
+            else { continue; } // should not have any boss type robots
+            $new_current_player_robots[] = $robot;
+            if ($num_master_slots_used >= $max_player_robots){ break; }
+        }
+        if (!empty($new_current_player_robots)){ $current_player_robots = $new_current_player_robots; }
+        //$current_player_robots = array_slice($current_player_robots, 0, $max_player_robots);
         //error_log('-> new $current_player_robots = '. print_r($current_player_robots, true));
     }
 }
