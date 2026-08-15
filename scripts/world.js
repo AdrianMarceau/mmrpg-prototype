@@ -3132,7 +3132,7 @@ class mmrpgWorldMap {
         if (!_selfQueue){ _selfQueue = {}; _selfRef.actionModalCallbacks = _selfQueue; }
 
         // Auto-queue any callbacks provided in the custom config before doing anything else
-        let autoQueueCallbacks = ['onShow', 'onHide', 'onConfim', 'onCancel', 'onComplete'];
+        let autoQueueCallbacks = ['onShow', 'onHide', 'onConfirm', 'onCancel', 'onComplete'];
         for (var i = 0; i < autoQueueCallbacks.length; i++){
             let callbackName = autoQueueCallbacks[i], callbackFunction = configCustom[callbackName];
             if (typeof callbackFunction === 'function'){ _self.queueActionModalCallback(callbackName, callbackFunction); }
@@ -3186,9 +3186,6 @@ class mmrpgWorldMap {
             //console.log('-> callbackFunction =', callbackFunction);
             //console.log('-> callbackQueue =', callbackQueue);
             //console.log('-> callbackReturns =', callbackReturns);
-            //if (callbackName === 'onConfirm'){ _self.playSoundEffect('link-click-action'); }
-            //else if (callbackName === 'onCancel'){ _self.playSoundEffect('back-click'); }
-            //else if (callbackName === 'onHide'){ _self.playSoundEffect('no-effect'); }
             if (typeof callbackFunction === 'function'){ callbackFunction(callbackArgs); callbackReturns++; }
             if (Array.isArray(callbackQueue)){
                 for (var i = 0; i < callbackQueue.length; i++){
@@ -3244,11 +3241,12 @@ class mmrpgWorldMap {
             let actionToken = action[1];
             let $confirmButton = $actionModal.find('.content .actions .button[data-action="confirm"]');
             let $cancelButton = $actionModal.find('.content .actions .button[data-action="cancel"]');
-            if ($confirmButton.length){ $confirmButton.html('<strong>Saving</strong>').addClass('clicked'); }
+            if ($confirmButton.length){ if (actionKind !== 'confirm'){ $confirmButton.html('<strong>Saving</strong>'); } $confirmButton.addClass('clicked'); }
             if ($cancelButton.length){ $cancelButton.addClass('hidden'); }
             if (actionKind === 'robot'){ onConfirmRobotAction(actionToken); }
             else if (actionKind === 'item'){ onConfirmItemAction(actionToken); }
             else if (actionKind === 'ability'){ onConfirmAbilityAction(actionToken); }
+            else if (actionKind === 'confirm'){ hideActionModal(true); }
             else { console.error('showActionModal.onConfirmAction() received invalid actionKind ' + actionKind + '!'); return false; }
             runModalCallback('onConfirm', {actionKind, actionToken});
             return true;
@@ -3424,7 +3422,7 @@ class mmrpgWorldMap {
             let robotString = actionObjectToken;
             let robotID = robotString.split('_')[0];
             let robotToken = robotString.split('_')[1];
-            //let robotInfo = typeof robotsIndex[robotToken] !== 'undefined' ? robotsIndex[robotToken] : null;
+            let robotInfo = typeof robotsIndex[robotToken] !== 'undefined' ? robotsIndex[robotToken] : null;
             //if (!robotToken || !robotInfo){ console.error('showActionModal() could not find robot info for token ' + robotToken + '!'); return; }
             //let robotData = typeof _worldPlayerRobots[robotString] !== 'undefined' ? _worldPlayerRobots[robotString] : null;
             //if (!robotToken || !robotData){ console.error('showActionModal() could not find player robot data for token ' + robotToken + '!'); return; }
@@ -3448,7 +3446,8 @@ class mmrpgWorldMap {
                     //console.log('-> adding teamRobotString =', teamRobotString);
                     _self.addTeamRobot(teamRobotString);
                     $robotDetailsDiv.find('.button[data-action="add-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
-                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
+                    if (robotInfo.class === 'master'){ $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled'); }
+                    else if (robotInfo.class === 'mecha'){ $robotDetailsDiv.find('.button[data-action="release-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled'); }
                     saveWorldState = true;
                     }
                 if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
@@ -3464,6 +3463,21 @@ class mmrpgWorldMap {
                     _self.removeTeamRobot(teamRobotString);
                     $robotDetailsDiv.find('.button[data-action="remove-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
                     $robotDetailsDiv.find('.button[data-action="add-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
+                    saveWorldState = true;
+                    }
+                if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
+                }
+            // Else if this is a RELEASE ROBOT request, we should release the robot back into the wild and update
+            else if (actionToken === 'release-robot'){
+                modalDetails.show = false;
+                //console.log('--> preparing to RELEASE ROBOT (', robotString, ') from team (', _worldPlayerTeam.join(','), ') ...');
+                let saveWorldState = false;
+                if (_worldPlayerTeam.indexOf(robotString) !== -1){
+                    let teamRobotString = robotString;
+                    //console.log('-> releasing teamRobotString =', teamRobotString);
+                    _self.releaseTeamRobot(teamRobotString);
+                    $robotDetailsDiv.find('.button[data-action="release-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="robot-info"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
                     saveWorldState = true;
                     }
                 if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
@@ -3711,6 +3725,16 @@ class mmrpgWorldMap {
                     setTimeout(function(){ onConfirmAction('ability_remove-ability'); }, 900);
                     };
                 }
+            }
+        else if (actionKind === 'confirm') {
+            // Use actionToken for the title, and actionObjectToken for the message body
+            modalDetails.title = actionToken || 'Confirm Action';
+            modalDetails.subtitles.forSelected = actionObjectToken || 'Are you sure?';
+            modalDetails.subtitles.forCurrent = '';
+            modalDetails.containers.forSelected = '';
+            modalDetails.containers.forCurrent = '';
+            // Ensure the confirm button isn't disabled by default
+            modalDetails.buttons.confirm.disabled = false;
             }
         else {
             console.error('showActionModal() received invalid actionKind ' + actionKind + '!');
