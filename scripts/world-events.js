@@ -1697,13 +1697,20 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (!playerIsCursor
                 && dataBattles.length === 1
                 && eventsAtPosition[0].kind2 === 'mecha'){
-                let hasPermanentWhistle = _playerToken === 'dr-lalinde';
+                //console.log('solo mecha event detected, generate the whistle button');
+                let playerHasTeamSlot = _worldPlayerRobotsKeys.length < _config.maxRobotsPerPlayer ? true : false;
+                let hasPermanentWhistle = false; //_playerToken === 'dr-lalinde';
+                let mechaBattleEvent = eventsAtPosition[0];
                 let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
                 let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
                 let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle';
+                let mechaWhistleTarget = mechaBattleEvent.token;
+                //console.log('mechaBattleEvent =', mechaBattleEvent);
+                //console.log('mechaWhistleQuantity =', mechaWhistleQuantity);
+                //console.log('mechaWhistleTarget =', mechaWhistleTarget);
                 if (!hasPermanentWhistle){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
-                let playerCanUseWhistle = mechaWhistleQuantity > 0 || hasPermanentWhistle ? true : false;
-                if (playerCanUseWhistle){ sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-whistle"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
+                let playerCanUseWhistle = (mechaWhistleQuantity > 0 || hasPermanentWhistle) && playerHasTeamSlot ? true : false;
+                if (playerCanUseWhistle){ sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaWhistleTarget + '"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
                 else { sideButtonsMarkup += '<a class="button big-button disabled"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
                 }
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
@@ -3012,6 +3019,54 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             else if (action === 'advice-from-auto'){
                 //console.log('-> special action "', action, '", time to give some advice');
 
+                }
+            else if (action === 'use-mecha-whistle'){
+                console.log('-> special action "', action, '", time to use the mecha whistle');
+                let delayMessageFor = 300;
+                let delayDismissFor = 1200;
+                let delayEffectFor = 2100;
+                let playerToken = _worldPlayer.token;
+                let playerNameSpan = _self.getPlayerNameSpan(playerToken);
+                let itemToken = 'mecha-whistle';
+                let itemNameSpan = _self.getItemNameSpan(itemToken);
+                let battleSymbols = _config.mapBattleSymbols;
+                let battlesIndex = _config.mapBattlesIndex;
+                let battleTarget = $button.attr('data-target') || false;
+                let battleInfo = battleTarget && (battlesIndex && battlesIndex[battleTarget]) ? battlesIndex[battleTarget] : false;
+                //console.log('-> playerToken =', playerToken);
+                //console.log('-> itemToken =', itemToken);
+                //console.log('-> battleSymbols =', battleSymbols);
+                //console.log('-> battlesIndex =', battlesIndex);
+                //console.log('-> battleTarget =', battleTarget);
+                //console.log('-> battleInfo =', battleInfo);
+                _self.showWorldMessage([
+                    playerNameSpan + ' uses a ' + itemNameSpan + '!',
+                    '...the mecha responded!'
+                    ], delayMessageFor);
+                setTimeout(function(){ dismissDropdown(false); }, delayDismissFor);
+                setTimeout(function(){
+                    //console.log('-> redirect to auto-recruitment URL now');
+                    // Shift the target into a different frame to show it heard the whistle
+                    let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
+                    $eventSprite.attr('data-frame', '02').addClass('zoom');
+                    // Now we redirect to the same page but w/ this battle as a auto-recruitment source
+                    let recruitHref = 'world.php?recruit=' + battleTarget;
+                    if (recruitHref){
+                        //console.log('recruiting w/ recruitHref =', recruitHref);
+                        _self.playSoundEffect('get-weird-item');
+                        _self.incZoomLevel();
+                        $thisWorld.addClass('busy');
+                        _self.saveWorldState(function(){
+                            _self.incZoomLevel();
+                            $thisWorld.addClass('loading');
+                            window.location.href = recruitHref;
+                            _self.incZoomLevel();
+                            }, true, false);
+                        $thisWorld.animate({opacity: 0}, 1200, function(){
+                            $thisWorld.addClass('hidden');
+                            });
+                        }
+                    }, delayEffectFor);
                 }
             else if (action === 'reset-world-pickups' || action === 'reset-world-encounters'){
                 //console.log('-> special action "', action, '", time to reset the ', action.split('-')[2]);
