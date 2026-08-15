@@ -175,7 +175,7 @@ else {
         $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy ';
         $text_button_label = str_replace('Dr. ', '', $doctor_info['player_name']).' Story';
         if (!empty($doctor_prototype_data['robots_unlocked'])){
-            error_log('$doctor_prototype_data ('.$doctor_token.') = '.print_r($doctor_prototype_data, true));
+            //error_log('$doctor_prototype_data ('.$doctor_token.') = '.print_r($doctor_prototype_data, true));
             echo '<a data-music-token="'.$text_player_music.'" data-battle-complete="'.$battle_complete_counter_lalinde.'" class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="'.$doctor_info['player_id'].'">';
                 echo '<div class="platform"><div class="chrome"><div class="inset">';
                     echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext">'.$text_button_label.(!empty($text_player_special) ? ' <span class="sprite achievement_icon achievement_'.$doctor_token.'-complete" style="display: inline-block; position: relative; bottom: 2px;" title="LaLinde Campaign Complete!" data-tooltip-type="player_type player_type_defense">&hearts;</span>' : '').'</span><span class="subtext">'.$text_player_chapter.'</span><span class="subtext2">'.$text_player_hearts.'</span></span><span class="arrow">&#9658;</span></label>';
