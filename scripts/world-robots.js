@@ -293,6 +293,137 @@ function removeTeamRobot(robotString, playSound, playAnimation){
     return true;
     }
 
+// Quick function for removing a given robot from the team and then optionally playing a sound effect
+function releaseTeamRobot(robotString, playSound, playAnimation, showMessage){
+    //console.log('%c' + 'mmrpgWorldMap.releaseTeamRobot(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('releaseTeamRobot() missing required robotString!'); return false; }
+    if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+    if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+    if (typeof showMessage !== 'boolean'){ showMessage = true; } // default to true if not provided
+    // Collect references to world objects
+    let _self = this;
+    let _config = _self.config;
+    let _elements = _self.elements;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerTeam = _worldPlayer.team;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    let _worldCallbacks = _world.callbacks;
+    let robotsOverviewAPI = _self.robotsOverviewAPI || {};
+    // If this robot isn't actually on the team, return now
+    if (_worldPlayerTeam.indexOf(robotString) === -1){
+        console.warn('releaseTeamRobot() called but robot ' + robotString + ' is not on the team!');
+        return false;
+        }
+    // Break the robot string into ID and token and collect its info
+    let _indexes = _self.indexes;
+    let _mmrpgRobotsIndex = _indexes.robots;
+    let playerToken = _worldPlayer.token;
+    let robotKey = _worldPlayerTeam.indexOf(robotString);
+    let robotId = parseInt(robotString.split('_')[0]) || false;
+    let robotToken = robotString.split('_')[1] || false;
+    let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
+    let robotData = _worldPlayerRobots[robotString] || false;
+    if (!robotInfo){ console.error('releaseTeamRobot() could not find robot info for robot ' + robotToken + '!'); return false; }
+    if (!robotData){ console.error('releaseTeamRobot() could not find robot info for robot ' + robotData + '!'); return false; }
+    //console.log('-> robotString =', robotString);
+    //console.log('-> robotKey =', robotKey, '-> robotId =', robotId, '-> robotToken =', robotToken);
+    //console.log('-> robotInfo =', robotInfo);
+    //console.log('-> robotData =', robotData);
+    // Release this robot's string from the team array first
+    //console.log('-> old _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+    delete _worldPlayerTeam[robotKey];
+    _worldPlayerTeam = Object.values(_worldPlayerTeam);
+    //console.log('-> new _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+    _worldPlayer.team = _worldPlayerTeam;
+    //console.log('-> _worldPlayer.team =', _worldPlayer.team);
+    // Collect a reference to this robot's element in the overview panel
+    let $robotsOverview = _elements.robotsOverview;
+    let $teamRobotsDiv = $robotsOverview.find('.team-robots');
+    let $selectedTeamRobot = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+    if (!$selectedTeamRobot || !$selectedTeamRobot.length){ console.warn('releaseTeamRobot() could not find team robot div for ' + robotString + '!'); return false; }
+    let $storageRobotsDiv = $robotsOverview.find('.storage-robots');
+    let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
+    if (!$selectedStorageRobot || !$selectedStorageRobot.length){ console.warn('releaseTeamRobot() could not find storage robot div for ' + robotString + '!'); return false; }
+    let $robotDetailsDiv = $robotsOverview.find('.storage-details[data-robot="' + robotString + '"]');
+    let $detailsImage = $robotDetailsDiv.find('.image');
+    let $detailsImageSprite = $detailsImage.find('> .sprite.robot');
+    // Release the robot from the team view as that's not needed anymore
+    $selectedTeamRobot.remove();
+    $teamRobotsDiv.attr('data-team-size', _worldPlayerTeam.length);
+    // Release the current class from the storage robot and update the frame
+    $selectedStorageRobot.removeClass('current').addClass('selected');
+    $selectedStorageRobot.find('.icon > .sprite.robot').attr('data-dir', 'left').attr('data-frame', '00');
+    // Define a function to play when the animation is all done
+    let afterAnimationComplete = function(){
+        $selectedStorageRobot.triggerSilentClick();
+        robotsOverviewAPI.refreshDetailsPanel();
+        //console.log('Time to remove ' + robotString + ' from the interface and relevant objects');
+        $selectedStorageRobot.css({opacity: 1}).animate({opacity: 0}, 1000, 'swing', function(){
+            //console.log('The robot ' + robotString + ' has been faded out, time to remove and refresh');
+            $selectedStorageRobot.remove();
+            robotsOverviewAPI.refreshStoragePage('robots');
+            if (showMessage){
+                let messageMarkup = [];
+                let playerNameTextSpan = _self.getPlayerNameSpan(playerToken);
+                let robotNameTextSpan = _self.getRobotNameSpan(robotToken);
+                messageMarkup.push(playerNameTextSpan + ' released the ' + robotNameTextSpan + '!');
+                messageMarkup.push('Goodbye ' + robotNameTextSpan + '!');
+                _self.showWorldMessage(messageMarkup);
+                }
+            });
+        };
+    // Add a robot-release class to this robot to show it being effected by the action
+    if (playSound){ _self.playSoundEffect('bounce-sound'); }
+    if (playAnimation){
+        // Add the robot-released animation class for the avatar then auto-release later
+        $selectedStorageRobot.addClass('robot-released');
+        setTimeout(function(){ $selectedStorageRobot.removeClass('robot-released'); }, 2000);
+        // Now shift the background while making the robot appear to slide away from the team
+        let _selfRef = _self.releaseTeamRobot, _relRef = _self.addTeamRobot;
+        if (_relRef.callback){ clearTimeout(_relRef.callback); delete _relRef.callback; }
+        if (_selfRef.callback){ clearTimeout(_selfRef.callback); delete _selfRef.callback; }
+        _selfRef.callback = setTimeout(function(){
+            if (!_selfRef.callback){ return; }
+            $detailsImage.addClass('animate').addClass('inactive');
+            $detailsImageSprite.attr('data-dir', 'right').attr('data-frame', '07');
+            setTimeout(function(){
+                if (!_selfRef.callback){ return; }
+                $detailsImageSprite.attr('data-frame', '08');
+                setTimeout(function(){
+                    if (!_selfRef.callback){ return; }
+                    $detailsImageSprite.attr('data-dir', 'left');
+                    setTimeout(function(){
+                        if (!_selfRef.callback){ return; }
+                        $detailsImageSprite.attr('data-frame', '00');
+                        afterAnimationComplete();
+                        }, 400);
+                    }, 600);
+                }, 600);
+            }, 10);
+        } else {
+        afterAnimationComplete();
+        }
+    // Remove this robot from the world map as it's no longer on the team
+    let $thisCanvas = _elements.canvas;
+    let $canvasMap = $('#map', $thisCanvas);
+    let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
+    let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
+    let $selectedMapRobot = $spriteObjectsLayer.find('.sprite[data-sprite="team-robot"][data-id="' + robotId + '"][data-token="' + robotToken + '"]');
+    $selectedMapRobot.animate({opacity: 0}, 300, function(){
+        $selectedMapRobot.remove();
+        _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
+        let key = 0; _elements.teamSprites.each(function(){ $(this).attr('data-key', key); key++; });
+        });
+    // Mark this robot's data for deletion and then remove it fully after a brief timeout
+    robotData.deleteMe = true;
+    // Trigger a save of the world state to persist this change
+    _self.saveWorldState(function(){
+        delete _worldPlayerRobots[robotString];
+        });
+    // Return true on success
+    return true;
+    }
 // Quick function for settings a robot's current energy amount to a specific value but without all the effects
 function setRobotEnergy(robotString, newEnergy){
     //console.log('%c' + 'mmrpgWorldMap.setRobotEnergy(' + robotString + ', ' + newEnergy + ')', 'color: magenta;');
@@ -1956,6 +2087,13 @@ function showRemoveRobotModal(robotToken, configCustom){
     let _self = this;
     return _self.showRobotModal('remove-robot', robotToken, configCustom);
     }
+// Define quick functions for showing the modal that releases a robot from the team to the wild
+function showReleaseRobotModal(robotToken, configCustom){
+    //console.log('%c' + 'mmrpgWorldMap.showReleaseRobotModal(robotToken:' + robotToken + ')', 'color: magenta;');
+    if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('showReleaseRobotModal() missing required robotToken!'); return; }
+    let _self = this;
+    return _self.showRobotModal('release-robot', robotToken, configCustom);
+    }
 
 // Assign the sub-functions to the main class's prototype
 
@@ -1965,6 +2103,7 @@ mmrpgWorldMap.prototype.unloadTeamRobot = unloadTeamRobot;
 
 mmrpgWorldMap.prototype.addTeamRobot = addTeamRobot;
 mmrpgWorldMap.prototype.removeTeamRobot = removeTeamRobot;
+mmrpgWorldMap.prototype.releaseTeamRobot = releaseTeamRobot;
 
 mmrpgWorldMap.prototype.setRobotEnergy = setRobotEnergy;
 mmrpgWorldMap.prototype.restoreRobotEnergy = restoreRobotEnergy;
@@ -2006,3 +2145,4 @@ mmrpgWorldMap.prototype.getRobotSpriteMarkup = getRobotSpriteMarkup;
 mmrpgWorldMap.prototype.showRobotModal = showRobotModal;
 mmrpgWorldMap.prototype.showAddRobotModal = showAddRobotModal;
 mmrpgWorldMap.prototype.showRemoveRobotModal = showRemoveRobotModal;
+mmrpgWorldMap.prototype.showReleaseRobotModal = showReleaseRobotModal;
