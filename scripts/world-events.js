@@ -1233,15 +1233,15 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 + '>';
                 sideButtonsMarkup += '<span class="has-sprite' + (!gatePrice ? ' one-row' : '') + '">';
                 if (!gatePrice){
-                    sideButtonsMarkup += '<sub>' + openTheGateLabel + '</sub> ';
+                    sideButtonsMarkup += '<strong>' + openTheGateLabel + '</strong> ';
                     sideButtonsMarkup += currencySpriteMarkup;
                     } else if (playerHasEnough){
-                    sideButtonsMarkup += '<sub>' + openTheGateLabel + '</sub> ';
+                    sideButtonsMarkup += '<strong>' + openTheGateLabel + '</strong> ';
                     sideButtonsMarkup += '<br /><sup class="no-strike">' + playerCountLabel + '</sup> ';
                     sideButtonsMarkup += currencySpriteMarkup;
                     } else {
-                    sideButtonsMarkup += '<sup>' + openTheGateLabel + '</sup> ';
-                    sideButtonsMarkup += '<br /><sub class="no-strike">' + playerCountLabel + '</sub> ';
+                    sideButtonsMarkup += '<strong>' + openTheGateLabel + '</strong> ';
+                    sideButtonsMarkup += '<br /><sup class="no-strike">' + playerCountLabel + '</sup> ';
                     sideButtonsMarkup += currencySpriteMarkup;
                     }
                 sideButtonsMarkup += '</span>';
@@ -3004,10 +3004,6 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     });
                 _self.saveWorldState();
                 }
-            else if (isDismiss){
-                //console.log('-> dismissing action dropdown!');
-                dismissDropdown(true);
-                }
             else if (action === 'shop-with-auto'){
                 //console.log('-> special action "', action, '", time to open auto\'s shop');
 
@@ -3075,6 +3071,10 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         $thisWorld.addClass('hidden');
                         });
                     }
+                }
+            else if (isDismiss){
+                //console.log('-> dismissing action dropdown!');
+                dismissDropdown(true);
                 }
             else {
                 // no compatible action found, do nothing
