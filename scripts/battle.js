@@ -134,19 +134,6 @@ $(document).ready(function(){
             ignoreSubButtonsTimeout = setTimeout(function(){ ignoreSubButtons = false; }, 100);
             });
 
-        /*
-        // Add hover and click sounds to any buttons in the float menu
-        $('#actions .float_links .button', $thisBattle).live('mouseenter', function(){
-            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-hover'); }
-            else { playSoundEffect.call(this, 'icon-hover'); }
-            });
-        $('#actions .float_links .button', $thisBattle).live('click', function(){
-            console.log('this = ', this);
-            if ($(this).is('.action_back')){ playSoundEffect.call(this, 'back-click'); }
-            else { playSoundEffect.call(this, 'icon-click'); }
-            });
-        */
-
         }
 
     // Collect a reference to the continue button
