@@ -853,7 +853,7 @@ function restoreRobotWeapons(robotString, restoreAmount, playSound){
     }
 // Quick function for reducing a robot's weapons (if available) by a specific amount (or all if === true)
 function reduceRobotWeapons(robotString, reduceAmount, playSound){
-    console.log('%c' + 'mmrpgWorldMap.reduceRobotWeapons(' + robotString + ', ' + reduceAmount + ')', 'color: magenta;');
+    //console.log('%c' + 'mmrpgWorldMap.reduceRobotWeapons(' + robotString + ', ' + reduceAmount + ')', 'color: magenta;');
     if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('reduceRobotWeapons() missing required robotString!'); return false; }
     if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
     // If reduceAmount is true, reduce all weapons, otherwise reduce the amount provided
@@ -1415,11 +1415,15 @@ function getRobotDetailsForOverview(robotToken){
     if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('getRobotDetailsForOverview() missing required robotToken!'); return ''; }
 
     // parse out the player-specific robot token was provided alongside an ID
+    let robotID = 0;
     let playerRobotToken = false;
     if (robotToken.indexOf('_') !== -1){
         playerRobotToken = robotToken;
-        robotToken = robotToken.split('_')[1];
+        robotID = playerRobotToken.split('_')[0];
+        robotToken = playerRobotToken.split('_')[1];
         }
+    let robotString = robotID + '_' + robotToken;
+    //console.log('robotID =', robotID, '| robotToken =', robotToken, '| robotString =', robotString);
 
     // Collect references to world objects
     let _self = this;
@@ -1859,6 +1863,7 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.actionsHTML = '';
     for (let i = 0; i < robotDetailsObject.actions.length; i++){
         let actionInfo = robotDetailsObject.actions[i];
+        let actionRobot = typeof actionInfo.robot !== 'undefined' ? actionInfo.robot : false;
         let actionButton = typeof actionInfo.button !== 'undefined' ? actionInfo.button : false;
         let actionDisabled = typeof actionInfo.disabled !== 'undefined' && actionInfo.disabled === true ? true : false;
         let actionHidden = typeof actionInfo.hidden !== 'undefined' && actionInfo.hidden === true ? true : false;
@@ -1867,6 +1872,7 @@ function getRobotDetailsForOverview(robotToken){
             + 'class="button ' + actionInfo.action + (actionDisabled ? ' disabled' : '') + (actionHidden ? ' hidden' : '') + '" '
             + 'data-action="' + actionInfo.action + '"'
             + (actionButton ? ' data-button="' + actionButton + '"' : '')
+            + (actionRobot ? ' data-robot="' + actionRobot + '"' : '')
             + (actionDisabled ? ' disabled="disabled"' : '') +
             '>' + actionIcon + actionInfo.text + '</button>';
         }
