@@ -1355,6 +1355,11 @@
     filter: brightness(0.8);
 }
 
+#canvas .event .battle_scene .sprite[data-robot-id].hide-me,
+#canvas .event .battle_scene .sprite[data-shadow-id].hide-me  {
+    display: none !important;
+}
+
 #canvas .event .battle_scene .sprite[data-robot-id][data-direction] {
     --sprite-direction-mod: 0;
 }
