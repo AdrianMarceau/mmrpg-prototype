@@ -663,6 +663,95 @@ if ($reset_locks === true){
     exit();
 }
 
+// If requested to do so, make sure we recruit from the battle from the provided token
+$recruit_from_battle = !empty($_GET['recruit']) && strstr($_GET['recruit'], 'world-battle_') ? trim($_GET['recruit']) : false;
+if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_battle)){
+    //error_log('recruiting from battle `'.print_r($recruit_from_battle, true).'` !');
+    $battle_index_token = $recruit_from_battle;
+    $battle_index_info = rpg_battle::get_index_info($battle_index_token);
+    $battle_target_player = !empty($battle_index_info) && !empty($battle_index_info['battle_target_player']) ? $battle_index_info['battle_target_player'] : false;
+    $battle_target_robot = !empty($battle_target_player) && !empty($battle_target_player['player_robots']) ? array_shift($battle_target_player['player_robots']) : false;
+    //error_log('-> $battle_index_info = '.print_r($battle_index_info, true));
+    //error_log('-> $battle_target_player = '.print_r($battle_target_player, true));
+    //error_log('-> $battle_target_robot = '.print_r($battle_target_robot, true));
+    // Ensure all mandatory battle variables were collected else we do nothing
+    if (!empty($battle_index_info)
+        && !empty($battle_target_player)
+        && !empty($battle_target_robot)){
+        // Generate the semi-permanent session key so we can add this robot to the save data
+        $this_player_token = $this_prototype_data['this_player_token'];
+        $this_mecha_token = $battle_target_robot['robot_token'];
+        $this_mecha_info = rpg_robot::get_index_info($this_mecha_token);
+        $this_mecha_info['robot_base_id'] = mmrpg_prototype_robots_next_base_id($this_mecha_token);
+        $this_mecha_info['robot_level'] = $battle_target_robot['robot_level'];
+        $this_mecha_info['robot_item'] = !empty($battle_target_robot['robot_item']) ? $battle_target_robot['robot_item'] : '';
+        $this_mecha_info['robot_image'] = !empty($battle_target_robot['robot_image']) ? $battle_target_robot['robot_image'] : '';
+        $this_mecha_info['robot_abilities'] = !empty($battle_target_robot['robot_abilities']) ? $battle_target_robot['robot_abilities'] : array('buster-shot');
+        $mecha_session_key = $this_mecha_info['robot_base_id'].'_'.$this_mecha_info['robot_token'];
+        //error_log('-> $this_player_token = '.print_r($this_player_token, true));
+        //error_log('-> $this_mecha_token = '.print_r($this_mecha_token, true));
+        //error_log('-> $this_mecha_info = '.print_r($this_mecha_info, true));
+        //error_log('-> $mecha_session_key = '.print_r($mecha_session_key, true));
+        // Create new session data for the mecha in the world array
+        $mecha_world_session_array = array(
+            'energy' => 0,
+            'weapons' => 0,
+            'attack' => 0,
+            'defense' => 0,
+            'speed' => 0
+            );
+        // Create a temporary entry in the battle rewards array with this mecha's level, experience, etc.
+        $mecha_battle_rewards_array = array(
+            'flags' => array(), 'counters' => array(), 'values' => array(),
+            'robot_id' => $this_mecha_info['robot_base_id'],
+            'robot_token' => $this_mecha_info['robot_token'],
+            'robot_level' => $this_mecha_info['robot_level'],
+            'robot_attack' => 0,
+            'robot_defense' => 0,
+            'robot_speed' => 0,
+            'robot_abilities' => array(),
+            );
+        // Create a temporary entry in the battle settings array with this mecha's level, experience, etc.
+        $mecha_battle_settings_array = array(
+            'flags' => array(), 'counters' => array(), 'values' => array(),
+            'robot_id' => $this_mecha_info['robot_base_id'],
+            'robot_token' => $this_mecha_info['robot_token'],
+            'robot_item' => $this_mecha_info['robot_item'],
+            'robot_image' => $this_mecha_info['robot_image'],
+            'original_player' => $this_player_token,
+            'robot_abilities' => array()
+            );
+        // Loop through abilities and add them to the battle rewards and settings arrays as well
+        foreach ($this_mecha_info['robot_abilities'] AS $key => $ability_token){
+            if ($key === 0){ $mecha_battle_rewards_array['robot_abilities'][$ability_token] = array('ability_token' => $ability_token); }
+            $mecha_battle_settings_array['robot_abilities'][$ability_token] = array('ability_token' => $ability_token);
+        }
+        // Append this new recruit to the end of the player's current lineup before we redirect
+        $old_last_robots = $WORLD_PLAYER_SESSION['last_robots'];
+        $new_last_robots = $old_last_robots.','.$mecha_session_key;
+        //error_log('-> $mecha_world_session_array = '.print_r($mecha_world_session_array, true));
+        //error_log('-> $mecha_battle_rewards_array = '.print_r($mecha_battle_rewards_array, true));
+        //error_log('-> $mecha_battle_settings_array = '.print_r($mecha_battle_settings_array, true));
+        //error_log('-> $new_last_robots = '.print_r($new_last_robots, true));
+        // Add the generated session arrays to their parents for persistent keeping
+        rpg_battle::unset_index_info($battle_index_token);
+        $WORLD_PLAYER_SESSION['last_robots'] = $new_last_robots;
+        $WORLD_SESSION['robot_sessions'][$mecha_session_key] = $mecha_world_session_array;
+        $GAME_SESSION['values']['battle_rewards'][$this_player_token]['player_robots'][$mecha_session_key] = $mecha_battle_rewards_array;
+        $GAME_SESSION['values']['battle_settings'][$this_player_token]['player_robots'][$mecha_session_key] = $mecha_battle_settings_array;
+        if (!empty($this_mecha_info['robot_item'])){
+            $this_mecha_item = $this_mecha_info['robot_item'];
+            $this_mecha_item_equipped = $this_mecha_item.'__equipped';
+            if (!isset($GAME_SESSION['values']['battle_items'][$this_mecha_item])){ $GAME_SESSION['values']['battle_items'][$this_mecha_item] = 0; }
+            $GAME_SESSION['values']['battle_items'][$this_mecha_item] += 1;
+            if (!isset($GAME_SESSION['values']['battle_items'][$this_mecha_item_equipped])){ $GAME_SESSION['values']['battle_items'][$this_mecha_item_equipped] = 0; }
+            $GAME_SESSION['values']['battle_items'][$this_mecha_item_equipped] += 1;
+        }
+    }
+    header('Location: world.php');
+    exit();
+}
+
 // Calculate remaining encounters for this area for later reference
 $battles_remaining = array();
 foreach ($world_map_encounters AS $namekey => $encounter){
