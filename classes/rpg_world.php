@@ -306,16 +306,11 @@ class rpg_world {
             }
             // If the last player robots were provided, update their world sessions
             if (!empty($worldData['lastPlayerRobots'])){
+                //error_log("\$worldData['lastPlayerRobots'] has data!");
+                //error_log("\$worldData['lastPlayerRobots'] has data! ".print_r($worldData['lastPlayerRobots'], true));
                 // scan the player robots for changes in: energy, weapons, attack, defense, speed
                 $lastPlayerRobots = $worldData['lastPlayerRobots'];
                 if (!empty($lastPlayerRobots)){
-                    /*
-                    $old_last_robots = !empty($lastPlayerSession['last_robots']) ? explode(',', $lastPlayerSession['last_robots']) : array();
-                    $new_last_robots = !empty($lastPlayerRobots) ? array_keys($lastPlayerRobots) : array();
-                    //error_log('$old_last_robots = '. print_r($old_last_robots, true));
-                    //error_log('$new_last_robots = '. print_r($new_last_robots, true));
-                    $lastPlayerSession['last_robots'] = implode(',', $new_last_robots);
-                    */
                     // update the player's last robots string and then any relevant session values per-robot
                     foreach ($lastPlayerRobots AS $key => $data){
                         //error_log('-> checking robot key "'.$key.'"');
@@ -2245,6 +2240,7 @@ class rpg_world {
             $markup .= '</div>';
             return $markup;
             };
+
         $get_toggle_options = function($toggle_options){
             if (empty($toggle_options)){ return false; }
             $markup = '';
@@ -2265,31 +2261,26 @@ class rpg_world {
             $markup .= '</div>';
             return $markup;
             };
+
         // Pre-parse any items that are part of sets so we can display their quantities as normal items
         $get_storage_item_sets = function($storage_item_tokens) use ($mmrpg_index_items){
-            //error_log('$parse_storage_item_sets() called!');
             if (empty($storage_item_tokens)){ return false; }
             $storage_item_sets = array();
             foreach ($storage_item_tokens AS $item_token => $item_quantity){
                 if (empty($item_token) || !is_string($item_token)){ continue; }
                 elseif ($item_token === 'item' || strstr($item_token, '__equipped')){ continue; }
                 elseif (!strstr($item_token, '__')){ continue; }
-                //error_log('-> storage-item '.$item_token.' w/ quantity '.$item_quantity);
                 $set_token = $item_token;
                 list($item_token, $num_in_set) = explode('__', $set_token, 2);
-                //error_log('--> $set_token = '.$set_token);
-                //error_log('--> $item_token = '.$item_token);
-                //error_log('--> $num_in_set = '.$num_in_set);
                 if (empty($mmrpg_index_items[$item_token]) || empty($set_token) || empty($num_in_set)){ continue; }
                 if (!isset($storage_item_sets[$item_token])){ $storage_item_sets[$item_token] = array(); }
                 $storage_item_sets[$item_token][] = $set_token;
-                //error_log('----> $storage_item_sets['.$item_token.'][] = '.$set_token);
                 }
             return $storage_item_sets;
             };
+
         $storage_item_sets = $get_storage_item_sets($storage_item_tokens);
-        //error_log('-> $storage_item_tokens(raw) = '.print_r($storage_item_tokens, true));
-        //error_log('-> $storage_item_sets = '.print_r($storage_item_sets, true));
+
         if (!empty($storage_item_sets)){
             foreach ($storage_item_sets AS $item_token => $set_tokens){
                 unset($storage_item_tokens[$item_token]);
@@ -2301,19 +2292,12 @@ class rpg_world {
                 $storage_item_tokens = array_merge($before, $insert_array, $after);
                 foreach ($set_tokens AS $set_token){ unset($storage_item_tokens[$set_token]); }
             }
-            //error_log('-> $storage_item_tokens(modded) = '.print_r($storage_item_tokens, true));
         }
-        // [robots-overview][team-size]
-        //if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
-        //elseif ($num_robot_unlocked === 1){ $return_markup .= '<div class="team-size"><strong>1 robot</strong></div>'; }
-        //elseif ($num_robot_unlocked === $current_team_size){ $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' robots</strong></div>'; }
-        //else { $return_markup .= '<div class="team-size"><strong>'.$current_team_size.' of '.$num_robot_unlocked.'</strong></div>'; }
+
         // [robots-overview][team-rotate]
         if ($num_robot_unlocked > 1){ $return_markup .= '<a class="team-rotate"><i class="fa fas fa-sync"></i></a>'; }
         // [robots-overview][team-switch]
         if ($num_robot_unlocked > 0){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
-        //if ($num_robot_unlocked > $current_team_size){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
-        //else { $return_markup .= '<span class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></span>'; }
         // [robots-overview][team-items]
         $return_markup .= '<a class="storage-button team-items" data-view="items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
         // [robots-overview][team-abilities]
@@ -2380,9 +2364,11 @@ class rpg_world {
                     $has_statmods = true;
                     $robot_stats_markup = '<div class="statmods">'.$robot_stats_markup.'</div>';
                     }
+
                 // collect the robot's frame based on its current health
                 $robot_frame = $get_robot_energy_frame($robot_energy_rating);
                 $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
+
                 // put it all together to generate the robot markup
                 $markup_class = 'team-robot'.($has_statmods ? ' hasmods' : '').($robot_disabled ? ' disabled' : '');
                 $markup_attrs = 'data-robot="'.$robot_id.'_'.$robot_token.'" data-status="'.$robot_energy_rating.'-energy"';
@@ -2472,9 +2458,11 @@ class rpg_world {
                     $robot_stats_markup .= '<div class="mod color '.$stat_token.' '.$stat_dir.'" title="'.ucfirst($stat_token).' Mods">'.$stat_markup.'</div>';
                 }
                 if (!empty($robot_stats_markup)){ $robot_stats_markup = '<div class="statmods">'.$robot_stats_markup.'</div>'; }
+
                 // collect the robot's frame based on its current health
                 $robot_frame = $get_robot_energy_frame($robot_energy_rating);
                 $robot_sprite = str_replace('data-frame="00"', 'data-frame="'.$robot_frame.'"', $robot_sprite);
+
                 // put it all together to generate the robot markup
                 $markup_class = 'team-robot'.($robot_current ? ' current' : '').($robot_disabled ? ' disabled' : '');
                 $markup_attrs = '';
@@ -2497,24 +2485,20 @@ class rpg_world {
                     $robot_markup .= $robot_weapons_markup;
                     $robot_markup .= $robot_stats_markup;
                 $robot_markup .= '</div>';
+
                 // add this robot's markup to the return markup
                 $return_markup .= $robot_markup;
             }
             $return_markup .= '</div>';
+
             $return_markup .= $get_sort_options(array(
                 'storage-key' => 'recent',
                 'index-key' => 'id',
                 'core-key' => 'core',
                 'level-exp' => 'level',
                 ));
-            /* $return_markup .= $get_toggle_options(array(
-                'disabled' => array(
-                    'visible' => 'eye-slash',
-                    'hidden' => 'eye',
-                    'default' => 'hidden',
-                    ),
-                )); */
         $return_markup .= '</div>';
+
         // [robots-overview][storage-items]
         $return_markup .= '<div class="storage-items storage-box listing" data-storage="items">';
             $storage_item_types_revised = array('none', 'copy', 'energy', 'weapons', 'attack', 'defense', 'speed');
@@ -2524,11 +2508,11 @@ class rpg_world {
             foreach ($storage_item_tokens AS $item_token => $item_quantity){
                 if (empty($item_token) || !is_string($item_token)){ continue; }
                 if ($item_token === 'item' || strstr($item_token, '__equipped')){ continue; }
-                //error_log('-> storage-item '.$item_token.' w/ quantity '.$item_quantity);
+
                 $num_in_set = false; $set_token = false;
                 if (strstr($item_token, '__')){ $set_token = $item_token; list($item_token, $num_in_set) = explode('__', $set_token, 2); }
                 if (!empty($set_token) && $storage_item_sets[$item_token]){ $item_quantity = count($storage_item_sets[$item_token]); }
-                //error_log('--> set-token: '.$set_token.' | num-in-set: '.$num_in_set.' | new-quantity: '.$item_quantity);
+
                 if (empty($mmrpg_index_items[$item_token])){ continue; }
                 $item_quantity_absolute = $item_quantity;
                 $item_quantity_equipped = !empty($equipped_player_items[$item_token]) ? $equipped_player_items[$item_token] : 0;
@@ -2537,24 +2521,30 @@ class rpg_world {
                 elseif (strstr($item_token, '-core') && $item_quantity > MMRPG_SETTINGS_CORES_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_CORES_MAXQUANTITY; }
                 elseif ($item_quantity > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $item_quantity = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
                 if (empty($item_quantity) || $item_quantity < 1){ $item_quantity = 0; }
+
                 $item_info = $mmrpg_index_items[$item_token];
                 $item_id = $item_info['item_id'];
                 $item_type1 = !empty($item_info['item_type']) ? $item_info['item_type'] : 'none';
                 $item_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : '';
+
                 $item_index_key = array_search($item_token, array_keys($mmrpg_index_items));
                 $item_type_key = array_search($item_type1, $storage_item_types_revised);
                 $item_storage_key = array_search($item_token, $storage_item_tokens_reversed);
+
                 if (!empty($item_type2) && $item_type1 !== 'none'){ $item_type_key += (array_search($item_type2, array_keys($storage_item_types_revised)) / 100); }
                 elseif (!empty($item_type2) && $item_type1 === 'none'){ $item_type_key += count($storage_item_types_revised); }
                 elseif (strstr($item_token, 'omega-')){ $item_type_key += count($storage_item_types_revised) + 1; }
+
                 $item_name = $item_info['item_name'];
                 $item_class = $item_info['item_class'];
                 $item_subclass = $item_info['item_subclass'];
                 $item_types = 'type '.(empty($item_info['item_type']) ? 'none' : $item_info['item_type'].(!empty($item_info['item_type2']) ? '_'.$item_info['item_type2'] : ''));
+
                 $item_display_types = 'type ';
                 if (empty($item_info['item_type']) && empty($item_info['item_type2'])){ $item_display_types .= 'none'; }
                 elseif (empty($item_info['item_type']) && !empty($item_info['item_type2'])){ $item_display_types .= $item_info['item_type2']; }
                 else { $item_display_types .= $item_info['item_type'].(!empty($item_info['item_type2']) ? '_'.$item_info['item_type2'] : ''); }
+
                 $item_sprite = self::get_sprite('item', $item_token, '', 'right', 'icon', '', '', 'icon');
                 $markup_attrs = '';
                 $markup_attrs .= 'data-item="'.$item_token.'" ';
@@ -2563,6 +2553,7 @@ class rpg_world {
                 $markup_attrs .= 'data-index-key="'.$item_index_key.'" ';
                 $markup_attrs .= 'data-storage-key="'.$item_storage_key.'" ';
                 $markup_attrs .= 'data-type-key="'.$item_type_key.'" ';
+
                 $item_markup = '';
                 $item_markup .= '<div class="team-item" '.trim($markup_attrs).'>';
                     $item_markup .= '<div class="image '.$item_display_types.'">';
@@ -2575,6 +2566,7 @@ class rpg_world {
                 $return_markup .= $item_markup;
             }
             $return_markup .= '</div>';
+
             $return_markup .= $get_sort_options(array(
                 'index-key' => 'id',
                 'type-key' => 'type',
@@ -2589,31 +2581,36 @@ class rpg_world {
                     ),
                 ));
         $return_markup .= '</div>';
+
         // [robots-overview][storage-abilities]
         $return_markup .= '<div class="storage-abilities storage-box listing" data-storage="abilities">';
             $elemental_type_tokens = rpg_type::get_index_tokens(false, false, false, false);
             $storage_ability_types_revised = array_unique(array_merge($elemental_type_tokens, array('copy', 'none'), array_keys($mmrpg_index_types)));
-            //error_log('$elemental_type_tokens = '.print_r($elemental_type_tokens, true));
-            //error_log('$storage_ability_types_revised = '.print_r($storage_ability_types_revised, true));
             $storage_ability_tokens_reversed = array_reverse(array_values($storage_ability_tokens));
+
             $return_markup .= '<div class="wrapper">';
             foreach ($storage_ability_tokens AS $ability_key => $ability_token){
                 if ($ability_token === 'ability' || empty($mmrpg_index_abilities[$ability_token])){ continue; }
+
                 $ability_info = $mmrpg_index_abilities[$ability_token];
                 $ability_id = $ability_info['ability_id'];
                 $ability_type1 = !empty($ability_info['ability_type']) ? $ability_info['ability_type'] : 'none';
                 $ability_type2 = !empty($ability_info['ability_type2']) ? $ability_info['ability_type2'] : '';
+
                 $ability_index_key = array_search($ability_token, array_keys($mmrpg_index_abilities));
                 $ability_type_key = array_search($ability_type1, $storage_ability_types_revised);
                 $ability_storage_key = array_search($ability_token, $storage_ability_tokens_reversed);
+
                 if (!empty($ability_type2)){ $ability_type_key += (array_search($ability_type2, $storage_ability_types_revised) / 100); }
                 $ability_name = $ability_info['ability_name'];
                 $ability_cost = !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'] : 0;
+
                 $ability_types = 'type '.(empty($ability_info['ability_type']) ? 'none' : $ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : ''));
                 $ability_display_types = 'type ';
                 if (empty($ability_info['ability_type']) && empty($ability_info['ability_type2'])){ $ability_display_types .= 'none'; }
                 elseif (empty($ability_info['ability_type']) && !empty($ability_info['ability_type2'])){ $ability_display_types .= $ability_info['ability_type2']; }
                 else { $ability_display_types .= $ability_info['ability_type'].(!empty($ability_info['ability_type2']) ? '_'.$ability_info['ability_type2'] : ''); }
+
                 $ability_sprite = self::get_sprite('ability', $ability_token, '', 'right', 'icon', '', '', 'icon');
                 $markup_attrs = '';
                 $markup_attrs .= 'data-ability="'.$ability_token.'" ';
@@ -2622,6 +2619,7 @@ class rpg_world {
                 $markup_attrs .= 'data-index-key="'.$ability_index_key.'" ';
                 $markup_attrs .= 'data-storage-key="'.$ability_storage_key.'" ';
                 $markup_attrs .= 'data-type-key="'.$ability_type_key.'" ';
+
                 $ability_markup = '';
                 $ability_markup .= '<div class="team-ability" '.trim($markup_attrs).'>';
                     $ability_markup .= '<div class="image">';
@@ -2631,9 +2629,11 @@ class rpg_world {
                     $ability_markup .= '<strong class="name'.(!strstr($ability_name, ' ') ? ' oneline' : '').'">'.str_replace(' ', '<br />', $ability_name).'</strong>';
                     $ability_markup .= '<span class="cost"><sup>'.$ability_cost.'</sup><sub>WE</sub></span>';
                 $ability_markup .= '</div>';
+
                 $return_markup .= $ability_markup;
             }
             $return_markup .= '</div>';
+
             $return_markup .= $get_sort_options(array(
                 'index-key' => 'id',
                 'type-key' => 'type',
@@ -2648,8 +2648,10 @@ class rpg_world {
                     ),
                 ));
         $return_markup .= '</div>';
+
         // [robots-overview][close-button]
         $return_markup .= '<a class="team-close"><i class="fa fas fa-times"></i></a>';
+
         return $return_markup;
     }
 
@@ -3592,6 +3594,7 @@ class rpg_world {
             $kind = $encounter_data[0]; $subkind = '';
             if (strstr($kind, '/')){ list($kind, $subkind) = explode('/', $kind, 2); }
             //$xkind = rpg_world::get_xkind($kind);
+            //error_log('-> scanning $encounter_data... '.print_r($encounter_data, true));
             $token = $encounter_data[1];
             $alt = $encounter_data[2];
             $pos = $encounter_data[3];
@@ -3599,6 +3602,11 @@ class rpg_world {
             $name = $encounter_data[5];
             //error_log('-> processing battle w/'.PHP_EOL.'-> $token ='.' '.$token.PHP_EOL.'-> $kind = '.$kind.PHP_EOL.'-> $subkind = '.$subkind.PHP_EOL.'-> $alt = '.$alt.PHP_EOL.'-> $pos = '.$pos.PHP_EOL.'-> $battle = '.$battle);
             if (!rpg_battle::has_index_info($battle)){ continue; }
+            //$info = rpg_battle::get_index_info($battle);
+            //error_log('-> w/ $info = '.print_r($info, true));
+            //if (empty($info) || empty($info['battle_target_player']['player_robots'])){ continue; }
+            //$robot = $info['battle_target_player']['player_robots'][0];
+            //error_log('-> w/ $robot = '.print_r($robot, true));
             if ($subkind === 'rescue' && mmrpg_prototype_robot_unlocked('', $token)){ continue; }
             if (!empty($world_map_encounter_symbols[$encounter_namekey])){ $pos = $world_map_encounter_symbols[$encounter_namekey]; }
             list($col, $row) = explode('-', $pos);

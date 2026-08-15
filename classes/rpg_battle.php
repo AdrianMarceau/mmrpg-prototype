@@ -1188,9 +1188,6 @@ class rpg_battle extends rpg_object {
                     // If this is the copy shot ability and we're in DEMO mode, continue
                     if (!empty($_SESSION['GAME']['DEMO'])){ continue; }
 
-                    // If this robot has already been unlocked, continue
-                    //if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_reward_info['token'])){ continue; }
-
                     // If this robot has already been unlocked by anyone, continue
                     if (mmrpg_prototype_robot_unlocked(false, $robot_reward_info['token'])){ continue; }
 

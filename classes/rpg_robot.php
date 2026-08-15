@@ -161,8 +161,8 @@ class rpg_robot extends rpg_object {
                 $this_robotinfo['robot_energy'], $this_robotinfo['robot_weapons'], $this_robotinfo['robot_attack'], $this_robotinfo['robot_defense'], $this_robotinfo['robot_speed'],
                 ($this_robotinfo['robot_energy'] + $this_robotinfo['robot_weapons'] + $this_robotinfo['robot_attack'] + $this_robotinfo['robot_defense'] + $this_robotinfo['robot_speed'])
                 );
-            error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
             */
+            //error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
         }
 
         // -- LOAD ROBOT INFO FROM INDEX OR SESSION -- //

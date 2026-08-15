@@ -197,7 +197,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                     $delete_robots = array('acid-man', 'bounce-man');
                     $possible_players = array('dr-light', 'dr-wily', 'dr-cossack');
                     foreach ($delete_robots as $delete_robot){
-                        error_log('destroy '.$delete_robot.' in the player data for unlock testing!');
+                        //error_log('destroy '.$delete_robot.' in the player data for unlock testing!');
                         unset($_SESSION[$session_token]['values']['robot_database'][$delete_robot]);
                         foreach ($possible_players as $possible_player){
                             unset($_SESSION[$session_token]['values']['battle_rewards'][$possible_player]['player_robots'][$delete_robot]);
