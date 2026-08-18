@@ -9,6 +9,8 @@ if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('9
 
 // Include the TOP file
 require_once('top.php');
+$GAME_SESSION = $_SESSION['GAME'];
+session_write_close();
 
 // Set a time limit for game scripts to prevent overdoing it
 if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === false){ set_time_limit(5); }
@@ -40,12 +42,12 @@ $this_graph_data = array(
     );
 
 // If a reset was intentionally called
-if (!empty($_GET['reset']) || (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
+if (!empty($_GET['reset']) || (!empty($GAME_SESSION['DEMO']) && !empty($GAME_SESSION['CACHE_DATE']) && $GAME_SESSION['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
     // Reset the game session
     mmrpg_reset_game_session();
 }
 // Else if this is an out-of-sync demo
-elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
+elseif (!empty($GAME_SESSION['DEMO']) && !empty($GAME_SESSION['CACHE_DATE']) && $GAME_SESSION['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
 
     // Reset the game session
     mmrpg_reset_game_session();
@@ -54,8 +56,8 @@ elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DAT
 // Check if the session has not been created or the cache date has changed
 elseif (
     !empty($_GET['reload']) || // if a reload was specifically requested
-    !isset($_SESSION['GAME']['CACHE_DATE']) || // if there is no session created yet
-    (!empty($_SESSION['GAME']['DEMO']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
+    !isset($GAME_SESSION['CACHE_DATE']) || // if there is no session created yet
+    (!empty($GAME_SESSION['DEMO']) && $GAME_SESSION['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
     ){
 
     // Ensure there is a save file to load
@@ -73,7 +75,7 @@ elseif (
     }
 
     // Update the cache date to reflect the reload
-    $_SESSION['GAME']['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
+    $GAME_SESSION['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
 
     // Save the updated file back to the system
     mmrpg_save_game_session();
@@ -90,7 +92,7 @@ $_SESSION['SKILLS'] = array();
 
 // If the player has unlocked more than one playable character,
 // we should clear the player selection so they see the title screen
-if (mmrpg_prototype_players_unlocked() > 1){ unset($_SESSION['GAME']['battle_settings']['this_player_token']); }
+if (mmrpg_prototype_players_unlocked() > 1){ unset($GAME_SESSION['battle_settings']['this_player_token']); }
 
 // Define the flag that toggles the game's online/offline status
 $this_online_flag = true;
@@ -161,7 +163,7 @@ if (count($matches)>1){
 <meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">
 
 </head>
-<? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
+<? $temp_window_flag = !empty($GAME_SESSION['index_settings']['windowFlag']) ? $GAME_SESSION['index_settings']['windowFlag'] : false; ?>
 <body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
 
 <h1 id="header">Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></h1>
