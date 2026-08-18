@@ -243,6 +243,13 @@ foreach ($this_shop_index AS $shop_token => $shop_info){
 
 }
 
+// Grab a list of all already-unlocked items and abilities for reference later
+mmrpg_prototype_items_unlocked(true, $items_unlocked);
+mmrpg_prototype_abilities_unlocked(false, false, $abilities_unlocked);
+$items_unlocked_keys = array_keys($items_unlocked);
+$abilities_unlocked_keys = array_keys($abilities_unlocked);
+//error_log('$items_unlocked = '.print_r($items_unlocked, true));
+//error_log('$abilities_unlocked = '.print_r($abilities_unlocked, true));
 
 // -- AUTO SHOP UNLOCKS -- //
 
@@ -285,7 +292,7 @@ if (!empty($this_shop_index['auto'])){
         rpg_object::save_cached_index('shop.auto', $cache_token, $unlocked_items);
     }
     $level = $this_shop_index['auto']['shop_level'];
-    $unlocked_items = !empty($unlocked_items) ? array_filter($unlocked_items, function($info) use ($level){
+    $unlocked_items = !empty($unlocked_items) ? array_filter($unlocked_items, function($info) use ($level, $items_unlocked){
         if (empty($info['item_shop_level'])){ return true; }
         elseif ($level >= $info['item_shop_level']){ return true; }
         return false;
@@ -306,7 +313,7 @@ if (!empty($this_shop_index['auto'])){
 
         // Add parts to the list of selling kinds and define the quote shown at the top
         $this_shop_index['auto']['shop_kind_selling'][] = 'parts';
-        $this_shop_index['auto']['shop_quote_selling']['parts'] = 'Great news! I\'ve cracked the code on holdable items and created new parts! See anything you like?';
+        $this_shop_index['auto']['shop_quote_selling']['parts'] = 'Great news! I\'ve cracked the code on holdable items and can now make copies of any that you find!';
 
         // Define base lists for sellable parts
         $base_parts_selling = array();
@@ -342,11 +349,23 @@ if (!empty($this_shop_index['auto'])){
             rpg_object::save_cached_index('shop.auto', $cache_token, $unlocked_parts);
         }
         $level = $this_shop_index['auto']['shop_level'];
-        $unlocked_parts = !empty($unlocked_parts) ? array_filter($unlocked_parts, function($info) use ($level){
+        /* $unlocked_parts = !empty($unlocked_parts) ? array_filter($unlocked_parts, function($info) use ($level){
             if (empty($info['item_shop_level'])){ return true; }
             elseif ($level >= $info['item_shop_level']){ return true; }
             return false;
-            }) : array();
+            }) : array(); */
+        $unlocked_parts_keys = array_keys($unlocked_parts);
+        uksort($unlocked_parts, function($a, $b) use ($items_unlocked_keys, $unlocked_parts_keys){
+            $a_owned = in_array($a, $items_unlocked_keys);
+            $b_owned = in_array($b, $items_unlocked_keys);
+            $a_index = array_search($a, $unlocked_parts_keys);
+            $b_index = array_search($b, $unlocked_parts_keys);
+            if ($a_owned && !$b_owned){ return -1; }
+            elseif (!$a_owned && $b_owned){ return 1; }
+            elseif ($a_index < $b_index){ return -1; }
+            elseif ($a_index > $b_index){ return 1; }
+            else { return 0; }
+            });
 
         // Use the pulled list of unlocked items to expand Auto's shop
         if (!empty($unlocked_parts)){
