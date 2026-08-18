@@ -10,7 +10,7 @@ $force_refresh = !empty($_REQUEST['refresh']) && $_REQUEST['refresh'] === 'true'
 if ($return_type === 'javascript'){
     // Explicitly set the content type as javascript
     header('Content-type: text/javascript;');
-    // Ensure this settings file is never cached as it changes
+    // Ensure this settings file is cached for at least a day
     $seconds_in_a_day = 86400; // 24 hours
     header("Cache-Control: public, max-age={$seconds_in_a_day}");
     header("Expires: " . gmdate('D, d M Y H:i:s', time() + $seconds_in_a_day) . ' GMT');

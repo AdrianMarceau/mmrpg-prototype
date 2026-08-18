@@ -2,6 +2,7 @@
 
 // Require the top file if not already included
 require_once(dirname(dirname(__FILE__)).'/top.php');
+$GAME_SESSION = $_SESSION['GAME'];
 session_write_close();
 
 // If the return value was set explicitly as javascript, update headers
@@ -27,11 +28,11 @@ if (defined('MMRPG_CONFIG_CDN_ENABLED') && MMRPG_CONFIG_CDN_ENABLED === true){
 }
 
 // Update the event timeout setting if set
-$event_timeout = !empty($_SESSION['GAME']['battle_settings']['eventTimeout']) ? $_SESSION['GAME']['battle_settings']['eventTimeout'] : 0;
+$event_timeout = !empty($GAME_SESSION['battle_settings']['eventTimeout']) ? $GAME_SESSION['battle_settings']['eventTimeout'] : 0;
 if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};\n"; }
 
 // Update the audio balance config setting if set
-$audio_balance_config = !empty($_SESSION['GAME']['battle_settings']['audioBalanceConfig']) ? $_SESSION['GAME']['battle_settings']['audioBalanceConfig'] : '';
+$audio_balance_config = !empty($GAME_SESSION['battle_settings']['audioBalanceConfig']) ? $GAME_SESSION['battle_settings']['audioBalanceConfig'] : '';
 if (!empty($audio_balance_config)){
     echo "gameSettings.audioBalanceConfig = ".json_encode($audio_balance_config).";\n";
     echo "gameSettings.masterVolume = ".$audio_balance_config['masterVolume'].";\n";
@@ -45,8 +46,8 @@ if (!empty($animation_effects_index)){
     foreach ($animation_effects_index AS $effect_key => $effect_info){
         $setting_token = $effect_info['token'];
         $setting_value = $effect_info['default'];
-        if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
-            $value = $_SESSION['GAME']['battle_settings'][$setting_token];
+        if (isset($GAME_SESSION['battle_settings'][$setting_token])){
+            $value = $GAME_SESSION['battle_settings'][$setting_token];
             $setting_value = $value === 'true' ? true : false;
         }
         $setting_value_js = $setting_value ? 'true' : 'false';
