@@ -691,8 +691,13 @@ function mmrpg_game_ability_tokens_unlocked($player_token = ''){
 
 // Define a function for unlocking a game ability for use in battle
 function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $events_create = false){
-    //$GAME_SESSION = &$_SESSION[mmrpg_game_token()];
+    //error_log('mmrpg_game_unlock_ability($player_info:'.print_r($player_info, true).', $robot_info:'.print_r($robot_info, true).', $ability_info:'.print_r($ability_info, true).', $events_create:'.($events_create ? 'true' : 'false').') called!');
     $session_token = mmrpg_game_token();
+
+    // Compensate for string-based arguments
+    if (!empty($player_info) && is_string($player_info)){ $player_token = $player_info; $player_info = rpg_player::get_index_info($player_token); }
+    if (!empty($robot_info) && is_string($robot_info)){ $robot_token = $robot_info; $robot_info = rpg_robot::get_index_info($robot_token); }
+    if (!empty($ability_info) && is_string($ability_info)){ $ability_token = $ability_info; $ability_token = rpg_ability::get_index_info($ability_token); }
 
     // Define a reference to the game's session flag variable
     if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
@@ -716,8 +721,12 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     // Automatically unlock this ability for use in battle
     $this_reward = $this_setting = array('ability_token' => $this_ability_token);
 
+    // If this ability is not explicitly a master ability, we shouldn't be unlocking it for anyone
+    if ($ability_info['ability_class'] !== 'master'){ return false; }
+
     // Check if player info and robot info has been provided, and unlock for this robot if it has
     if (!empty($player_info) && !empty($robot_info)){
+        //error_log('now unlocking ability for robot '.$robot_info['robot_token']);
         $ptoken = $player_info['player_token'];
         $rid = !empty($robot_info['robot_base_id']) ? $robot_info['robot_base_id'] : $robot_info['robot_id'];
         $rtoken = $robot_info['robot_token'];
@@ -741,6 +750,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     }
 
     // Check to see if player info has been provided, and unlock for this player if it has
+    //error_log('now unlocking ability for player '.$player_info['player_token']);
     if (!empty($player_info)){ $unlock_for_player_tokens = array($player_info['player_token']); }
     else { $unlock_for_player_tokens = array_keys($_SESSION[$session_token]['values']['battle_rewards']); }
     foreach ($unlock_for_player_tokens AS $unlock_for_player_token){
@@ -749,6 +759,7 @@ function mmrpg_game_unlock_ability($player_info, $robot_info, $ability_info, $ev
     }
 
     // No matter what, always unlock new abilities in the main array
+    //error_log('now unlocking ability for everyone');
     if (!isset($_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'] = array(); }
     if (!in_array($this_ability_token, $_SESSION[$session_token]['values']['battle_abilities'])){ $_SESSION[$session_token]['values']['battle_abilities'][] = $this_ability_token; }
 
