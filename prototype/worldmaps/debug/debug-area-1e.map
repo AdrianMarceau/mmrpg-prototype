@@ -2,7 +2,7 @@
 # DEBUG AREA 1E (DESERT)
 @token    = debug-area-1e
 @name     = DEBUG Area 1E
-@level    = 40
+@level    = 10
 @size     = 50 x 16
 @sheet    = mmrpg-overworld-2k25-v2
 #---------------------------#
@@ -30,7 +30,7 @@
 @terrain[]   = desert(oil-wells)
 @terrain[]   = grass(gentle-countryside)
 #---------------------------#
-@music[]     = default(pharaoh-man-mm4)
+@music[]     = default(stone-man-mm5)
 #---------------------------#
 @habitats[] = gockroach-s(desert)
 @habitats[] = beetle-borg(desert)
@@ -42,12 +42,14 @@
 @bosses[]    = roaming-boss-4(42-4, pharaoh-man)
 @bosses[]    = roaming-boss-3(31-12, charge-man)
 @bosses[]    = roaming-boss-5(43-13, solar-man)
+@bosses[]    = roaming-boss-6(14-5, stone-man)
 #---------------------------#
 @items[]     = boss-star-1(6-12, earth-star, oil-man)
 @items[]     = boss-star-2(23-7, flame-star, heat-man)
 @items[]     = boss-star-3(42-4, flame-star, pharaoh-man)
 @items[]     = boss-star-4(31-12, swift-star, charge-man)
 @items[]     = boss-star-5(43-13, flame-star, solar-man)
+@items[]     = boss-star-6(14-5, earth-star, stone-man)
 #---------------------------#
 #@items[]     = light-heart-3(5-13, light-heart__3)
 #@items[]     = light-heart-4(23-6, light-heart__4)
@@ -103,6 +105,17 @@
 @blocks[]    = barrier-block-1-11(25-13, barrier-block, yellow-vert)
 @blocks[]    = barrier-block-1-12(25-14, barrier-block, yellow-vert)
 @blocks[]    = barrier-block-1-13(25-15, barrier-block, yellow-vert)
+#---------------------------#
+# LIGHT PLAYER PLATFORM
+# + INIT ITEMS
+#------------------------
+@events[]     = light-platform-left(5-2, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
+@events[]     = light-platform-middle(6-2, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
+@events[]     = light-platform-right(7-2, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
+@items[]      = light-init-program(12-5, light-program, anchored)
+@items[]      = light-init-heart(3-14, light-heart, anchored)
+@items[]      = light-init-core(18-14, copy-core, anchored)
+@groups[]     = no-encounters_light-platform-buffer(4-2...8-3)
 #---------------------------#
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]

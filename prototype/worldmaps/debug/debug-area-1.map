@@ -54,23 +54,14 @@
 @groups[]    = no-encounters_spawn-buffer(9-14...13-18)
 @events[]    = auto-heal(9-14, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
 @events[]    = auto-reset(13-14, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
-@items[]     = first-consumable-eti(8-19, energy-tank, x1, always)
-#@items[]     = first-consumable-wti(14-19, weapon-tank, x1, always)
-#---------------------------#
-# LIGHT PLAYER PLATFORM
-# + INIT ITEMS
-#------------------------
-@events[]     = light-platform-left(10-8, lightpad-left, any, drop-zone, item:light-program, activate-player-platform)
-@events[]     = light-platform-middle(11-8, lightpad-middle, any, drop-zone, item:light-heart, activate-player-platform)
-@events[]     = light-platform-right(12-8, lightpad-right, any, drop-zone, item:copy-core, activate-player-platform)
-@items[]      = light-init-program(19-26, light-program, anchored)
-@items[]      = light-init-heart(17-16, light-heart__1, anchored)
-@items[]      = light-init-core(3-24, copy-core, anchored)
+@items[]     = first-consumable-yai(16-9, yashichi, x1, always)
+@items[]     = first-consumable-eti(8-13, energy-tank, x1, always)
+@items[]     = first-consumable-wti(14-13, weapon-tank, x1, always)
 #---------------------------#
 # INTRO ENCOUNTER
 #------------------
-@mechas[]    = light-runway-mecha-1(11-12, met, 1)
-@mechas[]    = light-runway-mecha-2(11-11, sniper-joe, 2)
+@mechas[]    = lalinde-runway-mecha-1(11-12, met, 1)
+@mechas[]    = lalinde-runway-mecha-2(11-11, sniper-joe, 2)
 #---------------------------#
 # MECHA PORTAL BOSSES
 #----------------------
@@ -81,8 +72,8 @@
 #---------------------------#
 # ITEMS CODES PICKUP
 #---------------------
-@items[]     = item-codes-pickup(14-22, item-codes)
-@items[]     = equip-codes-pickup(8-22, equip-codes)
+@items[]     = item-codes-pickup(17-16, item-codes)
+@items[]     = equip-codes-pickup(9-21, equip-codes)
 #---------------------------#
 # ITEM CORRIDOR PICKUPS
 # + STARTER ABILITIES
@@ -92,6 +83,16 @@
 @blocks[]    = star-gate-01-b1(15-8, star-block, vert-left, x1)
 @gates[]     = star-gate-01-g1(15-9, star-gate, vertical, x1)
 @blocks[]    = star-gate-01-b2(15-10, star-block, vert-left, x1)
+#------------------------
+@mechas[]    = west-corridor-mecha-1(6-8, met, 4)
+@mechas[]    = west-corridor-mecha-2(6-10, met, 4)
+@mechas[]    = west-corridor-mecha-3(4-9, met, 6)
+@mechas[]    = west-corridor-mecha-4(2-8, met, 8)
+@mechas[]    = west-corridor-mecha-5(2-10, met, 8)
+#------------------------
+@mechas[]    = east-corridor-mecha-1(17-9, flea, 8)
+@mechas[]    = east-corridor-mecha-2(18-9, flea, 8)
+@mechas[]    = east-corridor-mecha-3(19-9, flea, 8)
 #------------------------
 @items[]      = energy-pellet-pickup(16-10, energy-pellet)
 @items[]      = energy-capsule-pickup(16-8, energy-capsule)
@@ -111,16 +112,17 @@
 #------------------------
 @abilities[]  = buster-shot-pickup(8-9, buster-shot)
 #------------------------
-@items[]      = first-mecha-whistle(16-9, mecha-whistle)
-@items[]      = second-mecha-whistle(5-27, mecha-whistle)
+@items[]      = first-mecha-whistle(13-10, mecha-whistle)
+@items[]      = second-mecha-whistle(8-19, mecha-whistle)
+@items[]      = third-mecha-whistle(5-27, mecha-whistle)
 #------------------------
 @blocks[]    = star-gate-02-b1(7-8, star-block, vert-right, x3)
 @gates[]     = star-gate-02-g1(7-9, star-gate, vertical, x3)
 @blocks[]    = star-gate-02-b2(7-10, star-block, vert-right, x3)
 #------------------------
-@abilities[]  = light-buster-pickup(6-8, light-buster)
-@abilities[]  = wily-buster-pickup(6-9, wily-buster)
-@abilities[]  = cossack-buster-pickup(6-10, cossack-buster)
+@abilities[]  = wily-buster-pickup(6-7, wily-buster)
+@abilities[]  = light-buster-pickup(6-9, light-buster)
+@abilities[]  = cossack-buster-pickup(6-11, cossack-buster)
 #------------------------
 @blocks[]    = star-gate-03-b1(5-8, star-block, vert-right, x6)
 @gates[]     = star-gate-03-g1(5-9, star-gate, vertical, x6)
@@ -154,12 +156,11 @@
 @rescues[]   = rescue-roll-robot(7-23, roll, 2)
 @mechas[]    = rescue-roll-guard-1(7-22, sniper-joe, 2)
 @mechas[]    = rescue-roll-guard-2(8-23, sniper-joe, 2)
-@items[]     = rescue-roll-pickup-1(9-21, extra-life)
+@items[]     = rescue-roll-pickup-1(4-23, extra-life)
 #---------------------------#
 # SUBSPACE BUTTON + EVENTS
 #---------------------------
 @bosses[]    = subspace-portal-boss(19-28, trill, 10, speed)
-#@items[]     = subspace-light-heart(19-29, light-heart__2)
 @buttons[]   = subspace-button(19-30, purple, up, set-group-terrain, subspace-path, subspace)
 @groups[]    = subspace-path(14-24...14-28, 15-28)
 #---------------------------#
@@ -206,6 +207,16 @@
 @hazards[]    = oil-hazard-2(23-16, crude-oil)
 @hazards[]    = oil-hazard-3(23-17, crude-oil)
 #---------------------------#
+# LALINDE PLAYER PLATFORM
+# + INIT ITEMS
+#------------------------
+@events[]     = lalinde-platform-left(10-8, lalindepad-left, any, drop-zone, item:lalinde-program, activate-player-platform)
+@events[]     = lalinde-platform-middle(11-8, lalindepad-middle, any, drop-zone, item:empty-heart, activate-player-platform)
+@events[]     = lalinde-platform-right(12-8, lalindepad-right, any, drop-zone, item:empty-core, activate-player-platform)
+@items[]      = lalinde-init-program(11-15, lalinde-program, anchored)
+@items[]      = lalinde-init-heart(10-17, empty-heart, anchored)
+@items[]      = lalinde-init-core(12-17, empty-core, anchored)
+#---------------------------#
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[60],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[60],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
@@ -213,11 +224,11 @@
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[60],[60],[60],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[60],[60],[60],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[60],[60],[60],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[20],[20],[20],[20],[20],[20],[__],[20],[20],[20],[20],[20],[__],[20],[20],[20],[20],[20],[20],[__],[__],[__],[__],[__]
 [__],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[__],[__],[__],[__],[__]
 [__],[20],[20],[20],[20],[20],[20],[__],[20],[20],[20],[20],[20],[__],[20],[20],[20],[20],[20],[20],[__],[__],[__],[__],[__]
-[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[20],[__],[__],[__],[__],[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[20],[20],[20],[20],[20],[20],[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[20],[20],[20],[60],[20],[20],[20],[__],[20],[20],[20],[__],[__],[__],[__],[__],[__],[__]
