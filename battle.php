@@ -146,6 +146,15 @@ if (!empty($this_battle_token)){
         //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
     }
 
+    // Prevent characters with a zero heart limit (e.g., Dr. LaLinde) from unlocking robot rewards
+    if (!empty($this_player_token) && !empty($this_battle_data['battle_rewards']['robots'])){
+        $heart_limit = mmrpg_prototype_limit_hearts_earned($this_player_token);
+        if (empty($heart_limit) || $this_player_token === 'dr-lalinde') {
+            unset($this_battle_data['battle_rewards']['robots']);
+            rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+        }
+    }
+
 }
 else {
     //error_log('(battle.php) battle token was empty! redirecting home...');
