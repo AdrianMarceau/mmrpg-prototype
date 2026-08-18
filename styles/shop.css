@@ -470,8 +470,7 @@
 #shop #console .event .item_cell_disabled > span,
 #shop #console .event .item_cell_disabled > label,
 #shop #console .event .item_cell_disabled > div {
-    opacity: 0.15;
-    filter: alpha(opacity=15);
+    filter: opacity(0.15);
 }
 #shop #console .event .item_cell_disabled[data-unlocked="coming-soon"] {
 
@@ -482,6 +481,14 @@
 #shop #console .event .item_cell_disabled .buy_button,
 #shop #console .event .item_cell_disabled .sell_button {
     cursor: default;
+    pointer-events: none;
+}
+
+#shop #console .event .item_cell_blocked {
+
+}
+#shop #console .event .item_cell_blocked .item_name .icon_sprite {
+    filter: brightness(0) opacity(0.5);
 }
 #shop #console .event .item_cell_confirm {
     padding: 6px;

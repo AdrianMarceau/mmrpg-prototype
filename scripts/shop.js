@@ -779,13 +779,15 @@ function updateItemQuantity(itemToken, itemQuantity){
         if (thisKind == 'item'){
 
             thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('x '+itemQuantity);
-            if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
+            if (thisCell.is('.item_cell_blocked')){ thisCell.addClass('item_cell_disabled'); }
+            else if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
             else if (thisAction == 'sell' && itemQuantity <= 0){ thisCell.addClass('item_cell_disabled');  }
 
             } else if (thisKind == 'ability'){
 
             thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');
-            if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
+            if (thisCell.is('.item_cell_blocked')){ thisCell.addClass('item_cell_disabled'); }
+            else if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
             else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
 
             } else if (thisKind == 'field' || thisKind == 'robot'){
@@ -793,7 +795,8 @@ function updateItemQuantity(itemToken, itemQuantity){
             if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
 
             thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');
-            if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
+            if (thisCell.is('.item_cell_blocked')){ thisCell.addClass('item_cell_disabled'); }
+            else if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
             else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
 
             } else if (thisKind == 'alt'){

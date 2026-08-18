@@ -125,7 +125,7 @@ $mmrpg_index_robots = rpg_robot::get_index(true, false);
                     $robot_info_name = $robot_sprite_image_markup.'<span class="wrap">'.$robot_info_name.'</span>';
 
                     ?>
-                        <td class="<?= $robot_cell_float ?> item_cell" data-kind="robot" data-action="buy" data-token="<?= 'robot-'.$robot_info_token ?>">
+                        <td class="<?= $robot_cell_float ?> item_cell<?= ($robot_block_purchase ? ' item_cell_blocked' : '') ?>" data-kind="robot" data-action="buy" data-token="<?= 'robot-'.$robot_info_token ?>">
                             <span class="item_name robot_name robot_type robot_type_<?= $robot_info_type ?>" data-click-tooltip="<?= $temp_info_tooltip ?>"<?= ($robot_block_purchase ? 'style="text-decoration: line-through;"' : '') ?>><?= $robot_info_name ?></span>
                             <a class="button buy_button robot_type robot_type_none" href="#">Buy</a>
                             <label class="item_quantity" data-quantity="0"<?= ($robot_block_purchase ? 'style="visibility: hidden;"' : '') ?>><?= !empty($robot_info_quantity) ? '&#10004;' : '-' ?></label>
