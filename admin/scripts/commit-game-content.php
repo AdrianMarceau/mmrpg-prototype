@@ -38,6 +38,7 @@ $commit_paths_bytoken = array();
 if ($request_token === 'all'){
     // All all git changes to the list of commit paths
     foreach ($mmrpg_git_changes AS $key => $path){
+        if (!strstr($path, '/')){ continue; }
         list($token, $file_or_subtoken) = explode('/', $path);
         if ($token === '_groups'){ $token .= '/'.$file_or_subtoken; }
         if (!in_array($token, $commit_tokens)){
