@@ -1707,6 +1707,7 @@ class rpg_game {
 
     // Define a function for getting (or generating) a CDN file index for a given directory
     public static function get_cdn_index($project, $content){
+        //error_log('rpg_game::get_cdn_index($project: '.print_r($project, true).', $content: '.print_r($content, true).')');
 
         // Return false if either argument is invalid
         if (!preg_match('/^[-_a-z0-9]+$/i', $project)){ error_log('rpg_game::get_cdn_index() $project string was invalid ('.gettype($project).' '.print_r($project, type).')'); return false; }
@@ -1721,6 +1722,7 @@ class rpg_game {
 
         // LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
         if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+            //error_log('returning json from cached file '.$cache_file_path);
             $cache_file_markup = file_get_contents($cache_file_path);
             $cache_file_json = json_decode($cache_file_markup, true);
             return $cache_file_json;
@@ -1729,6 +1731,9 @@ class rpg_game {
         // Otherwise we need to collect the list and add it to the local cache
         $url = MMRPG_CONFIG_CDN_ROOTURL.$project.'/'.rtrim($content, '/').'/index';
         $ch = curl_init();
+        //error_log('pulling json from curl request to '.$url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 9);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (MMRPG_CONFIG_IS_LIVE ? true : false));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -1737,6 +1742,7 @@ class rpg_game {
         curl_close($ch);
 
         // If results were empty, exit now
+        //error_log('$result = '.print_r($result, true));
         if (empty($result)){ return false; }
 
         // Otherwise we can decode the data and extract the index
