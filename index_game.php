@@ -1,7 +1,7 @@
 <?php
 
 // MAINTENANCE
-if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61', '72.137.208.122'))){
+if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '123.456.789.012'))){
     die('<div style="font-family: Arial; font-size: 16px; line-height: 21px; margin: 0; padding: 20px 25%; background-color: rgb(0, 122, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
         UPDATE IN PROGRESS<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience and thank you for your patience.<br /> - Adrian
         </div>');
@@ -94,6 +94,9 @@ $_SESSION['SKILLS'] = array();
 // we should clear the player selection so they see the title screen
 if (mmrpg_prototype_players_unlocked() > 1){ unset($GAME_SESSION['battle_settings']['this_player_token']); }
 
+// Check to see if a window flag has been set in the session already
+$index_window_flag = !empty($GAME_SESSION['index_settings']['windowFlag']) ? $GAME_SESSION['index_settings']['windowFlag'] : false;
+
 // Define the flag that toggles the game's online/offline status
 $this_online_flag = true;
 $this_browser_flag = true;
@@ -114,6 +117,9 @@ if (count($matches)>1){
             //You get the idea
     }
 }
+
+// Close the session now that we're done writing
+session_write_close();
 
 ?>
 <!DOCTYPE html>
@@ -163,8 +169,7 @@ if (count($matches)>1){
 <meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">
 
 </head>
-<? $temp_window_flag = !empty($GAME_SESSION['index_settings']['windowFlag']) ? $GAME_SESSION['index_settings']['windowFlag'] : false; ?>
-<body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
+<body id="mmrpg" class="index <?= !empty($index_window_flag) ? 'windowFlag_'.$index_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
 
 <h1 id="header">Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></h1>
 <div id="window" style="position: relative; ">
