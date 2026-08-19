@@ -3,6 +3,12 @@
 if (empty($_SESSION[$session_token]['flags'])){ $_SESSION[$session_token]['flags'] = array(); }
 $temp_game_flags = &$_SESSION[$session_token]['flags'];
 
+// Collect the unlock flags for the various doctors
+$unlock_flag_light = false;
+$unlock_flag_wily = false;
+$unlock_flag_cossack = false;
+$unlock_flag_lalinde = false;
+
 /*
  * DEMO MISSION SELECT
  */
