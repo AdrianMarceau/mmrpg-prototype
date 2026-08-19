@@ -11,7 +11,12 @@ require('includes/config.php');
 @ini_set('session.gc_maxlifetime', 24*60*60);
 @ini_set('session.gc_probability', 1);
 @ini_set('session.gc_divisor', 1);
-session_start();
+if (defined('READ_ONLY_SESSION')
+    && READ_ONLY_SESSION === true){
+    session_start(['read_and_close' => true]);
+} else {
+    session_start();
+}
 
 // Turn off magic quotes before it causes and problems
 if (get_magic_quotes_gpc()){
