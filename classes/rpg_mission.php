@@ -152,13 +152,17 @@ class rpg_mission {
                 $robot_level = $robot_data['robot_level'];
                 $robot_item = $robot_data['robot_item'];
                 $robot_info = $mmrpg_index_robots[$robot_token];
+                $robot_native_abilities = isset($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
                 $robot_info_plus_data = array_merge($robot_info, $robot_data);
+                //error_log('$robot_info ='.print_r($robot_info, true));
+                //error_log('$robot_native_abilities ='.print_r($robot_native_abilities, true));
                 if (empty($robot_data['robot_id'])){
                     $auto_robot_id = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], $robot_key);
                     $robot_data['robot_id'] = $auto_robot_id;
                     }
                 if (empty($robot_data['robot_abilities'])){
-                    $auto_ability_num = (1 + round(($robot_level/100) * 7));
+                    $auto_ability_min = max(count($robot_native_abilities), 1);
+                    $auto_ability_num = ($auto_ability_min + round(($robot_level/100) * (8 - $auto_ability_min)));
                     $auto_ability_list = mmrpg_prototype_generate_abilities($robot_info_plus_data, $robot_level, $auto_ability_num, $robot_item);
                     $robot_data['robot_abilities'] = $auto_ability_list;
                     }
