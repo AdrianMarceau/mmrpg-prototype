@@ -50,8 +50,9 @@
                 // Loop through the items and print them one by one
                 $item_counter = 0;
                 foreach ($item_list_array AS $token => $price){
-                    if (isset($mmrpg_database_items[$token])){ $item_info = $mmrpg_database_items[$token]; }
-                    else { continue; }
+                    if (!isset($mmrpg_database_items[$token])){ continue; }
+                    elseif (!isset($items_unlocked[$token])){ continue; }
+                    $item_info = $mmrpg_database_items[$token];
 
                     $item_counter++;
                     $item_info_token = $token;
