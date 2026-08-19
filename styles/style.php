@@ -1,5 +1,6 @@
 <?
 // Require the application top
+define('READ_ONLY_SESSION', true);
 define('MMRPG_INDEX_STYLES', true);
 require_once('../top.php');
 session_write_close();
