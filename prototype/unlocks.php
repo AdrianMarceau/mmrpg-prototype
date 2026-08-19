@@ -581,10 +581,12 @@ if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
  * DR. LIGHT EVENT ITEMS
  */
 
-// Unlock the AUTO LINK after Dr. Light has completed all of Chapter One
+// Unlock the AUTO LINK after Dr. Light has completed all of Chapter One OR found one of his codes
 if (!mmrpg_prototype_item_unlocked('auto-link')
-    && $chapters_unlocked_light['1']
-    ){
+    && ($chapters_unlocked_light['1']
+        || mmrpg_prototype_item_unlocked('item-codes')
+        || mmrpg_prototype_item_unlocked('equip-codes')
+    )){
 
     // Unlock the Auto Link and generate the required event details
     mmrpg_game_unlock_item('auto-link', array(
@@ -655,10 +657,12 @@ if (mmrpg_prototype_complete('dr-light')
  * DR. WILY EVENT ITEMS
  */
 
-// Unlock the REGGAE LINK after Dr. Wily has completed all of Chapter One
+// Unlock the REGGAE LINK after Dr. Wily has completed all of Chapter One OR found one of its codes
 if (!mmrpg_prototype_item_unlocked('reggae-link')
-    && $chapters_unlocked_wily['1']
-    ){
+    && ($chapters_unlocked_wily['1']
+        || mmrpg_prototype_item_unlocked('ability-codes')
+        || mmrpg_prototype_item_unlocked('weapon-codes')
+    )){
 
     // Unlock the Reggae Link and generate the required event details
     mmrpg_game_unlock_item('reggae-link', array(
@@ -729,10 +733,12 @@ if (mmrpg_prototype_complete('dr-wily')
  * DR. COSSACK EVENT ITEMS
  */
 
-// Unlock the KALINKA LINK after Dr. Cossack has completed at least half of Chapter Two
+// Unlock the KALINKA LINK after Dr. Cossack has completed at least half of Chapter One OR found one of her codes
 if (!mmrpg_prototype_item_unlocked('kalinka-link')
-    && $chapters_unlocked_cossack['1']
-    ){
+    && ($chapters_unlocked_cossack['1']
+        || mmrpg_prototype_item_unlocked('master-codes')
+        || mmrpg_prototype_item_unlocked('dress-codes')
+    )){
 
     // Unlock the Kalinka Link and generate the required event details
     mmrpg_game_unlock_item('kalinka-link', array(
