@@ -1180,9 +1180,13 @@ class rpg_battle extends rpg_object {
 
             // ROBOT REWARDS
 
+            // Check to see if this player has at least one limit heart, else no unlocking
+            $this_player_limit_hearts = mmrpg_prototype_limit_hearts_earned($this_player->player_token);
+            //error_log($this_player->player_token.' has earned '.$this_player_limit_hearts.' limit hearts');
+
             // Loop through any robot rewards for this battle
             $this_robot_rewards = !empty($this->battle_rewards['robots']) ? $this->battle_rewards['robots'] : array();
-            if (!empty($this_robot_rewards)){
+            if (!empty($this_robot_rewards) && !empty($this_player_limit_hearts)){
                 foreach ($this_robot_rewards AS $robot_reward_key => $robot_reward_info){
 
                     // If this is the copy shot ability and we're in DEMO mode, continue
@@ -1232,6 +1236,7 @@ class rpg_battle extends rpg_object {
                     if (!is_numeric($this_robot_experience)){ $this_robot_experience = 0; }
 
                     // Automatically unlock this robot for use in battle
+                    //error_log($this_player->player_token.' is unlocking '.$robot_info['robot_token'].' with '.$this_player_limit_hearts.' limit hearts');
                     $this_reward = $robot_info;
                     $this_reward['robot_level'] = $this_robot_level;
                     $this_reward['robot_experience'] = $this_robot_experience;
