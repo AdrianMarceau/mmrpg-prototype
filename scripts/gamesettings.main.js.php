@@ -1,6 +1,7 @@
 <?
 
 // Require the top file if not already included
+define('READ_ONLY_SESSION', true);
 require_once(dirname(dirname(__FILE__)).'/top.php');
 $GAME_SESSION = $_SESSION['GAME'];
 session_write_close();

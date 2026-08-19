@@ -1,6 +1,7 @@
 <?php
 
 // Require the top file if not already included
+define('READ_ONLY_SESSION', true);
 require_once(dirname(dirname(__FILE__)).'/top.php');
 session_write_close();
 
