@@ -57,9 +57,21 @@ $mmrpg_database_items = array_filter($mmrpg_database_items, function($item_info)
     return true;
     });
 $global_battle_items = array_filter($global_battle_items, function($item_token) use ($mmrpg_database_items){
+    if (strstr($item_token, '__')){ list($item_token, $num_in_set) = explode('__', $item_token); }
     if (!isset($mmrpg_database_items[$item_token])){ return false; }
     return true;
     }, ARRAY_FILTER_USE_KEY);
+
+// Collapse the global battle items so that quantities look normal (necessary for those in sets like limit hearts)
+//error_log('$global_battle_items (before) = '.print_r($global_battle_items, true));
+$collapsed_items = array();
+foreach ($global_battle_items as $key => $value){
+    $base_key = explode('__', $key, 2)[0];
+    $collapsed_items[$base_key] = ($collapsed_items[$base_key] ?? 0) + $value;
+}
+if (!empty($collapsed_items)){ $global_battle_items = $collapsed_items; }
+//error_log('$global_battle_items (after) = '.print_r($global_battle_items, true));
+
 
 // Pre-loop through and check to see what the max item is that is NOT hidden or at least unlocked
 $tmp_counter = 0;
