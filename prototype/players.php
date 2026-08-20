@@ -185,7 +185,7 @@ else {
             $text_option_classes = 'option option_'.$this_button_size.' option_this-player-select option_'.$doctor_token.' block_1 type_energy option_disabled';
             echo '<a class="'.$text_option_classes.'" data-token="'.$doctor_token.'" data-token-id="0">';
                 echo '<div class="platform"><div class="chrome"><div class="inset">';
-                    echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext"><s>'.$text_button_label.'</s></span><span class="subtext">&cross; Limit Heart Not Found</span><span class="subtext2">&cross; Init Core Not Found</span></span><span class="arrow">&nbsp;</span></label>';
+                    echo '<label class="has_image"><span class="multi">'.$text_sprites_markup.'<span class="maintext"><s>'.$text_button_label.'</s></span><span class="subtext">------------</span><span class="subtext2">--------</span></span><span class="arrow">&nbsp;</span></label>';
                 echo '</div></div></div>';
             echo '</a>'."\n";
         }
