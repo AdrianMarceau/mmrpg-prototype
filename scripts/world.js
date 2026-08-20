@@ -3305,7 +3305,9 @@ class mmrpgWorldMap {
             let $abilitiesInStorage = $abilityStorageBox.find('.team-ability[data-ability]');
             let selectedAbilityToken = $selectedAbilityButton.length ? $selectedAbilityButton.attr('data-ability') : null;
             let selectedAbilitySlot = $selectedAbilityButton.length ? parseInt($selectedAbilityButton.attr('data-slot')) : null;
-            let selectedAbilityID = selectedAbilityToken && abilitiesIndex[selectedAbilityToken] ? abilitiesIndex[selectedAbilityToken].id : null;
+            let selectedAbilityInfo = selectedAbilityToken && abilitiesIndex[selectedAbilityToken] ? abilitiesIndex[selectedAbilityToken] : null;
+            let selectedAbilityIsLocked = selectedAbilityInfo.class !== 'master' ? true : false;
+            let selectedAbilityID = selectedAbilityToken && selectedAbilityInfo.id ? selectedAbilityInfo.id : null;
             //console.log('--> selectedAbilityToken =', selectedAbilityToken);
             //console.log('--> selectedAbilitySlot =', selectedAbilitySlot);
             //console.log('--> selectedAbilityID =', selectedAbilityID);
@@ -3326,8 +3328,10 @@ class mmrpgWorldMap {
             if (action === 'equip-ability'){
                 //console.log('--> equipping new ability ...');
                 let newAbilityToken = $actionModal.attr('data-action-token'); //actionObjectToken;
-                let newAbilityID = abilitiesIndex[newAbilityToken] ? abilitiesIndex[newAbilityToken].id : null;
-                let newAbilityMarkup = _self.generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {slot: selectedAbilitySlot});
+                let newAbilityInfo = abilitiesIndex[newAbilityToken] ? abilitiesIndex[newAbilityToken] : null;
+                let newAbilityID = newAbilityInfo.id ? newAbilityInfo.id : null;
+                let newAbilityIsLocked = newAbilityInfo.class !== 'master' ? true : false;
+                let newAbilityMarkup = _self.generateAbilitySelectButtonMarkup(newAbilityToken, playerRobotInfo, {slot: selectedAbilitySlot, locked: newAbilityIsLocked});
                 //console.log('--> newAbilityToken =', newAbilityToken);
                 //console.log('--> newAbilityID =', newAbilityID);
                 //console.log('--> currentAbilities(before) =', JSON.stringify(currentAbilities));
@@ -3342,7 +3346,7 @@ class mmrpgWorldMap {
                     currentAbilities[selectedAbilitySlot] = newAbilityID;
                     currentAbilities[existingAbilitySlot] = selectedAbilityID;
                     let $existingAbilityButton = $currentAbilitiesList.find('.team-ability[data-ability="' + newAbilityToken + '"]');
-                    $existingAbilityButton.replaceWith(_self.generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {slot: existingAbilitySlot}));
+                    $existingAbilityButton.replaceWith(_self.generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {slot: existingAbilitySlot, locked: selectedAbilityIsLocked}));
                     $selectedAbilityButton.replaceWith(newAbilityMarkup);
                     }
                 //console.log('--> currentAbilities(after) =', JSON.stringify(currentAbilities));
@@ -3670,10 +3674,11 @@ class mmrpgWorldMap {
             let selectedAbilityToken = actionObjectToken;
             let selectedAbilityInfo = typeof abilitiesIndex[selectedAbilityToken] !== 'undefined' ? abilitiesIndex[selectedAbilityToken] : null;
             if (!selectedAbilityToken || !selectedAbilityInfo){ console.error('showActionModal() could not find new ability info for token ' + selectedAbilityToken + '!'); return; }
+            let selectedAbilityIsLocked = selectedAbilityInfo.class !== 'master' ? true : false;
             //console.log('--> selectedAbilityToken =', selectedAbilityToken);
             //console.log('--> selectedAbilityInfo =', selectedAbilityInfo);
             if (actionToken === 'equip-ability'){
-                let selectedAbilityList = '' + generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {selected: false});
+                let selectedAbilityList = '' + generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {selected: false, locked: selectedAbilityIsLocked});
                 modalDetails.subtitles.forTooltip = 'Select Ability To Replace';
                 modalDetails.containers.forSelected = '<div class="ability-list selected">' + selectedAbilityList + '</div>';
                 }
@@ -3689,10 +3694,11 @@ class mmrpgWorldMap {
                         let currentAbilityID = typeof current[slotKey] !== 'undefined' ? current[slotKey] : null;
                         let currentAbilityInfo = currentAbilityID ? abilitiesIndex.getByID(currentAbilityID) : null;
                         let currentAbilityToken = currentAbilityID && currentAbilityInfo ? currentAbilityInfo.token : null;
-                        let isDisabled = false, isSelected = false;
+                        let isDisabled = false, isSelected = false, isLocked = false;
                         if (actionToken === 'equip-ability'){ isDisabled = (currentAbilityToken === selected) || (!currentAbilityToken && numEmpty > 0) ? true : false; }
                         else if (actionToken === 'remove-ability'){ isDisabled = !currentAbilityToken ? true : false; isSelected = (currentAbilityToken === selectedAbilityToken) ? true : false; }
-                        let buttonOptions = {slot: slotKey, disabled: isDisabled, selected: isSelected};
+                        if (currentAbilityInfo && currentAbilityInfo.class !== 'master'){ isLocked = true; }
+                        let buttonOptions = {slot: slotKey, disabled: isDisabled, selected: isSelected, locked: isLocked};
                         if (currentAbilityID && currentAbilityToken && currentAbilityInfo){ listMarkup += generateAbilitySelectButtonMarkup(currentAbilityToken, playerRobotInfo, buttonOptions); }
                         else { numEmpty++; listMarkup += generateAbilitySelectPlaceholderMarkup(playerRobotInfo, buttonOptions); }
                         } return listMarkup;
