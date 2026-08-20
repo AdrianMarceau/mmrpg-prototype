@@ -158,7 +158,7 @@ if (true){
         // Collect and print the editor markup for this player
         ?>
 
-            <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>">
+            <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>" data-level="<?= $shop_info['shop_level'] ?>">
 
                 <div class="this_sprite sprite_left" style="background-image: url(images/fields/<?= $shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
                     <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="background-image: url(<?= $shop_image_file_path ?>); "><?= $shop_info['shop_name']?></div>
@@ -181,17 +181,6 @@ if (true){
                         //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
 
                         // Loop through all elements and display gauge's for relevant ones
-                        if (empty($core_max_levels)){
-                            $core_max_levels = $db->get_array_list("SELECT
-                                (CASE WHEN ability_type = '' THEN 'none' ELSE ability_type END) AS core_type,
-                                MAX(ability_shop_level) AS core_max
-                                FROM mmrpg_index_abilities
-                                WHERE ability_flag_published = 1 AND ability_flag_complete = 1 AND ability_shop_tab = 'reggae/weapons'
-                                GROUP BY ability_type
-                                ORDER BY core_max DESC
-                                ;", 'core_type');
-                        }
-                        //error_log('$core_max_levels = '.(isset($core_max_levels) ? print_r($core_max_levels, true) : '---'));
                         $core_type_list = array_keys($mmrpg_database_types);
                         unset($core_type_list[array_search('copy', $core_type_list)]);
                         unset($core_type_list[array_search('none', $core_type_list)]);

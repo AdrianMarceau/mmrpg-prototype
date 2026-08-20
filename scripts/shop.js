@@ -473,8 +473,10 @@ $(document).ready(function(){
 
         var $shopDiv = thisTab.closest('.event[data-token="'+thisKeeper+'"]');
         var $shopSprite = $('> .this_sprite', $shopDiv);
+        var shopLevel = parseInt($shopDiv.attr('data-level'));
         //console.log('$shopDiv = ', $shopDiv.length, $shopDiv);
         //console.log('$shopSprite = ', $shopSprite.length, $shopSprite);
+        console.log('shopLevel = ', shopLevel);
 
         // Define the post options for the ajax call
         var postData = {shop:thisKeeper,kind:thisKind,action:thisAction,token:thisToken,quantity:thisQuantity,price:thisPrice,player:thisPlayer};
@@ -494,8 +496,8 @@ $(document).ready(function(){
                 var newlineIndex = data.indexOf("\n");
                 var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
                 data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
-                //console.log('data (after) =', data);
-                //console.log('dataExtra =', dataExtra);
+                console.log('data (after) =', data);
+                console.log('dataExtra =', dataExtra);
 
                 // Break apart the response into parts
                 var data = data.split('|');
@@ -520,8 +522,10 @@ $(document).ready(function(){
                     var newZennyTotal = data[3] != undefined ? parseInt(data[3]) : false;
                     var newPointsTotal = data[4] != undefined && data[4].indexOf('points:') !== -1 ? parseInt(data[4].replace('points:', '')) : false;
                     var newLeaderboardRank = data[5] != undefined && data[5].indexOf('rank:') !== -1 ? data[5].replace('rank:', '') : false;
+                    var newShopLevel = data[6] != undefined && data[6].indexOf('shop:') !== -1 ? parseInt(data[6].replace('shop:', '')) : false;
                     var zennyDifference = Math.abs(newZennyTotal - thisShopData.zennyCounter);
                     //console.log({newItemCount:newItemCount,newZennyTotal:newZennyTotal,newPointsTotal:newPointsTotal,newLeaderboardRank:newLeaderboardRank});
+                    console.log('newShopLevel =', newShopLevel);
 
                     // Define the change text
                     if (thisAction == 'buy'){ var thisChangeText = '<span class="zenny" style="color: #C35E5E;">-'+printNumberWithCommas(thisPrice)+'z</span>'; }
@@ -655,6 +659,14 @@ $(document).ready(function(){
                                             }
                                     }
 
+                                // If this was explicitly a sell action, make sure we reload the page
+                                // in case the shop level and/or inventory have changed
+                                if (newShopLevel !== shopLevel
+                                    || postData.token.match(/-core$/)){
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                        }, 600);
+                                    }
 
                                 }
 
