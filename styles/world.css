@@ -3668,14 +3668,17 @@ html, body {
     cursor: pointer;
     z-index: 1;
 }
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.locked {
+    cursor: default;
+}
 /* #robots-overview .storage-details[data-robot] .equipped-abilities .value:hover, */
-#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered:not(.locked),
 #robots-overview .storage-details[data-robot] .equipped-abilities .value.new,
 #robots-overview .storage-details[data-robot] .equipped-abilities .value.selected {
     outline: 1px solid #ffffff;
     z-index: 30;
 }
-#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered {
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered:not(.locked) {
     outline-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 0 transparent;
     animation: team-object-hover-outline 3s infinite;
@@ -3738,6 +3741,16 @@ html, body {
 #robots-overview .storage-details[data-robot] .equipped-abilities .value.hovered > .sprite,
 #robots-overview .storage-details[data-robot] .equipped-abilities .value.selected > .sprite {
     top: -9px !important;
+}
+
+#robots-overview .storage-details[data-robot] .equipped-abilities .value > .sprite.is-mecha,
+#robots-overview .storage-details[data-robot] .equipped-abilities .value > .sprite.is-boss {
+
+}
+#robots-overview .storage-details[data-robot] .equipped-abilities .value.locked > .sprite .sprite {
+    background-image: url(../images/assets/unlockable_80x80.png) !important;
+    background-position: 0px 0px !important;
+    background-size: 40px 40px !important;
 }
 
 #robots-overview .storage-details[data-robot] .infoline.extra {
@@ -5879,6 +5892,14 @@ display: block;
 }
 #world #canvas #action-modal .content .container.for-current .ability-list .team-ability {
     width: calc((100% / 4) - 4px);
+}
+#world #canvas #action-modal .content .container.for-current .ability-list .team-ability.locked {
+
+}
+#world #canvas #action-modal .content .container.for-current .ability-list .team-ability.locked .sprite .sprite {
+    background-image: url(../images/assets/unlockable_80x80.png) !important;
+    background-position: 0px 0px !important;
+    background-size: 40px 40px !important;
 }
 
 #world #canvas #zoom-controls {
