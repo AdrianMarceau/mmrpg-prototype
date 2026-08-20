@@ -400,7 +400,8 @@ class rpg_robot extends rpg_object {
         }
 
         // If this robot is already disabled, make sure their status reflects it
-        if (!empty($this->flags['hidden'])){
+        if (!empty($this->flags['hidden'])|| $this->robot_energy <= 0){
+            //error_log('applying disabled state to '.$this->robot_token);
             $this->flags['apply_disabled_state'] = true;
             $this->robot_status = 'disabled';
             $this->robot_energy = 0;
