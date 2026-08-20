@@ -5171,6 +5171,11 @@ class rpg_world {
         if (!empty($robot_info['robot_energy'])){
             $robot_energy = $robot_stats['energy']['current'];
             $robot_energy_max = $robot_stats['energy']['current'];
+            if (!empty($player_index_info['player_energy'])){
+                $player_boost = ceil($robot_info['robot_energy'] * ($player_index_info['player_energy'] / 100));
+                $robot_energy += $player_boost;
+                $robot_energy_max += $player_boost;
+            }
             if (!empty($robot_session['energy']) && is_numeric($robot_session['energy'])){ $robot_energy += $robot_session['energy']; }
             $robot_energy_percent = round(($robot_energy / $robot_energy_max) * 100);
             if ($robot_energy_percent === 100 && $robot_energy < $robot_energy_max){ $robot_energy_percent -= 1; }
@@ -5181,6 +5186,11 @@ class rpg_world {
         if (!empty($robot_info['robot_weapons'])){
             $robot_weapons = $robot_stats['weapons']['current'];
             $robot_weapons_max = $robot_stats['weapons']['current'];
+            if (!empty($player_index_info['player_weapons'])){
+                $player_boost = ceil($robot_info['robot_weapons'] * ($player_index_info['player_weapons'] / 100));
+                $robot_weapons += $player_boost;
+                $robot_weapons_max += $player_boost;
+            }
             if (!empty($robot_session['weapons']) && is_numeric($robot_session['weapons'])){ $robot_weapons += $robot_session['weapons']; }
             $robot_weapons_percent = ceil(($robot_weapons / $robot_weapons_max) * 100);
             $robot_weapons_rating = $get_rating_token($robot_weapons_percent);
