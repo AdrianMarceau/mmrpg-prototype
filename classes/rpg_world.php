@@ -5046,7 +5046,7 @@ class rpg_world {
         } elseif ($player_token === 'dr-cossack'){
             $player_unlock_subtext = 'This advanced-level campaign packs the hardest punch of all and acts as the final player-story before the end-game!';
         } elseif ($player_token === 'dr-lalinde'){
-            $player_unlock_subtext = '<span style="color: red;">[System Error: Story Campaign File Is Corrupted]</span>';
+            $player_unlock_subtext = '<span style="display: block; color: red; font-family: monospace; font-size: 12px; padding: 10px 0 0;">System Error: Story Campaign File Is Corrupted</span>';
             $auto_unlock_robots = false;
             $auto_unlock_campaign = false;
             $auto_unlock_heart = false;
@@ -5070,7 +5070,7 @@ class rpg_world {
             $temp_canvas_markup = '';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_intro_field.'/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
             $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/'.$player_intro_field.'/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
-            $temp_canvas_markup .= '<div class="sprite_wrapper breathing_animation" style="bottom: 20px; left: calc(50% + 100px);"><div class="wrap">';
+            $temp_canvas_markup .= '<div class="sprite_wrapper breathing_animation" style="bottom: 20px; left: calc(50% + '.($first_robot !== 'robot' ? 100 : 20).'px);"><div class="wrap">';
             $temp_canvas_markup .= '<div class="sprite sprite_player sprite_shadow sprite_'.$player_zoom_xsize.' sprite_'.$player_zoom_xsize.'_victory" style="background-image: url(images/players/'.$player_token.'/sprite_left_'.$player_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5, 0.5) translate('.(-50 + ($player_zoom_size > 80 ? 5 : 0)).'%, 0) skew(26deg, 0); transform-origin: bottom left; filter: brightness(0); opacity: 0.1;"></div>';
             $temp_canvas_markup .= '<div class="sprite sprite_player sprite_'.$player_zoom_xsize.' sprite_'.$player_zoom_xsize.'_victory" style="background-image: url(images/players/'.$player_token.'/sprite_left_'.$player_zoom_xsize.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 0; left: 0; transform: scale(1.5) translate('.(-50 + ($player_zoom_size > 80 ? 5 : 0)).'%, 0); transform-origin: bottom center; image-rendering: pixelated;"></div>';
             $temp_canvas_markup .= '</div></div>';
@@ -5089,7 +5089,7 @@ class rpg_world {
                 $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="player_type type '.$player_type.'">'.$player_name.'</strong> from the player select menu to play through '.$player_pronoun.' story missions at any time.</p>';
             } else {
                 $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span($player_type, $player_name).' has been unlocked as a playable character in Free Roam <s>and <br /> the '.rpg_type::print_span($player_type, $player_story).' campaign has been unlocked on the Main Menu</s>!</p>';
-                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Explore the world as brilliant scientist <strong>'.$player_name.'</strong> and experience events from '.$player_pronoun.' perspective! Discover new items and abilities using '.$player_pronoun.' unique skills while you search for answers. '.$player_unlock_subtext.'</p>';
+                $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Explore the world as brilliant scientist <strong>'.$player_name.'</strong> and experience events from '.$player_pronoun.' perspective! Discover new items, abilities, and allies using '.$player_pronoun.' unique skills while you search for answers to what happened here in The Prototype. '.$player_unlock_subtext.'</p>';
                 $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;"><s>Select <strong class="player_type type '.$player_type.'">'.$player_name.'</strong> from the player select menu to play through '.$player_pronoun.' story missions at any time.</s></p>';
             }
             if (!isset($GAME_SESSION['EVENTS'])){ $GAME_SESSION['EVENTS'] = array(); }
