@@ -133,6 +133,19 @@ if (!empty($this_battle->flags['world_battle'])){
 
 }
 
+// Loop through player robots and enforce disabled status if energy was depleted by session state
+foreach ($this_player->values['robots_active'] AS $key => $info){
+    if ($this_robot->robot_id == $info['robot_id']){ $temp_robot = $this_robot; }
+    else { $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info); }
+    if ($temp_robot->robot_energy <= 0){
+        $temp_robot->flags['apply_disabled_state'] = true;
+        $temp_robot->robot_status = 'disabled';
+        $temp_robot->robot_energy = 0;
+        $temp_robot->update_session();
+    }
+}
+$this_robot->robot_reload();
+
 // Check if this is a player battle
 $flag_player_battle = $target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID ? true : false;
 
