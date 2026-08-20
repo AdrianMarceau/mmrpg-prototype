@@ -913,6 +913,7 @@ class rpg_game {
 
     // Define a function for collecting all robots unlocked by player or all
     public static function robot_tokens_unlocked($player_token = '', $return_keys = false){
+        //error_log('rpg_game::robot_tokens_unlocked($player_token: "'.$player_token.'", $return_keys: '.($return_keys ? 'true' : 'false').') called');
         // Define the game session helper var
         $session_token = self::session_token();
         // Define the temp robot and return arrays
@@ -937,14 +938,19 @@ class rpg_game {
         else {
             // Loop through and collect the robot settings and rewards for all players
             $battle_values = array('battle_rewards', 'battle_settings');
+            //error_log('looping battle values');
             foreach ($battle_values AS $value_token){
+                //error_log('battle values '.$value_token);
                 foreach ($_SESSION[$session_token]['values'][$value_token] AS $player_token => $player_info){
+                    //error_log('$_SESSION['.$session_token.'][\'values\']['.$value_token.']['.$player_token.']');
                     if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
                         foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_key => $robot_info){
+                        //error_log('$_SESSION['.$session_token.'][\'values\']['.$value_token.']['.$player_token.']['.$robot_key.']');
                         $robot_token = !empty($robot_info['robot_token']) ? $robot_info['robot_token'] : '';
                         if (empty($robot_key) || empty($robot_token) || empty($robot_info)){ continue; }
+                        //error_log($value_token.' for '.$robot_token.' exist!');
                         if (!in_array($robot_key, $unlocked_robots_keys)){ $unlocked_robots_keys[] = $robot_key; }
-                        if (!empty($robot_token) && !in_array($robot_token, $unlocked_robots_tokens)){ $unlocked_robots_keys[] = $robot_token; }
+                        if (!empty($robot_token) && !in_array($robot_token, $unlocked_robots_tokens)){ $unlocked_robots_tokens[] = $robot_token; }
                         }
                     }
                 }
