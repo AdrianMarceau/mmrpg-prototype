@@ -1732,7 +1732,7 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'is-mecha '; // DEBUG
             if (in_array($ability_info['ability_token'], array(
                 'friend-share',
-                //'mecha-support', 'mecha-assault', 'mecha-party',
+                'mecha-support', 'mecha-assault', 'mecha-party',
                 'copy-shot', 'copy-soul', 'copy-style',
                 ))){
                 //$debug_fragment .= 'is-mecha-incompatible '; // DEBUG
