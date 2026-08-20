@@ -313,6 +313,9 @@ class rpg_world {
                 // scan the player robots for changes in: energy, weapons, attack, defense, speed
                 $lastPlayerRobots = $worldData['lastPlayerRobots'];
                 if (!empty($lastPlayerRobots)){
+                    // Collect a list of unlocked abilities for later reference when looping
+                    //mmrpg_prototype_abilities_unlocked('', '', $unlockedAbilities);
+                    //error_log('-> $unlockedAbilities = '. print_r($unlockedAbilities, true));
                     // update the player's last robots string and then any relevant session values per-robot
                     foreach ($lastPlayerRobots AS $key => $data){
                         //error_log('-> checking robot key "'.$key.'"');
@@ -3816,6 +3819,7 @@ class rpg_world {
                 else if (!empty($actor_info['actions']['default'])){ $actions = $actor_info['actions']['default']; }
                 $base_classes = 'sprite object vs-actor bounce';
                 $kind_classes = $kind.' '.$sprite.($image ? ' '.$image : '');
+                //if (true){ $base_classes .= ' always-zoom'; }
                 $inner_sprite = '<span class="'.$base_classes.' '.$kind_classes.'"></span>';
                 $attrs = 'data-actor="'.$actor_namekey.'" data-colour="'.$colour.'" data-label="'.$name.'" data-type="'.$type.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
@@ -3869,11 +3873,21 @@ class rpg_world {
         $map_spritesize_offset = $map_config['spritesize_offset'];
         $sprites = array();
         list($col, $row) = explode('-', $target_position);
-        $top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
-        $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
-        $z_index = $top + 1;
-        if (strstr($team_dir, 'left')){ $left += count($team_sprites) * 4; }
-        elseif (strstr($team_dir, 'right')){ $left -= count($team_sprites) * 4; }
+        // Establish the absolute base position of the player on the grid
+        $base_top = ($row - 1) * $map_tile_height + $map_spritesize_offset[0];
+        $base_left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
+        // Map the 8 movement directions to angles (in degrees) for screen space
+        $dir_angles = array(
+            'right'      => 0,
+            'down-right' => 45,
+            'down'       => 90,
+            'down-left'  => 135,
+            'left'       => 180,
+            'up-left'    => 225,
+            'up'         => 270,
+            'up-right'   => 315
+            );
+        $base_angle = isset($dir_angles[$team_dir]) ? $dir_angles[$team_dir] : 45;
         foreach ($team_sprites as $key => $sprite){
             $id = 0;
             $kind = $sprite[0];
@@ -3883,14 +3897,28 @@ class rpg_world {
             $alt = strstr($img, '_') ? explode('_', $img, 2)[1] : '';
             $dir = strstr($team_dir, 'left') ? 'left' : 'right';
             $disabled = in_array('disabled', $sprite) ? true : false;
-            if ($key > 0){
-                if (strstr($team_dir, 'left')){ $left -= 10; }
-                elseif (strstr($team_dir, 'right')){ $left += 10; }
-                if (strstr($team_dir, 'up')){ $top += 4; }
-                elseif (strstr($team_dir, 'down')){ $top -= 4; }
-                else { $top -= 2; }
-                $z_index = $top + 1;
-                }
+            if ($key === 0) {
+                // THE PLAYER: Positioned exactly at the tile coordinate
+                $left = $base_left;
+                $top = $base_top;
+                // Give the player a strict +10 Z-offset above their base row to ensure they are on top
+                $z_index = $base_top + 10;
+            } else {
+                // THE ROBOTS: Fan out in a semi-circle behind the player
+                $multiplier = ceil($key / 2); // Groups into pairs: 1, 1, 2, 2, 3, 3...
+                $sign = ($key % 2 == 0) ? 1 : -1; // Alternates left/right sides of the center-line
+                // Spread them by 45 degrees outward from directly "behind" (base angle + 180)
+                $fan_offset_degrees = $multiplier * 20 * $sign;
+                $target_angle = $base_angle + 180 + $fan_offset_degrees;
+                $target_angle_rad = deg2rad($target_angle);
+                // Expand the radius slightly for outer robots so they don't crowd
+                $radius = 10 + ($multiplier * 5);
+                // Calculate exact position using sin/cos
+                $left = round($base_left - (cos($target_angle_rad) * $radius));
+                $top = round($base_top - (sin($target_angle_rad) * $radius));
+                // Robots render sequentially below the player, but stay within the tile's Z-band
+                $z_index = $base_top + 5 - $key;
+            }
             $class = $team_class.' bounce'.($disabled ? ' disabled' : '');
             $styles = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
             $attrs = 'data-key="'.$key.'"';
@@ -3899,7 +3927,7 @@ class rpg_world {
             $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="'.$team_class.'-'.$kind.'" data-'.$kind.'="'.$id.'_'.$token.'"', $markup);
             if ($disabled){ $markup = str_replace('data-frame="00"', 'data-frame="03"', $markup); }
             if (!empty($markup)){ $sprites[] = $markup; }
-            }
+        }
         return implode(PHP_EOL, $sprites);
     }
 
@@ -4170,6 +4198,7 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                //elseif ($token === 'mecha-whistle'){ $class .= ' always-zoom'; }
                 elseif (strstr($token, '-star')){ $class .= ' always-zoom'; $z_index -= 2; }
                 elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
