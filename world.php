@@ -670,7 +670,7 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
     $battle_index_token = $recruit_from_battle;
     $battle_index_info = rpg_battle::get_index_info($battle_index_token);
     $battle_target_player = !empty($battle_index_info) && !empty($battle_index_info['battle_target_player']) ? $battle_index_info['battle_target_player'] : false;
-    $battle_target_robot = !empty($battle_target_player) && !empty($battle_target_player['player_robots']) ? array_shift($battle_target_player['player_robots']) : false;
+    $battle_target_robot = !empty($battle_target_player) && !empty($battle_target_player['player_robots']) ? $battle_target_player['player_robots'][0] : false;
     //error_log('-> $battle_index_info = '.print_r($battle_index_info, true));
     //error_log('-> $battle_target_player = '.print_r($battle_target_player, true));
     //error_log('-> $battle_target_robot = '.print_r($battle_target_robot, true));
@@ -725,10 +725,11 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
         foreach ($this_mecha_info['robot_abilities'] AS $key => $ability_token){
             if ($key === 0){ $mecha_battle_rewards_array['robot_abilities'][$ability_token] = array('ability_token' => $ability_token); }
             $mecha_battle_settings_array['robot_abilities'][$ability_token] = array('ability_token' => $ability_token);
+            mmrpg_game_unlock_ability($this_player_token, $this_mecha_info, array('ability_token' => $ability_token), false);
         }
         // Append this new recruit to the end of the player's current lineup before we redirect
         $old_last_robots = $WORLD_PLAYER_SESSION['last_robots'];
-        $new_last_robots = $old_last_robots.','.$mecha_session_key;
+        $new_last_robots = trim($old_last_robots.','.$mecha_session_key, ',');
         //error_log('-> $mecha_world_session_array = '.print_r($mecha_world_session_array, true));
         //error_log('-> $mecha_battle_rewards_array = '.print_r($mecha_battle_rewards_array, true));
         //error_log('-> $mecha_battle_settings_array = '.print_r($mecha_battle_settings_array, true));
