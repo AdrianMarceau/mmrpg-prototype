@@ -913,7 +913,9 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
 
     // Define or collect the various print options
     $show_event = true;
-    if ($print_options === false){ $show_event = false; $print_options = array(); }
+    if ($print_options === false){ $show_event = false; }
+    elseif ($print_options === true){ $show_event = true; }
+    if (!is_array($print_options)){ $print_options = array(); }
     if (!isset($print_options['player_token'])){ $print_options['player_token'] = ''; }
     if (!isset($print_options['shop_token'])){ $print_options['shop_token'] = ''; }
     if (!isset($print_options['event_text'])){ $print_options['event_text'] = 'The {item} was unlocked!'; }
