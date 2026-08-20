@@ -1056,7 +1056,7 @@
                                     <div class="field halfsize">
                                         <strong class="label">Required Shop Level <em>min shop level attained before available</em></strong>
                                         <input class="hidden" type="hidden" name="ability_shop_level" value="0" />
-                                        <input class="textbox" type="number" name="item_shop_level" value="<?= !empty($item_data['item_shop_level']) ? $item_data['item_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="10" />
+                                        <input class="textbox" type="number" name="item_shop_level" value="<?= !empty($item_data['item_shop_level']) ? $item_data['item_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="5" />
                                     </div>
 
                                     <div class="field halfsize">
