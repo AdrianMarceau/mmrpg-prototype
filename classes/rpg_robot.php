@@ -1633,9 +1633,11 @@ class rpg_robot extends rpg_object {
             elseif ($ability_info['ability_class'] === 'system'){ continue; }
             elseif (empty($ability_info['ability_flag_published'])){ continue; }
             elseif (empty($ability_info['ability_flag_complete'])){ continue; }
-            elseif (empty($ability_info['ability_flag_unlockable'])){ continue; }
+            elseif ($ability_info['ability_master'] !== $robot_token && empty($ability_info['ability_flag_unlockable'])){ continue; }
+            //error_log('-> now checking '.$robot_token.' has '.$ability_token.' compatibility');
             if (self::has_ability_compatibility($robot_token, $ability_info, $item_token)){
                 $compatible_abilities[] = $ability_token;
+                //error_log('--> yes it is');
             }
         }
         return $compatible_abilities;
