@@ -2042,7 +2042,7 @@ function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_
 }
 
 // Define a function for checking how many prototype abilities has been unlocked
-function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array()){
+function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array(), $include_hidden = false){
 
     // Pull in global variables
     $mmrpg_index_players = rpg_player::get_index(true);
@@ -2074,7 +2074,7 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         if ($info['ability_class'] != 'master'){ unset($ability_tokens[$key]); }
         elseif (empty($info['ability_flag_published'])){ unset($ability_tokens[$key]); }
         elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
-        elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
+        elseif (!$include_hidden && !empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
     }
     $ability_tokens = !empty($ability_tokens) ? array_values($ability_tokens) : array();
 
