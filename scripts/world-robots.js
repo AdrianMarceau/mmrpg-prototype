@@ -2055,6 +2055,11 @@ function getRobotNameSpan(robotToken, customText){
     let _self = this;
     let _indexes = _self.indexes;
     let _mmrpgRobotsIndex = _indexes.robots;
+    let robotId = 0;
+    if (robotToken.indexOf('_') !== -1){
+        robotId = parseInt(robotToken.split('_')[0]);
+        robotToken = robotToken.split('_')[1];
+        }
     let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
     let robotName = robotInfo ? robotInfo.name : 'Robot';
     let robotType1 = robotInfo.core || '';
