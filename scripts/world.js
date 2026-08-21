@@ -4346,12 +4346,14 @@ class mmrpgWorldMap {
         }
 
     // Define a quick event for showing the title banner w/ whatever title and subtitle text is provided w/ optional custom timeout for autohide
-    showTitleBanner(titleText, subtitleText, showBreadcrumb, autoHideTimeout){
+    showTitleBanner(titleText, subtitleText, showBreadcrumb, autoHideTimeout, bannerColour){
         //console.log('%c' + 'mmrpgWorldMap.showTitleBanner()', 'color: magenta;');
         if (!titleText || typeof titleText !== 'string' || !titleText.length){ console.error('showTitleBanner() missing required titleText!'); return; }
         if (subtitleText && typeof subtitleText !== 'string'){ console.error('showTitleBanner() received invalid subtitleText!'); return; }
         showBreadcrumb = typeof showBreadcrumb === 'boolean' ? showBreadcrumb : false; // default to false if not provided
         autoHideTimeout = typeof autoHideTimeout === 'number' ? autoHideTimeout : 3000; // default to 3 seconds if not provided
+        bannerColour = typeof bannerColour === 'string' ? ' type ' + bannerColour : ''; // default to pitch nothing specific
+        //console.log('bannerColour =', bannerColour);
         let _self = this;
         let _elements = _self.elements;
         let $thisCanvas = _elements.canvas;
@@ -4359,7 +4361,7 @@ class mmrpgWorldMap {
         let $titleBanner = _elements.titleBanner;
         if (!$titleBanner || !$titleBanner.length){
             let titleBannerMarkup = '';
-            titleBannerMarkup += '<div id="title-banner" class="chrome">';
+            titleBannerMarkup += '<div id="title-banner" class="chrome' + bannerColour + '">';
                 titleBannerMarkup += '<div class="wrap">';
                     titleBannerMarkup += '<h1 class="title">' + titleText + (showBreadcrumb ? ' &raquo;' : '') + '</h1>';
                     titleBannerMarkup += '<h2 class="subtitle">' + subtitleText + '</h2>';
@@ -4369,7 +4371,7 @@ class mmrpgWorldMap {
             $titleBanner = $('#title-banner', $thisCanvas);
             _elements.titleBanner = $titleBanner;
             } else {
-            $titleBanner.removeClass('active');
+            $titleBanner.removeClass().addClass('chrome' + bannerColour);
             $titleBanner.find('.title').html(titleText + (showBreadcrumb ? ' &raquo;' : ''));
             $titleBanner.find('.subtitle').html(subtitleText);
             }
@@ -4384,7 +4386,7 @@ class mmrpgWorldMap {
                     $titleBanner.find('.title').html('');
                     $titleBanner.find('.subtitle').html('');
                     $titleBanner.addClass('hidden');
-                    }, (autoHideTimeout * 2));
+                    }, (autoHideTimeout + 100));
                 }, autoHideTimeout);
             }
         // Return no specific result
