@@ -916,11 +916,12 @@ function reduceRobotWeapons(robotString, reduceAmount, playSound){
     }
 
 // Quick function for resetting a robot's stat mods for a given stat back to zero
-function resetRobotStat(robotString, statToken, playSound){
+function resetRobotStat(robotString, statToken, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.resetRobotStat(robot:' + robotString + ', stat:' + statToken + ', sound:' + playSound + ')', 'color: magenta;');
     if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('resetRobotStat() missing required robotString!'); return false; }
     if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('resetRobotStat() missing required statToken!'); return false; }
     if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+    if (typeof showMessage !== 'boolean'){ showMessage = true; } // default to true if not provided
     // Collect references to world objects
     let _self = this;
     let _config = _self.config;
@@ -966,6 +967,14 @@ function resetRobotStat(robotString, statToken, playSound){
         let hasModsNow = robotHasMods();
         if (hasModsNow){ $robotOverview.addClass('hasmods'); }
         else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
+        // Print a status message about the reset
+        if (showMessage && hadModsThen){
+            let messageMarkup = [];
+            let robotNameTextSpan = _self.getRobotNameSpan(robotToken);
+            //let statName = statToken[0].toUpperCase() + statToken.slice(1);
+            messageMarkup.push(robotNameTextSpan + '&#39;s ' + statToken + ' returned to normal!');
+            _self.showWorldMessage(messageMarkup);
+            }
         }, 1000); // minor delay to sync with animation
     // Add a reset class to this robot to show it being effected by the action
     $robotOverview.addClass('stat-reset ' + statToken + '-stat-reset');
@@ -977,26 +986,27 @@ function resetRobotStat(robotString, statToken, playSound){
     return true;
     }
 // Define some quick alias functions for the above (attack, defense, and speed varieties)
-function resetRobotAttack(robotString, playSound){
+function resetRobotAttack(robotString, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.resetRobotAttack(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.resetRobotStat(robotString, 'attack', playSound);
+    let _self = this; return _self.resetRobotStat(robotString, 'attack', playSound, showMessage);
     }
-function resetRobotDefense(robotString, playSound){
+function resetRobotDefense(robotString, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.resetRobotDefense(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.resetRobotStat(robotString, 'defense', playSound);
+    let _self = this; return _self.resetRobotStat(robotString, 'defense', playSound, showMessage);
     }
-function resetRobotSpeed(robotString, playSound){
+function resetRobotSpeed(robotString, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.resetRobotSpeed(robot:' + robotString + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.resetRobotStat(robotString, 'speed', playSound);
+    let _self = this; return _self.resetRobotStat(robotString, 'speed', playSound, showMessage);
     }
 
 // Quick function for boosting (incrementing) a given robots stat by a specific amount (up to max of +5)
-function boostRobotStat(robotString, statToken, boostAmount, playSound){
+function boostRobotStat(robotString, statToken, boostAmount, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.boostRobotStat(robot:' + robotString + ', stat:' + statToken + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
     if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('boostRobotStat() missing required robotString!'); return false; }
     if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('boostRobotStat() missing required statToken!'); return false; }
     if (typeof boostAmount !== 'number' || isNaN(boostAmount) || boostAmount < 1){ console.error('boostRobotStat() missing or invalid boostAmount!'); return false; }
     if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
+    if (typeof showMessage !== 'boolean'){ showMessage = true; } // default to true if not provided
     // Collect references to world objects
     let _self = this;
     let _config = _self.config;
@@ -1038,8 +1048,10 @@ function boostRobotStat(robotString, statToken, boostAmount, playSound){
     let $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
     // Update the robot info with the new stat-mod value
     let hadModsThen = robotHasMods();
-    let newStatModValue = (robotInfo[statModKey] || 0) + statBoostAmount;
+    let currentModValue = robotInfo[statModKey] || 0;
+    let newStatModValue = currentModValue + statBoostAmount;
     if (newStatModValue > statModMax){ newStatModValue = statModMax; } // cap at max value
+    let relBoostAmount = newStatModValue - currentModValue;
     robotInfo[statModKey] = newStatModValue;
     _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
     // Create the statmods container if it does not already exist then append to container
@@ -1065,6 +1077,18 @@ function boostRobotStat(robotString, statToken, boostAmount, playSound){
         let hasModsNow = robotHasMods();
         if (hasModsNow){ $robotOverview.addClass('hasmods'); }
         else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
+        // Print a status message about the boost
+        if (showMessage){
+            let boostText = '';
+            if (newStatModValue === 0){ boostText = 'returned to normal'; }
+            else if (relBoostAmount >= 3){ boostText = 'rose drastically'; }
+            else if (relBoostAmount >= 2){ boostText = 'sharply rose'; }
+            else { boostText = 'rose'; }
+            let messageMarkup = [];
+            let robotNameTextSpan = _self.getRobotNameSpan(robotToken);
+            messageMarkup.push(robotNameTextSpan + '&#39;s ' + statToken + ' ' + boostText + '!');
+            _self.showWorldMessage(messageMarkup);
+            }
         }, 1000); // minor delay to sync with animation
     // Add a boost class to this robot to show it being effected by the action
     $robotOverview.addClass('stat-boosted ' + statToken + '-stat-boosted');
@@ -1076,27 +1100,28 @@ function boostRobotStat(robotString, statToken, boostAmount, playSound){
     return true;
     }
 // Define some quick alias functions for the above (attack, defense, and speed varieties)
-function boostRobotAttack(robotString, boostAmount, playSound){
+function boostRobotAttack(robotString, boostAmount, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.boostRobotAttack(robot:' + robotString + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.boostRobotStat(robotString, 'attack', boostAmount, playSound);
+    let _self = this; return _self.boostRobotStat(robotString, 'attack', boostAmount, playSound, showMessage);
     }
-function boostRobotDefense(robotString, boostAmount, playSound){
+function boostRobotDefense(robotString, boostAmount, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.boostRobotDefense(robot:' + robotString + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.boostRobotStat(robotString, 'defense', boostAmount, playSound);
+    let _self = this; return _self.boostRobotStat(robotString, 'defense', boostAmount, playSound, showMessage);
     }
-function boostRobotSpeed(robotString, boostAmount, playSound){
+function boostRobotSpeed(robotString, boostAmount, playSound, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.boostRobotSpeed(robot:' + robotString + ', amount:' + boostAmount + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.boostRobotStat(robotString, 'speed', boostAmount, playSound);
+    let _self = this; return _self.boostRobotStat(robotString, 'speed', boostAmount, playSound, showMessage);
     }
 
 // Quick function for breaking (decrementing) a given robots stat by a specific amount (down to min of -5)
-function breakRobotStat(robotString, statToken, breakAmount, playSound, playAnimation){
+function breakRobotStat(robotString, statToken, breakAmount, playSound, playAnimation, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.breakRobotStat(robot:' + robotString + ', stat:' + statToken + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
     if (!robotString || typeof robotString !== 'string' || !robotString.length){ console.error('breakRobotStat() missing required robotString!'); return false; }
     if (!statToken || typeof statToken !== 'string' || !statToken.length){ console.error('breakRobotStat() missing required statToken!'); return false; }
     if (typeof breakAmount !== 'number' || isNaN(breakAmount) || breakAmount < 1){ console.error('breakRobotStat() missing or invalid breakAmount!'); return false; }
     if (typeof playSound !== 'boolean'){ playSound = true; } // default to true if not provided
     if (typeof playAnimation !== 'boolean'){ playAnimation = true; } // default to true if not provided
+    if (typeof showMessage !== 'boolean'){ showMessage = true; } // default to true if not provided
     // Collect references to world objects
     let _self = this;
     let _config = _self.config;
@@ -1144,8 +1169,10 @@ function breakRobotStat(robotString, statToken, breakAmount, playSound, playAnim
     let $robotStatModDiv = $('.mod.'+statToken, $robotStatMods);
     // Update the robot info with the new stat-mod value
     let hadModsThen = robotHasMods();
-    let newStatModValue = (robotInfo[statModKey] || 0) - statBreakAmount;
+    let currentModValue = robotInfo[statModKey] || 0;
+    let newStatModValue = currentModValue - statBreakAmount;
     if (newStatModValue < statModMin){ newStatModValue = statModMin; } // cap at min value
+    let relBreakAmount = currentModValue - newStatModValue;
     robotInfo[statModKey] = newStatModValue;
     _worldPlayerRobots[robotString] = robotInfo; // sync the robot info with the index
     // Create the statmods container if it does not already exist then append to container
@@ -1184,6 +1211,19 @@ function breakRobotStat(robotString, statToken, breakAmount, playSound, playAnim
         let hasModsNow = robotHasMods();
         if (hasModsNow){ $robotOverview.addClass('hasmods'); }
         else { $robotOverview.removeClass('hasmods'); $robotStatMods.remove(); }
+        // Print a status message about the break
+        if (showMessage){
+            let breakText = '';
+            if (newStatModValue === 0){ breakText = 'returned to normal'; }
+            else if (relBreakAmount >= 3){ breakText = 'severely fell'; }
+            else if (relBreakAmount >= 2){ breakText = 'harshly fell'; }
+            else { breakText = 'fell'; }
+
+            let messageMarkup = [];
+            let robotNameTextSpan = _self.getRobotNameSpan(robotToken);
+            messageMarkup.push(robotNameTextSpan + '&#39;s ' + statToken + ' ' + breakText + '!');
+            _self.showWorldMessage(messageMarkup);
+            }
         }, 1000); // minor delay to sync with animation
     // Add a break class to this robot to show it being effected by the action
     $robotOverview.addClass('stat-breaked ' + statToken + '-stat-breaked');
@@ -1195,17 +1235,17 @@ function breakRobotStat(robotString, statToken, breakAmount, playSound, playAnim
     return true;
     }
 // Define some quick alias functions for the above (attack, defense, and speed varieties)
-function breakRobotAttack(robotString, breakAmount, playSound, playAnimation){
+function breakRobotAttack(robotString, breakAmount, playSound, playAnimation, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.breakRobotAttack(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.breakRobotStat(robotString, 'attack', breakAmount, playSound, playAnimation);
+    let _self = this; return _self.breakRobotStat(robotString, 'attack', breakAmount, playSound, playAnimation, showMessage);
     }
-function breakRobotDefense(robotString, breakAmount, playSound, playAnimation){
+function breakRobotDefense(robotString, breakAmount, playSound, playAnimation, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.breakRobotDefense(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.breakRobotStat(robotString, 'defense', breakAmount, playSound, playAnimation);
+    let _self = this; return _self.breakRobotStat(robotString, 'defense', breakAmount, playSound, playAnimation, showMessage);
     }
-function breakRobotSpeed(robotString, breakAmount, playSound, playAnimation){
+function breakRobotSpeed(robotString, breakAmount, playSound, playAnimation, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.breakRobotSpeed(robot:' + robotString + ', amount:' + breakAmount + ', sound:' + playSound + ')', 'color: magenta;');
-    let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound, playAnimation);
+    let _self = this; return _self.breakRobotStat(robotString, 'speed', breakAmount, playSound, playAnimation, showMessage);
     }
 
 // Quick function for giving a given robot a new hold item and then optionally playing a sound effect
