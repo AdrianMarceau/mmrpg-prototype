@@ -1783,16 +1783,19 @@ function getRobotDetailsForOverview(robotToken){
             let abilitySlotNum = abilitySlotKey + 1;
             let abilityID = typeof playerRobotAbilities[abilitySlotKey] !== 'undefined' ? playerRobotAbilities[abilitySlotKey] : 0;
             let abilityInfo = _mmrpgAbilitiesIndex.getByID(abilityID);
-            let abilityToken, abilityName, abilityTypeClasses;
+            let abilityToken, abilityName, abilityTypeClasses, abilityOtherClasses;
             if (abilityInfo){
                 abilityToken = abilityInfo.token;
                 abilityName = abilityInfo.name;
                 abilityTypeClasses = (abilityInfo.type2 && !abilityInfo.type ? abilityInfo.type2 : ((abilityInfo.type ? abilityInfo.type : 'none') + (abilityInfo.type2 ? '_' + abilityInfo.type2 : '')));
                 if (newPlayerRobotAbilities.indexOf(abilityToken) !== -1){ abilityTypeClasses += ' new'; }
+                if (abilityInfo.class !== 'master'){ abilityOtherClasses = ' locked'; }
+                else { abilityOtherClasses = ''; }
                 } else {
                 abilityToken = '';
                 abilityName = 'None';
                 abilityTypeClasses = 'empty';
+                abilityOtherClasses = '';
                 }
             let abilityNameFormatted = '<span class="name"><strong>' + abilityName.replace(' ', '<br />') + '</strong></span>';;
             let abilityIconSprite = abilityToken ? _self.getAbilitySpriteMarkup(abilityToken, {classes: 'icon', showBack: true}) : '';
@@ -1804,7 +1807,7 @@ function getRobotDetailsForOverview(robotToken){
             //console.log('--> abilityInfo =', abilityInfo);
             abilitiesLine.values.push({
                 value: abilityValueMarkup,
-                valueClasses: 'type ' + abilityTypeClasses,
+                valueClasses: 'type ' + abilityTypeClasses + abilityOtherClasses,
                 valueAttrs: {'ability-id': abilityID, 'ability-token': abilityToken, 'ability-slot': abilitySlotNum},
                 });
             }
