@@ -2241,6 +2241,8 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
         || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
 
+        if (typeof window.HowlerGlobal !== 'undefined'){ window.HowlerGlobal.autoSuspend = false; }
+
         sound = new Howl({
             src: gameSettings.soundEffectSources,
             sprite: gameSettings.soundEffectSprites,
@@ -2250,7 +2252,7 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             rate: 1.0,
             loop: false,
             html5: false,
-        });
+            });
 
         gameSettings.soundEffectPool[soundEffectPoolKey] = {
             key: soundEffectPoolKey,
@@ -2266,24 +2268,22 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
 
     let playSoundWhenReady = function(effectName, effectVolume, effectRate){
         let playSound = function(sound){
-            // FIX 2: Trigger play FIRST to get the unique ID for this specific playback
+            // Trigger play FIRST to get the unique ID for this specific playback
             let playId = sound.play(effectName);
-
-            // FIX 3: Apply rate and volume strictly to this playId so it doesn't corrupt others
+            // Apply rate and volume strictly to this playId so it doesn't corrupt others
             sound.rate(effectRate, playId);
-            sound.volume(effectVolume, playId);
-
-            // Store the id back into your effect object if you need to manipulate it later
+            //sound.volume(effectVolume, playId);
+            sound.fade(0, effectVolume, 10, playId);
+            // Store the id back into your effect object for if we need to manipulate it later
             effect.id = playId;
-        };
-
+            };
         if (sound.state() !== 'loaded'){
             sound.once('load', function(){
                 playSound(sound);
-            });
-        } else {
+                });
+            } else {
             playSound(sound);
-        }
+            }
         return true;
     };
 
