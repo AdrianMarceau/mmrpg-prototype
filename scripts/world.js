@@ -3427,13 +3427,14 @@ class mmrpgWorldMap {
             let robotID = robotString.split('_')[0];
             let robotToken = robotString.split('_')[1];
             let robotInfo = typeof robotsIndex[robotToken] !== 'undefined' ? robotsIndex[robotToken] : null;
-            //if (!robotToken || !robotInfo){ console.error('showActionModal() could not find robot info for token ' + robotToken + '!'); return; }
-            //let robotData = typeof _worldPlayerRobots[robotString] !== 'undefined' ? _worldPlayerRobots[robotString] : null;
+            //let robotData = typeof _worldPlayerRobots[actionObjectToken] !== 'undefined' ? _worldPlayerRobots[actionObjectToken] : null;
             //if (!robotToken || !robotData){ console.error('showActionModal() could not find player robot data for token ' + robotToken + '!'); return; }
+            //if (!robotToken || !robotInfo){ console.error('showActionModal() could not find robot info for token ' + robotToken + '!'); return; }
+            //console.log('--> robotString =', robotString);
             //console.log('--> robotID =', robotID);
             //console.log('--> robotToken =', robotToken);
-            //console.log('--> robotInfo =', robotInfo);
             //console.log('--> robotData =', robotData);
+            //console.log('--> robotInfo =', robotInfo);
             //let $robotOnTeam = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
             //let $robotInStorage = $robotStorageBox.find('.team-robot[data-robot="' + robotString + '"]');
             let $robotDetailsDiv = $robotsOverview.find('.storage-details[data-robot="' + robotString + '"]');
