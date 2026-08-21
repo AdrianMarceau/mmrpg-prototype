@@ -723,6 +723,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     let _mapActorsIndex = _config.mapActorsIndex;
     let _mmrpgPlayersIndex = _indexes.players;
     let _mmrpgRobotsIndex = _indexes.robots;
+    let _mmrpgAbilitiesIndex = _indexes.abilities;
+    let _mmrpgItemsIndex = _indexes.items;
     let _userId = _config.userId;
     let _playerId = _config.playerId;
     let _playerToken = _config.playerToken;
@@ -2914,7 +2916,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     }
                 }
             else if (isBlock){
-                // TODO: action will always equal "remove-block" but we should verify
+                // TODO: action will always equal 'remove-block' but we should verify
                 //console.log('-> block-related action button clicked with action:', action);
                 let blockSymbols = _config.mapBlockSymbols;
                 let blocksIndex = _config.mapBlocksIndex;
@@ -2931,6 +2933,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if (!blockRobot || !blockAbility){ console.error('-> block robot and name are both required, cannot remove block!'); return false; }
                 let $eventSprite = $(firstEvent.sprite);
                 let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                let $robotSprite = $('.sprite[data-sprite="team-robot"][data-robot="' + blockRobot + '"]', $canvasMap);
                 //console.log('-> $eventSprite =', $eventSprite);
                 //console.log('-> $innerSprite =', $innerSprite);
                 let blockKind = blockInfo.sprite ? blockInfo.sprite : false;
@@ -2943,6 +2946,10 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 //console.log('-> blockType =', blockType);
                 //console.log('-> blockWeaknesses =', blockWeaknesses);
                 //console.log('-> blockEffects =', blockEffects);
+                //let blockRobotInfo = _mmrpgRobotsIndex[blockRobot.split('_')[1]];
+                //let blockAbilityInfo = _mmrpgAbilitiesIndex[blockAbility];
+                //console.log('-> blockRobotInfo =', blockRobotInfo);
+                //console.log('-> blockAbilityInfo =', blockAbilityInfo);
                 dismissDropdown(false);
                 blockInfo.removed = true;
                 delete blockSymbols[blockInfo.pos];
@@ -2954,8 +2961,20 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 _self.reduceRobotWeapons(blockRobot, 1, false);
                 _self.playSoundEffect('block-destroyed-sound', {delay: 200});
                 $canvasMap.addClass('shake-once');
+                $robotSprite.attr('data-frame', '01');
+                $robotSprite.addClass('always-zoom');
+                let robotNameSpan = _self.getRobotNameSpan(blockRobot);
+                let abilityNameSpan = _self.getAbilityNameSpan(blockAbility);
+                let blockNameSpan = _self.getCustomNameSpan(blockInfo.sprite.replace('-', ' '), blockInfo.colour);
+                let wasOrWere = blockInfo.sprite.substr(-1, 1) === 's' ? 'were' : 'was';
+                _self.showWorldMessage([
+                    robotNameSpan + ' used ' + abilityNameSpan,
+                    'The ' + blockNameSpan + ' ' + wasOrWere + ' destroyed!'
+                    ]);
                 $eventSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
                     $eventSprite.remove();
+                    $robotSprite.removeClass('always-zoom');
+                    $robotSprite.attr('data-frame', '00');
                     $canvasMap.removeClass('shake-once');
                     _self.calculateWalkableMapTiles(true);
                     _self.refreshMapPositionEvents();
@@ -2963,7 +2982,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 _self.saveWorldState();
                 }
             else if (isHazard){
-                // TODO: action will always equal "remove-hazard" but we should verify
+                // TODO: action will always equal 'remove-hazard' but we should verify
                 //console.log('-> hazard-related action button clicked with action:', action);
                 let hazardSymbols = _config.mapHazardSymbols;
                 let hazardsIndex = _config.mapHazardsIndex;
@@ -2980,6 +2999,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if (!hazardRobot || !hazardAbility){ console.error('-> hazard robot and name are both required, cannot remove hazard!'); return false; }
                 let $eventSprite = $(firstEvent.sprite);
                 let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
+                let $robotSprite = $('.sprite[data-sprite="team-robot"][data-robot="' + hazardRobot + '"]', $canvasMap);
                 //console.log('-> $eventSprite =', $eventSprite);
                 //console.log('-> $innerSprite =', $innerSprite);
                 let hazardKind = hazardInfo.sprite ? hazardInfo.sprite : false;
@@ -3003,8 +3023,20 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 _self.reduceRobotWeapons(hazardRobot, 1, false);
                 _self.playSoundEffect('hazard-destroyed-sound', {delay: 200});
                 $canvasMap.addClass('shake-once');
+                $robotSprite.attr('data-frame', '01');
+                $robotSprite.addClass('always-zoom');
+                let robotNameSpan = _self.getRobotNameSpan(hazardRobot);
+                let abilityNameSpan = _self.getAbilityNameSpan(hazardAbility);
+                let hazardNameSpan = _self.getCustomNameSpan(hazardInfo.sprite.replace('-', ' '), hazardInfo.colour);
+                let wasOrWere = hazardInfo.sprite.substr(-1, 1) === 's' ? 'were' : 'was';
+                _self.showWorldMessage([
+                    robotNameSpan + ' used ' + abilityNameSpan,
+                    'The ' + hazardNameSpan + ' ' + wasOrWere + ' removed!'
+                    ]);
                 $eventSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
                     $eventSprite.remove();
+                    $robotSprite.removeClass('always-zoom');
+                    $robotSprite.attr('data-frame', '00');
                     $canvasMap.removeClass('shake-once');
                     _self.calculateWalkableMapTiles(true);
                     _self.refreshMapPositionEvents();
@@ -3021,7 +3053,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
 
                 }
             else if (action === 'use-mecha-whistle'){
-                console.log('-> special action "', action, '", time to use the mecha whistle');
+                //console.log('-> special action "', action, '", time to use the mecha whistle');
                 let delayMessageFor = 300;
                 let delayDismissFor = 1200;
                 let delayEffectFor = 2100;
@@ -3039,34 +3071,40 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 //console.log('-> battlesIndex =', battlesIndex);
                 //console.log('-> battleTarget =', battleTarget);
                 //console.log('-> battleInfo =', battleInfo);
-                _self.showWorldMessage([
-                    playerNameSpan + ' uses a ' + itemNameSpan + '!',
-                    '...the mecha responded!'
-                    ], delayMessageFor);
-                setTimeout(function(){ dismissDropdown(false); }, delayDismissFor);
-                setTimeout(function(){
-                    //console.log('-> redirect to auto-recruitment URL now');
-                    // Shift the target into a different frame to show it heard the whistle
-                    let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
-                    $eventSprite.attr('data-frame', '02').addClass('zoom');
-                    // Now we redirect to the same page but w/ this battle as a auto-recruitment source
-                    let recruitHref = 'world.php?recruit=' + battleTarget;
-                    if (recruitHref){
-                        //console.log('recruiting w/ recruitHref =', recruitHref);
-                        _self.playSoundEffect('get-weird-item');
-                        _self.incZoomLevel();
-                        $thisWorld.addClass('busy');
-                        _self.saveWorldState(function(){
+                _self.playSoundEffect('get-weird-item');
+                _self.showWorldMessage(playerNameSpan + ' uses a ' + itemNameSpan + '!', delayMessageFor);
+                // Right now this always works, but wrap it in a function in case we wanna add conditions later
+                if (true){
+                    _self.showWorldMessage('...the mecha responded!', delayDismissFor);
+                    _self.decrementItemQuantity('mecha-whistle');
+                    setTimeout(function(){ dismissDropdown(false); }, delayDismissFor);
+                    setTimeout(function(){
+                        //console.log('-> redirect to auto-recruitment URL now');
+                        // Shift the target into a different frame to show it heard the whistle
+                        let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
+                        $eventSprite.attr('data-frame', '02').addClass('zoom');
+                        // Now we redirect to the same page but w/ this battle as a auto-recruitment source
+                        let recruitHref = 'world.php?recruit=' + battleTarget;
+                        if (recruitHref){
+                            //console.log('recruiting w/ recruitHref =', recruitHref);
+                            _self.playSoundEffect('get-big-item');
                             _self.incZoomLevel();
-                            $thisWorld.addClass('loading');
-                            window.location.href = recruitHref;
-                            _self.incZoomLevel();
-                            }, true, false);
-                        $thisWorld.animate({opacity: 0}, 1200, function(){
-                            $thisWorld.addClass('hidden');
-                            });
-                        }
-                    }, delayEffectFor);
+                            $thisWorld.addClass('busy');
+                            _self.saveWorldState(function(){
+                                _self.incZoomLevel();
+                                $thisWorld.addClass('loading');
+                                window.location.href = recruitHref;
+                                _self.incZoomLevel();
+                                }, true, false);
+                            $thisWorld.animate({opacity: 0}, 1200, function(){
+                                $thisWorld.addClass('hidden');
+                                });
+                            }
+                        }, delayEffectFor);
+                    } else {
+                    _self.showWorldMessage('...but nothing happened.', delayDismissFor);
+                    _self.playSoundEffect('small-debuff-received');
+                    }
                 }
             else if (action === 'reset-world-pickups' || action === 'reset-world-encounters'){
                 //console.log('-> special action "', action, '", time to reset the ', action.split('-')[2]);
