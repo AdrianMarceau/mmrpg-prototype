@@ -2209,7 +2209,7 @@ class rpg_world {
         $storage_robot_strings = mmrpg_prototype_robots_unlocked($current_player_token, true, true);
 
         $storage_item_tokens = array(); mmrpg_prototype_items_unlocked(true, $storage_item_tokens);
-        $storage_ability_tokens = array(); mmrpg_prototype_abilities_unlocked('', '', $storage_ability_tokens);
+        $storage_ability_tokens = array(); mmrpg_prototype_abilities_unlocked('', '', $storage_ability_tokens, true);
         $equipped_player_items = array(); mmrpg_prototype_items_equipped('', $equipped_player_items);
 
         $battle_robot_history = rpg_world::get_battle_history($current_player_token);
