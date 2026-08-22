@@ -2114,6 +2114,15 @@ class rpg_world {
         return $this_battle_stars;
     }
 
+    // Define a function for getting the starforce collected so far
+    public static function get_star_force($strict = false){
+        //error_log('rpg_world::get_star_force()');
+        $session_token = rpg_game::session_token();
+        $star_force_key = 'star_force'.($strict ? '_strict' : '');
+        $this_star_force = !empty($_SESSION[$session_token]['values'][$star_force_key]) ? $_SESSION[$session_token]['values'][$star_force_key] : array();
+        return $this_star_force;
+    }
+
     // Define a function for getting the player switcher markup given current conditions
     public static function get_player_switcher_markup($this_prototype_data, $player_tokens){
         //error_log('rpg_world::get_player_switcher_markup() called!');
