@@ -367,9 +367,9 @@ if (empty($this_prototype_data['this_player_items_index'])){
     //error_log('$this_player_items_index(new) = '. print_r($this_player_items_index, true));
 }
 
-// Collect the user's list of collects stars so we know what we already have and their metadata (all players share)
-$unlocked_player_stars = rpg_world::get_battle_stars();
+// Pull the user's list of collected stars so we know what we already have and their metadata (all players share)
 if (empty($this_prototype_data['this_player_stars_index'])){
+    $unlocked_player_stars = rpg_world::get_battle_stars();
     $this_player_stars_index = array();
     if (!empty($unlocked_player_stars)){
         //error_log('$unlocked_player_stars = '. print_r($unlocked_player_stars, true));
@@ -382,6 +382,13 @@ if (empty($this_prototype_data['this_player_stars_index'])){
     $this_prototype_data['this_player_stars_index'] = $this_player_stars_index;
     //error_log('$this_player_stars_index(new) = '. print_r($this_player_stars_index, true));
 }
+
+// Pull the user's collected starforce values so we don't have to manually calculate at runtime
+if (empty($this_prototype_data['this_player_star_force'])){
+    $unlocked_star_force = rpg_world::get_star_force();
+    $this_prototype_data['this_player_star_force'] = $unlocked_star_force;
+}
+
 
 // Update the player's mobility with any character-specific bonuses or contextual modifiers
 if ($this_prototype_data['this_player_token'] === 'player'){ $this_prototype_data['this_player_mobility'] = -1; }
@@ -1025,6 +1032,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
     _worldConfig.playerAbilities = <?= json_encode($this_prototype_data['this_player_abilities'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerItemsIndex = <?= json_encode($this_prototype_data['this_player_items_index'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerStarsIndex = <?= json_encode($this_prototype_data['this_player_stars_index'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerStarForce = <?= json_encode($this_prototype_data['this_player_star_force'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerRobotsLimit = <?= json_encode($this_prototype_data['this_player_robots_limit'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility'], JSON_NUMERIC_CHECK) ?>;

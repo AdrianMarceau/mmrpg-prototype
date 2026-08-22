@@ -8,6 +8,7 @@ gameSettings.worldConfig = {
     playerAbilities: ['buster-shot'],
     playerItemsIndex: {},
     playerStarsIndex: {},
+    playerStarForce: {},
     playerRobotsIndex: {},
     playerRobotsLimit: -1,
     playerMobility: 1, // default only
@@ -548,6 +549,15 @@ class mmrpgWorldMap {
             //console.log('---> adding stars to player state:', livePlayerStars);
             _worldPlayer.stars = livePlayerStars;
             //console.log('---> initWorldMap() livePlayerStars =', livePlayerStars);
+            }
+        // If player starforce was defined [values] in the predefined config, copy them over to the state
+        let _playerStarForce = _config.playerStarForce;
+        if (Object.keys(_playerStarForce).length){
+            //console.log('---> initWorldMap() found ' + Object.keys(_playerStarForce).length + ' star force elements to initialize!');
+            let livePlayerStarForce = _self.getClonedObject(_playerStarForce);
+            //console.log('---> adding starforce to player state:', livePlayerStarForce);
+            _worldPlayer.starForce = livePlayerStarForce;
+            //console.log('---> initWorldMap() livePlayerStarForce =', livePlayerStarForce);
             }
         // Define the function to run when everything is done loading
         let onWorldLoaded = function(){
@@ -3105,6 +3115,9 @@ class mmrpgWorldMap {
         let _selfRef = _self.showActionModal;
         let _config = _self.config;
         let _indexes = _self.indexes;
+        let _mmrpgIndexPlayers = _indexes.players;
+        let _mmrpgIndexRobots = _indexes.robots;
+        let _mmrpgIndexAbilities = _indexes.abilities;
         let _elements = _self.elements;
         let $thisCanvas = _elements.canvas;
         let $canvasWrapper = $('> .wrapper', $thisCanvas);
@@ -3350,6 +3363,16 @@ class mmrpgWorldMap {
                     $selectedAbilityButton.replaceWith(newAbilityMarkup);
                     }
                 //console.log('--> currentAbilities(after) =', JSON.stringify(currentAbilities));
+                // check if this player has copy-style for a persona or not
+                let copyStyleAbilityID = abilitiesIndex['copy-style'].id;
+                let hasCopyStyleEquipped = currentAbilities.indexOf(copyStyleAbilityID) !== -1 ? true : false;
+                if (playerRobotInfo.coreElse === 'copy'){
+                    if (hasCopyStyleEquipped){ _self.applyPersonaToRobot(_worldPlayer, playerRobotInfo); }
+                    else { _self.removePersonaFromRobot(_worldPlayer, playerRobotInfo); }
+                    }
+                //console.log('--> copyStyleAbilityID =', copyStyleAbilityID);
+                //console.log('--> hasCopyStyleEquipped =', hasCopyStyleEquipped);
+                //console.log('--> playerRobotInfo.image =', playerRobotInfo.image);
                 let $newAbilityButton = $currentAbilitiesList.find('.team-ability[data-ability="' + newAbilityToken + '"]');
                 let $abilityInStorage = $abilitiesInStorage.filter('[data-ability="' + newAbilityToken + '"].selected');
                 $newAbilityButton.addClass('selected').addClass('saving');
@@ -3370,6 +3393,16 @@ class mmrpgWorldMap {
                 delete currentAbilities[selectedAbilitySlot];
                 currentAbilities = Object.values(currentAbilities);
                 //console.log('--> currentAbilities(after) =', JSON.stringify(currentAbilities));
+                // check if this player has copy-style for a persona or not
+                let copyStyleAbilityID = abilitiesIndex['copy-style'].id;
+                let hasCopyStyleEquipped = currentAbilities.indexOf(copyStyleAbilityID) !== -1 ? true : false;
+                if (playerRobotInfo.coreElse === 'copy'){
+                    if (hasCopyStyleEquipped){ _self.applyPersonaToRobot(_worldPlayer, playerRobotInfo); }
+                    else { _self.removePersonaFromRobot(_worldPlayer, playerRobotInfo); }
+                    }
+                //console.log('--> copyStyleAbilityID =', copyStyleAbilityID);
+                //console.log('--> hasCopyStyleEquipped =', hasCopyStyleEquipped);
+                //console.log('--> playerRobotInfo.image =', playerRobotInfo.image);
                 $selectedAbilityButton.remove();
                 let $remainingAbilityButtons = $('.team-ability[data-ability]', $currentAbilitiesList);
                 $remainingAbilityButtons.each(function(index){ $(this).attr('data-slot', index); });
