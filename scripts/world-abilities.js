@@ -477,6 +477,11 @@ function getAbilityNameSpan(abilityToken, customText){
     let _self = this;
     let _indexes = _self.indexes;
     let _mmrpgAbilitiesIndex = _indexes.abilities;
+    let abilityId = 0;
+    if (abilityToken.indexOf('_') !== -1){
+        abilityId = parseInt(abilityToken.split('_')[0]);
+        abilityToken = abilityToken.split('_')[1];
+        }
     let abilityInfo = _mmrpgAbilitiesIndex[abilityToken] || false;
     let abilityName = abilityInfo ? abilityInfo.name : 'Ability';
     let abilityType1 = abilityInfo.type || '';
@@ -509,6 +514,7 @@ function getAbilitySpriteMarkup(abilityToken, spriteOptions){
     let abilitySpriteClass = 'sprite ability' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
     let abilitySpriteStyle = 'animation-delay: ' + spriteOptions.delay + 's;' + (spriteOptions.styles ? ' ' + spriteOptions.styles : '');
     let abilityTypeClasses = abilityInfo.type === '' ? 'none' : (abilityInfo.type + (abilityInfo.type2 !== '' ? '_' + abilityInfo.type2 : ''));
+    abilitySpriteClass += ' is-' + abilityInfo.class;
     abilitySpriteAttrs += ' class="' + abilitySpriteClass + '"';
     abilitySpriteAttrs += ' data-sprite="ability"';
     abilitySpriteAttrs += ' data-token="' + abilityToken + '"';
@@ -575,6 +581,7 @@ function generateAbilitySelectButtonMarkup(abilityToken, playerRobotInfo, button
     buttonOptions.new = typeof buttonOptions.new !== 'undefined' ? buttonOptions.new : false;
     buttonOptions.selected = typeof buttonOptions.selected !== 'undefined' ? buttonOptions.selected : false;
     buttonOptions.disabled = typeof buttonOptions.disabled !== 'undefined' ? buttonOptions.disabled : false;
+    buttonOptions.locked = typeof buttonOptions.locked !== 'undefined' ? buttonOptions.locked : false;
     buttonOptions.slot = typeof buttonOptions.slot === 'number' ? buttonOptions.slot : false;
 
     let abilityAnimationDelay = -1 * ( Math.floor(Math.random() * 10) / 100 );
@@ -585,7 +592,7 @@ function generateAbilitySelectButtonMarkup(abilityToken, playerRobotInfo, button
     let abilityCostFormatted = '<sup>' + abilityEnergyCost + '</sup><sub>WE</sub>';
 
     let buttonAttrs = '';
-    let buttonClass = 'team-ability' + (buttonOptions.new ? ' new' : '') + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '');
+    let buttonClass = 'team-ability' + (buttonOptions.new ? ' new' : '') + (buttonOptions.selected ? ' selected' : '') + (buttonOptions.disabled ? ' disabled' : '') + (buttonOptions.locked ? ' locked' : '');
     let buttonStyle = '';
     buttonAttrs += ' class="' + buttonClass + '"';
     buttonAttrs += ' data-ability="' + abilityToken + '"';
