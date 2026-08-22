@@ -662,6 +662,42 @@ function getItemQuantity(itemToken, excludeEquipped){
     return finalItemQuantity;
     }
 
+// Define a core function for setting the base quantity of an item in the player's inventory
+function setItemQuantity(itemToken, newQuantity){
+    //console.log('%c' + 'mmrpgWorldMap.setItemQuantity(item:' + itemToken + ', newQuantity:' + newQuantity + ')', 'color: magenta;');
+    if (!itemToken || typeof itemToken !== 'string' || !itemToken.length){ console.error('setItemQuantity() missing required itemToken!'); return 0; }
+    if (typeof newQuantity !== 'number' || isNaN(newQuantity)){ newQuantity = 0; }
+    // Collect references to world objects
+    let _self = this;
+    let _world = _self.state;
+    let _worldPlayer = _world.player;
+    let _worldPlayerItems = _worldPlayer.items;
+    // Prevent negative inventory amounts
+    if (newQuantity < 0){ newQuantity = 0; }
+    // Update the inventory state
+    _worldPlayerItems[itemToken] = newQuantity;
+    // Return the newly updated quantity
+    return _worldPlayerItems[itemToken];
+}
+
+// Helper function to increment an item's quantity
+function incrementItemQuantity(itemToken, amount){
+    //console.log('%c' + 'mmrpgWorldMap.incrementItemQuantity(item:' + itemToken + ', amount:' + amount + ')', 'color: magenta;');
+    if (typeof amount !== 'number' || isNaN(amount) || amount <= 0){ amount = 1; }
+    // Get total current quantity (without excluding equipped items)
+    let currentTotal = this.getItemQuantity(itemToken, false);
+    return this.setItemQuantity(itemToken, currentTotal + amount);
+}
+
+// Helper function to decrement an item's quantity
+function decrementItemQuantity(itemToken, amount){
+    //console.log('%c' + 'mmrpgWorldMap.decrementItemQuantity(item:' + itemToken + ', amount:' + amount + ')', 'color: magenta;');
+    if (typeof amount !== 'number' || isNaN(amount) || amount <= 0){ amount = 1; }
+    // Get total current quantity (without excluding equipped items)
+    let currentTotal = this.getItemQuantity(itemToken, false);
+    return this.setItemQuantity(itemToken, currentTotal - amount);
+}
+
 // Define a quick function for getting the overview details for a given item in the user's inventory
 function getItemDetailsForOverview(itemToken, targetSelected){
     //console.log('%c' + 'mmrpgWorldMap.getItemDetailsForOverview(item:' + itemToken + ', targetSelected:' + targetSelected + ')', 'color: magenta;');
@@ -1188,6 +1224,9 @@ mmrpgWorldMap.prototype.triggerItemPickup = triggerItemPickup;
 mmrpgWorldMap.prototype.addItemToInventory = addItemToInventory;
 
 mmrpgWorldMap.prototype.getItemQuantity = getItemQuantity;
+mmrpgWorldMap.prototype.setItemQuantity = setItemQuantity;
+mmrpgWorldMap.prototype.incrementItemQuantity = incrementItemQuantity;
+mmrpgWorldMap.prototype.decrementItemQuantity = decrementItemQuantity;
 
 mmrpgWorldMap.prototype.getItemDetailsForOverview = getItemDetailsForOverview;
 mmrpgWorldMap.prototype.getItemDetailsMarkupForOverview = getItemDetailsMarkupForOverview;
