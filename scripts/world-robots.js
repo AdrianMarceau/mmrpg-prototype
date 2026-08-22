@@ -107,6 +107,7 @@ function addTeamRobot(robotString, playSound, playAnimation){
     let _playerRobotsIndex = _config.playerRobotsIndex;
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
+    let baseRobotInfo = _mmrpgRobotsIndex[robotToken] || false;
     let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
     let robotData = _worldPlayerRobots[robotString] || false;
     if (!robotInfo){ console.error('addTeamRobot() could not find robot info for robot ' + robotToken + '!'); return false; }
@@ -119,7 +120,9 @@ function addTeamRobot(robotString, playSound, playAnimation){
     //console.log('-> old _worldPlayerTeam =', _worldPlayerTeam.join(', '));
     _worldPlayerTeam.push(robotString);
     _worldPlayerTeam = Object.values(_worldPlayerTeam);
+    let newRobotKey = 1 + _worldPlayerTeam.indexOf(robotString); // +1 for the player
     //console.log('-> new _worldPlayerTeam =', _worldPlayerTeam.join(', '));
+    //console.log('-> new newRobotKey =', newRobotKey, 'for', robotString);
     _worldPlayer.team = _worldPlayerTeam;
     //console.log('-> _worldPlayer.team =', _worldPlayer.team);
     // Collect a reference to this robot's element in the overview panel
@@ -174,7 +177,8 @@ function addTeamRobot(robotString, playSound, playAnimation){
     let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
     let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
     let $teamPlayerSprite = $spriteObjectsLayer.find('.sprite[data-sprite="team-player"]').first();
-    let $newRobotSprite = null, newSpriteMarkup = _self.getRobotSpriteMarkup(robotString);
+    let $newRobotSprite = null;
+    let newSpriteMarkup = _self.getRobotSpriteMarkup(robotString);
     if (newSpriteMarkup){
         let newRobotOffsets = {
             top: (parseInt($teamPlayerSprite.css('top')) - 4) + 'px',
@@ -184,7 +188,9 @@ function addTeamRobot(robotString, playSound, playAnimation){
         //console.log('newRobotOffsets =', newRobotOffsets);
         $newRobotSprite = $(newSpriteMarkup);
         $newRobotSprite.addClass('team bounce').css(newRobotOffsets);
-        $newRobotSprite.attr('data-sprite', 'team-robot').attr('data-id', robotId).attr('data-token', robotToken);
+        $newRobotSprite.attr('data-sprite', 'team-robot');
+        $newRobotSprite.attr('data-robot', robotId + '_' + robotToken);
+        $newRobotSprite.attr('data-key', newRobotKey);
         $spriteObjectsLayer.append($newRobotSprite);
         _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
         }
@@ -193,6 +199,7 @@ function addTeamRobot(robotString, playSound, playAnimation){
     // Return true on success
     return true;
     }
+
 // Quick function for removing a given robot from the team and then optionally playing a sound effect
 function removeTeamRobot(robotString, playSound, playAnimation){
     //console.log('%c' + 'mmrpgWorldMap.removeTeamRobot(robot:' + robotString + ', sound:' + playSound + ', animate:' + playAnimation + ')', 'color: magenta;');
@@ -284,9 +291,15 @@ function removeTeamRobot(robotString, playSound, playAnimation){
     let $canvasMap = $('#map', $thisCanvas);
     let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
     let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
-    let $selectedMapRobot = $spriteObjectsLayer.find('.sprite[data-sprite="team-robot"][data-id="' + robotId + '"][data-token="' + robotToken + '"]');
-    $selectedMapRobot.animate({opacity: 0}, 300, function(){ $selectedMapRobot.remove(); });
-    _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
+    let $selectedMapRobot = $spriteObjectsLayer.find('.sprite[data-sprite="team-robot"][data-robot="' + robotId + '_' + robotToken + '"]');
+    // Immediately remove data-key from outgoing robot and update remaining to close the gap
+    $selectedMapRobot.removeAttr('data-key');
+    _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap).not($selectedMapRobot);
+    let key = 0; _elements.teamSprites.each(function(){ $(this).attr('data-key', key); key++; });
+    $selectedMapRobot.animate({opacity: 0}, 300, function(){
+        $selectedMapRobot.remove();
+        _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
+        });
     // Trigger a save of the world state to persist this change
     _self.saveWorldState();
     // Return true on success
@@ -409,11 +422,14 @@ function releaseTeamRobot(robotString, playSound, playAnimation, showMessage){
     let $canvasMap = $('#map', $thisCanvas);
     let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
     let $spriteObjectsLayer = $('.layer[data-layer="sprites/objects"]', $canvasMap);
-    let $selectedMapRobot = $spriteObjectsLayer.find('.sprite[data-sprite="team-robot"][data-id="' + robotId + '"][data-token="' + robotToken + '"]');
+    let $selectedMapRobot = $spriteObjectsLayer.find('.sprite[data-sprite="team-robot"][data-robot="' + robotId + '_' + robotToken + '"]');
+    // Immediately remove data-key from outgoing robot and update remaining to close the gap
+    $selectedMapRobot.removeAttr('data-key');
+    _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap).not($selectedMapRobot);
+    let key = 0; _elements.teamSprites.each(function(){ $(this).attr('data-key', key); key++; });
     $selectedMapRobot.animate({opacity: 0}, 300, function(){
         $selectedMapRobot.remove();
         _elements.teamSprites = $('.sprite[data-sprite^="team-"]', $canvasMap);
-        let key = 0; _elements.teamSprites.each(function(){ $(this).attr('data-key', key); key++; });
         });
     // Mark this robot's data for deletion and then remove it fully after a brief timeout
     robotData.deleteMe = true;
@@ -424,6 +440,7 @@ function releaseTeamRobot(robotString, playSound, playAnimation, showMessage){
     // Return true on success
     return true;
     }
+
 // Quick function for settings a robot's current energy amount to a specific value but without all the effects
 function setRobotEnergy(robotString, newEnergy){
     //console.log('%c' + 'mmrpgWorldMap.setRobotEnergy(' + robotString + ', ' + newEnergy + ')', 'color: magenta;');
@@ -491,6 +508,7 @@ function setRobotEnergy(robotString, newEnergy){
     // Return true on success
     return true;
     }
+
 // Quick function for restoring a robot's energy (if available) by a specific amount (or all if === true)
 function restoreRobotEnergy(robotString, restoreAmount, playSound, playAnimation, showMessage){
     //console.log('%c' + 'mmrpgWorldMap.restoreRobotEnergy(' + robotString + ', ' + restoreAmount + ')', 'color: magenta;');
@@ -1449,6 +1467,441 @@ function calculateRobotStat(baseValue, modValue){
     return newValue;
     }
 
+// Define a quick function for checking if a given robot has an active persona or not (persona set + copy-style equipped)
+function hasActivePersona(robotData){
+    //console.log('%c' + 'mmrpgWorldMap.hasActivePersona(robotData:' + typeof robotData + ')', 'color: magenta;');
+    //console.log('-> w/ robotData =', robotData);
+    if (!robotData || typeof robotData !== 'object'){ return false; }
+    let _self = this;
+    let _indexes = _self.indexes;
+    let _mmrpgAbilitiesIndex = _indexes.abilities;
+    let copyStyleAbility = _mmrpgAbilitiesIndex['copy-style'];
+    let copyStyleAbilityId = copyStyleAbility.id;
+    //console.log('robotData.persona =', robotData.persona);
+    //console.log('robotData.abilities =', robotData.abilities);
+    //console.log('copyStyleAbility =', copyStyleAbility);
+    //console.log('copyStyleAbilityId =', copyStyleAbilityId);
+    //console.log('robotData.abilities.indexOf(copyStyleAbilityId) =', robotData.abilities.indexOf(copyStyleAbilityId));
+    if (!robotData.persona || typeof robotData.persona !== 'string'){ return false; }
+    if (!robotData.abilities || !robotData.abilities.length){ return false; }
+    if (robotData.abilities.indexOf(copyStyleAbilityId) === -1){ return false; }
+    // If we made it this far we must have an active persona
+    return true;
+    }
+
+// Define a function for calculating a robot stat with a given level boost
+function calculateLevelBoostedStat(base, level, percent = 5){
+    //console.log('%c' + 'mmrpgWorldMap.calculateLevelBoostedStat(base:' + base + ', level:' + level + ', percent:' + percent + ')', 'color: magenta;');
+    const relLevel = level < 100 ? (level - 1) : level;
+    const statBoost = Math.round(base + (base * (percent / 100) * relLevel));
+    return statBoost;
+    }
+
+// Define a function for calculating robot stat details given level, base stats, current core, and optionally starforce values
+function calculateStatValues(level, baseStats, bonusStats = {}, limit = false, core = '', starforceValues = {}){
+    //console.log('%c' + 'mmrpgWorldMap.calculateStatValues(level:' + level + ', baseStats:' + typeof baseStats + ', bonusStats:' + typeof bonusStats + ', limit:' + (limit ? 'true' : 'false') + ', core:' + core + ', starforceValues:' + typeof starforceValues + ')', 'color: magenta;');
+    let _self = this;
+    // Define the basic stat tokens (Note: Though the comment says four, there are five here)
+    const statTokens = ['energy', 'weapons', 'attack', 'defense', 'speed'];
+    const MMRPG_SETTINGS_STATS_BONUS_MAX = 1;
+    // Check if this is of a special core type
+    let core1 = '';
+    let core2 = '';
+    if (Array.isArray(core)){
+        core1 = core[0] ? core[0] : '';
+        core2 = core[1] ? core[1] : '';
+        } else {
+        core1 = core || '';
+        }
+    const isCopyCore = (core1 === 'copy' || core2 === 'copy');
+    const isNeutralCore = (core1 === '');
+    const isElementalCore = (!isCopyCore && !isNeutralCore);
+    // Define the defaults for starforce boost and multiplier
+    let baseStarforceMultiplier = 0;
+    if (isElementalCore) { baseStarforceMultiplier = 10.0; }
+    else if (isCopyCore) { baseStarforceMultiplier = 1.0; }
+    else if (isNeutralCore) { baseStarforceMultiplier = 0.1; }
+    // Define the robot stats object to return
+    const robotStats = {
+        level: level,
+        levelMax: 100
+        };
+    // Loop through each stat and calculate values
+    statTokens.forEach((stat) => {
+        robotStats[stat] = {};
+        robotStats[stat].base = baseStats[stat] || 0;
+        // Define the defaults for starforce boost and multiplier
+        let starforceMultiplier = 0;
+        if (isElementalCore){ starforceMultiplier = 10.00; }
+        else if (isCopyCore){ starforceMultiplier = 1.00; }
+        else if (isNeutralCore){
+            if (stat === 'energy'){ starforceMultiplier = 0.10; }
+            else if (stat === 'weapons'){ starforceMultiplier = 0.01; }
+            }
+        // If starforce values were not empty, calculate boosts
+        let starforceBoost = 0;
+        if (starforceValues && Object.keys(starforceValues).length > 0){
+            // Use all types if neutral or copy core, otherwise be more selective
+            if (isCopyCore || isNeutralCore){
+                for (const key in starforceValues){
+                    starforceBoost += starforceValues[key] * starforceMultiplier;
+                    }
+                }
+            else if (isElementalCore && starforceValues[core1] !== undefined){
+                const boostValue = starforceValues[core1];
+                starforceBoost += boostValue * starforceMultiplier;
+                }
+            // Round up (or down, since floor) the starforce boost to a full number
+            starforceBoost = Math.floor(starforceBoost);
+            }
+        // Calculate the individual stat values based on their type and multipliers
+        if (stat === 'energy'){
+            // If this is the ENERGY stat
+            robotStats[stat].baseMax = _self.calculateLevelBoostedStat(robotStats[stat].base, robotStats.levelMax, 1);
+            robotStats[stat].bonus = bonusStats[stat] !== undefined ? bonusStats[stat] : 0;
+            robotStats[stat].bonusMax = 0; // Simplified from PHP logic
+            if (limit && robotStats[stat].bonus > robotStats[stat].bonusMax){
+                robotStats[stat].bonus = robotStats[stat].bonusMax;
+                }
+            robotStats[stat].starforce = isNeutralCore ? starforceBoost : 0;
+            robotStats[stat].current = _self.calculateLevelBoostedStat(robotStats[stat].base, robotStats.level, 1) + robotStats[stat].bonus + robotStats[stat].starforce;
+            robotStats[stat].currentNoboost = _self.calculateLevelBoostedStat(robotStats[stat].base, level, 1);
+            robotStats[stat].max = robotStats[stat].baseMax + robotStats[stat].bonusMax + robotStats[stat].starforce;
+            if (robotStats[stat].current > robotStats[stat].max){
+                robotStats[stat].over = robotStats[stat].current - robotStats[stat].max;
+                }
+            }
+        else if (stat === 'weapons'){
+            // Else if this is the WEAPONS stat
+            robotStats[stat].baseMax = robotStats[stat].base;
+            robotStats[stat].bonus = 0;
+            robotStats[stat].bonusMax = 0;
+            robotStats[stat].starforce = isNeutralCore ? starforceBoost : 0;
+            robotStats[stat].current = robotStats[stat].base + robotStats[stat].starforce;
+            robotStats[stat].currentNoboost = robotStats[stat].base;
+            robotStats[stat].max = robotStats[stat].base;
+            robotStats[stat].over = 0;
+            }
+        else {
+            // If this is ATTACK, DEFENSE, or SPEED stats
+            robotStats[stat].baseMax = _self.calculateLevelBoostedStat(robotStats[stat].base, robotStats.levelMax);
+            robotStats[stat].bonus = bonusStats[stat] !== undefined ? bonusStats[stat] : 0;
+            robotStats[stat].bonusMax = Math.round(robotStats[stat].baseMax * MMRPG_SETTINGS_STATS_BONUS_MAX);
+            if (limit && robotStats[stat].bonus > robotStats[stat].bonusMax){
+                robotStats[stat].bonus = robotStats[stat].bonusMax;
+                }
+            robotStats[stat].starforce = !isNeutralCore ? starforceBoost : 0;
+            robotStats[stat].current = _self.calculateLevelBoostedStat(robotStats[stat].base, robotStats.level) + robotStats[stat].bonus + robotStats[stat].starforce;
+            robotStats[stat].currentNoboost = _self.calculateLevelBoostedStat(robotStats[stat].base, level);
+            robotStats[stat].max = robotStats[stat].baseMax + robotStats[stat].bonusMax + robotStats[stat].starforce;
+            if (robotStats[stat].current > robotStats[stat].max){
+                robotStats[stat].over = robotStats[stat].current - robotStats[stat].max;
+                }
+            }
+        });
+    // Return calculated robot stats
+    return robotStats;
+    }
+
+// Define a function that takes a base robot info array as well as a persona array and then applies it over top of the base
+function applyPersonaInfoToRobot(thisRobotInfo, personaRobotInfo, extraSettings = {}){
+    //console.log('%c' + 'mmrpgWorldMap.applyPersonaInfoToRobot(thisRobotInfo, personaRobotInfo, extraSetting)', 'color: magenta;');
+    if (!thisRobotInfo || typeof thisRobotInfo !== 'object'){ console.error('applyPersonaInfoToRobot() could not find thisRobotInfo or it was empty! \n-> thisRobotInfo:', thisRobotInfo); return false; }
+    if (!personaRobotInfo || typeof personaRobotInfo !== 'object'){ console.error('applyPersonaInfoToRobot() could not find personaRobotInfo or it was empty! \n-> personaRobotInfo:', personaRobotInfo); return false; }
+    if (!thisRobotInfo.token || !personaRobotInfo.token){ console.error('applyPersonaInfoToRobot() could not find token(s) in thisRobotInfo/personaRobotInfo', thisRobotInfo.token, personaRobotInfo.token); return false; }
+    let _self = this;
+    //console.log('-> w/ thisRobotInfo =', _self.getClonedObject(thisRobotInfo));
+    //console.log('-> w/ personaRobotInfo =', _self.getClonedObject(personaRobotInfo));
+    //console.log('-> w/ extraSettings =', extraSettings);
+    //console.log('applying personaRobotInfo from ' + personaRobotInfo.token + ' to ' + thisRobotInfo.token + ' ...');
+    // Update the robotinfo with the persona token and image if applicable
+    thisRobotInfo.persona = extraSettings.persona ? extraSettings.persona : personaRobotInfo.token;
+    thisRobotInfo.personaImage = extraSettings.personaImage ? extraSettings.personaImage : personaRobotInfo.image;
+    // Define a new name for this persona so it's clear that it's a transformation
+    let crossLetter  = thisRobotInfo.token.substr(0, 1).toUpperCase();
+    let personaName = crossLetter + '× ' + personaRobotInfo.name;
+    thisRobotInfo.name = personaName;
+    // List out the fields we want to copy verbaitm
+    let cloneFields = [
+        'number', 'game', 'gender',
+        'core', 'core2', 'field', 'field2',
+        'image', 'imageSize',
+        'description', 'description2', 'quotes',
+        'weaknesses', 'resistances', 'affinities', 'immunities',
+        'skill', 'skillName', 'skillDescription', 'skillDescription2', 'skillParameters',
+        ];
+    // Loop through and simply copy over the easy ones to the current robotinfo array
+    for (let i = 0; i < cloneFields.length; i++){
+        let cloneField = cloneFields[i];
+        if (typeof personaRobotInfo[cloneField] === 'undefined'){ continue; }
+        if (typeof personaRobotInfo[cloneField] !== 'object'){ thisRobotInfo[cloneField] = personaRobotInfo[cloneField]; }
+        else { thisRobotInfo[cloneField] = _self.getClonedObject(personaRobotInfo[cloneField]); }
+        }
+    // Now let's overwrite the persona image if a specific one has been supplied
+    if (extraSettings.personaImage){ thisRobotInfo.image = extraSettings.personaImage; }
+    else if (personaRobotInfo.image){ thisRobotInfo.image = personaRobotInfo.image; }
+    // Now let's copy over the other stats either directly or relatively depending on class
+    let statsToCopy = ['energy', 'attack', 'defense', 'speed'];
+    if (thisRobotInfo.class === personaRobotInfo.class){
+        // Copy the stats over 1-to-1 because the persona is of the same class
+        //console.log('-> copy stats 1-to-1');
+        for (let i = 0; i < statsToCopy.length; i++){
+            let statToCopy = statsToCopy[i];
+            if (!personaRobotInfo[statToCopy]){ continue; }
+            thisRobotInfo[statToCopy] = personaRobotInfo[statToCopy];
+            }
+        }
+    else {
+        // The persona is of a different class, so calculate base-stat-total
+        // for current and then use that to pull relative values from the target persona
+        //console.log('-> copy stats relatively');
+        // Calculate the relative difference between the two robot's BSTs
+        let oldBaseStatTotal = 0;
+        let personaBaseStatTotal = 0;
+        for (let i = 0; i < statsToCopy.length; i++){
+            let statToCopy = statsToCopy[i];
+            oldBaseStatTotal += thisRobotInfo[statToCopy];
+            personaBaseStatTotal += personaRobotInfo[statToCopy];
+            }
+        //console.log('oldBaseStatTotal =', oldBaseStatTotal);
+        //console.log('personaBaseStatTotal =', personaBaseStatTotal);
+        // Cache the old stat spreads for later reference
+        let oldStatSpread = [];
+        let personaStatSpread = [];
+        for (let i = 0; i < statsToCopy.length; i++){
+            let statToCopy = statsToCopy[i];
+            oldStatSpread[statToCopy] = thisRobotInfo[statToCopy];
+            personaStatSpread[statToCopy] = personaRobotInfo[statToCopy];
+            }
+        // Calculate stat ratios for the new robot then apply them to the old BST
+        let personaStatRatios = [];
+        for (let i = 0; i < statsToCopy.length; i++){
+            let statToCopy = statsToCopy[i];
+            personaStatRatios[statToCopy] = personaRobotInfo[statToCopy] / personaBaseStatTotal;
+            }
+        for (let i = 0; i < statsToCopy.length; i++){
+            let statToCopy = statsToCopy[i];
+            thisRobotInfo[statToCopy] = (oldBaseStatTotal * personaStatRatios[statToCopy]);
+            if (statToCopy === 'energy'){ thisRobotInfo[statToCopy] = Math.ceil(thisRobotInfo[statToCopy]); }
+            else { thisRobotInfo[statToCopy] = Math.round(thisRobotInfo[statToCopy]); }
+            }
+        // Collect the new stat spread for later reference
+        let newStatSpread = [];
+        for (let i = 0; i < statsToCopy.length; i++){
+            let statToCopy = statsToCopy[i];
+            newStatSpread[statToCopy] = thisRobotInfo[statToCopy];
+            }
+        //console.log('oldStatSpread = ', oldStatSpread);
+        //console.log('personaStatSpread = ', personaStatSpread);
+        //console.log('newStatSpread = ', newStatSpread);
+        //console.log('oldStatSpread = ' + oldStatSpread.join('/') + ' = ' + oldStatSpread.reduce((a, b) => a + b, 0));
+        //console.log('personaStatSpread = ' + personaStatSpread.join('/') + ' = ' + personaStatSpread.reduce((a, b) => a + b, 0));
+        //console.log('newStatSpread = ' + newStatSpread.join('/') + ' = ' + newStatSpread.reduce((a, b) => a + b, 0));
+        }
+    //console.log('NEW thisRobotInfo =', _self.getClonedObject(thisRobotInfo));
+    // Return true on success
+    return true;
+    }
+
+// Define a function for fully applying a given persona to a loaded player robot
+function applyPersonaToRobot(playerInfo, playerRobot){
+    //console.log('%c' + 'mmrpgWorldMap.applyPersonaToRobot(playerInfo, playerRobot)', 'color: magenta;');
+    //console.log('~ w/ playerRobot =', playerRobot);
+    let _self = this;
+    let _indexes = _self.indexes;
+    //console.log('_indexes =', _indexes);
+    let _mmrpgIndexPlayers = _indexes.players;
+    let _mmrpgIndexRobots = _indexes.robots;
+    //if (!playerRobot.persona || !playerRobot.personaImage){ return removePersonaFromRobot(playerInfo, playerRobot); }
+    let playerIndexInfo = _mmrpgIndexPlayers[playerInfo.token];
+    let baseIndexInfo = _mmrpgIndexRobots[playerRobot.token];
+    let personaIndexInfo = _mmrpgIndexRobots[playerRobot.persona];
+    //console.log('playerIndexInfo =', playerIndexInfo);
+    //console.log('playerRobot (start) =', _self.getClonedObject(playerRobot));
+    //console.log('playerRobotStats (start) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    // Remember this robot's weapons and energy percent
+    let robotEnergyPercent = playerRobot.energy /  playerRobot.energyMax;
+    let robotWeaponsPercent = playerRobot.weapons /  playerRobot.weaponsMax;
+    //console.log('robotEnergyPercent =', robotEnergyPercent, '(energy:', playerRobot.energy, ',energyMax:', playerRobot.energyMax, ')');
+    //console.log('robotWeaponsPercent =', robotWeaponsPercent, '(weapons:', playerRobot.energy, ',weaponsMax:', playerRobot.weaponsMax, ')');
+    // Collect and reset this robot back to base stats first
+    playerRobot.energy = baseIndexInfo.energy;
+    playerRobot.attack = baseIndexInfo.attack;
+    playerRobot.defense = baseIndexInfo.defense;
+    playerRobot.speed = baseIndexInfo.speed;
+    //console.log('playerRobotStats (after-reset) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    // Then apply the persona over this vanilla version of the robot
+    _self.applyPersonaInfoToRobot(playerRobot, personaIndexInfo, {
+        persona: playerRobot.persona,
+        personaImage: playerRobot.personaImage
+        });
+    //console.log('playerRobotStats (after-persona) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    // Now collect their actual current state (level, starforce, bonuses) and recalculate
+    let robotLevel = playerRobot.level;
+    //console.log('robotLevel =', robotLevel);
+    let robotStarforce = playerInfo.starForce;
+    //console.log('robotStarforce =', robotStarforce);
+    let robotBaseStats = {
+        token: playerRobot.persona,
+        energy: playerRobot.energy || 0,
+        weapons: playerRobot.weapons || 0,
+        attack: playerRobot.attack || 0,
+        defense: playerRobot.defense || 0,
+        speed: playerRobot.speed || 0,
+        };
+    let robotBonusStats = {
+        token: playerRobot.token,
+        energy: playerRobot.energyBonus || 0,
+        weapons: playerRobot.weaponsBonus || 0,
+        attack: playerRobot.attackBonus || 0,
+        defense: playerRobot.defenseBonus || 0,
+        speed: playerRobot.speedBonus || 0,
+        };
+    //console.log('robotBaseStats =', robotBaseStats);
+    //console.log('robotBonusStats =', robotBonusStats);
+    let newRobotStats = _self.calculateStatValues(
+        robotLevel,
+        robotBaseStats,
+        robotBonusStats,
+        true, 'copy',
+        robotStarforce,
+        );
+    //console.log('newRobotStats =', newRobotStats);
+    playerRobot.energy = Math.round(newRobotStats.energy.current * robotEnergyPercent);
+    playerRobot.energyMax = newRobotStats.energy.current;
+    playerRobot.attack = newRobotStats.attack.current;
+    playerRobot.defense = newRobotStats.defense.current;
+    playerRobot.speed = newRobotStats.speed.current;
+    //console.log('playerRobotStats (after-recalc) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    if (playerIndexInfo.type){
+        let playerType = playerIndexInfo.type;
+        if (playerType === 'energy'){ playerRobot.energy = Math.ceil(playerRobot.energy * 1.25); playerRobot.energyMax = Math.ceil(playerRobot.energyMax * 1.25); }
+        else if (playerType === 'attack'){ playerRobot.attack = Math.ceil(playerRobot.attack * 1.25); }
+        else if (playerType === 'defense'){ playerRobot.defense = Math.ceil(playerRobot.defense * 1.25); }
+        else if (playerType === 'speed'){ playerRobot.speed = Math.ceil(playerRobot.speed * 1.25); }
+        //console.log('playerRobotStats (w-player-boost) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+        }
+    //console.log('playerRobot (end) =', _self.getClonedObject(playerRobot));
+    // Return true on success
+    return true;
+    }
+
+// Define a function that removes persona info from a robot and reverts it to its base state
+function removePersonaInfoFromRobot(thisRobotInfo, baseRobotInfo){
+    //console.log('%c' + 'mmrpgWorldMap.removePersonaInfoFromRobot(thisRobotInfo, baseRobotInfo)', 'color: magenta;');
+    if (!thisRobotInfo || typeof thisRobotInfo !== 'object'){ console.error('removePersonaInfoFromRobot() could not find thisRobotInfo or it was empty! \n-> thisRobotInfo:', thisRobotInfo); return false; }
+    if (!baseRobotInfo || typeof baseRobotInfo !== 'object'){ console.error('removePersonaInfoFromRobot() could not find baseRobotInfo or it was empty! \n-> baseRobotInfo:', baseRobotInfo); return false; }
+    if (!thisRobotInfo.token || !baseRobotInfo.token){ console.error('removePersonaInfoFromRobot() could not find token(s) in thisRobotInfo/baseRobotInfo', thisRobotInfo.token, baseRobotInfo.token); return false; }
+    let _self = this;
+    // Clear the persona tokens and images entirely
+    delete thisRobotInfo.persona;
+    delete thisRobotInfo.personaImage;
+    // Revert the name back to the base robot's original name
+    thisRobotInfo.name = baseRobotInfo.name;
+    // List out the fields we want to revert verbaitm
+    let cloneFields = [
+        'number', 'game', 'gender',
+        'core', 'core2', 'field', 'field2',
+        'image', 'imageSize',
+        'description', 'description2', 'quotes',
+        'weaknesses', 'resistances', 'affinities', 'immunities',
+        'skill', 'skillName', 'skillDescription', 'skillDescription2', 'skillParameters',
+        ];
+    // Loop through and restore original fields from the base robot info
+    for (let i = 0; i < cloneFields.length; i++){
+        let cloneField = cloneFields[i];
+        if (typeof baseRobotInfo[cloneField] === 'undefined'){
+            // If the base doesn't have this field, make sure we scrub it from the current robot
+            delete thisRobotInfo[cloneField];
+            continue;
+            }
+        if (typeof baseRobotInfo[cloneField] !== 'object'){ thisRobotInfo[cloneField] = baseRobotInfo[cloneField]; }
+        else { thisRobotInfo[cloneField] = _self.getClonedObject(baseRobotInfo[cloneField]); }
+        }
+    // Now let's revert the base stats directly back to the original values
+    let statsToCopy = ['energy', 'attack', 'defense', 'speed'];
+    for (let i = 0; i < statsToCopy.length; i++){
+        let statToCopy = statsToCopy[i];
+        thisRobotInfo[statToCopy] = baseRobotInfo[statToCopy];
+        }
+    // Return true on success
+    return true;
+    }
+
+// Define a function for fully removing any applied persona from a loaded player robot
+function removePersonaFromRobot(playerInfo, playerRobot){
+    //console.log('%c' + 'mmrpgWorldMap.removePersonaFromRobot(playerInfo, playerRobot)', 'color: magenta;');
+    //console.log('~ w/ playerRobot =', playerRobot);
+    // Validate that we have the proper information to proceed
+    if (!playerInfo || typeof playerInfo !== 'object'){ console.error('removePersonaFromRobot() could not find playerInfo or it was empty! \n-> playerInfo:', playerInfo); return false; }
+    if (!playerRobot || typeof playerRobot !== 'object'){ console.error('removePersonaFromRobot() could not find playerRobot or it was empty! \n-> playerRobot:', playerRobot); return false; }
+    let _self = this;
+    let _indexes = _self.indexes;
+    let _mmrpgIndexPlayers = _indexes.players;
+    let _mmrpgIndexRobots = _indexes.robots;
+    let playerIndexInfo = _mmrpgIndexPlayers[playerInfo.token];
+    let baseIndexInfo = _mmrpgIndexRobots[playerRobot.token];
+    //console.log('playerIndexInfo =', playerIndexInfo);
+    //console.log('playerRobot (start) =', _self.getClonedObject(playerRobot));
+    //console.log('playerRobotStats (start) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    // Remember this robot's weapons and energy percent
+    let robotEnergyPercent = playerRobot.energy /  playerRobot.energyMax;
+    let robotWeaponsPercent = playerRobot.weapons /  playerRobot.weaponsMax;
+    //console.log('robotEnergyPercent =', robotEnergyPercent, '(energy:', playerRobot.energy, ',energyMax:', playerRobot.energyMax, ')');
+    //console.log('robotWeaponsPercent =', robotWeaponsPercent, '(weapons:', playerRobot.energy, ',weaponsMax:', playerRobot.weaponsMax, ')');
+    // Remove persona info and reset base stats over this version of the robot
+    _self.removePersonaInfoFromRobot(playerRobot, baseIndexInfo);
+    //console.log('playerRobotStats (after-removal) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    // Now collect their actual current state (level, starforce, bonuses) and recalculate
+    let robotLevel = playerRobot.level;
+    //console.log('robotLevel =', robotLevel);
+    let robotStarforce = playerInfo.starForce;
+    //console.log('robotStarforce =', robotStarforce);
+    let robotBaseStats = {
+        token: playerRobot.token, // Be sure to pass the original token here, not the persona
+        energy: playerRobot.energy || 0,
+        weapons: playerRobot.weapons || 0,
+        attack: playerRobot.attack || 0,
+        defense: playerRobot.defense || 0,
+        speed: playerRobot.speed || 0,
+        };
+    let robotBonusStats = {
+        token: playerRobot.token,
+        energy: playerRobot.energyBonus || 0,
+        weapons: playerRobot.weaponsBonus || 0,
+        attack: playerRobot.attackBonus || 0,
+        defense: playerRobot.defenseBonus || 0,
+        speed: playerRobot.speedBonus || 0,
+        };
+    //console.log('robotBaseStats =', robotBaseStats);
+    //console.log('robotBonusStats =', robotBonusStats);
+    let newRobotStats = _self.calculateStatValues(
+        robotLevel,
+        robotBaseStats,
+        robotBonusStats,
+        true, 'copy',
+        robotStarforce,
+        );
+    //console.log('newRobotStats =', newRobotStats);
+    playerRobot.energy = Math.round(newRobotStats.energy.current * robotEnergyPercent);
+    playerRobot.energyMax = newRobotStats.energy.current;
+    playerRobot.attack = newRobotStats.attack.current;
+    playerRobot.defense = newRobotStats.defense.current;
+    playerRobot.speed = newRobotStats.speed.current;
+    //console.log('playerRobotStats (after-recalc) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+    if (playerIndexInfo.type){
+        let playerType = playerIndexInfo.type;
+        if (playerType === 'energy'){ playerRobot.energy = Math.ceil(playerRobot.energy * 1.25); playerRobot.energyMax = Math.ceil(playerRobot.energyMax * 1.25); }
+        else if (playerType === 'attack'){ playerRobot.attack = Math.ceil(playerRobot.attack * 1.25); }
+        else if (playerType === 'defense'){ playerRobot.defense = Math.ceil(playerRobot.defense * 1.25); }
+        else if (playerType === 'speed'){ playerRobot.speed = Math.ceil(playerRobot.speed * 1.25); }
+        //console.log('playerRobotStats (w-player-boost) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
+        }
+    //console.log('playerRobot (end) =', _self.getClonedObject(playerRobot));
+    // Return true on success
+    return true;
+    }
+
 // Define a quick function for getting the overview details for a given robot in the user's inventory
 function getRobotDetailsForOverview(robotToken){
     //console.log('%c' + 'mmrpgWorldMap.getRobotDetailsForOverview(robot:' + robotToken + ')', 'color: magenta;');
@@ -1499,13 +1952,17 @@ function getRobotDetailsForOverview(robotToken){
     //console.log('--> playerRobotsCurrent =', playerRobotsCurrent);
     //console.log('--> playerRobotInfo.persona =', (playerRobotInfo ? playerRobotInfo.persona : 'N/A'));
     if (typeof _mmrpgRobotsIndex[robotToken] === 'undefined'){ console.error('getRobotDetailsForOverview() could not find robot in index for token ' + robotToken + '!'); return false; }
+    let playerRobotHasActivePersona = playerRobotInfo ? _self.hasActivePersona(playerRobotInfo) : false;
     let baseRobotIndexInfo = _mmrpgRobotsIndex[robotToken];
-    let robotIndexInfo = playerRobotInfo && playerRobotInfo.persona ? _mmrpgRobotsIndex[playerRobotInfo.persona] : baseRobotIndexInfo;
+    let robotIndexInfo = playerRobotHasActivePersona ? _mmrpgRobotsIndex[playerRobotInfo.persona] : baseRobotIndexInfo;
+    //console.log('--> playerRobotHasActivePersona =', playerRobotHasActivePersona);
+    //console.log('--> playerRobotInfo =', playerRobotInfo);
     //console.log('--> baseRobotIndexInfo =', baseRobotIndexInfo);
     //console.log('--> robotIndexInfo =', robotIndexInfo);
 
     // Generate the markup, classes, styles, etc. that will make up the robot details
     let robotTitle = 'Robot Details';
+    let baseRobotKind = baseRobotIndexInfo.class;
     let robotKind = robotIndexInfo.class;
     let robotName = robotIndexInfo.name;
     let robotDescription = robotIndexInfo.description;
@@ -1517,7 +1974,8 @@ function getRobotDetailsForOverview(robotToken){
     let robotImageSize = robotIndexInfo.imageSize;
     let robotImageAlt = '';
     if (playerRobotInfo.name){ robotName = playerRobotInfo.name; }
-    if (playerRobotInfo.image){ robotImage = playerRobotInfo.image; }
+    if (playerRobotHasActivePersona){ robotImage = playerRobotInfo.personaImage; }
+    else if (playerRobotInfo.image){ robotImage = playerRobotInfo.image; }
     if (robotImage.indexOf('_') !== -1){ robotImage = robotImage.split('_'); robotImageAlt = robotImage[1]; robotImage = robotImage[0]; }
     //console.log('--> robotKind =', robotKind);
     //console.log('--> robotName =', robotName);
@@ -1853,11 +2311,11 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.actions = [];
     let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
     let showTeamAddButton = showStorageButtons && !robotIsCurrent ? true : false;
-    let showTeamRemoveButton = robotKind === 'master' && showStorageButtons && robotIsCurrent ? true : false;
-    let showTeamReleaseButton = robotKind === 'mecha' && showStorageButtons && robotIsCurrent ? true : false;
+    let showTeamRemoveButton = baseRobotKind === 'master' && showStorageButtons && robotIsCurrent ? true : false;
+    let showTeamReleaseButton = baseRobotKind === 'mecha' && showStorageButtons && robotIsCurrent ? true : false;
     let allowTeamAddButton = showTeamAddButton, allowTeamRemoveButton = showTeamRemoveButton, allowTeamReleaseButton = showTeamReleaseButton;
     if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; allowTeamReleaseButton = false; }
-    else if (playerRobotsCurrent.length >= _config.playerRobotsLimit && robotKind !== 'mecha'){ allowTeamAddButton = false; }
+    else if (playerRobotsCurrent.length >= _config.playerRobotsLimit && baseRobotKind !== 'mecha'){ allowTeamAddButton = false; }
     else if (playerRobotsCurrent.length >= _config.maxRobotsPerPlayer){ allowTeamAddButton = false; }
     robotDetailsObject.actions.push({ action: 'robot-info', text: yButtonIcon + ' Details', button: 'Y', robot: robotString, disabled: false, hidden: !showStorageButtons });
     robotDetailsObject.actions.push({ action: 'add-robot', text: xButtonIcon + ' Summon', button: 'X', robot: robotString, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
@@ -2087,11 +2545,25 @@ function getRobotSpriteMarkup(robotToken, spriteOptions){
     let _self = this;
     let _config = _self.config;
     let _indexes = _self.indexes;
+    let _mmrpgRobotsIndex = _indexes.robots;
     let _world = _self.state;
-    let robotInfo = _indexes.robots.getByToken(robotToken);
+    let _worldPlayer = _world.player;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    let robotString = robotId + '_' + robotToken;
+    let robotInfo = _mmrpgRobotsIndex.getByToken(robotToken);
     if (!robotInfo || typeof robotInfo !== 'object'){ console.error('getRobotSpriteMarkup() could not find robotInfo for token ' + robotToken + '!'); return ''; }
+    let robotData = typeof _worldPlayerRobots[robotString] !== 'undefined' ? _worldPlayerRobots[robotString] : null;
+    let robotImageToken = robotToken, robotImageAlt = '';
+    if (robotData && robotData.image){ robotImageToken = robotData.image; }
+    else if (robotData && _self.hasActivePersona(robotData)){ robotImageToken = robotData.personaImage; }
+    if (robotImageToken.indexOf('_')){ robotImageAlt = robotImageToken.split('_')[1]; robotImageToken = robotImageToken.split('_')[0]; }
+    //console.log('robotInfo =', robotInfo);
+    //console.log('robotData =', robotData);
+    //console.log('robotImageToken =', robotImageToken);
+    //console.log('robotImageAlt =', robotImageAlt);
     // Collect or define the sprite options with defaults if not provided
-    spriteOptions.alt = typeof spriteOptions.alt === 'string' && spriteOptions.alt.length > 1 ? spriteOptions.alt : '';
+    spriteOptions.image = typeof spriteOptions.image === 'string' && spriteOptions.image.length > 1 ? spriteOptions.image : robotImageToken;
+    spriteOptions.alt = typeof spriteOptions.alt === 'string' && spriteOptions.alt.length > 1 ? spriteOptions.alt : robotImageAlt;
     spriteOptions.size = typeof spriteOptions.size === 'number' && spriteOptions.size > 0 ? spriteOptions.size : (robotInfo.imageSize || 40);
     spriteOptions.dir = typeof spriteOptions.dir === 'string' && spriteOptions.dir.length ? spriteOptions.dir : 'right';
     spriteOptions.frame = typeof spriteOptions.frame === 'string' && spriteOptions.frame.length > 0 ? spriteOptions.frame : '00';
@@ -2106,7 +2578,7 @@ function getRobotSpriteMarkup(robotToken, spriteOptions){
     robotSpriteAttrs += ' class="' + robotSpriteClass + '"';
     robotSpriteAttrs += ' data-sprite="robot"';
     robotSpriteAttrs += ' data-kind="' + spriteOptions.kind + '"';
-    robotSpriteAttrs += ' data-token="' + robotToken + '"';
+    robotSpriteAttrs += ' data-token="' + spriteOptions.image + '"';
     robotSpriteAttrs += ' data-alt="' + spriteOptions.alt + '"';
     robotSpriteAttrs += ' data-size="' + spriteOptions.size + '"';
     robotSpriteAttrs += ' data-dir="' + spriteOptions.dir + '"';
@@ -2190,6 +2662,14 @@ mmrpgWorldMap.prototype.giveRobotItem = giveRobotItem;
 mmrpgWorldMap.prototype.takeRobotItem = takeRobotItem;
 
 mmrpgWorldMap.prototype.calculateRobotStat = calculateRobotStat;
+mmrpgWorldMap.prototype.hasActivePersona = hasActivePersona;
+mmrpgWorldMap.prototype.calculateLevelBoostedStat = calculateLevelBoostedStat;
+mmrpgWorldMap.prototype.calculateStatValues = calculateStatValues;
+
+mmrpgWorldMap.prototype.applyPersonaInfoToRobot = applyPersonaInfoToRobot;
+mmrpgWorldMap.prototype.applyPersonaToRobot = applyPersonaToRobot;
+mmrpgWorldMap.prototype.removePersonaInfoFromRobot = removePersonaInfoFromRobot;
+mmrpgWorldMap.prototype.removePersonaFromRobot = removePersonaFromRobot;
 
 mmrpgWorldMap.prototype.getRobotDetailsForOverview = getRobotDetailsForOverview;
 mmrpgWorldMap.prototype.getRobotDetailsMarkupForOverview = getRobotDetailsMarkupForOverview;
