@@ -443,6 +443,9 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
         //console.log('_world.currentSubScreen = ', _world.currentSubScreen);
         if (_world.currentScreen !== 'robots-overview'){ return; }
         let $abilityValue = $(this);
+        if ($abilityValue.is('.disabled')){ return; }
+        else if ($abilityValue.is('.hidden')){ return; }
+        else if ($abilityValue.is('.locked')){ return; }
         let abilityValueID = $abilityValue.attr('data-ability-id') || false;
         let $abilityInStorage = abilityValueID ? $storageAbilitiesDiv.find('.team-ability[data-ability-id="' + abilityValueID + '"]').first() : false;
         if (!$abilityInStorage || !$abilityInStorage.length){ $abilityInStorage = false; }
@@ -460,6 +463,7 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
             if (!delay){ callback(); }
             else { setTimeout(callback, delay); }
             };
+        $abilityValue.siblings().removeClass('selected');
         $abilityValue.addClass('selected');
         if (_world.currentSubScreen === 'abilities'){ abilityClickFunction(0); }
         else { showRobotsOverviewPanel('abilities', function(){ abilityClickFunction(); }); }
@@ -641,7 +645,7 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
             let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
             //console.log('-> targetRobotToken =', targetRobotToken);
             let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
-            let confirmClickAction = function(title, text, callback){ _self.showActionModal('confirm', title, text, null, { onConfirm: function() { console.log('confirming!'); callback.call(_self); } } ); };
+            let confirmClickAction = function(title, text, callback){ _self.showActionModal('confirm', title, text, null, { onConfirm: function() { callback.call(_self); } } ); };
             let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
             if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
             else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }
@@ -791,7 +795,8 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
             let abilityToken = $detailsDiv.attr('data-ability');
             //console.log('-> abilityToken =', abilityToken);
             robotsOverviewAPI.refreshRobotRefs();
-            let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+            //let $targetRobot = $teamRobotsInOverview.filter('.team-robot[data-robot].selected').first();
+            let $targetRobot = $('.team-robot[data-robot].selected', $teamRobotsDiv).first();
             let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
             //console.log('-> targetRobotToken =', targetRobotToken);
             // Launch a modal for the given action on the selected robot if applicable
