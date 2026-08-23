@@ -5166,6 +5166,7 @@ class rpg_world {
             $persona_index_info = $mmrpg_index_robots[$persona_token];
             rpg_robot::apply_persona_info($robot_info, $persona_index_info, $robot_settings);
             //error_log('new $robot_info = '.print_r($robot_info, true));
+            $robot_core_types = 'type '.(!empty($robot_info['robot_core']) ? ($robot_info['robot_core'].(!empty($robot_info['robot_core2']) ? ' '.$robot_info['robot_core2'] : '')) : 'none');
             $has_persona_applied = true;
         }
         $base_core_type = $has_persona_applied ? 'copy' : $robot_core;
@@ -5174,7 +5175,7 @@ class rpg_world {
         //error_log($robot_token.' | $robot_stats = '.print_r($robot_stats, true));
         //error_log($robot_token.' | $robot_session = '.print_r($robot_session, true));
 
-        error_log($robot_token.' | $robot_stats (before) = '.print_r($robot_stats, true));
+        //error_log($robot_token.' | $robot_stats (before) = '.print_r($robot_stats, true));
         if (!empty($player_index_info['player_type'])){
             $temp_player_type = $player_index_info['player_type'];
             if ($temp_player_type === 'energy'){ $robot_stats['energy']['current'] = ceil($robot_stats['energy']['current'] * 1.25); }
@@ -5182,7 +5183,7 @@ class rpg_world {
             elseif ($temp_player_type === 'defense'){ $robot_stats['defense']['current'] = ceil($robot_stats['defense']['current'] * 1.25); }
             elseif ($temp_player_type === 'speed'){ $robot_stats['speed']['current'] = ceil($robot_stats['speed']['current'] * 1.25); }
         }
-        error_log($robot_token.' | $robot_stats (after) = '.print_r($robot_stats, true));
+        //error_log($robot_token.' | $robot_stats (after) = '.print_r($robot_stats, true));
 
         $robot_disabled = false;
         $robot_image = $robot_token;

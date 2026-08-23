@@ -1709,14 +1709,17 @@ function applyPersonaToRobot(playerInfo, playerRobot){
     //console.log('~ w/ playerRobot =', playerRobot);
     let _self = this;
     let _indexes = _self.indexes;
-    //console.log('_indexes =', _indexes);
+    let _elements = _self.elements;
     let _mmrpgIndexPlayers = _indexes.players;
     let _mmrpgIndexRobots = _indexes.robots;
+    let $canvasMap = _elements.canvasMap;
+    let $robotsOverview = _elements.robotsOverview;
     //if (!playerRobot.persona || !playerRobot.personaImage){ return removePersonaFromRobot(playerInfo, playerRobot); }
     let playerIndexInfo = _mmrpgIndexPlayers[playerInfo.token];
     let baseIndexInfo = _mmrpgIndexRobots[playerRobot.token];
     let personaIndexInfo = _mmrpgIndexRobots[playerRobot.persona];
     //console.log('playerIndexInfo =', playerIndexInfo);
+    //console.log('personaIndexInfo (' + playerRobot.persona + ') =', personaIndexInfo);
     //console.log('playerRobot (start) =', _self.getClonedObject(playerRobot));
     //console.log('playerRobotStats (start) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
     // Remember this robot's weapons and energy percent
@@ -1782,6 +1785,12 @@ function applyPersonaToRobot(playerInfo, playerRobot){
         //console.log('playerRobotStats (w-player-boost) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
         }
     //console.log('playerRobot (end) =', _self.getClonedObject(playerRobot));
+
+    // Update the robot on the map and in the UI with the new sprite (assuming it's changed)
+    let teamRobotString = playerRobot.id + '_' + playerRobot.token;
+    //console.log('update map/overview robot w/ new persona image for', teamRobotString);
+    _self.refreshTeamRobotSprites(teamRobotString);
+
     // Return true on success
     return true;
     }
@@ -1793,9 +1802,6 @@ function removePersonaInfoFromRobot(thisRobotInfo, baseRobotInfo){
     if (!baseRobotInfo || typeof baseRobotInfo !== 'object'){ console.error('removePersonaInfoFromRobot() could not find baseRobotInfo or it was empty! \n-> baseRobotInfo:', baseRobotInfo); return false; }
     if (!thisRobotInfo.token || !baseRobotInfo.token){ console.error('removePersonaInfoFromRobot() could not find token(s) in thisRobotInfo/baseRobotInfo', thisRobotInfo.token, baseRobotInfo.token); return false; }
     let _self = this;
-    // Clear the persona tokens and images entirely
-    delete thisRobotInfo.persona;
-    delete thisRobotInfo.personaImage;
     // Revert the name back to the base robot's original name
     thisRobotInfo.name = baseRobotInfo.name;
     // List out the fields we want to revert verbaitm
@@ -1837,8 +1843,11 @@ function removePersonaFromRobot(playerInfo, playerRobot){
     if (!playerRobot || typeof playerRobot !== 'object'){ console.error('removePersonaFromRobot() could not find playerRobot or it was empty! \n-> playerRobot:', playerRobot); return false; }
     let _self = this;
     let _indexes = _self.indexes;
+    let _elements = _self.elements;
     let _mmrpgIndexPlayers = _indexes.players;
     let _mmrpgIndexRobots = _indexes.robots;
+    let $canvasMap = _elements.canvasMap;
+    let $robotsOverview = _elements.robotsOverview;
     let playerIndexInfo = _mmrpgIndexPlayers[playerInfo.token];
     let baseIndexInfo = _mmrpgIndexRobots[playerRobot.token];
     //console.log('playerIndexInfo =', playerIndexInfo);
@@ -1898,9 +1907,85 @@ function removePersonaFromRobot(playerInfo, playerRobot){
         //console.log('playerRobotStats (w-player-boost) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
         }
     //console.log('playerRobot (end) =', _self.getClonedObject(playerRobot));
+
+    // Update the robot on the map and in the UI with the new sprite (assuming it's changed)
+    let teamRobotString = playerRobot.id + '_' + playerRobot.token;
+    //console.log('update map/overview robot w/ original image for ', teamRobotString);
+    _self.refreshTeamRobotSprites(teamRobotString);
+
     // Return true on success
     return true;
     }
+
+// Define a function for manually refreshing a given robot sprite to whatever its current image is
+function refreshTeamRobotSprites(teamRobotString){
+    //console.log('%c' + 'mmrpgWorldMap.removePersonaFromRobot(playerInfo, playerRobot)', 'color: magenta;');
+    if (!teamRobotString || typeof teamRobotString !== 'string'){ console.error('refreshTeamRobotSprites() could not find teamRobotString or it was empty! \n-> teamRobotString:', teamRobotString); return false; }
+
+    // Collect references to top-level objects
+    let _self = this;
+    let _world = _self.state;
+    let _indexes = _self.indexes;
+    let _elements = _self.elements;
+    let _worldPlayer = _world.player;
+    let _worldPlayerRobots = _worldPlayer.robots;
+    let _mmrpgIndexPlayers = _indexes.players;
+    let _mmrpgIndexRobots = _indexes.robots;
+    let $canvasMap = _elements.canvasMap;
+    let $robotsOverview = _elements.robotsOverview;
+
+    // Collect the data for this robot from the world player object
+    if (typeof _worldPlayerRobots[teamRobotString] === 'undefined'){ console.error('refreshTeamRobotSprites() could not find teamRobotString in _worldPlayerRobots! \n-> _worldPlayerRobots:', _worldPlayerRobots); return false; }
+    let teamRobotData = _worldPlayerRobots[teamRobotString];
+    let teamRobotName = teamRobotData.name ? teamRobotData.name : 'Robot';
+    let teamRobotLevel = teamRobotData.level ? teamRobotData.level : 1;
+    let teamRobotImage = teamRobotData.image ? teamRobotData.image : teamRobotData.token;
+    let teamRobotImageSize = teamRobotData.imageSize ? teamRobotData.imageSize : 40;
+    let teamRobotImageAlt = '';
+    if (teamRobotImage.indexOf('_') !== -1){
+        teamRobotImageAlt = teamRobotImage.split('_')[1];
+        teamRobotImage = teamRobotImage.split('_')[0];
+        }
+    let teamRobotCoreType = teamRobotData.core ? teamRobotData.core : 'none';
+    //console.log('teamRobotData =', teamRobotData);
+    //console.log('teamRobotName =', teamRobotName);
+    //console.log('teamRobotLevel =', teamRobotLevel);
+    //console.log('teamRobotImage =', teamRobotImage);
+    //console.log('teamRobotImageAlt =', teamRobotImageAlt);
+    //console.log('teamRobotImageSize =', teamRobotImageSize);
+    //console.log('teamRobotCoreType =', teamRobotCoreType);
+
+    // Collect a reference to this robot on the current canvas map and in the overview panel
+    let $teamRobotOnCanvas = $('.sprite[data-sprite="team-robot"][data-robot="' + teamRobotString + '"]', $canvasMap);
+    let $teamRobotInOverview = $('.team-robots .team-robot[data-robot="' + teamRobotString + '"]', $robotsOverview);
+    let $teamRobotOverviewIcon = $('.icon', $teamRobotInOverview);
+    let $teamRobotOverviewLabel = $('.label', $teamRobotInOverview);
+    let $teamRobotOverviewName = $('.name', $teamRobotOverviewLabel);
+    let $teamRobotOverviewLevel = $('.lvl', $teamRobotOverviewLabel);
+    let $teamRobotOverviewSprite = $('.sprite[data-sprite="robot"]', $teamRobotOverviewIcon);
+    //console.log('$teamRobotOnCanvas =', $teamRobotOnCanvas.length, $teamRobotOnCanvas);
+    //console.log('$teamRobotInOverview =', $teamRobotInOverview.length, $teamRobotInOverview);
+
+    // Update the robot sprite on the canvas map and the overview with the new image (assuming it's changed)
+    $teamRobotOnCanvas
+        .attr('data-token', teamRobotImage)
+        .attr('data-alt', teamRobotImageAlt)
+        .attr('data-size', teamRobotImageSize);
+    $teamRobotOverviewSprite
+        .attr('data-token', teamRobotImage)
+        .attr('data-alt', teamRobotImageAlt)
+        .attr('data-size', teamRobotImageSize);
+
+    // Update the robot in the overview with the new name, colours, etc. (again, assuming it's been changed)
+    $teamRobotOverviewName.html(teamRobotName);
+    $teamRobotOverviewLevel.html('Lv. ' + teamRobotLevel);
+    $teamRobotOverviewIcon.removeClass().addClass('icon type ' + teamRobotCoreType);
+    $teamRobotOverviewLevel.removeClass().addClass('lvl type ' + (teamRobotLevel === 100 ? 'level' : 'none'));
+
+    // Return true on success
+    return true;
+
+}
 
 // Define a quick function for getting the overview details for a given robot in the user's inventory
 function getRobotDetailsForOverview(robotToken){
@@ -2670,6 +2755,7 @@ mmrpgWorldMap.prototype.applyPersonaInfoToRobot = applyPersonaInfoToRobot;
 mmrpgWorldMap.prototype.applyPersonaToRobot = applyPersonaToRobot;
 mmrpgWorldMap.prototype.removePersonaInfoFromRobot = removePersonaInfoFromRobot;
 mmrpgWorldMap.prototype.removePersonaFromRobot = removePersonaFromRobot;
+mmrpgWorldMap.prototype.refreshTeamRobotSprites = refreshTeamRobotSprites;
 
 mmrpgWorldMap.prototype.getRobotDetailsForOverview = getRobotDetailsForOverview;
 mmrpgWorldMap.prototype.getRobotDetailsMarkupForOverview = getRobotDetailsMarkupForOverview;
