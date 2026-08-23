@@ -1362,16 +1362,17 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
                         if (firstRobotWithAbilityType){ robotStringsUsed.push(firstRobotWithAbilityType[0]); }
                         let playerRobotAvailable = firstRobotWithAbilityType ? true : false;
-                        let playerRobotName = '', playerRobotToken = '', playerRobotId = 0;
+                        let playerRobotName = '', playerRobotString = '', playerRobotToken = '', playerRobotId = 0;
                         let $playerRobotSprite = null, robotSpriteMarkup = null;
                         if (playerRobotAvailable){ robotSpriteMarkup = _self.getRobotSpriteMarkup(firstRobotWithAbilityType[0], {dir: 'left', frame: '10'}); }
                         if (playerRobotAvailable && robotSpriteMarkup){
-                            playerRobotId = parseInt(firstRobotWithAbilityType[0].split('_')[0]);
-                            playerRobotToken = firstRobotWithAbilityType[0].split('_')[1];
+                            playerRobotString = firstRobotWithAbilityType[0];
+                            playerRobotId = parseInt(playerRobotString.split('_')[0]);
+                            playerRobotToken = playerRobotString.split('_')[1];
                             playerRobotName = toUpperCaseWords(playerRobotToken.replace('-', ' '));
                             $playerRobotSprite = $(robotSpriteMarkup);
                             $playerRobotSprite.addClass('team bounce');
-                            $playerRobotSprite.attr('data-sprite', 'team-robot').attr('data-id', playerRobotId).attr('data-token', playerRobotToken).attr('data-frame', '10');
+                            $playerRobotSprite.attr('data-sprite', 'team-robot').attr('data-robot', playerRobotString).attr('data-frame', '10');
                             robotSpriteMarkup = $playerRobotSprite[0].outerHTML;
                             let abilityInfo = abilitiesIndex[firstRobotWithAbilityType[1]];
                             //console.log('abilitiesIndex =', abilitiesIndex);
@@ -1457,16 +1458,17 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let firstRobotWithAbilityType = robotsWithAbilityType ? robotsWithAbilityType[0] : false;
                         if (firstRobotWithAbilityType){ robotStringsUsed.push(firstRobotWithAbilityType[0]); }
                         let playerRobotAvailable = firstRobotWithAbilityType ? true : false;
-                        let playerRobotName = '', playerRobotToken = '', playerRobotId = 0;
+                        let playerRobotName = '', playerRobotString = '', playerRobotToken = '', playerRobotId = 0;
                         let $playerRobotSprite = null, robotSpriteMarkup = null;
                         if (playerRobotAvailable){ robotSpriteMarkup = _self.getRobotSpriteMarkup(firstRobotWithAbilityType[0], {dir: 'left', frame: '10'}); }
                         if (playerRobotAvailable && robotSpriteMarkup){
-                            playerRobotId = parseInt(firstRobotWithAbilityType[0].split('_')[0]);
-                            playerRobotToken = firstRobotWithAbilityType[0].split('_')[1];
+                            playerRobotString = firstRobotWithAbilityType[0];
+                            playerRobotId = parseInt(playerRobotString.split('_')[0]);
+                            playerRobotToken = playerRobotString.split('_')[1];
                             playerRobotName = toUpperCaseWords(playerRobotToken.replace('-', ' '));
                             $playerRobotSprite = $(robotSpriteMarkup);
                             $playerRobotSprite.addClass('team bounce');
-                            $playerRobotSprite.attr('data-sprite', 'team-robot').attr('data-id', playerRobotId).attr('data-token', playerRobotToken).attr('data-frame', '10');
+                            $playerRobotSprite.attr('data-sprite', 'team-robot').attr('data-robot', playerRobotString).attr('data-frame', '10');
                             robotSpriteMarkup = $playerRobotSprite[0].outerHTML;
                             let abilityInfo = abilitiesIndex[firstRobotWithAbilityType[1]];
                             //console.log('abilitiesIndex =', abilitiesIndex);

@@ -2640,8 +2640,8 @@ function getRobotSpriteMarkup(robotToken, spriteOptions){
     let robotData = typeof _worldPlayerRobots[robotString] !== 'undefined' ? _worldPlayerRobots[robotString] : null;
     let robotImageToken = robotToken, robotImageAlt = '';
     if (robotData && robotData.image){ robotImageToken = robotData.image; }
-    else if (robotData && _self.hasActivePersona(robotData)){ robotImageToken = robotData.personaImage; }
-    if (robotImageToken.indexOf('_')){ robotImageAlt = robotImageToken.split('_')[1]; robotImageToken = robotImageToken.split('_')[0]; }
+    //else if (robotData && _self.hasActivePersona(robotData)){ robotImageToken = robotData.personaImage; }
+    if (robotImageToken.indexOf('_') !== -1){ robotImageAlt = robotImageToken.split('_')[1]; robotImageToken = robotImageToken.split('_')[0]; }
     //console.log('robotInfo =', robotInfo);
     //console.log('robotData =', robotData);
     //console.log('robotImageToken =', robotImageToken);
@@ -2656,6 +2656,7 @@ function getRobotSpriteMarkup(robotToken, spriteOptions){
     spriteOptions.classes = typeof spriteOptions.classes === 'string' && spriteOptions.classes.length > 1 ? spriteOptions.classes : '';
     spriteOptions.styles = typeof spriteOptions.styles === 'string' && spriteOptions.styles.length > 1 ? spriteOptions.styles : '';
     spriteOptions.kind = typeof spriteOptions.kind === 'string' && spriteOptions.kind.length > 1 ? spriteOptions.kind : 'sprite';
+    //console.log('spriteOptions =', spriteOptions);
     // Generate the robot sprite attributes and inner markup given the options
     let robotSpriteAttrs = '';
     let robotSpriteClass = 'sprite robot' + (spriteOptions.classes ? ' ' + spriteOptions.classes : '');
