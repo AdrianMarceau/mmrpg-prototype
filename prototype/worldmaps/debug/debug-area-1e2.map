@@ -3,7 +3,7 @@
 @token    = debug-area-1e2
 @name     = DEBUG Area 1E2
 @level    = 60
-@size     = 19 x 42
+@size     = 19 x 21
 @sheet    = mmrpg-overworld-2k25-v2
 #---------------------------#
 @field        = waterworks-dam
@@ -19,7 +19,7 @@
 @pickups      = impact-core(10),small-screw(2),large-screw(3),super-pellet(5),super-capsule(4),energy-capsule(2)
 #---------------------------#
 @encounters   = bombomboy(10),blocky(12),arc-weldy(12),picket-man(6),tosanaizer-v(3),air-stone(9),robo-fishtot(10)
-@groups[]     = no-encounters_da1-exit-buffer(3-11...5-13)
+@groups[]     = no-encounters_da1e-exit-buffer(1-11...3-13)
 @groups[]     = no-encounters_da1s2-exit-buffer(16-11...17-13)
 #---------------------------#
 @actors[]     = purple-reset-dude(16-14, robot, anti-eddie, -, default)
