@@ -6,61 +6,88 @@ def resize_map(filepath, left, right, top, bottom):
     with open(filepath, 'r') as f:
         lines = f.readlines()
 
-    header = []
-    grid = []
+    blocks = []
+    current_text = []
+    current_grid = []
 
-    # 1. Separate Header/Metadata from the Grid
+    # 1. Parse the file into sequential blocks to preserve multi-layer structure
     for line in lines:
-        if line.strip().startswith('['):
-            grid.append(line.strip())
+        stripped = line.strip()
+        if stripped.startswith('['):
+            # If we were collecting text, save it as a text block and clear it
+            if current_text:
+                blocks.append({'type': 'text', 'lines': current_text})
+                current_text = []
+
+            # Split by comma but preserve the exact cell strings
+            cells = [c.strip() for c in stripped.split(',')]
+            current_grid.append(cells)
         else:
-            header.append(line.rstrip('\n'))
+            # If we were collecting a grid, save it as a grid block and clear it
+            if current_grid:
+                blocks.append({'type': 'grid', 'rows': current_grid})
+                current_grid = []
 
-    # 2. Parse the Grid into a 2D array
-    parsed_grid = []
-    for row in grid:
-        # Split by comma but preserve the exact cell strings
-        cells = [c.strip() for c in row.split(',')]
-        parsed_grid.append(cells)
+            current_text.append(line.rstrip('\n'))
 
-    orig_h = len(parsed_grid)
-    orig_w = len(parsed_grid[0]) if orig_h > 0 else 0
+    # Append any remaining blocks at the end of the file
+    if current_text:
+        blocks.append({'type': 'text', 'lines': current_text})
+    if current_grid:
+        blocks.append({'type': 'grid', 'rows': current_grid})
+
+    orig_w, orig_h = 0, 0
+    new_w, new_h = 0, 0
     empty_cell = "[__]"
+    found_first_grid = False
 
-    # 3. Apply Vertical Resizing (Top/Bottom)
-    if top > 0:
-        for _ in range(top):
-            parsed_grid.insert(0, [empty_cell] * orig_w)
-    elif top < 0:
-        parsed_grid = parsed_grid[abs(top):]
+    # 2. Apply Resizing to ALL grid blocks
+    for block in blocks:
+        if block['type'] == 'grid':
+            grid = block['rows']
 
-    if bottom > 0:
-        for _ in range(bottom):
-            parsed_grid.append([empty_cell] * orig_w)
-    elif bottom < 0:
-        parsed_grid = parsed_grid[:-abs(bottom)]
+            # Capture original dimensions for the summary output based on the first layer
+            curr_orig_h = len(grid)
+            curr_orig_w = len(grid[0]) if curr_orig_h > 0 else 0
+            if not found_first_grid:
+                orig_h, orig_w = curr_orig_h, curr_orig_w
+                found_first_grid = True
 
-    # Update current height before horizontal resize
-    current_h = len(parsed_grid)
+            # Apply Vertical Resizing (Top/Bottom)
+            if top > 0:
+                for _ in range(top):
+                    grid.insert(0, [empty_cell] * curr_orig_w)
+            elif top < 0:
+                grid = grid[abs(top):]
 
-    # 4. Apply Horizontal Resizing (Left/Right)
-    for i in range(current_h):
-        if left > 0:
-            parsed_grid[i] = ([empty_cell] * left) + parsed_grid[i]
-        elif left < 0:
-            parsed_grid[i] = parsed_grid[i][abs(left):]
+            if bottom > 0:
+                for _ in range(bottom):
+                    grid.append([empty_cell] * curr_orig_w)
+            elif bottom < 0:
+                grid = grid[:-abs(bottom)]
 
-        if right > 0:
-            parsed_grid[i] = parsed_grid[i] + ([empty_cell] * right)
-        elif right < 0:
-            parsed_grid[i] = parsed_grid[i][:-abs(right)]
+            current_h = len(grid)
 
-    new_w = len(parsed_grid[0]) if parsed_grid else 0
-    new_h = len(parsed_grid) if parsed_grid else 0
+            # Apply Horizontal Resizing (Left/Right)
+            for i in range(current_h):
+                if left > 0:
+                    grid[i] = ([empty_cell] * left) + grid[i]
+                elif left < 0:
+                    grid[i] = grid[i][abs(left):]
 
-    # 5. Process Header Coordinates
+                if right > 0:
+                    grid[i] = grid[i] + ([empty_cell] * right)
+                elif right < 0:
+                    grid[i] = grid[i][:-abs(right)]
+
+            # Save the new grid dimensions
+            new_h = len(grid)
+            new_w = len(grid[0]) if new_h > 0 else 0
+
+            block['rows'] = grid
+
+    # 3. Process Coordinates in ALL text blocks
     # Matches digits-digits bounded by (, ), space, comma, or dot
-    # This ensures we match '10-14' or '8-12...12-16' but skip IDs like 'alt-01'
     coord_pattern = re.compile(r'(?<=[(\s,\.])(\d+)-(\d+)(?=[)\s,\.])')
 
     def update_coord(match):
@@ -69,28 +96,34 @@ def resize_map(filepath, left, right, top, bottom):
         new_y = y + top
         return f"{new_x}-{new_y}"
 
-    updated_header = []
-    for line in header:
-        if line.startswith('@size'):
-            # Update the map size variable explicitly
-            line = re.sub(r'(\d+)\s*x\s*(\d+)', f"{new_w} x {new_h}", line)
-            updated_header.append(line)
-        elif line.startswith('@'):
-            # Update X-Y coordinates in all other @ definitions
-            new_line = coord_pattern.sub(update_coord, line)
-            updated_header.append(new_line)
-        else:
-            updated_header.append(line)
+    for block in blocks:
+        if block['type'] == 'text':
+            updated_lines = []
+            for line in block['lines']:
+                if line.startswith('@size'):
+                    # Update the map size variable explicitly
+                    line = re.sub(r'(\d+)\s*x\s*(\d+)', f"{new_w} x {new_h}", line)
+                    updated_lines.append(line)
+                elif line.startswith('@'):
+                    # Update X-Y coordinates in all other @ definitions
+                    new_line = coord_pattern.sub(update_coord, line)
+                    updated_lines.append(new_line)
+                else:
+                    updated_lines.append(line)
+            block['lines'] = updated_lines
 
-    # 6. Save to a new file to allow for review
+    # 4. Save to a new file, iterating through our sequential blocks
     base, ext = os.path.splitext(filepath)
     out_path = f"{base}_resized{ext}"
 
     with open(out_path, 'w') as f:
-        for line in updated_header:
-            f.write(line + '\n')
-        for row in parsed_grid:
-            f.write(','.join(row) + '\n')
+        for block in blocks:
+            if block['type'] == 'text':
+                for line in block['lines']:
+                    f.write(line + '\n')
+            elif block['type'] == 'grid':
+                for row in block['rows']:
+                    f.write(','.join(row) + '\n')
 
     print(f"Map successfully resized!")
     print(f"Original size: {orig_w} x {orig_h} | New size: {new_w} x {new_h}")
