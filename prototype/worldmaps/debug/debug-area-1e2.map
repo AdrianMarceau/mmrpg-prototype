@@ -14,6 +14,7 @@
 @locks[]    = impact-portal-flower(17-12, portal-flower, impact, items:impact-core, x10, locked)
 #---------------------------#
 @portals[]  = west-exit(2-12, debug-area-1e__east-exit, left-only)
+@portals[]  = west-exit-2(1-12, debug-area-1e__east-exit, left-only)
 @portals[]  = south-exit(10-21, debug-area-1s2__east-exit, down-only)
 #---------------------------#
 @pickups      = impact-core(10),small-screw(2),large-screw(3),super-pellet(5),super-capsule(4),energy-capsule(2)
