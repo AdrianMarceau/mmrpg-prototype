@@ -611,7 +611,8 @@ class mmrpgWorldMap {
             };
         let onLayersLoaded = function(){
             _self.refreshTerrainTileOverlay();
-            let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+            let $terrainLayer = $('.layer[data-unique-layer="terrain_0"]', $canvasMap);
+            if (!$terrainLayer.length){  $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap); }
             if ($terrainLayer.length){
                 let dropdownRequired = !_elements.actionDropdown || !_elements.actionDropdown.length;
                 let overlayRequired = !_elements.clickOverlay || !_elements.clickOverlay.length;
@@ -629,6 +630,9 @@ class mmrpgWorldMap {
             return onWorldLoaded();
             };
         // Loop through each map layer and generate graphics and/or interactivity
+        let layerCount = 0, terrainCount = 0;
+        let minLayerCount = $mapLayers.length + 1;
+        let maxTerrainCount = $mapLayers.length - 1;
         $mapLayers.each(function(index, element){
             //console.log('-> checking layer #' + index + '...');
             let $thisLayer = $(element);
@@ -657,9 +661,16 @@ class mmrpgWorldMap {
                 }
             // If this is a terrain layer, we need to initialize the canvas and draw the tiles
             if (layerToken === 'terrain'){
+                $thisLayer.attr('data-unique-layer', 'terrain_' + terrainCount);
+                $thisLayer.css('z-index', maxTerrainCount - terrainCount);
+                terrainCount++;
+                layerCount++;
                 _self.initMapLayerCanvas($thisLayer, onLayerReady);
                 return true;
                 }
+            // Update the z-index to ensure everything stacks correctly
+            $thisLayer.css('z-index', minLayerCount + layerCount);
+            layerCount++;
             onLayerReady();
             return true;
             });
@@ -677,7 +688,8 @@ class mmrpgWorldMap {
         let _self = this;
         let _config = _self.config;
         let _world = _self.state;
-        let layerToken = $thisLayer.attr('data-layer');
+        let baseLayerToken = $thisLayer.attr('data-layer');
+        let layerToken = $thisLayer.attr('data-unique-layer') || baseLayerToken;
         let $canvas = $('canvas', $thisLayer), canvas = $canvas[0], ctx = canvas.getContext('2d');
         let $canvasJson = $('script[data-json]', $thisLayer).first(), canvasJson = $canvasJson.html(), canvasData = canvasJson ? JSON.parse(canvasJson) : false;
         if (!canvasData || typeof canvasData !== 'object' || !Object.keys(canvasData).length){ console.error('initMapLayerCanvas() unable to parse canvasData!'); return false; }
@@ -727,6 +739,7 @@ class mmrpgWorldMap {
             if (tileToken === 'keys'){ continue; }
             let tileInfo = tilesIndex[tileToken];
             if (!tileInfo){ console.error('indexCanvasTileData() missing tileInfo for tileToken:', tileToken); continue; }
+            if (Array.isArray(tileInfo[0])){ continue; }
             let tileInfoAttrs = {isWalkable: true, isVoid: false, isWater: false};
             //console.log('typeof tileInfo for tileToken "' + tileToken + '" =', typeof tileInfo, '\n-> w/ value:', tileInfo);
             (function(indexOfNotWalkable){
@@ -803,6 +816,38 @@ class mmrpgWorldMap {
             }
         layersIndex[layerToken] = thisLayerData;
         layerTilesIndex[layerToken] = thisLayerTiles;
+        if (layerToken.indexOf('terrain_') === 0){
+            let masterTiles = layerTilesIndex['terrain'] || {};
+            let currentLayerIndex = parseInt(layerToken.split('_')[1]); // 0, 1, 2...
+            for (let i = 0; i < tileDataKeys.length; i++){
+                let tileKey = tileDataKeys[i];
+                let thisTile = thisLayerTiles[tileKey];
+                let tileIsVoid = thisTile.sprite[1] === 'void' || thisTile.sprite[1].indexOf('void') !== -1;
+                if (typeof masterTiles[tileKey] === 'undefined'){
+                    // Initialize the slot if empty
+                    masterTiles[tileKey] = _self.getClonedObject(thisTile);
+                    masterTiles[tileKey].sourceLayer = currentLayerIndex;
+                    } else {
+                    let existingLayerIndex = masterTiles[tileKey].sourceLayer;
+                    let masterIsVoid = masterTiles[tileKey].sprite[1] === 'void' || masterTiles[tileKey].sprite[1].indexOf('void') !== -1;
+                    let incomingWins = false;
+                    // Layer 0 beats Layer 1, as long as Layer 0 isn't just a void hole
+                    if (!tileIsVoid && currentLayerIndex < existingLayerIndex){
+                        incomingWins = true;
+                        }
+                    // Alternatively, if the master is currently a void hole, any lower layer can peek through
+                    else if (masterIsVoid && !tileIsVoid){
+                        incomingWins = true;
+                        }
+                    if (incomingWins){
+                        masterTiles[tileKey].walkable = thisTile.walkable;
+                        masterTiles[tileKey].sprite = thisTile.sprite;
+                        masterTiles[tileKey].sourceLayer = currentLayerIndex;
+                        }
+                    }
+                }
+            layerTilesIndex['terrain'] = masterTiles;
+            }
         _world.layersIndex = layersIndex;
         _world.layerTilesIndex = layerTilesIndex;
         return true;
@@ -818,7 +863,8 @@ class mmrpgWorldMap {
         let _world = _self.state;
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
+        let $thisLayer = $('.layer[data-unique-layer="'+layerToken+'"]', $canvasMap);
+        if (!$thisLayer.length){ $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap); }
         if (!$thisLayer || !$thisLayer.length){ console.error('drawTilesToCanvas() missing required $thisLayer!'); return false; }
         let layersIndex = _world.layersIndex;
         let layerTilesIndex = _world.layerTilesIndex;
@@ -1005,7 +1051,7 @@ class mmrpgWorldMap {
     // Cache is invalidated automatically if canvas size changes.
     getOverlayGradientBuffer(layerToken, ctx){
         let _self = this;
-        let _selfRef = self;
+        let _selfRef = _self.getOverlayGradientBuffer;
         _selfRef._overlayCache = _selfRef._overlayCache || { gradients: {}, sliceBuf: null };
         const cache = _selfRef._overlayCache.gradients;
         const key = layerToken;
@@ -1026,7 +1072,7 @@ class mmrpgWorldMap {
     // Slices the gradient buffer, masks with current scene alpha in that rect, then blends back.
     applyOverlayToRect(ctx, gradBuf, x, y, w, h, blend){
         let _self = this;
-        let _selfRef = self;
+        let _selfRef = _self.applyOverlayToRect;
         _selfRef._overlayCache = _selfRef._overlayCache || { gradients: {}, sliceBuf: null };
         let slice = _selfRef._overlayCache.sliceBuf;
         if (!slice){ slice = _selfRef._overlayCache.sliceBuf = _self._getOffscreen(w, h); }
@@ -1177,9 +1223,9 @@ class mmrpgWorldMap {
                 if (!tileData || !tileData.walkable){ continue; }
                 allowedTerrain.push(tileKey);
                 }
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return allowedTerrain.includes(tileKey);
-                }));
+                });
             //console.log('--> walkableMapTiles (post-terrain) =', walkableMapTiles);
             }
 
@@ -1189,9 +1235,9 @@ class mmrpgWorldMap {
         let playerPosition = _config.mapStartPosition || (portalsIndex['spawn'] ? portalsIndex['spawn'].join('-') : '') || '1-1';
         if (exclude.players && playerPosition){
             //console.log('---> checking playerPosition =', playerPosition);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return tileKey !== playerPosition;
-                }));
+                });
             //console.log('---> walkableMapTiles (post-player) =', walkableMapTiles);
             }
         */
@@ -1201,9 +1247,9 @@ class mmrpgWorldMap {
         let battleSymbolKeys = Object.keys(battleSymbols);
         if (exclude.battles && battleSymbols){
             //console.log('---> checking battleSymbolKeys =', battleSymbolKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return !battleSymbolKeys.includes(tileKey);
-                }));
+                });
             //console.log('---> walkableMapTiles (post-battles) =', walkableMapTiles);
             }
 
@@ -1212,9 +1258,9 @@ class mmrpgWorldMap {
         let rivalSymbolKeys = Object.keys(rivalSymbols);
         if (exclude.rivals && rivalSymbols){
             //console.log('---> checking rivalSymbolKeys =', rivalSymbolKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return !rivalSymbolKeys.includes(tileKey);
-                }));
+                });
             //console.log('---> walkableMapTiles (post-rivals) =', walkableMapTiles);
             }
 
@@ -1222,7 +1268,7 @@ class mmrpgWorldMap {
         let worldPortalKeys = Object.keys(portalSymbols);
         if (exclude.portals && portalSymbols){
             //console.log('---> checking portalSymbolKeys =', worldPortalKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against portalSymbolKeys:', worldPortalKeys);
                 if (worldPortalKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a portal, checking if locked...');
@@ -1236,7 +1282,7 @@ class mmrpgWorldMap {
                         }
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-portals) =', walkableMapTiles);
             }
 
@@ -1244,7 +1290,7 @@ class mmrpgWorldMap {
         let worldButtonKeys = Object.keys(buttonSymbols);
         if (exclude.buttons && buttonSymbols){
             //console.log('---> checking worldButtonKeys =', worldButtonKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against buttonSymbols:', worldButtonKeys);
                 if (worldButtonKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a button, removing from walkableMapTiles');
@@ -1253,7 +1299,7 @@ class mmrpgWorldMap {
                     //console.log('---> tileKey:', tileKey, 'is not a button, keeping in walkableMapTiles');
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-buttons) =', walkableMapTiles);
             }
 
@@ -1261,7 +1307,7 @@ class mmrpgWorldMap {
         let worldSwitchKeys = Object.keys(switchSymbols);
         if (exclude.switches && switchSymbols){
             //console.log('---> checking worldSwitchKeys =', worldSwitchKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against switchSymbols:', worldSwitchKeys);
                 if (worldSwitchKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a switch, removing from walkableMapTiles');
@@ -1270,7 +1316,7 @@ class mmrpgWorldMap {
                     //console.log('---> tileKey:', tileKey, 'is not a switch, keeping in walkableMapTiles');
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-switches) =', walkableMapTiles);
             }
 
@@ -1278,7 +1324,7 @@ class mmrpgWorldMap {
         let worldGateKeys = Object.keys(gateSymbols);
         if (exclude.gates && gateSymbols){
             //console.log('---> checking worldGateKeys =', worldGateKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against gateSymbols:', worldGateKeys);
                 if (worldGateKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a gate, removing from walkableMapTiles');
@@ -1287,7 +1333,7 @@ class mmrpgWorldMap {
                     //console.log('---> tileKey:', tileKey, 'is not a gate, keeping in walkableMapTiles');
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-gates) =', walkableMapTiles);
             }
 
@@ -1295,7 +1341,7 @@ class mmrpgWorldMap {
         let worldLockKeys = Object.keys(lockSymbols);
         if (exclude.locks && lockSymbols){
             //console.log('---> checking lockSymbolKeys =', worldLockKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against lockSymbolKeys:', worldLockKeys);
                 if (worldLockKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a lock, checking if locked...');
@@ -1309,7 +1355,7 @@ class mmrpgWorldMap {
                         }
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-locks) =', walkableMapTiles);
             }
 
@@ -1317,7 +1363,7 @@ class mmrpgWorldMap {
         let worldBlockKeys = Object.keys(blockSymbols);
         if (exclude.blocks && blockSymbols){
             //console.log('---> checking worldBlockKeys =', worldBlockKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against blockSymbols:', worldBlockKeys);
                 if (worldBlockKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a block, removing from walkableMapTiles');
@@ -1326,7 +1372,7 @@ class mmrpgWorldMap {
                     //console.log('---> tileKey:', tileKey, 'is not a block, keeping in walkableMapTiles');
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-blocks) =', walkableMapTiles);
             }
 
@@ -1334,7 +1380,7 @@ class mmrpgWorldMap {
         let worldHazardKeys = Object.keys(hazardSymbols);
         if (exclude.hazards && hazardSymbols){
             //console.log('---> checking hazardSymbolKeys =', worldHazardKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against hazardSymbolKeys:', worldHazardKeys);
                 if (worldHazardKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a hazard, checking if locked...');
@@ -1348,7 +1394,7 @@ class mmrpgWorldMap {
                         }
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-hazards) =', walkableMapTiles);
             }
 
@@ -1356,7 +1402,7 @@ class mmrpgWorldMap {
         let worldActorKeys = Object.keys(actorSymbols);
         if (exclude.actors && actorSymbols){
             //console.log('---> checking worldActorKeys =', worldActorKeys);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 //console.log('---> checking tileKey:', tileKey, 'against actorSymbols:', worldActorKeys);
                 if (worldActorKeys.includes(tileKey)){
                     //console.log('---> tileKey:', tileKey, 'is a actor, removing from walkableMapTiles');
@@ -1365,7 +1411,7 @@ class mmrpgWorldMap {
                     //console.log('---> tileKey:', tileKey, 'is not a actor, keeping in walkableMapTiles');
                     }
                 return true; // keep this tile
-                }));
+                });
             //console.log('---> walkableMapTiles (post-actors) =', walkableMapTiles);
             }
 
@@ -1374,9 +1420,9 @@ class mmrpgWorldMap {
         let cursorPosition = _world.cursor.position;
         if (exclude.cursor && cursorPosition){
             //console.log('---> checking cursorPosition =', cursorPosition);
-            walkableMapTiles = Object.values(walkableMapTiles.filter(function(tileKey){
+            walkableMapTiles = walkableMapTiles.filter(function(tileKey){
                 return tileKey !== cursorPosition;
-                }));
+                });
             //console.log('---> walkableMapTiles (post-cursor) =', walkableMapTiles);
             }
 
@@ -1635,9 +1681,17 @@ class mmrpgWorldMap {
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
+        if (layerToken === 'terrain' && !_world.layersIndex['terrain']){
+            let uniqueLayerTokens = Object.keys(_world.layersIndex).filter(k => k.indexOf('terrain_') === 0);
+            for (let i = 0; i < uniqueLayerTokens.length; i++){
+                _self.refreshCanvasTilesForReal(uniqueLayerTokens[i]);
+                }
+            return true;
+            }
         let $thisWorld = _elements.world;
         let $canvasMap = _elements.map;
-        let $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap);
+        let $thisLayer = $('.layer[data-unique-layer="'+layerToken+'"]', $canvasMap);
+        if (!$thisLayer.length){ $thisLayer = $('.layer[data-layer="'+layerToken+'"]', $canvasMap); }
         if (!$thisLayer || !$thisLayer.length){ console.error('refreshCanvasTilesForReal() missing required $thisLayer!'); return false; }
         let layersIndex = _world.layersIndex;
         let thisLayerData = layersIndex[layerToken] || false;
@@ -1746,7 +1800,7 @@ class mmrpgWorldMap {
         forceMove = typeof forceMove === 'boolean' ? forceMove : false;
         animateMove = typeof animateMove === 'boolean' ? animateMove : true;
         let _self = this;
-        let _selfRef = self;
+        let _selfRef = _self.moveToPosition;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
@@ -1970,7 +2024,7 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap.scrollMap(scrollX:' + scrollX + ', scrollY:' + scrollY + ', forceRefresh:' + forceRefresh + ')', 'color: magenta;');
         // Collect references, indexes, and other variables we need to work with
         let _self = this;
-        let _selfRef = self;
+        let _selfRef = _self.scrollMap;
         let _config = _self.config;
         let _elements = _self.elements;
         let _world = _self.state;
@@ -2048,7 +2102,7 @@ class mmrpgWorldMap {
         if (newCol < 1 || newRow < 1){ console.error('newCol and newRow must be greater than zero!'); return false; }
         // Collect references, indexes, and other variables we need to work with
         let _self = this;
-        let _selfRef = self;
+        let _selfRef = _self.scrollMiniMap;
         let _config = _self.config;
         let _elements = _self.elements;
         let $minimapOverview = _elements.minimapOverview;

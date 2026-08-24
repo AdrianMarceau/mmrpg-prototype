@@ -751,6 +751,7 @@ class rpg_world {
                 if (!strstr($line, '=')){ continue; }
                 $line = preg_replace('/\s+\=\s+/i', '=', trim($line, '@ '));
                 list($name, $value) = explode('=', $line, 2);
+                if (strtolower($name) === 'layer'){ $map_layer_key = (int)trim($value); continue; }
                 if (strstr($name, '[') && strstr($name, ']')){
                     $key = substr($name, strpos($name, '[') + 1, -1);
                     $name = substr($name, 0, strpos($name, '['));
@@ -1412,37 +1413,76 @@ class rpg_world {
                 foreach ($world_pickup_cells AS $position){ unset($available_cells[$position]); }
             }
         }
-        // Then we through all the tiles and remove any that are unwalkable "void" type
-        $by_terrain = array();
+        // Then we evaluate the map layers top-down to determine the effective topmost tile for each position
+        $effective_tiles = array();
         if (!empty($map_data['layers'])){
             $tileLayers = $map_data['layers'];
-            //error_log('-> $tileLayers = '.print_r($tileLayers, true));
             foreach ($tileLayers AS $layer_key => $layer_tiles){
-                //error_log('-> checking layer #'.$layer_key.' $tileLayers ...');
-                //error_log('-> found '.count($layer_tiles).' rows in $layer_tiles ...');
                 foreach ($layer_tiles AS $row_key => $row_tiles){
-                    //error_log('-> checking $tileLayers['.$layer_key.']['.$row_key.'] ...');
-                    //error_log('-> $tileLayers['.$layer_key.']['.$row_key.'] = '.print_r($row_tiles, true));
                     $row_tiles = explode(',', $row_tiles);
                     foreach ($row_tiles AS $col_key => $tile_token){
                         $pos = ($col_key + 1).'-'.($row_key + 1);
+                        // We only care about this position if it hasn't been blocked by an event, portal, etc.
                         if (!isset($available_cells[$pos])){ continue; }
-                        // If this tile is a "void" type, remove it from the available cells
-                        if ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0){
-                            //error_log('-> removing tile position "'.$pos.'" from available cells (tile: '.$tile_token.')');
-                            unset($available_cells[$pos]);
-                        }
-                        // Otherwise we should add it to the appropriate array in the by_terrain list
-                        else {
-                            list($tile_token_clean) = strstr($tile_token, '-') ? explode('-', $tile_token) : array($tile_token);
-                            //error_log('-> adding tile position "'.$pos.'" to by_terrain["'.$tile_token_clean.'"] (tile: '.$tile_token.')');
-                            if (!isset($by_terrain[$tile_token_clean])){ $by_terrain[$tile_token_clean] = array(); }
-                            $by_terrain[$tile_token_clean][] = $pos;
+                        $is_void = ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0);
+                        if (!isset($effective_tiles[$pos])){
+                            $effective_tiles[$pos] = $tile_token;
+                        } else {
+                            $current_is_void = ($effective_tiles[$pos] === '' || $effective_tiles[$pos] === 'void' || strpos($effective_tiles[$pos], 'void-') === 0);
+                            // If the current top tile is a void hole, the layer beneath peeks through
+                            if ($current_is_void && !$is_void){
+                                $effective_tiles[$pos] = $tile_token;
+                            }
                         }
                     }
                 }
             }
         }
+        // Now process our finalized list to populate $by_terrain and remove unwalkable voids
+        $by_terrain = array();
+        foreach ($effective_tiles AS $pos => $tile_token){
+            $is_void = ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0);
+            if ($is_void){
+                // If it's void all the way down, it's truly unwalkable
+                unset($available_cells[$pos]);
+            } else {
+                // Otherwise, assign it to a single, definitive terrain category
+                list($tile_token_clean) = strstr($tile_token, '-') ? explode('-', $tile_token) : array($tile_token);
+                if (!isset($by_terrain[$tile_token_clean])){ $by_terrain[$tile_token_clean] = array(); }
+                $by_terrain[$tile_token_clean][] = $pos;
+            }
+        }
+        /*
+        // Then we through all the tiles and remove any that are unwalkable "void" type
+        $by_terrain = array();
+        if (!empty($map_data['layers'])){
+            $tileLayers = $map_data['layers'];
+            foreach ($tileLayers AS $layer_key => $layer_tiles){
+                foreach ($layer_tiles AS $row_key => $row_tiles){
+                    $row_tiles = explode(',', $row_tiles);
+                    foreach ($row_tiles AS $col_key => $tile_token){
+                        $pos = ($col_key + 1).'-'.($row_key + 1);
+
+                        // We only care about this position if it hasn't been blocked by an event, portal, etc.
+                        if (!isset($available_cells[$pos])){ continue; }
+
+                        $is_void = ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0);
+
+                        if (!isset($effective_tiles[$pos])){
+                            $effective_tiles[$pos] = $tile_token;
+                        } else {
+                            $current_is_void = ($effective_tiles[$pos] === '' || $effective_tiles[$pos] === 'void' || strpos($effective_tiles[$pos], 'void-') === 0);
+
+                            // If the current top tile is a void hole, the layer beneath peeks through
+                            if ($current_is_void && !$is_void){
+                                $effective_tiles[$pos] = $tile_token;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        */
         // Return the available cells as an array of positions
         $available_cells = array_keys($available_cells);
         $total = count($available_cells);
@@ -1558,6 +1598,12 @@ class rpg_world {
             if (empty($options)){ $options = array_keys($distributed_encounters); }
             if (empty($robot_token)){ $robot_token = array_shift($options); }
             if (!isset($generated_encounters[$robot_token])){ $generated_encounters[$robot_token] = 0; }
+            $real_robot_token = $robot_token;
+            $robot_alt = '';
+            if (strstr($robot_token, '_')){
+                $robot_alt = explode('_', $robot_token)[1];
+                $real_robot_token = explode('_', $robot_token)[0];
+            }
             //error_log(PHP_EOL.'-> next robot = "'.$robot_token.'"');
             $habitats = !empty($map_habitats[$robot_token]) ? $map_habitats[$robot_token] : '';
             //error_log('-> getting random position for robot "'.$robot_token.'" (habitats: '.print_r(implode(',', $habitats), true).')');
@@ -1579,7 +1625,7 @@ class rpg_world {
             //error_log('$robot_pos_terrain = '.print_r($robot_pos_terrain, true));
             //error_log('$battle_background = '.print_r($battle_background, true));
             //error_log('$battle_foreground = '.print_r($battle_foreground, true));
-            $robot_info = $mmrpg_index_robots[$robot_token];
+            $robot_info = $mmrpg_index_robots[$real_robot_token];
             $robot_name = $robot_info['robot_name'];
             $robot_class = $robot_info['robot_class'];
             $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
@@ -1616,7 +1662,8 @@ class rpg_world {
                 'field' => $battle_field,
                 'music' => $battle_music,
                 'target' => array('robots' => array(array(
-                    'token' => $robot_token,
+                    'token' => $real_robot_token,
+                    'image' => $robot_token,
                     'level' => $robot_level,
                     'item' => $robot_item,
                     ))),
@@ -1873,6 +1920,41 @@ class rpg_world {
         return $world_map_pickups;
     }
 
+// Define a function for getting the terrain type for a given position on the map, but do not limit only to available tiles
+    public static function get_map_position_terrain($position, $map_data_parsed){
+        //error_log('rpg_world::get_map_position_terrain() called for position "'.$position.'"');
+        if (empty($position) || !is_string($position) || !isset($map_data_parsed['tiles']) || !isset($map_data_parsed['layers'])){ return 'unknown'; }
+        $effective_tile = '';
+        // Loop through the layers to find the topmost visible tile for this position
+        foreach ($map_data_parsed['layers'] AS $layer_key => $layer_tiles){
+            foreach ($layer_tiles AS $row_key => $row_tiles){
+                $row_tiles = str_replace(array('[', ']'), '', $row_tiles);
+                $row_tiles = strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles);
+                foreach ($row_tiles AS $col_key => $tile_token){
+                    $pos = ($col_key + 1).'-'.($row_key + 1);
+                    if ($pos === $position){
+                        $is_void = ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0);
+                        if (empty($effective_tile)){
+                            $effective_tile = $tile_token;
+                        } else {
+                            $current_is_void = ($effective_tile === '' || $effective_tile === 'void' || strpos($effective_tile, 'void-') === 0);
+                            // Let the layer underneath peek through if the top is void
+                            if ($current_is_void && !$is_void){
+                                $effective_tile = $tile_token;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Return 'unknown' if it's void all the way down, otherwise return the base terrain token
+        if (empty($effective_tile) || $effective_tile === 'void' || strpos($effective_tile, 'void-') === 0){
+            return 'unknown';
+        }
+        return explode('-', $effective_tile)[0];
+    }
+
+    /*
     // Define a function for getting the terrain type for a given position on the map, but do not limit only to available tiles
     public static function get_map_position_terrain($position, $map_data_parsed){
         //error_log('rpg_world::get_map_position_terrain() called for position "'.$position.'"');
@@ -1890,6 +1972,7 @@ class rpg_world {
         }
         return 'unknown';
     }
+    */
 
     // Define a quick function for translating singular kinds to plural kinds
     // TODO:  Find the class method that already does this if exists, else create
