@@ -19,7 +19,7 @@
 #---------------------------#
 @pickups      = explode-core(10),weapon-pellet(10),weapon-capsule(5),defense-pellet(6),defense-capsule(3)
 #---------------------------#
-@encounters  = shelln(6),snapper(5),pelicanu(4),robo-fishtot(3),octone(2),bui-boi(1),manta-missile(1)
+@encounters  = shelln(6),snapper(5),snapper_alt(5),pelicanu(4),robo-fishtot(3),octone(2),bui-boi(1),manta-missile(1)
 @groups[]    = no-encounters_da1s-exit-buffer(3-1...5-3)
 @groups[]    = no-encounters_da1sw-exit-buffer(1-7...3-9)
 @groups[]    = no-encounters_da1e2-exit-buffer(18-1...20-3)
