@@ -1622,6 +1622,21 @@ class rpg_robot extends rpg_object {
         return $quote_text;
     }
 
+    // Define a function for getting a list of level-up abilities for a given robot
+    static public function get_level_up_abilities($robot_token){
+        //error_log('get_level_up_abilities('.$robot_token.')');
+        $this_robot_info = rpg_robot::get_index_info($robot_token);
+        //error_log('$this_robot_info = '.print_r($this_robot_info, true));
+        $level_up_abilities = array();
+        if (!empty($this_robot_info['robot_rewards']['abilities'])){
+            foreach ($this_robot_info['robot_rewards']['abilities'] AS $key => $info){
+                $level_up_abilities[] = $info['token'];
+            }
+        }
+        //error_log('$level_up_abilities = '.print_r($level_up_abilities, true));
+        return $level_up_abilities;
+    }
+
     // Define a function for getting all abilities compatible with a given robot
     static public function get_ability_compatibility($robot_token, $item_token = ''){
         //error_log('get_ability_compatibility('.$robot_token.', '.$item_token.')');
