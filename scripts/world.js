@@ -1721,6 +1721,15 @@ class mmrpgWorldMap {
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
         if (!effectName || typeof effectName !== 'string' || !effectName.length){ return false; }
         let _self = this;
+        let _world = _self.state;
+        if (layerToken === 'terrain' && !_world.layersIndex['terrain']){
+            let uniqueTokens = Object.keys(_world.layersIndex).filter(k => k.indexOf('terrain_') === 0);
+            let applied = false;
+            for (let i = 0; i < uniqueTokens.length; i++){
+                if (_self.applyLayerTileEffect(uniqueTokens[i], tilePosition, effectName)){ applied = true; }
+                }
+            return applied;
+            }
         let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
         if (!thisTileData){ console.error('applyLayerTileEffect() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
         thisTileData.effects[effectName] = true;
@@ -1736,6 +1745,15 @@ class mmrpgWorldMap {
         if (!tilePosition || typeof tilePosition !== 'string' || !tilePosition.length){ return false; }
         if (!effectName || typeof effectName !== 'string' || !effectName.length){ return false; }
         let _self = this;
+        let _world = _self.state;
+        if (layerToken === 'terrain' && !_world.layersIndex['terrain']) {
+            let uniqueTokens = Object.keys(_world.layersIndex).filter(k => k.indexOf('terrain_') === 0);
+            let removed = false;
+            for (let i = 0; i < uniqueTokens.length; i++) {
+                if (_self.removeLayerTileEffect(uniqueTokens[i], tilePosition, effectName)){ removed = true; }
+                }
+            return removed;
+            }
         let thisTileData = _self.getLayerTileIndexData(layerToken, tilePosition);
         if (!thisTileData){ console.error('removeLayerTileEffect() unable to find tile data for layer ' + layerToken + ' and position ' + tilePosition + '!'); return false; }
         thisTileData.effects[effectName] = false;
@@ -1751,6 +1769,14 @@ class mmrpgWorldMap {
         if (!effectName || typeof effectName !== 'string' || !effectName.length){ return false; }
         let _self = this;
         let _world = _self.state;
+        if (layerToken === 'terrain' && !_world.layersIndex['terrain']) {
+            let uniqueTokens = Object.keys(_world.layersIndex).filter(k => k.indexOf('terrain_') === 0);
+            let bulkRemoved = false;
+            for (let i = 0; i < uniqueTokens.length; i++) {
+                if (_self.bulkRemoveLayerTileEffect(uniqueTokens[i], effectName)){ bulkRemoved = true; }
+                }
+            return bulkRemoved;
+            }
         let layerTilesIndex = _world.layerTilesIndex;
         let thisLayerTiles = layerTilesIndex[layerToken] || false;
         if (!thisLayerTiles || typeof thisLayerTiles !== 'object'){ console.error('bulkRemoveLayerTileEffect() missing required _world.layerTilesIndex[' + layerToken + ']!'); return false; }
