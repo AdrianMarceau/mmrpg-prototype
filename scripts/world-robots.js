@@ -1333,11 +1333,14 @@ function giveRobotItem(robotString, itemToken, playSound, playAnimation){
             robotInfo.abilitiesViaItem = abilitiesViaItem;
             robotInfo.abilities = (function(currentAbilities, robotInfo){
                 let filteredAbilities = [];
+                let personaActive = robotInfo.personaActive || false;
                 let abilitiesCompatible = robotInfo.abilitiesCompatible || [];
+                let abilitiesViaPersona = robotInfo.abilitiesViaPersona || [];
                 let abilitiesViaItem = robotInfo.abilitiesViaItem || [];
                 for (var i = 0; i < currentAbilities.length; i++){
                     let id = currentAbilities[i], compatible = false;
-                    if (abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+                    if (!personaActive && abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+                    else if (personaActive && abilitiesViaPersona.indexOf(id) !== -1){ compatible = true; }
                     else if (abilitiesViaItem.indexOf(id) !== -1){ compatible = true; }
                     if (compatible){ filteredAbilities.push(id); }
                     }
@@ -1413,11 +1416,14 @@ function takeRobotItem(robotString, playSound, playAnimation){
     robotInfo.abilitiesViaItem = [];
     robotInfo.abilities = (function(currentAbilities, robotInfo){
         let filteredAbilities = [];
+        let personaActive = robotInfo.personaActive || false;
         let abilitiesCompatible = robotInfo.abilitiesCompatible || [];
+        let abilitiesViaPersona = robotInfo.abilitiesViaPersona || [];
         let abilitiesViaItem = robotInfo.abilitiesViaItem || [];
         for (var i = 0; i < currentAbilities.length; i++){
             let id = currentAbilities[i], compatible = false;
-            if (abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+            if (!personaActive && abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+            else if (personaActive && abilitiesViaPersona.indexOf(id) !== -1){ compatible = true; }
             else if (abilitiesViaItem.indexOf(id) !== -1){ compatible = true; }
             if (compatible){ filteredAbilities.push(id); }
             }
@@ -1712,6 +1718,7 @@ function applyPersonaToRobot(playerInfo, playerRobot){
     let _elements = _self.elements;
     let _mmrpgIndexPlayers = _indexes.players;
     let _mmrpgIndexRobots = _indexes.robots;
+    let _mmrpgAbilitiesIndex = _indexes.abilities;
     let $canvasMap = _elements.canvasMap;
     let $robotsOverview = _elements.robotsOverview;
     //if (!playerRobot.persona || !playerRobot.personaImage){ return removePersonaFromRobot(playerInfo, playerRobot); }
@@ -1727,6 +1734,8 @@ function applyPersonaToRobot(playerInfo, playerRobot){
     let robotWeaponsPercent = playerRobot.weapons /  playerRobot.weaponsMax;
     //console.log('robotEnergyPercent =', robotEnergyPercent, '(energy:', playerRobot.energy, ',energyMax:', playerRobot.energyMax, ')');
     //console.log('robotWeaponsPercent =', robotWeaponsPercent, '(weapons:', playerRobot.energy, ',weaponsMax:', playerRobot.weaponsMax, ')');
+    // Set the persona active flag to true before anything else
+    playerRobot.personaActive = true;
     // Collect and reset this robot back to base stats first
     playerRobot.energy = baseIndexInfo.energy;
     playerRobot.attack = baseIndexInfo.attack;
@@ -1790,6 +1799,11 @@ function applyPersonaToRobot(playerInfo, playerRobot){
     let teamRobotString = playerRobot.id + '_' + playerRobot.token;
     //console.log('update map/overview robot w/ new persona image for', teamRobotString);
     _self.refreshTeamRobotSprites(teamRobotString);
+
+    // Refresh the abilities menu as its probably open right now
+    let robotsOverviewAPI = _self.robotsOverviewAPI;
+    let $selectedTeamRobot = $('.team-robots .team-robot[data-robot="' + teamRobotString + '"]', $robotsOverview);
+    robotsOverviewAPI.filterAbilitiesToSelected($selectedTeamRobot);
 
     // Return true on success
     return true;
@@ -1858,6 +1872,8 @@ function removePersonaFromRobot(playerInfo, playerRobot){
     let robotWeaponsPercent = playerRobot.weapons /  playerRobot.weaponsMax;
     //console.log('robotEnergyPercent =', robotEnergyPercent, '(energy:', playerRobot.energy, ',energyMax:', playerRobot.energyMax, ')');
     //console.log('robotWeaponsPercent =', robotWeaponsPercent, '(weapons:', playerRobot.energy, ',weaponsMax:', playerRobot.weaponsMax, ')');
+    // Remove the persona active flag before anything else
+    playerRobot.personaActive = false;
     // Remove persona info and reset base stats over this version of the robot
     _self.removePersonaInfoFromRobot(playerRobot, baseIndexInfo);
     //console.log('playerRobotStats (after-removal) =', {energy: playerRobot.energy, attack: playerRobot.attack, defense: playerRobot.defense, speed: playerRobot.speed});
@@ -1912,6 +1928,11 @@ function removePersonaFromRobot(playerInfo, playerRobot){
     let teamRobotString = playerRobot.id + '_' + playerRobot.token;
     //console.log('update map/overview robot w/ original image for ', teamRobotString);
     _self.refreshTeamRobotSprites(teamRobotString);
+
+    // Refresh the abilities menu as its probably open right now
+    let robotsOverviewAPI = _self.robotsOverviewAPI;
+    let $selectedTeamRobot = $('.team-robots .team-robot[data-robot="' + teamRobotString + '"]', $robotsOverview);
+    robotsOverviewAPI.filterAbilitiesToSelected($selectedTeamRobot);
 
     // Return true on success
     return true;
