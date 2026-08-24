@@ -132,6 +132,8 @@ class rpg_mission {
                                 } elseif (is_array($robot_config)){
                                 if (isset($robot_config['id'])){ $robot_data['robot_id'] = $robot_config['id']; }
                                 if (isset($robot_config['token'])){ $robot_data['robot_token'] = $robot_config['token']; }
+                                if (isset($robot_config['image'])){ $robot_data['robot_image'] = $robot_config['image']; }
+                                if (isset($robot_config['name'])){ $robot_data['robot_name'] = $robot_config['name']; }
                                 if (isset($robot_config['item'])){ $robot_data['robot_item'] = $robot_config['item']; }
                                 if (isset($robot_config['level'])){ $robot_data['robot_level'] = $robot_config['level']; }
                                 if (isset($robot_config['abilities'])){ $robot_data['robot_abilities'] = $robot_config['abilities']; }
