@@ -1422,10 +1422,13 @@ function initRobotsOverviewAPI($thisWorld, $robotsOverview){
                     //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...');
                     //console.log('-> ' + abilityToken + ' vs. ' + robotToken + ' ...', '\n-> robotData =', robotData);
                     let robotAbilities = [];
+                    let personaActive = robotData.personaActive;
                     let abilitiesEquipped = robotData.abilities;
                     let abilitiesCompatible = robotData.abilitiesCompatible;
+                    let abilitiesViaPersona = robotData.abilitiesViaPersona;
                     let abilitiesViaItem = robotData.abilitiesViaItem;
-                    if (typeof abilitiesCompatible !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesCompatible); }
+                    if (!personaActive && typeof abilitiesCompatible !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesCompatible); }
+                    else if (personaActive && typeof abilitiesViaPersona !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesViaPersona); }
                     if (typeof abilitiesViaItem !== 'undefined'){ robotAbilities = robotAbilities.concat(abilitiesViaItem); }
                     let isEquipped = abilitiesEquipped.indexOf(abilityID) !== -1 ? true : false;
                     let isCompatible = robotAbilities.indexOf(abilityID) !== -1 ? true : false;
@@ -1503,12 +1506,15 @@ function initRobotsOverviewAPI($thisWorld, $robotsOverview){
         //console.log('-> selectedRobotData =', selectedRobotData);
         if (!selectedRobotData){ return false; }
         let selectedRobotAbilities = [];
+        let personaActive = selectedRobotData.personaActive;
         let abilitiesEquipped = selectedRobotData.abilities || [];
         let abilitiesCompatible = selectedRobotData.abilitiesCompatible || [];
+        let abilitiesViaPersona = selectedRobotData.abilitiesViaPersona || [];
         let abilitiesViaItem = selectedRobotData.abilitiesViaItem || [];
         //console.log('-> abilitiesCompatible =', abilitiesCompatible);
         //console.log('-> abilitiesViaItem =', abilitiesViaItem);
-        if (typeof abilitiesCompatible !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesCompatible); }
+        if (!personaActive && typeof abilitiesCompatible !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesCompatible); }
+        else if (personaActive && typeof abilitiesViaPersona !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesViaPersona); }
         if (typeof abilitiesViaItem !== 'undefined'){ selectedRobotAbilities = selectedRobotAbilities.concat(abilitiesViaItem); }
         //console.log('-> selectedRobotAbilities =', selectedRobotAbilities);
         $abilityObjectsInOverview.each(function(){
