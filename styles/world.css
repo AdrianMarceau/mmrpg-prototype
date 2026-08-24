@@ -1106,6 +1106,8 @@ html, body {
 #world #map .layer.objects .sprite.rival.disabled { z-index: 0; display: none; }
 
 #world #map .layer.objects .sprite.rival { filter: brightness(0.6); }
+#world #map .layer.objects .sprite.rival.player { filter: brightness(0.8); }
+#world #map .layer.objects .sprite.rival.robot { filter: brightness(0.6); }
 
 @keyframes world-sprite-item-hover {
     0%, 100% { transform: translate(0, 0); }
