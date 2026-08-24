@@ -5327,6 +5327,15 @@ class rpg_world {
         $robot_abilities_compatible = rpg_robot::get_ability_compatibility($robot_token, ''); // omitting $robot_item so we get a base-list instead
         $robot_abilities_compatible_via_item = rpg_robot::get_ability_compatibility($robot_token, $robot_item); // now we grab a copy w/ item included to get a diff
         $robot_abilities_via_item = array_values(array_diff($robot_abilities_compatible_via_item, $robot_abilities_compatible));
+        $robot_abilities_via_persona = array();
+        if (!empty($robot_settings['robot_persona'])){
+            $persona_token = $robot_settings['robot_persona'];
+            $robot_abilities_compatible_via_levelup = rpg_robot::get_level_up_abilities($robot_token);
+            $robot_abilities_compatible_via_persona = rpg_robot::get_ability_compatibility($persona_token, '');
+            $robot_abilities_compatible_via_persona = array_values(array_merge($robot_abilities_compatible_via_persona, $robot_abilities_compatible_via_levelup));
+            $robot_abilities_compatible_via_persona[] = 'copy-style';
+            $robot_abilities_via_persona = array_values($robot_abilities_compatible_via_persona); //array_values(array_diff($robot_abilities_compatible_via_persona, $robot_abilities_compatible));
+        }
         //error_log('['.$robot_token.'] -> $robot_abilities(before) = '.print_r($robot_abilities, true));
         //error_log('['.$robot_token.'] -> $robot_abilities_compatible(before) = '.print_r($robot_abilities_compatible, true));
         //error_log('['.$robot_token.'] -> $robot_abilities_compatible_via_item(before) = '.print_r($robot_abilities_compatible_via_item, true));
@@ -5334,6 +5343,7 @@ class rpg_world {
         $robot_abilities = array_map($temp_ability_token_to_id, $robot_abilities);
         $robot_abilities_compatible = array_map($temp_ability_token_to_id, $robot_abilities_compatible);
         $robot_abilities_via_item = array_map($temp_ability_token_to_id, $robot_abilities_via_item);
+        $robot_abilities_via_persona = array_map($temp_ability_token_to_id, $robot_abilities_via_persona);
         //$robot_abilities_compatible_base = array_map($temp_ability_token_to_id, $robot_abilities_compatible_base);
         //error_log('-> $robot_abilities(after) = '.print_r($robot_abilities, true));
         //error_log('['.$robot_token.'] -> $robot_abilities_compatible(after) = '.print_r($robot_abilities_compatible, true));
@@ -5354,6 +5364,7 @@ class rpg_world {
             'support' => $robot_support,
             'persona' => $robot_persona,
             'personaImage' => $robot_persona_image,
+            'personaActive' => $has_persona_applied,
             'energy' => $robot_energy,
             'energyMax' => $robot_energy_max,
             'energyPercent' => $robot_energy_percent,
@@ -5376,6 +5387,7 @@ class rpg_world {
             'abilities' => $robot_abilities,
             'abilitiesCompatible' => $robot_abilities_compatible,
             'abilitiesViaItem' => $robot_abilities_via_item,
+            'abilitiesViaPersona' => $robot_abilities_via_persona,
             'disabled' => $robot_disabled,
             );
         //if (!$has_persona_applied){ unset($robot_overview['persona']); }
