@@ -1766,10 +1766,10 @@ class rpg_world {
                     $battle_flags['world_battle'] = true;
                     $battle_flags['remove_on_complete'] = true;
                     // If this is a master battle, make sure we add the necessary robot and ability rewards to this battle
-                    if (empty($robot_alt)
-                        && $robot_class === 'master'
+                    if ($robot_class === 'master'
                         && $encounter_class !== 'rescue'){
-                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)
+                        if (empty($robot_alt)
+                            && !mmrpg_prototype_robot_unlocked('', $robot_token)
                             && !empty($robot_info['robot_flag_published'])
                             && !empty($robot_info['robot_flag_complete'])
                             && !empty($robot_info['robot_flag_unlockable'])){
@@ -1829,7 +1829,7 @@ class rpg_world {
                         'turns' => $battle_turns,
                         'zenny' => $battle_zenny,
                         'target' => array('robots' => array(array(
-                            'token' => $robot_real_token,
+                            'token' => $real_robot_token,
                             'image' => $robot_token,
                             'level' => $robot_level,
                             'item' => $robot_item,
