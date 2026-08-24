@@ -1593,7 +1593,7 @@ class rpg_world {
         //error_log('$ratios_sum = '.print_r($ratios_sum, true).PHP_EOL);
         //error_log('$max_random_encounters = '.print_r($max_random_encounters, true).PHP_EOL);
         //error_log('$distributed_encounters = '.print_r($distributed_encounters, true).PHP_EOL);
-        $robot_token = '';
+        $robot_token = ''; $robot_real_token = ''; $robot_alt = '';
         for ($robot_key = 0; $robot_key < $max_random_encounters; $robot_key++){
             if (empty($options)){ $options = array_keys($distributed_encounters); }
             if (empty($robot_token)){ $robot_token = array_shift($options); }
@@ -1615,11 +1615,19 @@ class rpg_world {
                     $available = array_merge($available, $cells);
                     }
                 }
-            if (empty($available)){ $available = $available_encounter_cells['all']; }
+            if (empty($available) && empty($habitats)){ $available = $available_encounter_cells['all']; }
             //error_log('$available = '.print_r($available, true));
             //error_log('$available(count) = '.count($available).' vs. $used_encounter_cells(count) = '.count($used_encounter_cells));
             $robot_pos = self::get_rand_pos($available, $used_encounter_cells);
             if (!$robot_pos){ continue; } // means there's no more room for this type!!!
+            if (!$robot_pos){ // means there's no more room for this type!!!
+                // FREEZE FIX: Zero out this robot's quota and reset the token so it doesn't stall the loop
+                $distributed_encounters[$robot_token] = 0;
+                $robot_real_token = '';
+                $robot_token = '';
+                $robot_alt = '';
+                continue;
+            }
             $robot_pos_terrain = self::get_map_position_terrain($robot_pos, $map_data_parsed);
             //error_log('$robot_pos = '.print_r($robot_pos, true));
             //error_log('$robot_pos_terrain = '.print_r($robot_pos_terrain, true));
@@ -1631,6 +1639,7 @@ class rpg_world {
             $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
             $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
             $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
+            $robot_flags = array();
             $battle_token = $world_battle_token.'_random-robot-'.($robot_key + 1);
             $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
             $battle_description = 'Defeat '.$robot_name.' in battle!';
@@ -1666,6 +1675,7 @@ class rpg_world {
                     'image' => $robot_token,
                     'level' => $robot_level,
                     'item' => $robot_item,
+                    'flags' => $robot_flags,
                     ))),
                 'flags' => array(
                     'world_battle' => true,
@@ -1707,6 +1717,12 @@ class rpg_world {
                     //error_log('-> $target = '.print_r($target, true));
                     //error_log('-> $value = '.print_r($value, true));
                     //error_log('-> next '.$encounter_class.' = "'.$robot_token.'" (key: '.$robot_key.')');
+                    $real_robot_token = $robot_token;
+                    $robot_alt = '';
+                    if (strstr($robot_token, '_')){
+                        $robot_alt = explode('_', $robot_token)[1];
+                        $real_robot_token = explode('_', $robot_token)[0];
+                    }
                     $robot_pos_terrain = rpg_world::get_map_position_terrain($robot_pos, $map_data_parsed);
                     $robot_info = $mmrpg_index_robots[$robot_token];
                     $robot_class = $robot_info['robot_class'];
@@ -1750,7 +1766,8 @@ class rpg_world {
                     $battle_flags['world_battle'] = true;
                     $battle_flags['remove_on_complete'] = true;
                     // If this is a master battle, make sure we add the necessary robot and ability rewards to this battle
-                    if ($robot_class === 'master'
+                    if (empty($robot_alt)
+                        && $robot_class === 'master'
                         && $encounter_class !== 'rescue'){
                         if (!mmrpg_prototype_robot_unlocked('', $robot_token)
                             && !empty($robot_info['robot_flag_published'])
@@ -1812,7 +1829,8 @@ class rpg_world {
                         'turns' => $battle_turns,
                         'zenny' => $battle_zenny,
                         'target' => array('robots' => array(array(
-                            'token' => $robot_token,
+                            'token' => $robot_real_token,
+                            'image' => $robot_token,
                             'level' => $robot_level,
                             'item' => $robot_item,
                             'flags' => $robot_flags,
