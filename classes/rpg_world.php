@@ -1017,6 +1017,22 @@ class rpg_world {
                     $map_data_parsed['size'] = $map_size;
                     $map_data_parsed['tiles'] = $map_tiles;
                     $map_data_parsed['sprites'] = $map_sprites;
+                    if (!empty($map_data_vars['aliases'])){
+                        $map_aliases = array();
+                        $raw_aliases = is_array($map_data_vars['aliases']) ? $map_data_vars['aliases'] : array($map_data_vars['aliases']);
+                        foreach ($raw_aliases as $key => $val){
+                            // Support both `@aliases[] = 01:beach` AND `@aliases[01] = beach`
+                            if (is_numeric($key) && strpos($val, ':') !== false){ list($alias_key, $target) = explode(':', $val, 2); }
+                            else { $alias_key = $key; $target = $val; }
+                            $alias_key = trim($alias_key);
+                            $target = trim($target);
+                            // If target references a sheet ID (e.g. "50"), resolve it to tile name; otherwise use target directly
+                            if (isset($map_data_parsed['tiles']['keys'][$target])){ $map_aliases[$alias_key] = $map_data_parsed['tiles']['keys'][$target]; }
+                            else { $map_aliases[$alias_key] = $target; }
+                        }
+                        // Prepend map aliases so they take precedence over sheet keys
+                        $map_data_parsed['tiles']['keys'] = $map_aliases + $map_data_parsed['tiles']['keys'];
+                    }
                 }
                 $map_sprite_sheet = $map_data_parsed['sheet'];
                 //error_log('$map_sprite_sheet (parsed) = '.print_r($map_sprite_sheet, true));
@@ -1067,8 +1083,9 @@ class rpg_world {
                     foreach ($row_tiles AS $col_key => $col_tile){
                         //error_log('----> checking $col_key = '.$col_key.' w/ $col_tile = '.print_r($col_tile, true));
                         if (substr($col_tile, 0, 1) === '[' && substr($col_tile, -1) === ']'){ $col_tile = substr($col_tile, 1, -1); } // remove brackets if present
-                        if (!is_numeric($col_tile)){ $col_tile = 0; } // ensure this is a numeric tile key
+                        //if (!is_numeric($col_tile)){ $col_tile = 0; } // ensure this is a numeric tile key
                         //$col_tile = intval($col_tile); // ensure this is an integer tile key
+                        $col_tile = trim($col_tile);
                         $col_tile_key = isset($raw_tile_keys[$col_tile]) ? $raw_tile_keys[$col_tile] : ''; // get the tile key from the raw keys
                         //error_log('----> parsed $col_tile '.print_r($row_tiles[$col_key], true).' => '.print_r($col_tile, true).' => '.print_r($col_tile_key, true));
                         $parsed_map_layers[$layer_key][$row_key][$col_key] = $col_tile_key; // add the tile key to the parsed map layers
