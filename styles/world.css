@@ -2037,7 +2037,15 @@ html, body {
     opacity: 0.0;
     transition: opacity 0.3s;
 }
-#world #canvas #player-switcher .team-player:hover > .label {
+#world #canvas #player-switcher .team-player > .label sub,
+#world #canvas #player-switcher .team-player > .label sup {
+    display: block;
+    margin: 4px auto 0;
+    font-size: 10px;
+    font-weight: bold;
+}
+#world #canvas #player-switcher .team-player:hover > .label,
+#world #canvas #player-switcher .team-player.hovered > .label {
     opacity: 1.0;
 }
 #world #canvas #player-switcher.disabled .team-player,

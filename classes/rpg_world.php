@@ -2227,22 +2227,32 @@ class rpg_world {
     // Define a function for getting the player switcher markup given current conditions
     public static function get_player_switcher_markup($this_prototype_data, $player_tokens){
         //error_log('rpg_world::get_player_switcher_markup() called!');
+        $WORLD_SESSION = self::get_session();
+        $WORLD_PLAYER_SESSIONS = $WORLD_SESSION['player_sessions'];
         $return_markup = '';
-        $get_label_span = function($name, $kind){ return ('<span class="label">'.$name.' ('.ucfirst($kind).')</span>'); };
+        $get_label_span = function($name, $kind, $location = ''){ return (
+            '<span class="label">'.
+                $name.' ('.ucfirst($kind).')'.
+                (!empty($location) ? ' <sub>'.$location : '</sub>').
+            '</span>'
+            ); };
         $cursor_token = 'player';
         $cursor_active = $this_prototype_data['this_player_token'] === $cursor_token ? true : false;
         $cursor_sprite = self::get_cursor_sprite('right', 'cursor');
-        $cursor_label = $get_label_span('Prε', 'cursor');
+        $cursor_label = $get_label_span('Prε', 'cursor', '');
         $cursor_types = 'type explode';
         //$return_markup .= ('<a class="option'.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         $mmrpg_index_players = self::get_index('players');
         $return_markup .= ('<a class="team-player '.$cursor_types.($cursor_active ? ' active' : '').'" data-player="'.$cursor_token.'">'.$cursor_sprite.$cursor_label.'</a>');
         foreach ($player_tokens AS $player_key => $player_token){
             if ($player_token === 'player' || empty($mmrpg_index_players[$player_token])){ continue; }
+            $player_session = !empty($WORLD_PLAYER_SESSIONS[$player_token]) ? $WORLD_PLAYER_SESSIONS[$player_token] : array();
             $player_info = $mmrpg_index_players[$player_token];
             $player_active = $player_token === $this_prototype_data['this_player_token'] ? true : false;
             $player_sprite = self::get_sprite('player', $player_token, '', 'right', 'character', '');
-            $player_label = $get_label_span($player_info['player_name'], 'player');
+            $player_location = !empty($player_session['last_map']) ? $player_session['last_map'] : '';
+            $player_location = !empty($player_location) ? str_replace('AREA', 'Area', strtoupper(str_replace('-', ' ', $player_location))) : '';
+            $player_label = $get_label_span($player_info['player_name'], 'player', $player_location);
             $player_types = 'type '.$player_info['player_type'];
             $markup_class = 'team-player '.$player_types.($player_active ? ' active' : '');
             $markup_attrs = !$player_active ? ' data-player="'.$player_token.'"' : '';
