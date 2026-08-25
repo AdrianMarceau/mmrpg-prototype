@@ -1212,7 +1212,7 @@ class mmrpgWorldMap {
 
         // Now filter out the ones that have their walkable flag set to false on the terrain layer
         //console.log('filtering walkableMapTiles by terrain layer ...');
-        let terrainTilesIndex = layerTilesIndex['terrain_0'];
+        let terrainTilesIndex = layerTilesIndex['terrain']; // 'terrain' instead of 'terrain_0' so it pulls the topmost from each space
         if (exclude.terrain && terrainTilesIndex){
             //console.log('... checking terrainTilesIndex =', terrainTilesIndex);
             let allowedTerrain = [];
