@@ -2344,10 +2344,6 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let buttonInfo = buttonName && (buttonsIndex && buttonsIndex[buttonName]) ? buttonsIndex[buttonName] : false;
                 let $eventSprite = $(firstEvent.sprite);
                 let $innerSprite = $eventSprite ? $('> .sprite', $eventSprite) : false;
-                //console.log('-> buttonName =', buttonName);
-                //console.log('-> buttonInfo =', buttonInfo);
-                //console.log('-> $eventSprite =', $eventSprite);
-                //console.log('-> $innerSprite =', $innerSprite);
                 if (!buttonName || !buttonInfo){ console.error('-> button name or info not found, cannot push button!'); return false; }
                 if (!$eventSprite || !$eventSprite.length){ console.error('-> event sprite not found, cannot push button!'); return false; }
                 if (!$innerSprite || !$innerSprite.length){ console.error('-> inner sprite not found, cannot push button!'); return false; }
@@ -2379,8 +2375,9 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let terrainName = buttonData[1] || false;
                         if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
                         if (!terrainName){ console.error('-> terrainName not provided, cannot set group terrain!'); return false; }
-                        let terrainTilesIndex = _world.layerTilesIndex['terrain'] || false;
-                        if (!terrainTilesIndex){ console.error('-> terrainTilesIndex not found, cannot set terrain!'); return false; }
+                        // MULTI-LAYER UPDATE: Target layer 0 explicitly
+                        let terrainTilesIndex = _world.layerTilesIndex['terrain_0'] || false;
+                        if (!terrainTilesIndex){ console.error('-> terrain_0 not found in _world.layerTilesIndex, cannot set terrain!'); return false; }
                         let groupsIndex = _config.mapGroupsIndex;
                         let groupTiles = groupsIndex[groupName] || false;
                         if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found, cannot set terrain!'); return false; }
@@ -2388,24 +2385,23 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         for (let i = 0; i < groupTiles.length; i++){
                             let tileKey = groupTiles[i];
                             let tileData = terrainTilesIndex[tileKey];
-                            if (!tileData) {
+                            if (!tileData){
                                 console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!');
                                 continue;
-                            }
+                                }
                             // Ensure we are assigning just the base terrain name (strip any bitmasks if accidentally provided in config)
                             let targetTerrainBase = terrainName.split('-')[0];
                             tileData.sprite[1] = targetTerrainBase;
-                        }
+                            }
                         // --- PASS 2: Hand off to the helper to calculate edges and refresh the map! ---
                         _self.refreshTerrainEdges(groupTiles);
+                        _self.calculateWalkableMapTiles(true);
                         }
 
                     // event action REMOVE-GROUP-BLOCKS for buttons, switches, etc. to use
                     if (buttonAction === 'remove-group-blocks'){
-                        //console.log('-> removing group blocks for button', buttonName);
                         let groupName = buttonData[0] || false;
                         let blockFilter = buttonData[1] || false;
-                        //console.log('-> groupName =', groupName, '\n', '-> blockFilter =', blockFilter);
                         if (!groupName){ console.error('-> groupName not provided, cannot remove group blocks!'); return false; }
                         let groupsIndex = _config.mapGroupsIndex;
                         let groupTiles = groupsIndex[groupName] || false;
@@ -2443,12 +2439,10 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             _self.saveWorldState();
                             }
                         }
-
                     })(buttonInfo);
                 }
             else if (isSwitch){
                 // TODO: action will always equal "toggle-switch" but we should verify
-                //console.log('-> world-switch clicked with action:', action);
                 let switchesIndex = _config.mapSwitchesIndex;
                 let switchStates = _world.switches;
                 let switchName = $button.attr('data-switch') || false;
@@ -2483,8 +2477,9 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let terrainDown = switchData[2] || false;
                         if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
                         if (!terrainUp || !terrainDown){ console.error('-> terrainUp or terrainDown not provided, cannot toggle group terrain!'); return false; }
-                        let terrainTilesIndex = _world.layerTilesIndex['terrain'] || false;
-                        if (!terrainTilesIndex){ console.error('-> terrainTilesIndex not found!'); return false; }
+                        // MULTI-LAYER UPDATE: Target layer 0 explicitly
+                        let terrainTilesIndex = _world.layerTilesIndex['terrain_0'] || false;
+                        if (!terrainTilesIndex){ console.error('-> terrain_0 not found in _world.layerTilesIndex, cannot toggle group terrain!'); return false; }
                         let groupsIndex = _config.mapGroupsIndex;
                         let groupTiles = groupsIndex[groupName] || false;
                         if (!groupTiles){ console.error('-> groupsIndex not found for groupName "' + groupName + '"!'); return false; }
@@ -2503,6 +2498,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             }
                         // --- PASS 2: Hand off to the helper to do the rest! ---
                         _self.refreshTerrainEdges(groupTiles);
+                        _self.calculateWalkableMapTiles(true);
                         }
 
                     })(switchInfo, newState);

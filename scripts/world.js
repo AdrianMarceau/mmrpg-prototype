@@ -1212,7 +1212,7 @@ class mmrpgWorldMap {
 
         // Now filter out the ones that have their walkable flag set to false on the terrain layer
         //console.log('filtering walkableMapTiles by terrain layer ...');
-        let terrainTilesIndex = layerTilesIndex['terrain'];
+        let terrainTilesIndex = layerTilesIndex['terrain_0'];
         if (exclude.terrain && terrainTilesIndex){
             //console.log('... checking terrainTilesIndex =', terrainTilesIndex);
             let allowedTerrain = [];
@@ -1519,7 +1519,7 @@ class mmrpgWorldMap {
     // Define a function that calculates the correct bitmask string for a tile based on its neighbors
     calculateTileBitmask(tileKey, baseTerrain){
         let mapTilesIndex = this.config.mapTilesIndex;
-        let terrainTilesIndex = this.state.layerTilesIndex['terrain'] || {};
+        let terrainTilesIndex = this.state.layerTilesIndex['terrain_0'] || {};
         // Skip tiles that don't auto-tile
         if (baseTerrain === 'void'
             || baseTerrain === 'dotted'
@@ -1545,7 +1545,7 @@ class mmrpgWorldMap {
     refreshTerrainEdges(changedTileKeys){
         let mapTilesIndex = this.config.mapTilesIndex;
         let layerTilesIndex = this.state.layerTilesIndex;
-        let terrainTilesIndex = layerTilesIndex['terrain'];
+        let terrainTilesIndex = layerTilesIndex['terrain_0'];
         if (!terrainTilesIndex) return false;
         let neighborsToUpdate = new Set();
         let groupTiles = Array.isArray(changedTileKeys) ? changedTileKeys : Array.from(changedTileKeys);
@@ -1579,9 +1579,9 @@ class mmrpgWorldMap {
             tileData.dirty = true;
             });
         // Save states and trigger standard map redraw updates
-        layerTilesIndex['terrain'] = terrainTilesIndex;
+        layerTilesIndex['terrain_0'] = terrainTilesIndex;
         this.state.layerTilesIndex = layerTilesIndex;
-        this.refreshCanvasTiles('terrain');
+        this.refreshCanvasTiles('terrain_0');
         this.calculateWalkableMapTiles(true);
         this.refreshMapPositionEvents();
         this.saveWorldState();
