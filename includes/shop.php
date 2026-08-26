@@ -27,7 +27,7 @@ $global_unlocked_alts = !empty($_SESSION[$session_token]['values']['robot_alts']
 $global_unlocked_robots_cores = array();
 $global_unlocked_abilities_types = array();
 $global_unlocked_items_tokens = !empty($global_unlocked_items) ? array_keys($global_unlocked_items) : 0;
-error_log('$global_unlocked_robots = '.print_r($global_unlocked_robots, true));
+//error_log('$global_unlocked_robots = '.print_r($global_unlocked_robots, true));
 
 // -- DEFINE SHOP INDEXES -- //
 
@@ -783,7 +783,7 @@ if (!empty($this_shop_index['kalinka'])){
 
         // Collect the unlocked alts for this game file
         $alt_list_unlocked = !empty($_SESSION[$session_token]['values']['robot_alts']) ? $_SESSION[$session_token]['values']['robot_alts'] : array();
-        error_log('$alt_list_unlocked = '.print_r($alt_list_unlocked, true));
+        //error_log('$alt_list_unlocked = '.print_r($alt_list_unlocked, true));
 
         // Create an array to hold any alts unlocked for selling
         $unlocked_alts_list = array();
@@ -793,8 +793,8 @@ if (!empty($this_shop_index['kalinka'])){
         $discount_tokens = array('roll', 'disco', 'rhythm');
         $allowed_tokens = array_values($global_unlocked_robots);
         $allowed_tokens = array_diff_key($allowed_tokens, array_flip($banned_tokens));
-        error_log('$global_unlocked_robots = '.print_r($global_unlocked_robots, true));
-        error_log('$allowed_tokens = '.print_r($allowed_tokens, true));
+        //error_log('$global_unlocked_robots = '.print_r($global_unlocked_robots, true));
+        //error_log('$allowed_tokens = '.print_r($allowed_tokens, true));
 
         // Pull alt images from the database for the player's unlocked robots
         if (!empty($allowed_tokens)){
