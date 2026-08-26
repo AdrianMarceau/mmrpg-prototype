@@ -159,6 +159,22 @@ ob_start();
                 $temp_abilityinfo['ability_id'] = $this_robot->robot_id.str_pad($temp_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
                 $temp_ability = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
                 $temp_ability->trigger_onload(true);
+
+                // If this robot's abilities are being distilled, strip them of their types
+                $temp_overcast_type = $this_robot->get_value('overcast_type');
+                if (!empty($temp_overcast_type)){
+                    if ($temp_overcast_type === 'none'){
+                        $temp_ability->set_type('');
+                        $temp_ability->set_type2('');
+                    } else {
+                        $temp_ability->set_type($temp_overcast_type);
+                        $temp_ability->set_type2('');
+                    }
+                } else {
+                    $temp_ability->set_type($temp_abilityinfo['ability_type']);
+                    $temp_ability->set_type2($temp_abilityinfo['ability_type2']);
+                }
+
                 $temp_type = $temp_ability->ability_type;
                 $temp_type2 = $temp_ability->ability_type2;
                 $temp_type_or_none = !empty($temp_type) ? $temp_type : 'none';
