@@ -2770,6 +2770,23 @@ class rpg_robot extends rpg_object {
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
 
+            // If the attacking robot's abilities are being overcast, overwrite their types
+            if (!empty($target_robot)){
+                $temp_overcast_type = $target_robot->get_value('overcast_type');
+                if (!empty($temp_overcast_type)){
+                    if ($temp_overcast_type === 'none'){
+                        $this_object->set_type('');
+                        $this_object->set_type2('');
+                    } else {
+                        $this_object->set_type($temp_overcast_type);
+                        $this_object->set_type2('');
+                    }
+                } else {
+                    $this_object->reset_type();
+                    $this_object->reset_type2();
+                }
+            }
+
             // Pre-collect the bulwark robots from the players to see if the bench is protected
             if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
                 $temp_thisplayer_bulwark_robots = $this->player->get_value('bulwark_robots');
@@ -2832,6 +2849,23 @@ class rpg_robot extends rpg_object {
 
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
+
+            // If the attacking robot's abilities are being overcast, overwrite their types
+            if (!empty($target_robot)){
+                $temp_overcast_type = $target_robot->get_value('overcast_type');
+                if (!empty($temp_overcast_type)){
+                    if ($temp_overcast_type === 'none'){
+                        $this_object->set_type('');
+                        $this_object->set_type2('');
+                    } else {
+                        $this_object->set_type($temp_overcast_type);
+                        $this_object->set_type2('');
+                    }
+                } else {
+                    $this_object->reset_type();
+                    $this_object->reset_type2();
+                }
+            }
 
             // Pre-collect the bulwark robots from the players to see if the bench is protected
             if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
