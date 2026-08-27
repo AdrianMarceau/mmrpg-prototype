@@ -603,6 +603,16 @@ elseif ($this_action == 'scan'){
 
 }
 // Else if the player's robot is using an ability
+elseif ($this_action == 'ability'
+    || $this_action == 'item'
+    || $this_action == 'switch'){
+
+    // Require the ability action file
+    require_once('battle/actions/action_playerturn.php');
+
+}
+/*
+// Else if the player's robot is using an ability
 elseif ($this_action == 'ability'){
 
     // Require the ability action file
@@ -623,6 +633,7 @@ elseif ($this_action == 'switch'){
     require_once('battle/actions/ability_switch.php');
 
 }
+*/
 
 // Re-collect this robot if different from the "current" one in this player's values
 $this_player->player_reload();

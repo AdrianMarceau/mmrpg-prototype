@@ -1,5 +1,9 @@
 <?
 
+// DEPRECATED!!!  2026-08-27
+// This script is no-longer used and turn-actions have
+// been re-routed to 'battle/actions/action_playerturn.php'
+
 // -- ABILITY-ITEM BATTLE ACTION -- //
 //error_log('battle/actions/ability_item.php');
 
