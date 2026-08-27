@@ -105,8 +105,12 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_number_position = array_search($r1['robot_token'], $mmrpg_database_robots_keys);
                 $robot2_number_position = array_search($r2['robot_token'], $mmrpg_database_robots_keys);
-                $r1['robot_level'] = $temp_player_robots_rewards[$r1['robot_token']]['robot_level'];
-                $r2['robot_level'] = $temp_player_robots_rewards[$r2['robot_token']]['robot_level'];
+                // Extract base tokens just in case we are dealing with an ID-prefixed mecha
+                $r1_base_token = preg_replace('/^[0-9]+_/', '', $r1['robot_token']);
+                $r2_base_token = preg_replace('/^[0-9]+_/', '', $r2['robot_token']);
+                // Safely assign levels: check strict token -> check base token -> default to 1
+                $r1['robot_level'] = !empty($temp_player_robots_rewards[$r1['robot_token']]['robot_level']) ? $temp_player_robots_rewards[$r1['robot_token']]['robot_level'] : (!empty($temp_player_robots_rewards[$r1_base_token]['robot_level']) ? $temp_player_robots_rewards[$r1_base_token]['robot_level'] : 1);
+                $r2['robot_level'] = !empty($temp_player_robots_rewards[$r2['robot_token']]['robot_level']) ? $temp_player_robots_rewards[$r2['robot_token']]['robot_level'] : (!empty($temp_player_robots_rewards[$r2_base_token]['robot_level']) ? $temp_player_robots_rewards[$r2_base_token]['robot_level'] : 1);
                 if ($robot1_number_position === false && $robot2_number_position !== false){ return -1; }
                 elseif ($robot1_number_position !== false && $robot2_number_position === false){ return 1; }
                 elseif ($r1['robot_level'] < $r2['robot_level']){ return -1; }
@@ -124,8 +128,12 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
                 if (empty($r1) || empty($r2)){ return 0; }
                 $robot1_number_position = array_search($r1['robot_token'], $mmrpg_database_robots_keys);
                 $robot2_number_position = array_search($r2['robot_token'], $mmrpg_database_robots_keys);
-                $r1['robot_level'] = $temp_player_robots_rewards[$r1['robot_token']]['robot_level'];
-                $r2['robot_level'] = $temp_player_robots_rewards[$r2['robot_token']]['robot_level'];
+                // Extract base tokens just in case we are dealing with an ID-prefixed mecha
+                $r1_base_token = preg_replace('/^[0-9]+_/', '', $r1['robot_token']);
+                $r2_base_token = preg_replace('/^[0-9]+_/', '', $r2['robot_token']);
+                // Safely assign levels: check strict token -> check base token -> default to 1
+                $r1['robot_level'] = !empty($temp_player_robots_rewards[$r1['robot_token']]['robot_level']) ? $temp_player_robots_rewards[$r1['robot_token']]['robot_level'] : (!empty($temp_player_robots_rewards[$r1_base_token]['robot_level']) ? $temp_player_robots_rewards[$r1_base_token]['robot_level'] : 1);
+                $r2['robot_level'] = !empty($temp_player_robots_rewards[$r2['robot_token']]['robot_level']) ? $temp_player_robots_rewards[$r2['robot_token']]['robot_level'] : (!empty($temp_player_robots_rewards[$r2_base_token]['robot_level']) ? $temp_player_robots_rewards[$r2_base_token]['robot_level'] : 1);
                 if ($robot1_number_position === false && $robot2_number_position !== false){ return 1; }
                 elseif ($robot1_number_position !== false && $robot2_number_position === false){ return -1; }
                 elseif ($r1['robot_level'] < $r2['robot_level']){ return 1; }
@@ -227,9 +235,20 @@ if (!empty($_SESSION[$session_token]['values']['battle_settings'][$temp_player][
         }
 
 
-
         // Sort the robots and maintain index association
         uasort($temp_player_robots, 'temp_player_robots_sort');
+
+        // Shift ID-prefixed mechas (e.g., '146_sniper-joe') to the end of the sorted list
+        $temp_standard_robots = array();
+        $temp_mecha_robots = array();
+        foreach ($temp_player_robots AS $token => $info){
+            // Check if the token starts with digits and an underscore
+            if (strstr($token, '_')){ $temp_mecha_robots[$token] = $info; }
+            else { $temp_standard_robots[$token] = $info; }
+        }
+
+        // Safely recombine using the union operator to guarantee keys are NEVER re-indexed
+        $temp_player_robots = $temp_standard_robots + $temp_mecha_robots;
 
         // If there are any locked robots, make sure we anchor them to the bottom without hurting the existing order
         if (!empty($player_robots_locked)){
