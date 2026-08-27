@@ -1649,7 +1649,7 @@ class rpg_item extends rpg_object {
                                 <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$item_info['item_key'] ?></div>
                             <? endif; ?>
                             <? if ($item_image_token != 'item'){ ?>
-                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>);" class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"><?= $item_info['item_name']?>'s Icon</div></div>
+                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>);" class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"></div></div>
                             <? } else { ?>
                                 <div class="icon item_type <?= $item_header_types ?>"><div class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon">No Image</div></div>
                             <? } ?>
@@ -1666,6 +1666,7 @@ class rpg_item extends rpg_object {
                         <? else: ?>
                             <?= $item_info['item_name'] ?>
                         <? endif; ?>
+                            &nbsp;
                         <? if (!empty($item_info['item_type_special'])){ ?>
                             <div class="header_core item_type"><?= ucfirst($item_info['item_type_special']) ?> Type</div>
                         <? } elseif (!empty($item_info['item_type']) && !empty($item_info['item_type2'])){ ?>
@@ -1683,13 +1684,13 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Name :</label>
+                                        <label style="display: block; float: left;">Name :&nbsp;</label>
                                         <span class="item_type item_type_"><?= $item_info['item_name'] ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Kind :</label>
+                                        <label style="display: block; float: left;">Kind :&nbsp;</label>
                                         <span class="item_type item_type_"><?= ucfirst($item_info['item_subclass']) ?></span>
                                     </td>
                                 </tr>
@@ -1700,7 +1701,7 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Power :</label>
+                                        <label style="display: block; float: left;">Power :&nbsp;</label>
                                         <? if(!empty($item_info['item_damage']) || !empty($item_info['item_recovery'])): ?>
                                             <? if(!empty($item_info['item_damage'])){ ?><span class="item_stat"><?= number_format($item_info['item_damage'], 0, '.', ',').(!empty($item_info['item_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
                                             <? if(!empty($item_info['item_recovery'])){ ?><span class="item_stat"><?= number_format($item_info['item_recovery'], 0, '.', ',').(!empty($item_info['item_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
@@ -1714,7 +1715,7 @@ class rpg_item extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Value :</label>
+                                        <label style="display: block; float: left;">Value :&nbsp;</label>
                                         <?
                                         // Collect this item's price and/or BP value where applicable
                                         $value_rows = array();

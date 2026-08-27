@@ -2891,7 +2891,7 @@ class rpg_player extends rpg_object {
                         <? if($print_options['show_key'] !== false): ?>
                             <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$player_info['player_key'] ?></div>
                         <? endif; ?>
-                        <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(images/players/<?= $player_image_token ?>/mug_right_<?= $player_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"><?= $player_info['player_name']?>'s Mugshot</div></div>
+                        <div class="mugshot player_type player_type_<?= !empty($player_info['player_type']) ? $player_info['player_type'] : 'none' ?>"><div style="background-image: url(images/players/<?= $player_image_token ?>/mug_right_<?= $player_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_player sprite_40x40 sprite_40x40_mug sprite_size_<?= $player_image_size_text ?> sprite_size_<?= $player_image_size_text ?>_mug player_status_active player_position_active"></div></div>
                     </div>
                 <? endif; ?>
 
@@ -2911,7 +2911,7 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Name :</label>
+                                        <label style="display: block; float: left;">Name :&nbsp;</label>
                                         <span class="player_name player_type"><?= $player_info['player_name']?></span>
                                     </td>
                                 </tr>
@@ -2922,7 +2922,7 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Skill :</label>
+                                        <label style="display: block; float: left;">Skill :&nbsp;</label>
                                         <?
                                             // Display any special boosts this player has
                                             if (!empty($player_info['player_energy'])){ echo '<span class="player_name player_type player_type_energy">Energy +'.$player_info['player_energy'].'%</span>'; }
@@ -3215,25 +3215,25 @@ class rpg_player extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label>Start Quote : </label>
+                                        <label>Start Quote :&nbsp;</label>
                                         <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_start']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_start']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Taunt Quote : </label>
+                                        <label>Taunt Quote :&nbsp;</label>
                                         <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_taunt']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_taunt']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Victory Quote : </label>
+                                        <label>Victory Quote :&nbsp;</label>
                                         <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_victory']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_victory']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Defeat Quote : </label>
+                                        <label>Defeat Quote :&nbsp;</label>
                                         <span class="player_quote">&quot;<?= !empty($player_info['player_quotes']['battle_defeat']) ? str_replace($temp_find, $temp_replace, $player_info['player_quotes']['battle_defeat']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>

@@ -4072,8 +4072,9 @@ class rpg_robot extends rpg_object {
                             <? if($print_options['show_key'] !== false): ?>
                                 <div class="number robot_type <?= $robot_header_types ?>"><?= 'No.'.$robot_info['robot_key'] ?></div>
                             <? endif; ?>
+                            &nbsp;
                             <? if (!in_array($robot_image_token, $default_robot_class_tokens)){ ?>
-                                <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: url(images/robots/<?= $robot_image_token ?>/mug_right_<?= $robot_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active"><?= $robot_info['robot_name']?>'s Mugshot</div></div>
+                                <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: url(images/robots/<?= $robot_image_token ?>/mug_right_<?= $robot_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active"></div></div>
                             <? } else { ?>
                                 <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active">No Image</div></div>
                             <? } ?>
@@ -4157,7 +4158,7 @@ class rpg_robot extends rpg_object {
                                 <? if($print_options['layout_style'] != 'event'): ?>
                                     <tr>
                                         <td  class="right">
-                                            <label>Name :</label>
+                                            <label>Name :&nbsp;</label>
                                             <span class="robot_type" style="width: auto;"><?= $robot_info['robot_name']?></span>
                                             <? if (!empty($robot_info['robot_generation'])){ ?><span class="robot_type" style="width: auto;"><?= $robot_info['robot_generation']?> Gen</span><? } ?>
                                         </td>
@@ -4165,13 +4166,13 @@ class rpg_robot extends rpg_object {
                                 <? endif; ?>
                                 <tr>
                                     <td  class="right">
-                                        <label>Model :</label>
+                                        <label>Model :&nbsp;</label>
                                         <span class="robot_type"><?= $robot_info['robot_number']?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label>Type :</label>
+                                        <label>Type :&nbsp;</label>
                                         <? if($print_options['layout_style'] != 'event'): ?>
                                             <? if(!empty($robot_info['robot_core2'])): ?>
                                                 <span class="robot_type type_<?= $robot_info['robot_core'].'_'.$robot_info['robot_core2'] ?>">
@@ -4198,20 +4199,20 @@ class rpg_robot extends rpg_object {
                                             // Define the source game string
                                             $temp_source_string = rpg_game::get_source_name($robot_info['robot_game'], true);
                                             ?>
-                                            <label>Source :</label>
+                                            <label>Source :&nbsp;</label>
                                             <span class="source_game robot_type"><?= $temp_source_string ?></span>
                                         </td>
                                     </tr>
                                 <? endif; ?>
                                 <tr>
                                     <td  class="right">
-                                        <label>Class :</label>
+                                        <label>Class :&nbsp;</label>
                                         <span class="robot_type"><?= !empty($robot_info['robot_description']) ? $robot_info['robot_description'] : '&hellip;' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right fields" data-count="<?= count($field_info_array) ?>">
-                                        <label><?= empty($field_info_array) || count($field_info_array) == 1 ? 'Field' : 'Fields' ?> :</label>
+                                        <label><?= empty($field_info_array) || count($field_info_array) == 1 ? 'Field' : 'Fields' ?> :&nbsp;</label>
                                         <?
                                         // Loop through the robots fields if available
                                         if ($show_field_info && !empty($field_info_array)){
@@ -4245,7 +4246,7 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right weaknesses" data-count="<?= count($robot_info['robot_weaknesses']) ?>">
-                                        <label>Weaknesses :</label>
+                                        <label>Weaknesses :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_weaknesses'])){
                                             $temp_string = array();
@@ -4265,7 +4266,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right resistances" data-count="<?= count($robot_info['robot_resistances']) ?>">
-                                        <label>Resistances :</label>
+                                        <label>Resistances :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_resistances'])){
                                             $temp_string = array();
@@ -4285,7 +4286,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right affinities" data-count="<?= count($robot_info['robot_affinities']) ?>">
-                                        <label>Affinities :</label>
+                                        <label>Affinities :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_affinities'])){
                                             $temp_string = array();
@@ -4305,7 +4306,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right immunities" data-count="<?= count($robot_info['robot_immunities']) ?>">
-                                        <label>Immunities :</label>
+                                        <label>Immunities :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_immunities'])){
                                             $temp_string = array();
@@ -4330,7 +4331,7 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label>Energy :</label>
+                                        <label>Energy :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_energy" style="padding-left: <?= round( ( ($robot_info['robot_energy'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_energy'] ?></span></span>
@@ -4342,7 +4343,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label>Attack :</label>
+                                        <label>Attack :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_attack" style="padding-left: <?= round( ( ($robot_info['robot_attack'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_attack'] ?></span></span>
@@ -4354,7 +4355,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label>Defense :</label>
+                                        <label>Defense :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_defense" style="padding-left: <?= round( ( ($robot_info['robot_defense'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_defense'] ?></span></span>
@@ -4366,7 +4367,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Speed :</label>
+                                        <label>Speed :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_speed" style="padding-left: <?= round( ( ($robot_info['robot_speed'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_speed'] ?></span></span>
@@ -4405,7 +4406,7 @@ class rpg_robot extends rpg_object {
                                 <tbody>
                                     <tr>
                                         <td  class="center">
-                                            <label>Passive Skill :</label>
+                                            <label>Passive Skill :&nbsp;</label>
                                             <strong><?= $skill_info['skill_name'] ?></strong>
                                             <p><?= $skill_info['skill_description2'] ?></p>
                                         </td>
@@ -4664,25 +4665,25 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label>Start Quote : </label>
+                                        <label>Start Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_start']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_start']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Taunt Quote : </label>
+                                        <label>Taunt Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_taunt']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Victory Quote : </label>
+                                        <label>Victory Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_victory']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_victory']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Defeat Quote : </label>
+                                        <label>Defeat Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_defeat']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_defeat']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
@@ -5027,7 +5028,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_encountered'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Encountered : </label>
+                                            <label>Encountered :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_encountered']) ? '1 Time' : $global_robot_records['robot_encountered'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -5035,7 +5036,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_scanned'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Scanned : </label>
+                                            <label>Scanned :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_scanned']) ? '1 Time' : $global_robot_records['robot_scanned'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -5043,7 +5044,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_defeated'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Defeated : </label>
+                                            <label>Defeated :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_defeated']) ? '1 Time' : $global_robot_records['robot_defeated'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -5051,7 +5052,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_summoned'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Summoned : </label>
+                                            <label>Summoned :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_summoned']) ? '1 Time' : $global_robot_records['robot_summoned'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -5059,7 +5060,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_unlocked'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Unlocked By : </label>
+                                            <label>Unlocked By :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_unlocked']) ? '1 Player' : $global_robot_records['robot_unlocked'].' Players' ?></span>
                                         </td>
                                     </tr>
@@ -5067,7 +5068,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_avatars'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Avatar Of : </label>
+                                            <label>Avatar Of :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_avatars']) ? '1 Player' : $global_robot_records['robot_avatars'].' Players' ?></span>
                                         </td>
                                     </tr>
