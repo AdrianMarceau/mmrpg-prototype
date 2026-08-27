@@ -1616,7 +1616,6 @@ class rpg_canvas {
         $this_data['item_token'] = $this_item->item_token;
         $this_data['item_id_token'] = $this_item->item_id.'_'.$this_item->item_token;
         $this_data['item_image'] = isset($options['item_image']) ? $options['item_image'] : $this_item->item_image;
-        $this_data['item_image2'] = isset($options['item_image2']) ? $options['item_image2'] : $this_item->item_image2;
         $this_data['item_status'] = $robot_data['robot_status'];
         $this_data['item_position'] = $robot_data['robot_position'];
         $this_data['item_direction'] = $this_item->robot_id == $robot_data['robot_id'] ? $robot_data['robot_direction'] : ($robot_data['robot_direction'] == 'left' ? 'right' : 'left');
@@ -1709,7 +1708,6 @@ class rpg_canvas {
                 'data-status="'.$this_data['item_status'].'" '.
                 'data-scale="'.$this_data['item_scale'].'"'.
                 '></div>';
-            if (!empty($this_data['item_image2'])){ $temp_markup .= str_replace('/'.$this_data['item_image'].'/', '/'.$this_data['item_image2'].'/', $temp_markup); }
             echo $temp_markup;
 
         // Collect the generated item markup
@@ -2402,7 +2400,7 @@ class rpg_canvas {
                             $this_attachment_options['item_frame'] = isset($attachment_info['item_frame']) ? $attachment_info['item_frame'] : $this_item->item_frame;
                             $this_attachment_options['item_frame_span'] = isset($attachment_info['item_frame_span']) ? $attachment_info['item_frame_span'] : $this_item->item_frame_span;
                             $this_attachment_options['item_frame_animate'] = isset($attachment_info['item_frame_animate']) ? $attachment_info['item_frame_animate'] : $this_item->item_frame_animate;
-                            $attachment_frame_count = !empty($this_attachment_options['item_frame_animate']) ? sizeof($this_attachment_options['item_frame_animate']) : sizeof($this_attachment_options['item_frame']);
+                            $attachment_frame_count = !empty($this_attachment_options['item_frame_animate']) ? sizeof($this_attachment_options['item_frame_animate']) : 1; //sizeof($this_attachment_options['item_frame']);
                             $temp_event_frame = $this_battle->counters['event_frames'];
                             if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
                             elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
@@ -2433,7 +2431,7 @@ class rpg_canvas {
                             $this_attachment_options['skill_frame'] = isset($attachment_info['skill_frame']) ? $attachment_info['skill_frame'] : $this_skill->skill_frame;
                             $this_attachment_options['skill_frame_span'] = isset($attachment_info['skill_frame_span']) ? $attachment_info['skill_frame_span'] : $this_skill->skill_frame_span;
                             $this_attachment_options['skill_frame_animate'] = isset($attachment_info['skill_frame_animate']) ? $attachment_info['skill_frame_animate'] : $this_skill->skill_frame_animate;
-                            $attachment_frame_count = !empty($this_attachment_options['skill_frame_animate']) ? sizeof($this_attachment_options['skill_frame_animate']) : sizeof($this_attachment_options['skill_frame']);
+                            $attachment_frame_count = !empty($this_attachment_options['skill_frame_animate']) ? sizeof($this_attachment_options['skill_frame_animate']) : 1; //sizeof($this_attachment_options['skill_frame']);
                             $temp_event_frame = $this_battle->counters['event_frames'];
                             if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
                             elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
@@ -2464,7 +2462,7 @@ class rpg_canvas {
                             $this_attachment_options['object_frame'] = isset($attachment_info['object_frame']) ? $attachment_info['object_frame'] : $this_object->object_frame;
                             $this_attachment_options['object_frame_span'] = isset($attachment_info['object_frame_span']) ? $attachment_info['object_frame_span'] : $this_object->object_frame_span;
                             $this_attachment_options['object_frame_animate'] = isset($attachment_info['object_frame_animate']) ? $attachment_info['object_frame_animate'] : $this_object->object_frame_animate;
-                            $attachment_frame_count = !empty($this_attachment_options['object_frame_animate']) ? sizeof($this_attachment_options['object_frame_animate']) : sizeof($this_attachment_options['object_frame']);
+                            $attachment_frame_count = !empty($this_attachment_options['object_frame_animate']) ? sizeof($this_attachment_options['object_frame_animate']) : 1; //sizeof($this_attachment_options['object_frame']);
                             $temp_event_frame = $this_battle->counters['event_frames'];
                             if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
                             elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
@@ -2554,9 +2552,12 @@ class rpg_canvas {
                         if (empty($this_options['this_item_results']['total_actions'])
                             || !empty($this_options['this_item']->flags['force_canvas_header'])){
                             $this_item_label = !empty($this_item_data['item_title']) ? $this_item_data['item_title'] : $this_options['this_item']->item_name;
+                            $this_icon_type_class = !empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none';
+                            if (!empty($this_options['this_item']->item_type2) && $this_icon_type_class === 'none'){ $this_icon_type_class = $this_options['this_item']->item_type2; }
+                            elseif (!empty($this_options['this_item']->item_type2)){ $this_icon_type_class .= ' '.$this_options['this_item']->item_type2; }
                             $this_icon_markup_left = '<div class="sprite item_icon item_icon_left" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
                             $this_icon_markup_right = '<div class="sprite item_icon item_icon_right" style="background-image: url(images/items/'.(!empty($this_options['this_item']->item_image) ? $this_options['this_item']->item_image : $this_options['this_item']->item_token).'/icon_'.$this_robot_data['robot_direction'].'_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></div>';
-                            $this_icon_markup_combined =  '<div class="item item_sprite canvas_item_details item_type type type_'.(!empty($this_options['this_item']->item_type) ? $this_options['this_item']->item_type : 'none').(!empty($this_options['this_item']->item_type2) ? '_'.$this_options['this_item']->item_type2 : '').'">'.$this_icon_markup_left.'<div class="item_name">'.$this_item_label.'</div>'.$this_icon_markup_right.'</div>';
+                            $this_icon_markup_combined =  '<div class="item item_sprite canvas_item_details item_type type type_'.$this_icon_type_class.'">'.$this_icon_markup_left.'<div class="item_name">'.$this_item_label.'</div>'.$this_icon_markup_right.'</div>';
                             if (isset($this_options['canvas_show_this_item_underlay'])
                                 && empty($this_options['canvas_show_this_item_underlay'])
                                 && !empty($this_options['canvas_show_this_item_overlay'])){
@@ -2886,7 +2887,7 @@ class rpg_canvas {
                         $this_attachment_options['ability_frame'] = isset($attachment_info['ability_frame']) ? $attachment_info['ability_frame'] : $this_ability->ability_frame;
                         $this_attachment_options['ability_frame_span'] = isset($attachment_info['ability_frame_span']) ? $attachment_info['ability_frame_span'] : $this_ability->ability_frame_span;
                         $this_attachment_options['ability_frame_animate'] = isset($attachment_info['ability_frame_animate']) ? $attachment_info['ability_frame_animate'] : $this_ability->ability_frame_animate;
-                        $attachment_frame_count = !empty($this_attachment_options['ability_frame_animate']) ? sizeof($this_attachment_options['ability_frame_animate']) : sizeof($this_attachment_options['ability_frame']);
+                        $attachment_frame_count = !empty($this_attachment_options['ability_frame_animate']) ? sizeof($this_attachment_options['ability_frame_animate']) : 1; //sizeof($this_attachment_options['ability_frame']);
                         $temp_event_frame = $this_battle->counters['event_frames'];
                         if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
                         elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
@@ -2920,7 +2921,7 @@ class rpg_canvas {
                         $this_attachment_options['item_frame'] = isset($attachment_info['item_frame']) ? $attachment_info['item_frame'] : $this_item->item_frame;
                         $this_attachment_options['item_frame_span'] = isset($attachment_info['item_frame_span']) ? $attachment_info['item_frame_span'] : $this_item->item_frame_span;
                         $this_attachment_options['item_frame_animate'] = isset($attachment_info['item_frame_animate']) ? $attachment_info['item_frame_animate'] : $this_item->item_frame_animate;
-                        $attachment_frame_count = !empty($this_attachment_options['item_frame_animate']) ? sizeof($this_attachment_options['item_frame_animate']) : sizeof($this_attachment_options['item_frame']);
+                        $attachment_frame_count = !empty($this_attachment_options['item_frame_animate']) ? sizeof($this_attachment_options['item_frame_animate']) : 1; //sizeof($this_attachment_options['item_frame']);
                         $temp_event_frame = $this_battle->counters['event_frames'];
                         if ($temp_event_frame == 1 || $attachment_frame_count == 1){ $attachment_frame_key = 0;  }
                         elseif ($temp_event_frame < $attachment_frame_count){ $attachment_frame_key = $temp_event_frame; }
