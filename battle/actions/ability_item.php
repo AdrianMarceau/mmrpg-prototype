@@ -159,6 +159,15 @@ if ($active_target_robot->robot_status != 'disabled'){
         }
     }
 }
+// Check if the opposing player has an active Magnet Module
+$temp_thisplayer_magnet_robots = $this_player->get_value('magnet_robots');
+$temp_thisplayer_active_robot = $this_player->get_active_robot();
+if (!empty($temp_thisplayer_magnet_robots)
+    && !empty($temp_thisplayer_active_robot)
+    && in_array($temp_thisplayer_active_robot->robot_id, $temp_thisplayer_magnet_robots)){
+    // If the human player has an active Magnet Module, the CPU cannot switch!
+    $temp_switch_disabled = true;
+}
 
 // Check if switch was successful, else we do ability
 if (!$temp_switch_disabled
