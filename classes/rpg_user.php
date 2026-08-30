@@ -747,7 +747,8 @@ class rpg_user {
         $existing_item_records = $db->get_array_list("SELECT
             `unlocked`.`item_token`, `unlocked`.`item_quantity`
             FROM `{$record_table_name}` AS `unlocked`
-            LEFT JOIN `mmrpg_index_items` AS `index` ON `index`.`item_token` = `unlocked`.`item_token`
+            LEFT JOIN `mmrpg_index_items` AS `index`
+                ON `index`.`item_token` = SUBSTRING_INDEX(`unlocked`.`item_token`, '__', 1)
             WHERE `unlocked`.`user_id` = {$user_id} AND `index`.`item_flag_published` = 1 AND `index`.`item_flag_complete` = 1
             ORDER BY `unlocked`.`record_id` ASC
             ;", 'item_token');
