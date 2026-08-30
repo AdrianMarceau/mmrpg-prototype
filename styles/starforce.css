@@ -899,10 +899,10 @@
     position: relative;
 }
 #prototype .content.fullsize .starforce .chart_wrapper.star_totals {
-    width: 40%;
+    width: 60%;
 }
 #prototype .content.fullsize .starforce .chart_wrapper.star_forces {
-    width: 60%;
+    width: 40%;
 }
 #prototype .content.xforce .starforce .size_toggle span.maximize {
     display: none;

@@ -41,7 +41,12 @@ gameSettings.autoResizeWidth = true; // allow auto reszing of the game window wi
 gameSettings.autoResizeHeight = true; // allow auto reszing of the game window height
 gameSettings.currentBodyWidth = 0; // collect the current window width and update when necessary
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
-gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
+gameSettings.allowEditing = false; // default to false to deny all editing unless otherwise stated
+gameSettings.baseWindowWidth = 768; // default to the legacy build's size of 4:3-ish ratio
+gameSettings.baseWindowHeight = 622; // default to the legacy build's size of 4:3-ish ratio
+gameSettings.wideWindowWidth = 1120; // default to the new 2k25 build's size of 16:9 ratio
+gameSettings.wideWindowHeight = 630; // default to the new 2k25 build's size of 16:9 ratio
+gameSettings.wideModeActive = false; // default to false and then let the browser toggle later
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 gameSettings.onGameStart = []; // define an array to hold  events that have to wait until game start
 gameSettings.customValues = {}; // define an object to hold miscelaneous custom values during runtime
@@ -898,6 +903,14 @@ function windowResizeUpdate(updateType){
     //console.log('mmrpgBody.outerHeight() =', mmrpgBody.outerHeight());
     //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
     //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
+
+    if (gameSettings.currentBodyWidth >= 1120){
+        //console.log('wide mode is now active');
+        gameSettings.wideModeActive = true;
+    } else {
+        //console.log('wide mode is now disabled');
+        gameSettings.wideModeActive = false;
+    }
 
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 

@@ -24,14 +24,23 @@ html, body {
     background-color: transparent;
     position: relative;
 }
+@media (min-width: 1120px){
+    #world,
+    #world #canvas {
+        width: 1120px;
+        height: 630px;
+    }
+}
 
 #world #canvas {
     transition: opacity 1s linear;
     opacity: 1.0;
     border-radius: 6px;
     overflow: hidden;
-    width: 764px;
-    height: 620px;
+    /* width: 764px; */
+    /* height: 620px; */
+    width: calc(100% - 4px);
+    height: calc(100% - 2px);
     margin: 2px auto auto 1px;
 }
 #world #canvas .wrapper {

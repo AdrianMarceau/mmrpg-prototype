@@ -3461,8 +3461,8 @@ class rpg_player extends rpg_object {
                             unset($_SESSION[$session_token]['values']['battle_settings'][$temp_player]['player_robots'][$temp_key]);
                             continue;
                         }
-                        $temp_robot_settings = $temp_player_robot_settings[$temp_robot_info['robot_token']];
-                        $temp_robot_rewards = $temp_player_robot_settings[$temp_robot_info['robot_token']];
+                        $temp_robot_settings = $temp_player_robot_settings[$temp_key];
+                        $temp_robot_rewards = $temp_player_robot_settings[$temp_key];
                         // If this robot is not owned by the player, skip it as it doesn't count towards their totals
                         if (empty($temp_robot_settings['original_player']) && $temp_player != $player_token){ continue; }
                         if (!empty($temp_robot_settings['original_player']) && $temp_robot_settings['original_player'] != $player_token){ continue; }
@@ -3653,7 +3653,8 @@ class rpg_player extends rpg_object {
                             <? $temp_offset = $player_info['player_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $player_image_unlock_tokens ?>
-                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active"><?= $player_info['player_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active facing_right"><?= $player_info['player_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_left_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active facing_left"><?= $player_info['player_name']?></div>
                             </span>
                         </a>
                     <? else: ?>
@@ -3661,7 +3662,8 @@ class rpg_player extends rpg_object {
                             <? $temp_offset = $player_info['player_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $player_image_unlock_tokens ?>
-                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active"><?= $player_info['player_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_right_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active facing_right"><?= $player_info['player_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 14px; background-image: url(images/players/<?= !empty($player_info['player_image']) ? $player_info['player_image'] : $player_info['player_token'] ?>/sprite_left_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); " class="sprite sprite_player sprite_player_sprite sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?> sprite_<?= $player_info['player_image_size'].'x'.$player_info['player_image_size'] ?>_base player_status_active player_position_active facing_left"><?= $player_info['player_name']?></div>
                             </span>
                         </span>
                     <? endif; ?>

@@ -674,6 +674,12 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
     height: 10px;
     z-index: 90;
 }
+#edit #console .event .event_player_images .sprite_wrapper .sprite.facing_right {
+    display: block;
+}
+#edit #console .event .event_player_images .sprite_wrapper .sprite.facing_left {
+    display: none;
+}
 #edit #console .event .event_player_summons {
     margin-top: 108px;
     height: 21px;
@@ -814,4 +820,57 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
 body.mobileFlag_portraitMode #prototype #canvas,
 body.mobileFlag_landscapeMode #prototype #canvas {
     width: 100% !important;
+}
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+
+    #edit .formatter colgroup col:first-child {
+        width: 140px;
+    }
+    #edit #canvas .wrapper_left {
+        float: left;
+        clear: left;
+    }
+    #edit #canvas .wrapper_right {
+        float: right;
+    }
+    #edit #console .event {
+        position: relative;
+    }
+    #edit #console .event .header,
+    #edit #console .event .body {
+        margin: 0 auto 0 0;
+        width: calc(100% - 200px);
+    }
+    #edit #console .event .header {
+
+    }
+    #edit #console .event .body {
+
+    }
+    #edit #console .event .event_player_mugshot {
+        position: absolute;
+        left: auto;
+        top: 76px;
+        right: 75px;
+        transform: scale(4);
+    }
+    #edit #console .event .event_player_images {
+        position: absolute;
+        left: auto;
+        top: 220px;
+        right: 75px;
+        margin: 0;
+        transform: scale(4);
+    }
+    #edit #console .event .event_player_images .sprite_wrapper .sprite.facing_left {
+        display: block;
+    }
+    #edit #console .event .event_player_images .sprite_wrapper .sprite.facing_right {
+        display: none;
+    }
+
 }

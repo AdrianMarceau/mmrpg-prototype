@@ -713,6 +713,12 @@ body.windowFlag_landscapeMode #prototype {
     margin: 0;
     position: absolute;
 }
+#edit #console .event .event_robot_images .sprite_wrapper .sprite.facing_right {
+    display: block;
+}
+#edit #console .event .event_robot_images .sprite_wrapper .sprite.facing_left {
+    display: none;
+}
 
 
 #edit #console .event .event_robot_images span.robot_image_alts {
@@ -1469,6 +1475,39 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
 
     #prototype #canvas {
         width: 100% !important;
+    }
+
+}
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+
+    #edit #console .event .header,
+    #edit #console .event .body {
+        margin: 0 180px 0 50px !important;
+    }
+    #edit #console .event .event_robot_images {
+        position: absolute;
+        margin: 0;
+        top: 0px;
+        left: auto;
+        right: 2px;
+        transform-origin: top right;
+        transform: scale(4, 4);
+    }
+    #edit #console .event .event_robot_images .sprite_wrapper .sprite.facing_right {
+        display: none;
+    }
+    #edit #console .event .event_robot_images .sprite_wrapper .sprite.facing_left {
+        display: block;
+    }
+    #edit #console .event .event_robot_summons {
+        margin-top: 50px;
+    }
+    #edit #console .event .event_robot_favourite {
+        margin-top: 80px;
     }
 
 }

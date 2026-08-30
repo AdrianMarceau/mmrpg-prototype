@@ -522,6 +522,12 @@
     margin-left: -2px;
     background-position: 0 0;
 }
+#shop #console .event .this_sprite .sprite.facing_right {
+    display: block;
+}
+#shop #console .event .this_sprite .sprite.facing_left {
+    display: none;
+}
 #shop #console .event .this_sprite .sprite_40x40 {
     margin-top: -4px;
     margin-left: -2px;
@@ -1032,22 +1038,64 @@
     background-color: #969696;
 }
 
+/* -- WIDESCREEN 2k26 STYLES -- */
 
-/*
- * MOBILE OVERRIDE STYLES
- */
-
-/* -- Landscape Mode -- */
-@media (min-width: 1024px){
+@media (min-width: 1120px){
 
     #mmrpg,
-    #mmrpg #prototype {
-        width: 768;
+    #prototype {
+        width: 1120px;
     }
-    #prototype #canvas {
-        width: 100% !important;
+    #shop #console .header,
+    #console .event .body_left {
+        margin: 0 auto 0 0;
+        width: calc(100% - 190px);
     }
-
-
+    #console .event .body_left {
+        margin: 0 auto 0 0;
+        width: calc(100% - 195px);
+    }
+    #shop #console .event .this_sprite {
+        top: 8px;
+        right: 10px;
+        left: auto;
+        transform-origin: top right;
+        transform: scale(4);
+        background-size: auto 120%;
+    }
+    #shop #console .event .this_sprite .sprite.facing_left {
+        display: block;
+    }
+    #shop #console .event .this_sprite .sprite.facing_right {
+        display: none;
+}
+    #shop #console .gauge.cores {
+        top: 190px;
+        right: 13px;
+        left: auto;
+        width: 160px;
+    }
+    #shop #console .gauge.cores .element {
+        float: left;
+        width: calc((100% / 4) - 5px);
+        margin: 0 4px 4px 0;
+        height: 16px;
+        font-size: 16px;
+        line-height: 1;
+    }
+    #shop #console .gauge.cores .element:nth-child(4n) {
+        margin-right: 0;
+    }
+    #shop #console .gauge.cores .element .sprite_core {
+        height: 12px;
+    }
+    #shop #console .gauge.cores .element .sprite_core .sprite {
+        top: -12px;
+    }
+    #shop #console .gauge.cores .element .count {
+        font-size: 10px;
+        line-height: 1;
+        margin: 2px auto 0 4px;
+    }
 
 }

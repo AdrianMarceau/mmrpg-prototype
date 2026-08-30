@@ -87,6 +87,15 @@ $(document).ready(function(){
 
     // -- PRIMARY SCRIPT FUNCTIONALITY -- //
 
+    // Ensure mouse hovers trigger the same visual state as gamepad inputs
+    $('#console .event .item_cell, #console .event .item_cell_confirm', thisShop).live('mouseenter', function(){
+        $('#console .event .item_cell, #console .event .item_cell_confirm', thisShop).removeClass('hovered');
+        $(this).addClass('hovered');
+        });
+    $('#console .event .item_cell, #console .event .item_cell_confirm', thisShop).live('mouseleave', function(){
+        $(this).removeClass('hovered');
+        });
+
     // Define a function for showing/highlighting a player in the above ready room when possible
     showShopInReadyRoom = function(shopToken){
         //console.log('showShopInReadyRoom(shopToken:', shopToken, ')');
@@ -1052,21 +1061,55 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
             }, 100);
         };
 
+    // Define a helper function to restore hover to the previously active item and scroll it into view
+    let restoreLastItemCellHover = function(confirmToken, confirmAction){
+        let $targetCell = null;
+        if (typeof userInputs.lastItemCell !== 'undefined' && userInputs.lastItemCell.length){
+            $targetCell = userInputs.lastItemCell;
+            } else if (confirmToken && confirmAction) {
+            // Fallback: If lastItemCell was lost, find it via the confirm cell's data attributes
+            $targetCell = $('.item_cell[data-token="' + confirmToken + '"][data-action="' + confirmAction + '"]', $activeTab);
+            }
+        if ($targetCell && $targetCell.length){
+            // A slight delay ensures we calculate offsets AFTER synchronous DOM clears (like canceling)
+            setTimeout(function(){
+                $('.item_cell', $activeTab).removeClass('hovered');
+                $targetCell.addClass('hovered');
+                let $scrollWrapper = $targetCell.closest('.scroll_wrapper');
+                if ($scrollWrapper.length){
+                    let containerTop = $scrollWrapper.offset().top;
+                    let containerBottom = containerTop + $scrollWrapper.height();
+                    let elemTop = $targetCell.offset().top;
+                    let elemBottom = elemTop + $targetCell.outerHeight();
+                    if (elemTop < containerTop){
+                        $scrollWrapper.scrollTop($scrollWrapper.scrollTop() - (containerTop - elemTop));
+                        } else if (elemBottom > containerBottom) {
+                        $scrollWrapper.scrollTop($scrollWrapper.scrollTop() + (elemBottom - containerBottom));
+                        }
+                    if (typeof $scrollWrapper.perfectScrollbar === 'function'){
+                        $scrollWrapper.perfectScrollbar('update');
+                        }
+                    }
+                }, 50);
+            }
+        delete userInputs.lastItemCell;
+        };
+
     // If the user pressed the A button, we should ?????
     if (activeInputs.A){
         //console.log('%c' + 'A button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
         if ($activeConfirmCell){
             //console.log('we are in checkout mode!');
+            let confirmToken = $activeConfirmCell.attr('data-token');
+            let confirmAction = $activeConfirmCell.attr('data-action');
             let $confirmButton = $('.confirm_button', $activeConfirmCell);
             //console.log('-> $confirmButton:', ($confirmButton ? $confirmButton.length : 0), typeof $confirmButton, $confirmButton);
             if (!$confirmButton || !$confirmButton.length){ return; }
             //closeTooltipFunction();
             hoverClickCellButton($confirmButton);
             $activeConfirmCell.removeClass('hovered');
-            if (typeof userInputs.lastItemCell === 'undefined'){ return; }
-            userInputs.lastItemCell.addClass('hovered');
-            delete userInputs.lastItemCell;
+            restoreLastItemCellHover(confirmToken, confirmAction);
             } else {
             //console.log('we are in browsing mode!');
             let $actionButton = $activeItemCell ? $('a.button', $activeItemCell) : null;
@@ -1109,14 +1152,14 @@ function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
         if (event){ event.preventDefault(); }
         if ($activeConfirmCell){
             //console.log('we are in checkout mode!');
+            let confirmToken = $activeConfirmCell.attr('data-token');
+            let confirmAction = $activeConfirmCell.attr('data-action');
             $activeConfirmCell.removeClass('hovered');
             let $cancelButton = $('.cancel_button', $activeConfirmCell);
             //console.log('-> $cancelButton:', ($cancelButton ? $cancelButton.length : 0), typeof $cancelButton, $cancelButton);
             if (!$cancelButton || !$cancelButton.length){ return; }
             hoverClickCellButton($cancelButton);
-            if (typeof userInputs.lastItemCell === 'undefined'){ return; }
-            userInputs.lastItemCell.addClass('hovered');
-            delete userInputs.lastItemCell;
+            restoreLastItemCellHover(confirmToken, confirmAction);
             } else {
             //console.log('we are in browsing mode!');
             //console.log('-> nothing to dismiss!');

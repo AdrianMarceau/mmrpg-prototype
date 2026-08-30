@@ -959,7 +959,7 @@ body.prototype {
 #prototype {
     margin: 0 auto;
     width: 768px;
-    height: 1024px;
+    height: 622px;
     padding: 0;
     vertical-align: top;
     border: 0 none transparent;
@@ -981,7 +981,6 @@ body.prototype {
     margin: 8px 8px 8px 6px;
     padding: 0 0 23px;
     width: 750px;
-    /*height: 248px;*/
     height: 184px;
     font-size: 10px;
     line-height: 248px;
@@ -4461,4 +4460,75 @@ body[data-source="website"] #prototype .menu {
 #mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"][data-token*="dr-cossack"].block_24 .battle_sprites {
     padding-left: 11%;
     text-align: left;
+}
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+    html:not([data-index]),
+    html:not([data-index]) body {
+        width: 1120px !important;
+        max-width: 1120px !important;
+    }
+    #prototype {
+        width: 1120px;
+        height: 630px;
+    }
+    #prototype .banner {
+        width: 1102px;
+        height: 192px;
+    }
+    #mmrpg.index #window {
+        width: 1120px !important;
+        height: 630px !important;
+    }
+    #prototype .banner .options_fullmenu .link {
+        font-size: 13px;
+    }
+    #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra.first {
+        margin-left: 8%;
+    }
+    #prototype.main_menu .option_back {
+        width: 1096px;
+    }
+    #prototype.main_menu .option_wrapper_start {
+        padding: 0 110px;
+    }
+    #prototype.main_menu .option_wrapper_start:before,
+    #prototype.main_menu .option_wrapper_start:after {
+        content: "";
+        display: block;
+        width: 94px;
+        height: 335px;
+        border: 1px solid #1a1a1a;
+        background-color: #1a1a1a;
+        background-repeat: no-repeat, no-repeat;
+        background-position: top right;
+        background-position: top right, bottom left;
+        background-image: url(../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png);
+        background-image: url(../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png), url(../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-left.png);
+        border-radius: 12px;
+        position: absolute;
+        z-index: 1;
+        top: 52px;
+    }
+    #prototype.main_menu .option_wrapper_start:before {
+        left: 14px;
+    }
+    #prototype.main_menu .option_wrapper_start:after {
+        right: 22px;
+    }
+    #mmrpg #prototype > div:not(.banner) .option.starfield div label .info[data-click-tooltip] {
+        right: -330%;
+    }
+    #mmrpg #prototype.main_menu .option_this-team-select .chrome label,
+    #mmrpg #prototype.main_menu .option_this-team-select:hover .chrome label {
+        margin-left: calc(50% + 100px) !important;
+    }
+
+    #mmrpg .tooltip .message {
+        font-size: 16px;
+        line-height: 1.6;
+    }
 }

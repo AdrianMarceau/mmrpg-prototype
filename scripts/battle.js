@@ -583,6 +583,25 @@ $(document).ready(function(){
                     }
                 }
             }
+        // If the user has pressed the L2/R2 triggers to scroll the console window
+        else if (activeInputs.L2 || activeInputs.R2){
+            if (event){ event.preventDefault(); }
+            let $consoleWrapper = $('#console .wrapper');
+            if ($consoleWrapper.length){
+                // 61px event height + 3px bottom margin
+                let scrollDistance = 64;
+                let currentScroll = $consoleWrapper.scrollTop();
+                if (activeInputs.L2){
+                    // Scroll back to older events (moving down the prepended list)
+                    $consoleWrapper.scrollTop(currentScroll + scrollDistance);
+                    } else if (activeInputs.R2){
+                    // Scroll forward to newer events (back towards the top)
+                    $consoleWrapper.scrollTop(currentScroll - scrollDistance);
+                    }
+                $consoleWrapper.perfectScrollbar('update');
+                return true;
+                }
+            }
         // If the user has pressed the L1/R1 bumpers to scoll sub-pages
         // if the mainactions have .float_links and .button.num pages inside
         // then the L1/R1 buttons should scroll through them and "click"

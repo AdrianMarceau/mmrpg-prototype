@@ -353,7 +353,7 @@ function temp_combination_number($k,$n){
 <script type="text/javascript" src="scripts/starforce.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 </head>
-<body id="mmrpg" class="iframe" data-frame="stars" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
+<body id="mmrpg" class="iframe" data-frame="stars" data-mode="<?= $global_allow_editing ? 'editor' : 'viewer' ?>" data-source="<?= $global_frame_source ?>" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1120px !important; ' : '' ?>">
 
     <div id="prototype" class="hidden" style="<?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
 
@@ -817,7 +817,7 @@ function temp_combination_number($k,$n){
                                             }
                                         };
                                     thisStarSettings.starData = {
-                                        type: 'pie',
+                                        type: 'bar',
                                         data: {
                                             labels: <?= json_encode($star_type_labels) ?>,
                                             datasets: [/*{

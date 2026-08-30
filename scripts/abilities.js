@@ -81,6 +81,29 @@ $(document).ready(function(){
     // Automatically click the first shop link
     $('.ability_tabs_links .tab_link[data-tab]', gameConsole).first().trigger('click');
 
+    // Make sure we auto-click the portait sprite whenever a cell is clicked
+    let $consoleSprite = $('.event .this_sprite', gameConsole);
+    let consoleSpriteTimeout = null;
+    $('.event tbody td[data-kind!=""]', gameConsole).bind('click', function(){
+        $consoleSprite.addClass('hovered');
+        if (consoleSpriteTimeout){ clearTimeout(consoleSpriteTimeout); }
+        consoleSpriteTimeout = setTimeout(function(){
+            $consoleSprite.removeClass('hovered');
+            }, 1000);
+        });
+
+    // Make sure hover classes are only ever on one cell at a time
+    $('.event tbody td[data-kind]', gameConsole).bind('mouseenter', function(){
+        let $thisCell = $(this);
+        let $parentBody = $thisCell.closest('tbody');
+        $('.event tbody td[data-kind]', gameConsole).removeClass('hovered');
+        $thisCell.addClass('hovered');
+        });
+    $('.event tbody td[data-kind]', gameConsole).bind('mouseleave', function(){
+        let $thisCell = $(this);
+        $thisCell.removeClass('hovered');
+        });
+
 
     /*
      * OTHER STUFF
@@ -231,10 +254,11 @@ function checkUserInputsForAbilitiesFrame(kind, event, activeInputs, userInputs)
             //console.log('activeAbilityCellIndex =', activeAbilityCellIndex);
             //console.log('maxAbilityCellIndex =', maxAbilityCellIndex);
             let nextAbilityCellIndex = activeAbilityCellIndex;
+            let verticalSkipAmount = gameSettings.wideModeActive ? 4 : 2;
             if (whichDirection === 'right'){ nextAbilityCellIndex += 1; }
             else if (whichDirection === 'left'){ nextAbilityCellIndex -= 1; }
-            else if (whichDirection === 'down'){ nextAbilityCellIndex += 2; }
-            else if (whichDirection === 'up'){ nextAbilityCellIndex -= 2; }
+            else if (whichDirection === 'down'){ nextAbilityCellIndex += verticalSkipAmount; }
+            else if (whichDirection === 'up'){ nextAbilityCellIndex -= verticalSkipAmount; }
             //console.log('nextAbilityCellIndex(A) =', nextAbilityCellIndex);
             if (nextAbilityCellIndex < 0){ nextAbilityCellIndex = maxAbilityCellIndex; }
             else if (nextAbilityCellIndex > maxAbilityCellIndex){ nextAbilityCellIndex = 0;}
@@ -260,6 +284,22 @@ function checkUserInputsForAbilitiesFrame(kind, event, activeInputs, userInputs)
         return;
         }
 
+    // Define a quick function for hovering + clicking a given item cell button
+    let hoverClickCell = function($cell, mouseLeave){
+        mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
+        let $parent = $cell.closest('table');
+        $('td[data-kind]', $parent).removeClass('clicked');
+        $cell.addClass('clicked');
+        $cell.trigger('mouseenter');
+        $cell.trigger('click');
+        if (typeof userInputs.hoverClickCellTimeout !== 'undefined'){ clearTimeout(userInputs.hoverClickCellTimeout); }
+        userInputs.hoverClickCellTimeout = setTimeout(function(){
+            $('td[data-kind]', $parent).removeClass('clicked');
+            if (mouseLeave){ $cell.trigger('mouseleave'); }
+            $cell.removeClass('clicked');
+            }, 100);
+        };
+
     // Define a quick function for hovering + clicking a given ability cell button
     let hoverClickCellButton = function($button, mouseLeave){
         mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
@@ -281,10 +321,22 @@ function checkUserInputsForAbilitiesFrame(kind, event, activeInputs, userInputs)
         //console.log('%c' + 'Y button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
         //console.log('we are in browsing mode!');
-        let $tooltipButton = $activeAbilityCell ? $('span[data-click-tooltip]', $activeAbilityCell) : null;
+        let $tooltipButton = $activeAbilityCell ? $('[data-click-tooltip]', $activeAbilityCell) : null;
         //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
         if (!$tooltipButton || !$tooltipButton.length){ return; }
         hoverClickCellButton($tooltipButton, false);
+        return;
+        }
+
+    // If the user pressed the A button, we should click the cell directly
+    if (activeInputs.A){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        //console.log('we are in browsing mode!');
+        let $tooltipCell = $activeAbilityCell ? $activeAbilityCell : null;
+        //console.log('-> $tooltipCell:', ($tooltipCell ? $tooltipCell.length : 0), typeof $tooltipCell, $tooltipCell);
+        if (!$tooltipCell || !$tooltipCell.length){ return; }
+        hoverClickCell($tooltipCell, false);
         return;
         }
 

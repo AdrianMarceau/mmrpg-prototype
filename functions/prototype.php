@@ -796,23 +796,27 @@ function mmrpg_prototype_player_stars_available($player_token){
         $temp_field_stars[] = $info['field'];
     }
     // Loop thourgh and collect the fusion stars
-    for ($i = 0; $i < 8; $i += 2){
-        list($t1a, $t1b) = explode('-', $temp_field_stars[$i]);
-        list($t2a, $t2b) = explode('-', $temp_field_stars[$i + 1]);
-        $temp_fusion_token = $t1a.'-'.$t2b;
-        $temp_fusion_stars[] = $temp_fusion_token;
-    }
-    // Loop through field stars and remove unlocked
-    foreach ($temp_field_stars AS $key => $token){
-        if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
-            unset($temp_field_stars[$key]);
+    if (!empty($temp_field_stars)){
+
+        for ($i = 0; $i < 8; $i += 2){
+            list($t1a, $t1b) = explode('-', $temp_field_stars[$i]);
+            list($t2a, $t2b) = explode('-', $temp_field_stars[$i + 1]);
+            $temp_fusion_token = $t1a.'-'.$t2b;
+            $temp_fusion_stars[] = $temp_fusion_token;
         }
-    }
-    // Loop through fusion stars and remove unlocked
-    foreach ($temp_fusion_stars AS $key => $token){
-        if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
-            unset($temp_fusion_stars[$key]);
+        // Loop through field stars and remove unlocked
+        foreach ($temp_field_stars AS $key => $token){
+            if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
+                unset($temp_field_stars[$key]);
+            }
         }
+        // Loop through fusion stars and remove unlocked
+        foreach ($temp_fusion_stars AS $key => $token){
+            if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
+                unset($temp_fusion_stars[$key]);
+            }
+        }
+
     }
     // Count the field stars
     $temp_field_stars = array_values($temp_field_stars);

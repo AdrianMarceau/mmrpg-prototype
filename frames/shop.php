@@ -147,6 +147,7 @@ if (true){
             }
         }
         $shop_image_file_path = $shop_info['shop_image_path'].'sprite_right_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $shop_image_file_path2 = $shop_info['shop_image_path'].'sprite_left_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         // Collect a temp robot object for printing items
         $player_info = $mmrpg_database_players[$shop_info['shop_player']];
@@ -161,7 +162,8 @@ if (true){
             <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>" data-level="<?= $shop_info['shop_level'] ?>">
 
                 <div class="this_sprite sprite_left" style="background-image: url(images/fields/<?= $shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
-                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="background-image: url(<?= $shop_image_file_path ?>); "><?= $shop_info['shop_name']?></div>
+                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00 facing_right" style="background-image: url(<?= $shop_image_file_path ?>); "><?= $shop_info['shop_name']?></div>
+                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00 facing_left" style="background-image: url(<?= $shop_image_file_path2 ?>); "><?= $shop_info['shop_name']?></div>
                 </div>
 
                 <?

@@ -1132,7 +1132,6 @@
     -moz-box-shadow: 0 1px 5px #000000;
     -webkit-box-shadow: 0 1px 5px #000000;
     overflow: hidden;
-
 }
 #canvas > .wrapper {
     border-radius: 6px;
@@ -3462,7 +3461,8 @@
     top: 4px;
     left: 4px;
     right: 4px;
-    height: 612px;
+    /* height: 612px;  */
+    height: calc(100% - 8px);
     background-color: #2A2A2A;
     border: 0 none transparent;
     -moz-border-radius: 6px;
@@ -3744,3 +3744,210 @@
 }
 
 */
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+    #battle {
+        width: 1120px;
+        height: 630px;
+    }
+    #canvas {
+        width: 1120px;
+    }
+    #canvas > .wrapper > .event {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    #canvas > .wrapper > .event_fieldback.wide {
+        width: 100%;
+        filter: brightness(0.2) blur(1px);
+    }
+    #console {
+        width: 1120px;
+    }
+    #console .event {
+        padding: 2px 120px;
+    }
+    #console .event .sprite_left {
+        left: 120px;
+    }
+    #console .event .sprite_right {
+        right: 120px;
+    }
+    #actions .wrapper {
+        width: auto;
+    }
+    #actions .main_actions {
+
+    }
+    #actions .main_actions_hastitle {
+
+    }
+    #actions .sub_actions  {
+        height: 50px;
+        line-height: 50px;
+    }
+    #actions .actions_battle .sub_actions {
+        height: 66px;
+        line-height: 66px;
+    }
+    #actions .sub_actions .button,
+    #actions .actions_battle .action_target {
+        width: calc((100% / 4) - 7px);
+        height: 58px;
+        line-height: 58px;
+    }
+    #actions .sub_actions[data-size="3"] .button {
+        width: calc((100% / 3) - 7px);
+    }
+    #actions .sub_actions .button label,
+    #actions .actions_battle .action_target label {
+        height: 46px;
+        line-height: 46px;
+    }
+    #actions .actions_option .action_option,
+    #actions .actions_settings .action_setting,
+    #actions .actions_settings_eventTimeout .action_setting,
+    #actions .actions_settings_volumeControl .action_setting,
+    #actions .actions_settings_autoScan .action_setting,
+    #actions .actions_switch .action_switch,
+    #actions .actions_scan .action_scan,
+    #actions .actions_target .action_target,
+    #actions .actions_ability .action_ability,
+    #actions .actions_item .action_item {
+        width: calc((100% / 4) - 7px);
+    }
+    #actions .block_4,
+    #actions .block_8 {
+        width: calc((100% / 4) - 7px) !important;
+    }
+
+    #mmrpg #canvas {
+        /* --base-details-shift: -62px; */
+        --base-details-push: 6px;
+        --base-details-shift: -66px;
+    }
+
+    #mmrpg #canvas .robot_details_left,
+    #mmrpg #canvas .robot_details_right,
+    #mmrpg #canvas .robot_mugshot_type.sprite_mugshot_left,
+    #mmrpg #canvas .robot_mugshot_type.sprite_mugshot_right,
+    #mmrpg #canvas .sprite_40x40_mugshot_left,
+    #mmrpg #canvas .sprite_40x40_mugshot_right,
+    #mmrpg #canvas .sprite_80x80_mugshot_left,
+    #mmrpg #canvas .sprite_80x80_mugshot_right,
+    #mmrpg #canvas .sprite_160x160_mugshot_left,
+    #mmrpg #canvas .sprite_160x160_mugshot_right {
+
+    }
+    #mmrpg #canvas .robot_details_left,
+    #mmrpg #canvas .robot_mugshot_type.sprite_mugshot_left,
+    #mmrpg #canvas .sprite_40x40_mugshot_left,
+    #mmrpg #canvas .sprite_80x80_mugshot_left,
+    #mmrpg #canvas .sprite_160x160_mugshot_left {
+
+    }
+    #mmrpg #canvas .robot_details_right,
+    #mmrpg #canvas .robot_mugshot_type.sprite_mugshot_right,
+    #mmrpg #canvas .sprite_40x40_mugshot_right,
+    #mmrpg #canvas .sprite_80x80_mugshot_right,
+    #mmrpg #canvas .sprite_160x160_mugshot_right {
+
+    }
+    #mmrpg .robot_details_left {
+        top: calc(var(--base-details-push) + 0px);
+        left: var(--base-details-shift);
+    }
+    #mmrpg .robot_details_right {
+        top: calc(var(--base-details-push) + 0px);
+        right: var(--base-details-shift);
+    }
+    #mmrpg #canvas .robot_mugshot_type.sprite_mugshot_left {
+        top: calc(var(--base-details-push) + 4px);
+        left: calc(var(--base-details-shift) + 4px);
+    }
+    #mmrpg #canvas .robot_mugshot_type.sprite_mugshot_right {
+        top: calc(var(--base-details-push) + 4px);
+        right: calc(var(--base-details-shift) + 4px);
+    }
+    #mmrpg .sprite_40x40_mugshot_left {
+        top: calc(var(--base-details-push) + 8px);
+        left: calc(var(--base-details-shift) + 8px);
+    }
+    #mmrpg .sprite_40x40_mugshot_right {
+        top: calc(var(--base-details-push) + 8px);
+        right: calc(var(--base-details-shift) + 8px);
+    }
+    #mmrpg .sprite_80x80_mugshot_left {
+        top: calc(var(--base-details-push) - 12px);
+        left: calc(var(--base-details-shift) - 12px);
+    }
+    #mmrpg .sprite_80x80_mugshot_right {
+        top: calc(var(--base-details-push) - 12px);
+        right: calc(var(--base-details-shift) - 12px);
+    }
+    #mmrpg .sprite_160x160_mugshot_left {
+        top: calc(var(--base-details-push) - 32px);
+        left: calc(var(--base-details-shift) - 32px);
+    }
+    #mmrpg .sprite_160x160_mugshot_right {
+        top: calc(var(--base-details-push) - 32px);
+        right: calc(var(--base-details-shift) - 32px);
+    }
+
+    #actions {
+        width: 1120px;
+        height: 236px;
+        padding: 0 120px;
+        box-sizing: border-box;
+    }
+    #actions:before,
+    #actions:after {
+        content: "";
+        display: block;
+        width: 106px;
+        height: calc(100% - 20px);
+        border: 1px solid #191919;
+        background-color: #212121;
+        background-repeat: no-repeat, no-repeat;
+        background-position: top right;
+        background-position: top right, bottom left;
+        background-image: url(../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png);
+        background-image: url(../images/assets/website-texture_circuit-board-2k23_corner-white_top-right.png), url(../images/assets/website-texture_circuit-board-2k23_corner-black_bottom-left.png);
+        border-radius: 12px;
+        position: absolute;
+        z-index: 1;
+        top: 8px;
+    }
+    #actions:before {
+        left: 14px;
+    }
+    #actions:after {
+        right: 14px;
+    }
+    #actions .sub_actions .button.colspan2,
+    #actions .actions_battle .action_target.colspan2 {
+        width: calc(((100% / 4) * 2) - 6px);
+    }
+    #actions .sub_actions .button.colspan2 + .colspan2,
+    #actions .actions_battle .action_target.colspan2 + .colspan2 {
+        width: calc(((100% / 4) * 2) - 8px);
+    }
+    #actions .sub_actions .action_back {
+        height: 42px;
+        line-height: 42px;
+        width: calc((100% / 1) - 7px);
+    }
+    #actions .sub_actions .action_back label {
+        height: 28px;
+        line-height: 28px;
+    }
+
+    #effects {
+        width: 1120px;
+        height: 630px;
+    }
+
+}

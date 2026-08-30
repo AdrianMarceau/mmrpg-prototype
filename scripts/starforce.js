@@ -110,6 +110,29 @@ $(document).ready(function(){
             });
         }
 
+    // Expose the pagination function so the resize handler can call it
+    window.showStarListPage = function(pageNum){
+        $starListPages.attr('data-current-page', pageNum);
+        $('a[data-page]', $starListPages).removeClass('active');
+        $starListPages.find('a[data-page="' + pageNum + '"]').addClass('active');
+        let numPerPage = parseInt($starListPages.attr('data-per-page')) || 32;
+        let layoutMode = $starListPages.attr('data-layout-mode') || 'narrow';
+        // Calculate the slice indexes for the current page
+        let minIndex = (pageNum - 1) * numPerPage;
+        let maxIndex = (pageNum * numPerPage) - 1;
+        // Grab all robots, but filter out unknowns if we are in wide mode
+        let $allRobots = $('.robot', $starListRobots);
+        let $targetRobots = layoutMode === 'wide' ? $allRobots.not('.unknown') : $allRobots;
+        // Hide absolutely everything first
+        $allRobots.addClass('hidden');
+        // Loop through our filtered targets and reveal only the ones that fall within our page slice
+        $targetRobots.each(function(index){
+            if (index >= minIndex && index <= maxIndex){
+                $(this).removeClass('hidden');
+                }
+            });
+        };
+
     // Define click events for the prev, next, and page buttons in the starlist
     let $starList = $('.starlist', thisBody);
     if (!$starList || !$starList.length){ $starList = null; }
@@ -117,6 +140,29 @@ $(document).ready(function(){
     if (!$starListPages || !$starListPages.length){ $starListPages = null; }
     let $starListRobots = $starList ? $('.robots', $starList) : null;
     if (!$starListRobots || !$starListRobots.length){ $starListRobots = null; }
+    if ($starList && $starListPages){
+        // Use .delegate() for low jquery version compatibility
+        $starListPages.delegate('a[data-page]', 'click', function(e){
+            e.preventDefault();
+            let $pageLink = $(this);
+            let pageNum = $pageLink.attr('data-page');
+            if (pageNum === 'prev' || pageNum === 'next'){
+                let shiftDirection = pageNum;
+                let currentPageNum = $starListPages.is('[data-current-page]') ? parseInt($starListPages.attr('data-current-page')) : 1;
+                // Dynamically check the current amount of page buttons
+                let maxPageNum = $('a[data-page]:not(.arrow)', $starListPages).length || 1;
+                let newPageNum = shiftDirection === 'prev' ? currentPageNum - 1 : currentPageNum + 1;
+                if (newPageNum < 1){ newPageNum = maxPageNum; }
+                else if (newPageNum > maxPageNum){ newPageNum = 1; }
+                window.showStarListPage(newPageNum);
+                } else {
+                let newPageNum = parseInt(pageNum);
+                window.showStarListPage(newPageNum);
+                }
+            });
+        window.showStarListPage(1);
+        }
+    /*
     if ($starList && $starListPages){
         let showStarListPage = function(pageNum){
             //console.log('showStarListPage() w/ pageNum =', pageNum);
@@ -155,6 +201,7 @@ $(document).ready(function(){
             });
 
         }
+    */
 
     // Define click events for the prev and next arrow buttons in the starchart
     var groupLists = $('.starchart .grouplist', thisBody);
@@ -241,6 +288,47 @@ $(document).ready(function(){
 
 // Create the windowResize event for this page
 function windowResizeStarforce(){
+    // Check window width to determine layout mode (>= 1120px)
+    let isWideMode = $(window).width() >= gameSettings.wideWindowWidth;
+    let newPerPage = isWideMode ? 64 : 32;
+    let layoutMode = isWideMode ? 'wide' : 'narrow';
+    let $starList = $('.starlist', thisBody);
+    let $starListPages = $('.pages', $starList);
+    let $starListRobots = $('.robots', $starList);
+    if ($starListPages.length && $starListRobots.length){
+        let currentPerPage = parseInt($starListPages.attr('data-per-page')) || 32;
+        let currentLayout = $starListPages.attr('data-layout-mode');
+        // Only regenerate if the layout mode or capacity has actually changed
+        if (newPerPage !== currentPerPage || layoutMode !== currentLayout){
+            $starListPages.attr('data-per-page', newPerPage);
+            $starListPages.attr('data-layout-mode', layoutMode);
+            // Count ONLY the robots we intend to show in this mode
+            let $targetRobots = isWideMode ? $('.robot:not(.unknown)', $starListRobots) : $('.robot', $starListRobots);
+            let totalRobots = $targetRobots.length;
+            let numPages = Math.ceil(totalRobots / newPerPage);
+            // Rebuild the pagination HTML dynamically
+            let pageLinksHtml = '<a class="arrow prev" data-page="prev"></a>';
+            for (let i = 1; i <= numPages; i++){
+                pageLinksHtml += '<a class="page' + (i === 1 ? ' active' : '') + '" data-page="' + i + '">Page ' + i + '</a>';
+                }
+            pageLinksHtml += '<a class="arrow next" data-page="next"></a>';
+            $starListPages.html(pageLinksHtml);
+            // Ensure the current page doesn't exceed the new total page count
+            let currentPage = parseInt($starListPages.attr('data-current-page')) || 1;
+            if (currentPage > numPages) { currentPage = numPages; }
+            // Apply the correct visibilities
+            if (typeof window.showStarListPage === 'function'){
+                window.showStarListPage(currentPage);
+                }
+            }
+        }
+    refreshStarchart();
+    return true;
+}
+
+/*
+// Create the windowResize event for this page
+function windowResizeStarforce(){
     //console.log('windowResizeStarforce()');
 
 
@@ -249,6 +337,7 @@ function windowResizeStarforce(){
     return true;
 
 }
+*/
 
 // Define a function for updating the star menu elements
 function refreshStarchart(){

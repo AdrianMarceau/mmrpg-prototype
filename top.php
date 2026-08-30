@@ -8,33 +8,27 @@ require('includes/config.php');
 
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
+
+// Set a custom session save path to isolate MMRPG sessions from other apps
+$session_dir = MMRPG_CONFIG_ROOTDIR . '.cache/sessions/tmp/';
+if (!is_dir($session_dir)) { mkdir($session_dir, 0777, true); }
+session_save_path($session_dir);
+
+// Configure session lifetime
 @session_set_cookie_params(24*60*60);
 @ini_set('session.gc_maxlifetime', 24*60*60);
+
+// Fix garbage collection to run 1% of the time instead of 100%
 @ini_set('session.gc_probability', 1);
-@ini_set('session.gc_divisor', 1);
-if (defined('READ_ONLY_SESSION')
-    && READ_ONLY_SESSION === true){
+@ini_set('session.gc_divisor', 100);
+if (defined('READ_ONLY_SESSION') && READ_ONLY_SESSION === true){
     session_start(['read_and_close' => true]);
 } else {
     session_start();
 }
 
-// Turn off magic quotes before it causes and problems
-if (get_magic_quotes_gpc()){
-    $process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
-    while (list($key, $val) = each($process)) {
-        foreach ($val as $k => $v) {
-            unset($process[$key][$k]);
-            if (is_array($v)) {
-                $process[$key][stripslashes($k)] = $v;
-                $process[] = &$process[$key][stripslashes($k)];
-            } else {
-                $process[$key][stripslashes($k)] = stripslashes($v);
-            }
-        }
-    }
-    unset($process);
-}
+// NOTE: The get_magic_quotes_gpc() block has been completely
+// removed to prevent PHP 8+ Fatal Errors and other issues
 
 // Include the anti-bot and anti-spam protection scripts
 require('includes/antibot.php');

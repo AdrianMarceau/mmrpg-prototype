@@ -81,6 +81,29 @@ $(document).ready(function(){
     // Automatically click the first item link
     $('.item_tabs_links .tab_link[data-tab]', gameConsole).first().trigger('click');
 
+    // Make sure we auto-click the portait sprite whenever a cell is clicked
+    let $consoleSprite = $('.event .this_sprite', gameConsole);
+    let consoleSpriteTimeout = null;
+    $('.event tbody td[data-kind!=""]', gameConsole).bind('click', function(){
+        $consoleSprite.addClass('hovered');
+        if (consoleSpriteTimeout){ clearTimeout(consoleSpriteTimeout); }
+        consoleSpriteTimeout = setTimeout(function(){
+            $consoleSprite.removeClass('hovered');
+            }, 1000);
+        });
+
+    // Make sure hover classes are only ever on one cell at a time
+    $('.event tbody td[data-kind]', gameConsole).bind('mouseenter', function(){
+        let $thisCell = $(this);
+        let $parentBody = $thisCell.closest('tbody');
+        $('.event tbody td[data-kind]', gameConsole).removeClass('hovered');
+        $thisCell.addClass('hovered');
+        });
+    $('.event tbody td[data-kind]', gameConsole).bind('mouseleave', function(){
+        let $thisCell = $(this);
+        $thisCell.removeClass('hovered');
+        });
+
 
     /*
      * OTHER STUFF
@@ -155,6 +178,7 @@ function checkUserInputsForItemsFrame(kind, event, activeInputs, userInputs){
 
     /*
     // If the user pressed the X button, we should scroll through visible panels
+    // ITEMS NOTE: nothing to click, there's only one visible panel!!!
     if (activeInputs.X){
         //console.log('%c' + 'X button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
@@ -170,10 +194,11 @@ function checkUserInputsForItemsFrame(kind, event, activeInputs, userInputs){
             }
         return;
         }
-    */
+        */
 
     /*
     // If the user pressed the L2/R2 button2, we should scroll through visible tabs
+    // ITEMS NOTE: nothing to click, there's only one visible tab!!!
     if (activeInputs.L2 || activeInputs.R2){
         //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
@@ -189,7 +214,7 @@ function checkUserInputsForItemsFrame(kind, event, activeInputs, userInputs){
             }
         return;
         }
-    */
+        */
 
     // ITEM CONTROLS: These controls only apply to the item menu
 
@@ -232,10 +257,11 @@ function checkUserInputsForItemsFrame(kind, event, activeInputs, userInputs){
             //console.log('activeItemCellIndex =', activeItemCellIndex);
             //console.log('maxItemCellIndex =', maxItemCellIndex);
             let nextItemCellIndex = activeItemCellIndex;
+            let verticalSkipAmount = gameSettings.wideModeActive ? 4 : 2;
             if (whichDirection === 'right'){ nextItemCellIndex += 1; }
             else if (whichDirection === 'left'){ nextItemCellIndex -= 1; }
-            else if (whichDirection === 'down'){ nextItemCellIndex += 2; }
-            else if (whichDirection === 'up'){ nextItemCellIndex -= 2; }
+            else if (whichDirection === 'down'){ nextItemCellIndex += verticalSkipAmount; }
+            else if (whichDirection === 'up'){ nextItemCellIndex -= verticalSkipAmount; }
             //console.log('nextItemCellIndex(A) =', nextItemCellIndex);
             if (nextItemCellIndex < 0){ nextItemCellIndex = maxItemCellIndex; }
             else if (nextItemCellIndex > maxItemCellIndex){ nextItemCellIndex = 0;}
@@ -261,6 +287,22 @@ function checkUserInputsForItemsFrame(kind, event, activeInputs, userInputs){
         }
 
     // Define a quick function for hovering + clicking a given item cell button
+    let hoverClickCell = function($cell, mouseLeave){
+        mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
+        let $parent = $cell.closest('table');
+        $('td[data-kind]', $parent).removeClass('clicked');
+        $cell.addClass('clicked');
+        $cell.trigger('mouseenter');
+        $cell.trigger('click');
+        if (typeof userInputs.hoverClickCellTimeout !== 'undefined'){ clearTimeout(userInputs.hoverClickCellTimeout); }
+        userInputs.hoverClickCellTimeout = setTimeout(function(){
+            $('td[data-kind]', $parent).removeClass('clicked');
+            if (mouseLeave){ $cell.trigger('mouseleave'); }
+            $cell.removeClass('clicked');
+            }, 100);
+        };
+
+    // Define a quick function for hovering + clicking a given item cell button
     let hoverClickCellButton = function($button, mouseLeave){
         mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
         let $parent = $button.closest('td[data-kind]');
@@ -276,15 +318,27 @@ function checkUserInputsForItemsFrame(kind, event, activeInputs, userInputs){
             }, 100);
         };
 
-    // If the user pressed the Y button, we should ?????
+    // If the user pressed the Y button, we should try to click any tooltip buttons
     if (activeInputs.Y){
         //console.log('%c' + 'Y button pressed!', 'color: orange;');
         if (event){ event.preventDefault(); }
         //console.log('we are in browsing mode!');
-        let $tooltipButton = $activeItemCell ? $('span[data-click-tooltip]', $activeItemCell) : null;
+        let $tooltipButton = $activeItemCell ? $('[data-click-tooltip]', $activeItemCell) : null;
         //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
         if (!$tooltipButton || !$tooltipButton.length){ return; }
         hoverClickCellButton($tooltipButton, false);
+        return;
+        }
+
+    // If the user pressed the A button, we should click the cell directly
+    if (activeInputs.A){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        //console.log('we are in browsing mode!');
+        let $tooltipCell = $activeItemCell ? $activeItemCell : null;
+        //console.log('-> $tooltipCell:', ($tooltipCell ? $tooltipCell.length : 0), typeof $tooltipCell, $tooltipCell);
+        if (!$tooltipCell || !$tooltipCell.length){ return; }
+        hoverClickCell($tooltipCell, false);
         return;
         }
 
