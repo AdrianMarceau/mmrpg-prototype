@@ -621,28 +621,6 @@ body.windowFlag_landscapeMode #prototype {
     background-color: #969696;
 }
 
-
-/*
- * MOBILE OVERRIDE STYLES
- */
-
-/* -- Landscape Mode -- */
-@media (min-width: 1024px){
-
-    #mmrpg,
-    #mmrpg #prototype {
-        width: 1024px;
-    }
-    #prototype {
-        width: auto;
-    }
-    #prototype .header,
-    #prototype .option {
-        width: 100%;
-    }
-
-}
-
 /* -- WIDESCREEN 2k26 STYLES -- */
 
 @media (min-width: 1120px){
@@ -658,6 +636,7 @@ body.windowFlag_landscapeMode #prototype {
     #ability #console .event .header,
     #ability #console .event .body {
         margin: 0 0 0 175px;
+        width: 100%;
     }
     #ability #console .event table,
     #ability #console .event tbody,
