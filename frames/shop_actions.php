@@ -59,6 +59,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
                 $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
                 $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
                 $new_shop_level = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_level'];
+                if (empty($new_shop_level)){ $new_shop_level = 1; }
 
                 // Save, produce the success message with the new field order
                 exit('success|item-sold|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank).'|shop:'.$new_shop_level);
@@ -111,6 +112,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'sell'){
             $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
             $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
             $new_shop_level = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_level'];
+            if (empty($new_shop_level)){ $new_shop_level = 1; }
 
             // Save, produce the success message with the new field order
             exit('success|star-shown|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank).'|shop:'.$new_shop_level);
@@ -193,6 +195,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                 $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
                 $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
                 $new_shop_level = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_level'];
+                if (empty($new_shop_level)){ $new_shop_level = 1; }
 
                 /*
                 // DEBUG DEBUG DEBUG
@@ -265,6 +268,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
                     $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
                     $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
                     $new_shop_level = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_level'];
+                    if (empty($new_shop_level)){ $new_shop_level = 1; }
 
                     // Save, produce the success message with the new ability order
                     exit('success|ability-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank).'|shop:'.$new_shop_level);
@@ -379,6 +383,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
             $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
             $new_shop_level = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_level'];
+            if (empty($new_shop_level)){ $new_shop_level = 1; }
 
             // Collect the newly regenerated unlocked robots index
             $this_unlocked_robots_index = mmrpg_prototype_robots_unlocked_index_json();
@@ -445,6 +450,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
             $new_battle_points = $_SESSION[$session_token]['counters']['battle_points'];
             $new_board_rank = $_SESSION[$session_token]['BOARD']['boardrank'];
             $new_shop_level = $_SESSION[$session_token]['values']['battle_shops'][$temp_shop]['shop_level'];
+            if (empty($new_shop_level)){ $new_shop_level = 1; }
 
             // Save, produce the success message with the new alt order
             exit('success|alt-purchased|'.$temp_current_quantity.'|'.$global_zenny_counter.'|points:'.$new_battle_points.'|rank:'.mmrpg_number_suffix($new_board_rank).'|shop:'.$new_shop_level);

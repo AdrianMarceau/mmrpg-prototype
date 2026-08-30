@@ -197,6 +197,7 @@ if (!empty($this_shop_index)){
                 $temp_level = mmrpg_prototype_calculate_shop_level_by_experience($temp_experience);
                 $temp_level = floor($temp_level);
                 if ($temp_level > 100){ $temp_level = 100; }
+                elseif ($temp_level < 1){ $temp_level = 1; }
                 $shop_array['shop_level'] = $temp_level;
                 $this_battle_shops[$shop_token] = $shop_array;
             }
