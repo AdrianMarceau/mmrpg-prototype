@@ -428,7 +428,7 @@ if (true){
                             $robot_image_size_token = $robot_image_size.'x'.$robot_image_size;
                             $robot_image_path = 'images/robots/'.$robot_image_token.'/mug_right_'.$robot_image_size_token.'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
-                            $show_sprite_showcase = !empty($robot_info['robot_unlocked']) || !empty($robot_info['robot_encountered']) ? true : false;
+                            $show_sprite_showcase = !empty($robot_info['robot_unlocked']) || !empty($robot_info['robot_summoned']) || !empty($robot_info['robot_encountered']) ? true : false;
 
                             ?>
                             <div class="event event_triple event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= $robot_is_unlockable ? 'robot_is_unlockable' : '' ?><?= $show_sprite_showcase ? ' has_sprite_showcase' : '' ?>" data-token="<?=$robot_info['robot_token']?>">
