@@ -1513,6 +1513,48 @@ function mmrpg_prototype_robots_unlocked($player_token = '', $return_tokens = fa
         }
     }
 }
+// Define a function for grabbing the number of robot masters that have been unlocked so far
+function mmrpg_prototype_robot_masters_unlocked($player_token = '', $return_tokens = false, $include_ids = false){
+    //error_log('mmrpg_prototype_robot_masters_unlocked('.$player_token.', '.($return_tokens ? 'true' : 'false').', '.($include_ids ? 'true' : 'false').') called');
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $unlocked_master_tokens = array();
+    $unlocked_master_strings = array();
+    $all_unlocked_robot_strings = mmrpg_prototype_robots_unlocked($player_token, true, true);
+    error_log('$all_unlocked_robot_strings = '.print_r($all_unlocked_robot_strings, true));
+    if (empty($all_unlocked_robot_strings)){ return $return_tokens ? array() : 0; }
+    foreach ($all_unlocked_robot_strings AS $key => $robot_string){
+        list($robot_id, $robot_token) = explode('_', $robot_string);
+        if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_info = $mmrpg_index_robots[$robot_token];
+        if ($robot_info['robot_class'] !== 'master'){ continue; }
+        $unlocked_master_tokens[] = $robot_token;
+        $unlocked_master_strings[] = $robot_string;
+    }
+    //error_log('$unlocked_master_tokens = '.print_r($unlocked_master_tokens, true));
+    //error_log('$unlocked_master_strings = '.print_r($unlocked_master_strings, true));
+    return $return_tokens ? ($include_ids ? $unlocked_master_strings : $unlocked_master_tokens) : count($unlocked_master_tokens);
+}
+// Define a function for grabbing the number of support mechas that have been unlocked so far
+function mmrpg_prototype_robot_mechas_unlocked($player_token = '', $return_tokens = false, $include_ids = false){
+    //error_log('mmrpg_prototype_robot_mechas_unlocked('.$player_token.', '.($return_tokens ? 'true' : 'false').', '.($include_ids ? 'true' : 'false').') called');
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $unlocked_mecha_tokens = array();
+    $unlocked_mecha_strings = array();
+    $all_unlocked_robot_strings = mmrpg_prototype_robots_unlocked($player_token, true, true);
+    //error_log('$all_unlocked_robot_strings = '.print_r($all_unlocked_robot_strings, true));
+    if (empty($all_unlocked_robot_strings)){ return $return_tokens ? array() : 0; }
+    foreach ($all_unlocked_robot_strings AS $key => $robot_string){
+        list($robot_id, $robot_token) = explode('_', $robot_string);
+        if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_info = $mmrpg_index_robots[$robot_token];
+        if ($robot_info['robot_class'] !== 'mecha'){ continue; }
+        $unlocked_mecha_tokens[] = $robot_token;
+        $unlocked_mecha_strings[] = $robot_string;
+    }
+    //error_log('$unlocked_mecha_tokens = '.print_r($unlocked_mecha_tokens, true));
+    //error_log('$unlocked_mecha_strings = '.print_r($unlocked_mecha_strings, true));
+    return $return_tokens ? ($include_ids ? $unlocked_mecha_strings : $unlocked_mecha_tokens) : count($unlocked_mecha_tokens);
+}
 
 
 // Define a function that counts the number of all unlocked robot tokens in the battle settings/rewards arrays
