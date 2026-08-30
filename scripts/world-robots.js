@@ -1335,11 +1335,13 @@ function giveRobotItem(robotString, itemToken, playSound, playAnimation){
                 let filteredAbilities = [];
                 let personaActive = robotInfo.personaActive || false;
                 let abilitiesCompatible = robotInfo.abilitiesCompatible || [];
+                let abilitiesViaLevel = robotInfo.abilitiesViaLevel || [];
                 let abilitiesViaPersona = robotInfo.abilitiesViaPersona || [];
                 let abilitiesViaItem = robotInfo.abilitiesViaItem || [];
                 for (var i = 0; i < currentAbilities.length; i++){
                     let id = currentAbilities[i], compatible = false;
-                    if (!personaActive && abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+                    if (abilitiesViaLevel.indexOf(id) !== -1){ compatible = true; }
+                    else if (!personaActive && abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
                     else if (personaActive && abilitiesViaPersona.indexOf(id) !== -1){ compatible = true; }
                     else if (abilitiesViaItem.indexOf(id) !== -1){ compatible = true; }
                     if (compatible){ filteredAbilities.push(id); }
@@ -1418,11 +1420,13 @@ function takeRobotItem(robotString, playSound, playAnimation){
         let filteredAbilities = [];
         let personaActive = robotInfo.personaActive || false;
         let abilitiesCompatible = robotInfo.abilitiesCompatible || [];
+        let abilitiesViaLevel = robotInfo.abilitiesViaLevel || [];
         let abilitiesViaPersona = robotInfo.abilitiesViaPersona || [];
         let abilitiesViaItem = robotInfo.abilitiesViaItem || [];
         for (var i = 0; i < currentAbilities.length; i++){
             let id = currentAbilities[i], compatible = false;
-            if (!personaActive && abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
+            if (abilitiesViaLevel.indexOf(id) !== -1){ compatible = true; }
+            else if (!personaActive && abilitiesCompatible.indexOf(id) !== -1){ compatible = true; }
             else if (personaActive && abilitiesViaPersona.indexOf(id) !== -1){ compatible = true; }
             else if (abilitiesViaItem.indexOf(id) !== -1){ compatible = true; }
             if (compatible){ filteredAbilities.push(id); }
