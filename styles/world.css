@@ -5913,7 +5913,8 @@ display: block;
     width: calc((100% / 4) - 4px);
 }
 #world #canvas #action-modal .content .container.for-current .ability-list .team-ability.locked {
-
+    pointer-events: none;
+    filter: brightness(0.7);
 }
 #world #canvas #action-modal .content .container.for-current .ability-list .team-ability.locked .sprite .sprite {
     background-image: url(../images/assets/unlockable_80x80.png) !important;
