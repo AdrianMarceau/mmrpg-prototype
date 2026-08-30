@@ -133,7 +133,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'console_markup'){
 }
 
 // Determine the token for the very first robot in the edit
-$first_robot_token = $allowed_edit_robots[0];
+$first_robot_token = isset($allowed_edit_robots[0]) ? $allowed_edit_robots[0] : '';
 
 ?>
 <!DOCTYPE html>
