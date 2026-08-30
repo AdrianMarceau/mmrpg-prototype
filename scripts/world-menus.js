@@ -645,7 +645,7 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
             let targetRobotToken = $targetRobot && $targetRobot.length ? $targetRobot.attr('data-robot') : false;
             //console.log('-> targetRobotToken =', targetRobotToken);
             let autoClickAction = function(){ $actionButton.addClass('clicked'); _self.playSoundEffect('icon-click'); };
-            let confirmClickAction = function(title, text, callback){ _self.showActionModal('confirm', title, text, null, { onConfirm: function() { callback.call(_self); } } ); };
+            let confirmClickAction = function(title, text, callback){ _self.showActionModal('confirm', title, text, targetRobotToken, { onConfirm: function() { callback.call(_self); } } ); };
             let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
             if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
             else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }

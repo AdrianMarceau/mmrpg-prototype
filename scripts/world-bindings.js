@@ -713,7 +713,7 @@ function bindEventsToInputs($thisWorld){
                 let actionObjectClass = '.team-' + currentActionKind + '[data-' + currentActionKind + ']';
                 let actionButtonClass = '.button[data-action]';
                 let actionObjectsPerRow = 4;
-                let $actionObjectsInModal = $(actionObjectClass, $containerForObjects);
+                let $actionObjectsInModal = $(actionObjectClass, $containerForObjects).not('.disabled, .locked, [disabled]');
                 let $actionButtonsInModal = $(actionButtonClass, $containerForButtons);
                 //console.log('--> $actionModal =', $actionModal.length); //, $actionModal);
                 //console.log('--> currentAction =', currentAction);
@@ -757,7 +757,9 @@ function bindEventsToInputs($thisWorld){
                     //console.log('%c' + 'A key pressed!', 'color: orange;');
                     if ($hoveredButton
                         && $hoveredButton.length
-                        && !$hoveredButton.is('.disabled')){
+                        && !$hoveredButton.is('.disabled')
+                        && !$hoveredButton.is('.locked')
+                        && !$hoveredButton.is('[disabled]')){
                         return clickButton($hoveredButton);
                         }
                     }
@@ -766,7 +768,9 @@ function bindEventsToInputs($thisWorld){
                     //console.log('%c' + 'B key pressed!', 'color: orange;');
                     if ($selectedButton
                         && $selectedButton.length
-                        && !$selectedButton.is('.disabled')){
+                        && !$selectedButton.is('.disabled')
+                        && !$selectedButton.is('.locked')
+                        && !$selectedButton.is('[disabled]')){
                         return clickButton($selectedButton.last());
                         } else {
                         return dismissActionModal();
@@ -778,8 +782,17 @@ function bindEventsToInputs($thisWorld){
                     let $referenceButton = ($hoveredButton && $hoveredButton.length ? $hoveredButton : ($selectedButton && $selectedButton.length ? $selectedButton : false));
                     if (!$referenceButton || !$referenceButton.length){
                         //console.log('---> No hovered nor selected modal buttons found! Auto-hovering given input ...');
-                        if (activeInputs.Down || activeInputs.Right){ hoverFirstActionObject(); }
-                        else if (activeInputs.Up || activeInputs.Left){ hoverLastActionObject(); }
+                        if ($actionObjectsInModal.length){
+                            // If there are action objects, hover those first
+                            if (activeInputs.Down || activeInputs.Right){ hoverFirstActionObject(); }
+                            else if (activeInputs.Up || activeInputs.Left){ hoverLastActionObject(); }
+                            } else if ($actionButtonsInModal.length){
+                            // Fallback to action buttons (Confirm first) if no objects exist
+                            if (activeInputs.Down || activeInputs.Right || activeInputs.Up || activeInputs.Left){
+                                if ($confirmButton && $confirmButton.is(':not(.disabled)')){ hoverConfirmButton(); }
+                                else { hoverButton($actionButtonsInModal.first()); }
+                                }
+                            }
                         }
                     else {
                         //console.log('---> Found ' + ($referenceButton.is($hoveredButton) ? 'hovered' : 'selected') + ' modal button ref! Moving hover given input ...');
@@ -813,9 +826,12 @@ function bindEventsToInputs($thisWorld){
                                 }
                             else if ($referenceButton.is($actionButtonsInModal)){
                                 //console.log('----> is action button ...');
-                                if (!hoverSelectedActionObject()){
-                                    if (activeInputs.Up){ hoverLastActionObject(); }
-                                    else if (activeInputs.Down){ hoverFirstActionObject(); }
+                                // Only try to navigate back up to objects if there are actually objects to navigate to
+                                if ($actionObjectsInModal.length){
+                                    if (!hoverSelectedActionObject()){
+                                        if (activeInputs.Up){ hoverLastActionObject(); }
+                                        else if (activeInputs.Down){ hoverFirstActionObject(); }
+                                        }
                                     }
                                 }
                             }
