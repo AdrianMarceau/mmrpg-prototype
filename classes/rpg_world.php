@@ -5283,6 +5283,7 @@ class rpg_world {
         $robot_core_or_none = !empty($robot_core) ? $robot_core : 'none';
         $robot_item = !empty($robot_settings['robot_item']) ? $robot_settings['robot_item'] : '';
         $robot_support = !empty($robot_settings['robot_support']) ? $robot_settings['robot_support'] : '';
+        //error_log('$robot_info = '.print_r($robot_info, true));
         $has_persona_applied = false;
         $robot_persona = !empty($robot_settings['robot_persona']) ? $robot_settings['robot_persona'] : '';
         $robot_persona_image = !empty($robot_settings['robot_persona_image']) ? $robot_settings['robot_persona_image'] : '';
@@ -5353,6 +5354,13 @@ class rpg_world {
         $robot_abilities = !empty($robot_settings['robot_abilities']) ? array_map(function($a){ return is_array($a) ? array_values($a)[0] : $a; }, array_values($robot_settings['robot_abilities'])) : array();
         $robot_abilities_compatible = rpg_robot::get_ability_compatibility($robot_token, ''); // omitting $robot_item so we get a base-list instead
         $robot_abilities_compatible_via_item = rpg_robot::get_ability_compatibility($robot_token, $robot_item); // now we grab a copy w/ item included to get a diff
+        $robot_abilities_via_level = array();
+        if (!empty($robot_info['robot_rewards']['abilities'])){
+            foreach ($robot_info['robot_rewards']['abilities'] AS $key => $ability){
+                if (!isset($ability['token'])){ continue; }
+                $robot_abilities_via_level[] = $ability['token'];
+            }
+        }
         $robot_abilities_via_item = array_values(array_diff($robot_abilities_compatible_via_item, $robot_abilities_compatible));
         $robot_abilities_via_persona = array();
         if (!empty($robot_settings['robot_persona'])){
@@ -5369,6 +5377,7 @@ class rpg_world {
         //error_log('['.$robot_token.'] -> $robot_abilities_via_item(before) = '.print_r($robot_abilities_via_item, true));
         $robot_abilities = array_map($temp_ability_token_to_id, $robot_abilities);
         $robot_abilities_compatible = array_map($temp_ability_token_to_id, $robot_abilities_compatible);
+        $robot_abilities_via_level = array_map($temp_ability_token_to_id, $robot_abilities_via_level);
         $robot_abilities_via_item = array_map($temp_ability_token_to_id, $robot_abilities_via_item);
         $robot_abilities_via_persona = array_map($temp_ability_token_to_id, $robot_abilities_via_persona);
         //$robot_abilities_compatible_base = array_map($temp_ability_token_to_id, $robot_abilities_compatible_base);
@@ -5413,6 +5422,7 @@ class rpg_world {
             'speedMods' => (isset($robot_session['speed']) ? $robot_session['speed'] : 0),
             'abilities' => $robot_abilities,
             'abilitiesCompatible' => $robot_abilities_compatible,
+            'abilitiesViaLevel' => $robot_abilities_via_level,
             'abilitiesViaItem' => $robot_abilities_via_item,
             'abilitiesViaPersona' => $robot_abilities_via_persona,
             'disabled' => $robot_disabled,

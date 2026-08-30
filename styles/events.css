@@ -1,6 +1,4 @@
 
-
-
 #events {
     top: 0;
     left: 0;
@@ -643,4 +641,17 @@
 #events #buttons .event_continue:hover {
     color: #ffffff;
     transform: scale(1.02);
+}
+
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+
+    #events .event_wrapper {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
 }

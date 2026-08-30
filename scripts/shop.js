@@ -485,7 +485,7 @@ $(document).ready(function(){
         var shopLevel = parseInt($shopDiv.attr('data-level'));
         //console.log('$shopDiv = ', $shopDiv.length, $shopDiv);
         //console.log('$shopSprite = ', $shopSprite.length, $shopSprite);
-        console.log('shopLevel = ', shopLevel);
+        //console.log('shopLevel = ', shopLevel);
 
         // Define the post options for the ajax call
         var postData = {shop:thisKeeper,kind:thisKind,action:thisAction,token:thisToken,quantity:thisQuantity,price:thisPrice,player:thisPlayer};
@@ -505,8 +505,8 @@ $(document).ready(function(){
                 var newlineIndex = data.indexOf("\n");
                 var dataExtra = newlineIndex !== -1 ? data.substr(newlineIndex + 1) : false;
                 data = newlineIndex !== -1 ? data.substr(0, newlineIndex) : data;
-                console.log('data (after) =', data);
-                console.log('dataExtra =', dataExtra);
+                //console.log('data (after) =', data);
+                //console.log('dataExtra =', dataExtra);
 
                 // Break apart the response into parts
                 var data = data.split('|');
@@ -534,7 +534,7 @@ $(document).ready(function(){
                     var newShopLevel = data[6] != undefined && data[6].indexOf('shop:') !== -1 ? parseInt(data[6].replace('shop:', '')) : false;
                     var zennyDifference = Math.abs(newZennyTotal - thisShopData.zennyCounter);
                     //console.log({newItemCount:newItemCount,newZennyTotal:newZennyTotal,newPointsTotal:newPointsTotal,newLeaderboardRank:newLeaderboardRank});
-                    console.log('newShopLevel =', newShopLevel);
+                    //console.log('newShopLevel =', newShopLevel);
 
                     // Define the change text
                     if (thisAction == 'buy'){ var thisChangeText = '<span class="zenny" style="color: #C35E5E;">-'+printNumberWithCommas(thisPrice)+'z</span>'; }

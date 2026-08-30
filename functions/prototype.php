@@ -1116,11 +1116,13 @@ function mmrpg_prototype_ability_unlocked($player_token = '', $robot_token = '',
 
 // Define a function for checking if a prototype item has been unlocked
 function mmrpg_prototype_item_unlocked($item_token){
+    //error_log('mmrpg_prototype_item_unlocked('.$item_token.') called');
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
 
     // If items are not yet loaded, return false
+    //error_log('$_SESSION[$session_token][\'values\'][\'battle_items\'] ='.print_r($_SESSION[$session_token]['values']['battle_items'], true));
     if (empty($_SESSION[$session_token]['values']['battle_items'])){ return false; }
 
     // If this specific item has not been unlocked, return false
@@ -1520,7 +1522,7 @@ function mmrpg_prototype_robot_masters_unlocked($player_token = '', $return_toke
     $unlocked_master_tokens = array();
     $unlocked_master_strings = array();
     $all_unlocked_robot_strings = mmrpg_prototype_robots_unlocked($player_token, true, true);
-    error_log('$all_unlocked_robot_strings = '.print_r($all_unlocked_robot_strings, true));
+    //error_log('$all_unlocked_robot_strings = '.print_r($all_unlocked_robot_strings, true));
     if (empty($all_unlocked_robot_strings)){ return $return_tokens ? array() : 0; }
     foreach ($all_unlocked_robot_strings AS $key => $robot_string){
         list($robot_id, $robot_token) = explode('_', $robot_string);
