@@ -447,5 +447,9 @@
         width: 1120px;
     }
 
+    #prototype .leaderboard .file .avatar .sprite {
+        image-rendering: pixelated;
+    }
+
 
 }

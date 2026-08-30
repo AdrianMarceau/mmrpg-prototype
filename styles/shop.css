@@ -521,6 +521,7 @@
     margin-top: -4px;
     margin-left: -2px;
     background-position: 0 0;
+    image-rendering: pixelated;
 }
 #shop #console .event .this_sprite .sprite.facing_right {
     display: block;
@@ -660,6 +661,7 @@
     position: relative;
     left: -14px;
     top: -10px;
+    /* image-rendering: pixelated;  */
 }
 #shop #console .event .item_name .icon_sprite .sprite_40x40 {
     left: -14px;
@@ -1054,6 +1056,10 @@
     #console .event .body_left {
         margin: 0 auto 0 0;
         width: calc(100% - 195px);
+    }
+    #shop #console .event .shop_quote {
+        font-size: 12px;
+        line-height: 1.8;
     }
     #shop #console .event .this_sprite {
         top: 8px;

@@ -645,7 +645,7 @@ body.windowFlag_landscapeMode #prototype {
 @media (min-width: 1120px){
 
     #item #console .event .item_quote {
-        font-size: 16px;
+        font-size: 12px;
         line-height: 1.8;
     }
     #item #console .event .this_sprite {
