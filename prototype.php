@@ -400,7 +400,7 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
                         <label>shop</label>
                     </a>
                 <? endif; ?>
-                <? if (mmrpg_prototype_robots_unlocked() > 1 || mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
+                <? if (mmrpg_prototype_robot_masters_unlocked() > 1 || mmrpg_prototype_battles_complete('dr-light') >= MMRPG_SETTINGS_CHAPTER1_MISSIONS): ?>
                     <span class="pipe">|</span>
                     <a class="link link_robots" data-step="edit_robots" data-index="<?= $this_menu_indexes['robots'] ?>" data-source="frames/edit_robots.php?action=robots" data-music="misc/robot-editor" data-maybe-tooltip="<?= $this_menu_tooltips['robots'] ?>" data-tooltip-type="field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
                         <i class="fa fas fa-robot"></i>
