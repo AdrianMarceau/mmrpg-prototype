@@ -1546,7 +1546,8 @@ class mmrpgWorldMap {
         let mapTilesIndex = this.config.mapTilesIndex;
         let layerTilesIndex = this.state.layerTilesIndex;
         let terrainTilesIndex = layerTilesIndex['terrain_0'];
-        if (!terrainTilesIndex) return false;
+        if (!terrainTilesIndex){ return false; }
+        let masterTiles = layerTilesIndex['terrain'] || {};
         let neighborsToUpdate = new Set();
         let groupTiles = Array.isArray(changedTileKeys) ? changedTileKeys : Array.from(changedTileKeys);
         // Collect neighbors for all changed tiles
@@ -1570,16 +1571,28 @@ class mmrpgWorldMap {
             let terrainSpriteSize = this.getClonedObject(terrainSpriteData[1]);
             let terrainSpriteAttrs = this.getClonedObject(terrainSpriteData[2]);
             let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
-            // Apply the final validated sprite data
+            // Apply the final validated sprite data to terrain_0
             tileData.sprite[1] = finalTerrainToken;
             tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
             tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
             tileData.walkable = terrainIsWalkable;
             tileData.effects.grid = terrainIsWalkable;
             tileData.dirty = true;
+            // --- FIX: Sync the updated tile data back to the master 'terrain' layer ---
+            if (masterTiles[tileKey]){
+                let masterIsVoid = masterTiles[tileKey].sprite[1] === 'void' || masterTiles[tileKey].sprite[1].indexOf('void') !== -1;
+                let tileIsVoid = finalTerrainToken === 'void' || finalTerrainToken.indexOf('void') !== -1;
+                // Update master tile if this layer takes precedence (e.g., layer 0) or if master was a void
+                if (masterTiles[tileKey].sourceLayer === 0 || (masterIsVoid && !tileIsVoid)){
+                    masterTiles[tileKey].walkable = tileData.walkable;
+                    masterTiles[tileKey].sprite = this.getClonedObject(tileData.sprite);
+                    masterTiles[tileKey].effects.grid = tileData.effects.grid;
+                    }
+                }
             });
         // Save states and trigger standard map redraw updates
         layerTilesIndex['terrain_0'] = terrainTilesIndex;
+        layerTilesIndex['terrain'] = masterTiles;
         this.state.layerTilesIndex = layerTilesIndex;
         this.refreshCanvasTiles('terrain_0');
         this.calculateWalkableMapTiles(true);
