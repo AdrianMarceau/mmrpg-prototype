@@ -141,7 +141,7 @@ class rpg_prototype {
         // -- PHASE ONE -- //
 
         // Intro
-        $chapters_unlocked['0'] = true;
+        $chapters_unlocked['0'] = $player_unlocked ? true : false;
         $chapters_unlocked['0b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 1) ? true : false;
         $chapters_unlocked['0c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 2) ? true : false;
 
