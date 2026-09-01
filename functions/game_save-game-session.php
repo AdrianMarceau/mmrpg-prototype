@@ -1,8 +1,7 @@
 <?
 // Define a function for saving the game session
-function mmrpg_save_game_session(){
-    //debug_profiler_checkpoint('func/save-game-session/before/');
-    //error_log('mmrpg_save_game_session()');
+function mmrpg_save_game_session($force_db_save = false){
+    //error_log('mmrpg_save_game_session($force_db_save:'.($force_db_save ? 'true' : 'false').')');
 
     // Reference global variables
     global $db;
@@ -32,6 +31,8 @@ function mmrpg_save_game_session(){
     $is_new_user = false;
 
     // -- NORMAL MODE SAVE GAME SESSION -- //
+    $this_save_array = array();
+    $this_board_array = array();
     if (!empty($GAME_SESSION)){
 
         //error_log('Saving game session for user ID '.$this_user['userid']);
@@ -171,27 +172,27 @@ function mmrpg_save_game_session(){
                 */
                 if (!empty($this_values['battle_complete']) || $reset_in_progress){
                     $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_complete']);
-                    if (isset($this_values['battle_complete_hash']) && $this_values['battle_complete_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_complete']); }
-                    unset($this_values['battle_complete'], $this_values['battle_complete_hash']);
+                    //$temp_hash = md5($this_save_array['save_values_battle_complete']);
+                    //if (isset($this_values['battle_complete_hash']) && $this_values['battle_complete_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_complete']); }
+                    unset($this_values['battle_complete']); //, $this_values['battle_complete_hash']
                 }
                 if (!empty($this_values['battle_failure']) || $reset_in_progress){
                     $this_save_array['save_values_battle_failure'] = json_encode(!empty($this_values['battle_failure']) ? $this_values['battle_failure'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_failure']);
-                    if (isset($this_values['battle_failure_hash']) && $this_values['battle_failure_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_failure']); }
-                    unset($this_values['battle_failure'], $this_values['battle_failure_hash']);
+                    //$temp_hash = md5($this_save_array['save_values_battle_failure']);
+                    //if (isset($this_values['battle_failure_hash']) && $this_values['battle_failure_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_failure']); }
+                    unset($this_values['battle_failure']); //, $this_values['battle_failure_hash']
                 }
                 if (!empty($this_values['battle_rewards']) || $reset_in_progress){
                     $this_save_array['save_values_battle_rewards'] = json_encode(!empty($this_values['battle_rewards']) ? $this_values['battle_rewards'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_rewards']);
-                    if (isset($this_values['battle_rewards_hash']) && $this_values['battle_rewards_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_rewards']); }
-                    unset($this_values['battle_rewards'], $this_values['battle_rewards_hash']);
+                    //$temp_hash = md5($this_save_array['save_values_battle_rewards']);
+                    //if (isset($this_values['battle_rewards_hash']) && $this_values['battle_rewards_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_rewards']); }
+                    unset($this_values['battle_rewards']); //, $this_values['battle_rewards_hash']
                 }
                 if (!empty($this_values['battle_settings']) || $reset_in_progress){
                     $this_save_array['save_values_battle_settings'] = json_encode(!empty($this_values['battle_settings']) ? $this_values['battle_settings'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_settings']);
-                    if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
-                    unset($this_values['battle_settings'], $this_values['battle_settings_hash']);
+                    //$temp_hash = md5($this_save_array['save_values_battle_settings']);
+                    //if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
+                    unset($this_values['battle_settings']); //, $this_values['battle_settings_hash']
                 }
                 /*
                 if (!empty($this_values['battle_items']) || $reset_in_progress){
@@ -219,9 +220,9 @@ function mmrpg_save_game_session(){
                 */
                 if (!empty($this_values['robot_alts']) || $reset_in_progress){
                     $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
-                    $temp_hash = md5($this_save_array['save_values_robot_alts']);
-                    if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
-                    unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
+                    //$temp_hash = md5($this_save_array['save_values_robot_alts']);
+                    //if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
+                    unset($this_values['robot_alts']); //, $this_values['robot_alts_hash']
                 }
                 /*
                 if (!empty($this_values['robot_database']) || $reset_in_progress){
@@ -233,10 +234,10 @@ function mmrpg_save_game_session(){
                 */
 
                 unset($this_values['battle_index']);
-                unset($this_values['battle_items'], $this_values['battle_items_hash']);
-                unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
-                unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
-                unset($this_values['robot_database'], $this_values['robot_database_hash']);
+                unset($this_values['battle_items']); //, $this_values['battle_items_hash']
+                unset($this_values['battle_abilities']); //, $this_values['battle_abilities_hash']
+                unset($this_values['battle_stars']); //, $this_values['battle_stars_hash']
+                unset($this_values['robot_database']); //, $this_values['robot_database_hash']
 
                 $this_save_array['save_id'] = $temp_save_id;
                 $this_save_array['user_id'] = $temp_user_id;
@@ -287,24 +288,31 @@ function mmrpg_save_game_session(){
         $check_tables = $db->get_array("SELECT
             `users`.`user_id`,
             `saves`.`save_id`,
+            `board`.`board_id`,
+            `world`.`world_id`,
             `saves`.`user_id` AS `save_user_id`,
             `board`.`user_id` AS `board_user_id`,
+            `world`.`user_id` AS `world_user_id`,
             (CASE WHEN `users`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_user`,
             (CASE WHEN `saves`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_save`,
-            (CASE WHEN `board`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_board`
+            (CASE WHEN `board`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_board`,
+            (CASE WHEN `world`.`user_id` IS NOT NULL THEN 1 ELSE 0 END) AS `has_world`
             FROM `mmrpg_users` AS `users`
             LEFT JOIN `mmrpg_saves` AS `saves` ON `saves`.`user_id` = `users`.`user_id`
             LEFT JOIN `mmrpg_leaderboard` AS `board` ON `board`.`user_id` = `users`.`user_id`
+            LEFT JOIN `mmrpg_users_worlds` AS `world` ON `world`.`user_id` = `users`.`user_id`
             WHERE
             `users`.`user_id` = {$this_user['userid']}
             ;");
         //error_log('$check_tables = '.print_r($check_tables, true));
 
+        /*
         // Update the user modified and accessed date (everything else is saved via profile settings pages)
         $db->update('mmrpg_users', array(
             'user_date_modified' => time(),
             'user_date_accessed' => time()
             ), 'user_id = '.$this_user['userid']);
+            */
 
         // Define the save database update array and populate
         $this_save_array = array();
@@ -315,27 +323,27 @@ function mmrpg_save_game_session(){
         */
         if (!empty($this_values['battle_complete']) || $reset_in_progress){
             $this_save_array['save_values_battle_complete'] = json_encode(!empty($this_values['battle_complete']) ? $this_values['battle_complete'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_complete']);
-            if (isset($this_values['battle_complete_hash']) && $this_values['battle_complete_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_complete']); }
-            unset($this_values['battle_complete'], $this_values['battle_complete_hash']);
+            //$temp_hash = md5($this_save_array['save_values_battle_complete']);
+            //if (isset($this_values['battle_complete_hash']) && $this_values['battle_complete_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_complete']); }
+            unset($this_values['battle_complete']); //, $this_values['battle_complete_hash']
         }
         if (!empty($this_values['battle_failure']) || $reset_in_progress){
             $this_save_array['save_values_battle_failure'] = json_encode(!empty($this_values['battle_failure']) ? $this_values['battle_failure'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_failure']);
-            if (isset($this_values['battle_failure_hash']) && $this_values['battle_failure_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_failure']); }
-            unset($this_values['battle_failure'], $this_values['battle_failure_hash']);
+            //$temp_hash = md5($this_save_array['save_values_battle_failure']);
+            //if (isset($this_values['battle_failure_hash']) && $this_values['battle_failure_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_failure']); }
+            unset($this_values['battle_failure']); //, $this_values['battle_failure_hash']
         }
         if (!empty($this_values['battle_rewards']) || $reset_in_progress){
             $this_save_array['save_values_battle_rewards'] = json_encode(!empty($this_values['battle_rewards']) ? $this_values['battle_rewards'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_rewards']);
-            if (isset($this_values['battle_rewards_hash']) && $this_values['battle_rewards_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_rewards']); }
-            unset($this_values['battle_rewards'], $this_values['battle_rewards_hash']);
+            //$temp_hash = md5($this_save_array['save_values_battle_rewards']);
+            //if (isset($this_values['battle_rewards_hash']) && $this_values['battle_rewards_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_rewards']); }
+            unset($this_values['battle_rewards']); //, $this_values['battle_rewards_hash']
         }
         if (!empty($this_values['battle_settings']) || $reset_in_progress){
             $this_save_array['save_values_battle_settings'] = json_encode(!empty($this_values['battle_settings']) ? $this_values['battle_settings'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_settings']);
-            if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
-            unset($this_values['battle_settings'], $this_values['battle_settings_hash']);
+            //$temp_hash = md5($this_save_array['save_values_battle_settings']);
+            //if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
+            unset($this_values['battle_settings']); //, $this_values['battle_settings_hash']
         }
         /*
         if (!empty($this_values['battle_items']) || $reset_in_progress){
@@ -363,8 +371,8 @@ function mmrpg_save_game_session(){
         */
         if (!empty($this_values['robot_alts']) || $reset_in_progress){
             $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
-            $temp_hash = md5($this_save_array['save_values_robot_alts']);
-            if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
+            //$temp_hash = md5($this_save_array['save_values_robot_alts']);
+            //if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
             unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
         }
         /*
@@ -377,10 +385,10 @@ function mmrpg_save_game_session(){
         */
 
         unset($this_values['battle_index']);
-        unset($this_values['battle_items'], $this_values['battle_items_hash']);
-        unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
-        unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
-        unset($this_values['robot_database'], $this_values['robot_database_hash']);
+        unset($this_values['battle_items']); //, $this_values['battle_items_hash']
+        unset($this_values['battle_abilities']); //, $this_values['battle_abilities_hash']
+        unset($this_values['battle_stars']); //, $this_values['battle_stars_hash']
+        unset($this_values['robot_database']); //, $this_values['robot_database_hash']
 
         $this_save_array['save_counters'] = json_encode($this_counters);
         $this_save_array['save_values'] = json_encode($this_values);
@@ -392,11 +400,15 @@ function mmrpg_save_game_session(){
         // Update this save's info in the database
         //echo('<hr /><pre>FINAL DB SAVES UPDATE (user_id = '.$this_user['userid'].')</pre>');
         //echo('<pre>$this_save_array = '.print_r($this_save_array, true).'</pre>');
+        /*
         $db->update('mmrpg_saves', $this_save_array, 'user_id = '.$this_user['userid']);
         unset($this_save_array);
+        */
 
+        /*
         // Make sure relevant user-tables in the database are updated with any unlocks
         mmrpg_save_game_session_user_tables($session_token, $this_user['userid']);
+        */
 
 
         // -- UPDATE LEADERBOARD RANKINGS -- //
@@ -414,7 +426,6 @@ function mmrpg_save_game_session(){
         $temp_field_stars_collected = !empty($battle_points_index['field_stars_collected']) ? $battle_points_index['field_stars_collected'] : array();
         $temp_fusion_stars_collected = !empty($battle_points_index['fusion_stars_collected']) ? $battle_points_index['fusion_stars_collected'] : array();
         $temp_items_unlocked = !empty($battle_points_index['items_unlocked']) ? $battle_points_index['items_unlocked'] : array();
-        $this_board_array = array();
         $this_board_array['board_points'] = $battle_points_index['total_battle_points'];
             foreach ($legacy_player_field_tokens AS $ptoken){ $this_board_array['board_points_'.$ptoken] = 0; }
         $this_board_array['board_robots'] = implode(',', $temp_robots_unlocked);
@@ -434,6 +445,7 @@ function mmrpg_save_game_session(){
         $this_board_array['board_zenny'] = !empty($this_counters['battle_zenny']) ? $this_counters['battle_zenny'] : 0;
         $this_board_array['board_date_modified'] = time();
 
+        /*
         // Update this board's info in the database
         //error_log('<pre>$this_board_array : '.print_r($this_board_array, true).'</pre>');
         if (!empty($check_tables['has_board'])){
@@ -445,6 +457,7 @@ function mmrpg_save_game_session(){
             $db->insert('mmrpg_leaderboard', $this_board_array);
             unset($this_board_array);
         }
+        */
 
         // Update the session points to the new value if set
         if (!empty($battle_points_index['total_battle_points'])){
@@ -457,6 +470,7 @@ function mmrpg_save_game_session(){
     }
 
     // -- NORMAL MODE SAVE WORLD SESSION -- //
+    $world_save_data = array();
     if (!empty($WORLD_SESSION)){
 
         //error_log('Saving world session for user ID '.$this_user['userid']);
@@ -465,7 +479,7 @@ function mmrpg_save_game_session(){
 
         // Collect the world ID if it exists, else create one for this user
         $get_world_id_query = "SELECT `world_id` FROM `mmrpg_users_worlds` WHERE `user_id` = {$this_user['userid']};";
-        $world_id = $db->get_value($get_world_id_query, 'world_id');
+        $world_id = !empty($check_tables['has_world']) ? $check_tables['world_id'] : 0; //$db->get_value($get_world_id_query, 'world_id');
         $user_id = $this_user['userid'];
         if (empty($world_id)){
             $db->insert('mmrpg_users_worlds', array(
@@ -577,6 +591,7 @@ function mmrpg_save_game_session(){
         $world_save_data = $get_world_save_data($WORLD_SESSION, $world_id, $user_id);
         //error_log('$world_save_data = '.print_r($world_save_data, true));
 
+        /*
         // Update the database with the new session data (if not empty of course)
         $success = false;
         if (!empty($world_save_data)){
@@ -592,7 +607,72 @@ function mmrpg_save_game_session(){
             //error_log('mmrpg_save_game_session() failure!');
             //error_log('ERROR: There was no world data to save for user_id '.$user_id.'!');
             }
+        */
 
+    }
+
+    // --- ASSEMBLE THE PAYLOAD --- //
+    $save_payload = array(
+        'user_id' => $this_user['userid'],
+        'save_array' => $this_save_array,
+        'board_array' => $this_board_array,
+        'world_data' => $world_save_data,
+        'has_board' => !empty($check_tables['has_board']) ? 1 : 0, // Keep track if they need an insert or update
+        'has_world' => !empty($check_tables['has_world']) ? 1 : 0, // Keep track if they need an insert or update
+        'date_accessed' => time(),
+        'date_modified' => time(),
+        // Capture the sub-tables data directly from the session instead of running mmrpg_save_game_session_user_tables()
+        'user_tables' => array(
+            'counters' => !empty($GAME_SESSION['counters']) ? $GAME_SESSION['counters'] : array(),
+            'robot_database' => !empty($GAME_SESSION['values']['robot_database']) ? $GAME_SESSION['values']['robot_database'] : array(),
+            'battle_items' => !empty($GAME_SESSION['values']['battle_items']) ? $GAME_SESSION['values']['battle_items'] : array(),
+            'battle_abilities' => !empty($GAME_SESSION['values']['battle_abilities']) ? $GAME_SESSION['values']['battle_abilities'] : array(),
+            'battle_stars' => !empty($GAME_SESSION['values']['battle_stars']) ? $GAME_SESSION['values']['battle_stars'] : array()
+            )
+        );
+
+    // --- NEW LOGIC: EXECUTE THE SAVE --- //
+    if ($force_db_save === true){
+
+        // 1. Force the database updates right now
+        $db->update('mmrpg_saves', $save_payload['save_array'], 'user_id = '.$this_user['userid']);
+        if (!empty($save_payload['has_board'])){
+            $db->update('mmrpg_leaderboard', $save_payload['board_array'], 'user_id = '.$this_user['userid']);
+        } else {
+            $save_payload['board_array']['user_id'] = $check_tables['user_id'];
+            $save_payload['board_array']['save_id'] = $check_tables['save_id'];
+            $db->insert('mmrpg_leaderboard', $save_payload['board_array']);
+        }
+        if (!empty($save_payload['world_data'])){
+            if (!empty($save_payload['has_world'])){
+                $db->update('mmrpg_users_worlds', $save_payload['world_data'], array('world_id' => $world_id, 'user_id' => $this_user['userid']));
+            } else {
+                $save_payload['world_data']['user_id'] = $check_tables['user_id'];
+                $db->insert('mmrpg_users_worlds', $save_payload['world_data']);
+            }
+        }
+
+        // 2. Run the sub-tables function
+        mmrpg_save_game_session_user_tables($session_token, $this_user['userid']);
+
+        // 3. Clean up any lingering cache files since the DB is now the source of truth
+        $existing_file = MMRPG_CONFIG_ROOTDIR . '.saves/save_' . $this_user['userid'] . '.json';
+        if (file_exists($existing_file)) { unlink($existing_file); }
+
+    } else {
+
+        // 1. Defer to Write-Behind Caching (Atomic File Write)
+        $json_payload = json_encode($save_payload, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT);
+        $save_dir = MMRPG_CONFIG_ROOTDIR . '.saves/';
+
+        // Ensure the directory exists
+        if (!file_exists($save_dir)) { mkdir($save_dir, 0777, true); }
+
+        $final_file = $save_dir . 'save_' . $this_user['userid'] . '.json';
+        $temp_file = $save_dir . 'temp_' . $this_user['userid'] . '.json';
+
+        file_put_contents($temp_file, $json_payload);
+        rename($temp_file, $final_file);
     }
 
     // Unset the reset flag in the session
@@ -605,8 +685,11 @@ function mmrpg_save_game_session(){
     //echo('GAME has been saved!');
     //exit();
 
+    // Release the session lock so AJAX requests are less likely to hang
+    session_write_close();
+
     // Return true on success
-    //debug_profiler_checkpoint('func/save-game-session/after/');
+    //error_log('func/save-game-session/after/');
     return true;
 
 }
