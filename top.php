@@ -15,7 +15,7 @@ if (!is_dir($session_dir)) { mkdir($session_dir, 0777, true); }
 session_save_path($session_dir);
 
 // Configure session lifetime
-@session_set_cookie_params(24*60*60);
+@session_set_cookie_params(24*60*60, '/');
 @ini_set('session.gc_maxlifetime', 24*60*60);
 
 // Fix garbage collection to run 1% of the time instead of 100%
