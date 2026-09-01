@@ -36,7 +36,7 @@
 @events[]    = wily-platform-right(7-2, wilypad-right, any, drop-zone, item:copy-core, activate-player-platform)
 #---------------------------#
 @items[]     = wily-init-program(14-10, wily-program, anchored)
-@items[]     = wily-init-heart(6-3, wily-heart__2, anchored)
+@items[]     = wily-init-heart(6-3, wily-heart__1, anchored)
 @items[]     = wily-init-core(11-7, copy-core, anchored)
 #---------------------------#
 @hazards[]    = fire-hazard-01(12-4, flame-pillar)
