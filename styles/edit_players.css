@@ -837,6 +837,9 @@ body.mobileFlag_landscapeMode #prototype #canvas {
     #edit #canvas .wrapper_right {
         float: right;
     }
+    #edit #console {
+        min-height: 300px;
+    }
     #edit #console .event {
         position: relative;
     }
