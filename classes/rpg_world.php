@@ -2341,6 +2341,7 @@ class rpg_world {
         $player_starforce = rpg_game::starforce_unlocked();
         $limit_hearts = mmrpg_prototype_limit_hearts_earned($current_player_token);
         $num_robot_unlocked = mmrpg_prototype_robots_unlocked($current_player_token);
+        $num_robot_masters_unlocked = mmrpg_prototype_robot_masters_unlocked($current_player_token);
 
         // Grab the storage robot composite strings directly
         $storage_robot_strings = mmrpg_prototype_robots_unlocked($current_player_token, true, true);
@@ -2447,7 +2448,7 @@ class rpg_world {
         // [robots-overview][team-rotate]
         if ($num_robot_unlocked > 1){ $return_markup .= '<a class="team-rotate"><i class="fa fas fa-sync"></i></a>'; }
         // [robots-overview][team-switch]
-        if ($num_robot_unlocked > 0){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>robots</b></a>'; }
+        if ($num_robot_unlocked > 0){ $return_markup .= '<a class="storage-button team-switch" data-view="robots"><i class="fa fas fa-robot"></i><b>'.($num_robot_masters_unlocked > 0 ? 'robots' : 'mechas').'</b></a>'; }
         // [robots-overview][team-items]
         $return_markup .= '<a class="storage-button team-items" data-view="items"><i class="fa fas fa-briefcase"></i><b>items</b></a>';
         // [robots-overview][team-abilities]
@@ -5171,10 +5172,12 @@ class rpg_world {
         $player_pronoun = rpg_player::get_player_pronoun($player_info['player_gender'], 'possessive2');
         $player_intro_field = rpg_player::get_intro_field($player_token);
         $player_starter_robot = rpg_player::get_starter_robot($player_token);
+        $auto_unlock_program = true;
         $auto_unlock_robots = true;
         $auto_unlock_heart = true;
         $auto_unlock_campaign = true;
         $player_unlock_subtext = 'This campaign is undefined and this text should not appear. Do no engage.';
+        $player_program_token = str_replace('dr-', '', $player_token).'-program'; // story mcguffin player program
         $player_heart_token = str_replace('dr-', '', $player_token).'-heart__1'; // player's first limit heart
         if ($player_token === 'dr-light'){
             $player_unlock_subtext = 'This beginner-level campaign teaches you the basics while you fight through an army of powered-up opponents!';
@@ -5189,6 +5192,7 @@ class rpg_world {
             $auto_unlock_heart = false;
         }
         mmrpg_game_unlock_player(array('player_token' => $player_token), $auto_unlock_robots, true);
+        if ($auto_unlock_program){ mmrpg_game_unlock_item($player_program_token, false); }
         if ($auto_unlock_heart){ mmrpg_game_unlock_item($player_heart_token, false); }
         $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true);
         $first_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
