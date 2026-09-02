@@ -3515,10 +3515,10 @@ class rpg_player extends rpg_object {
         $temp_prototype_complete = mmrpg_prototype_complete();
 
         // Define whether or not challenge switching is enabled
-        $temp_allow_challenge_switch = $temp_prototype_complete && mmrpg_prototype_item_unlocked('wily-program');
+        $temp_allow_challenge_switch = $temp_prototype_complete && mmrpg_prototype_item_unlocked('challenge-permit');
 
         // Define whether or not field switching is enabled
-        $temp_allow_field_switch = $temp_prototype_complete && mmrpg_prototype_item_unlocked('cossack-program');
+        $temp_allow_field_switch = $temp_prototype_complete && mmrpg_prototype_item_unlocked('stellar-beacon');
 
         // Collect a temp robot object for printing items
         if ($player_info['player_token'] == 'dr-light'){
@@ -3626,8 +3626,8 @@ class rpg_player extends rpg_object {
 
             // Check to see which size this player container should be based on unlocks
             $event_container_size = 1;
-            if (mmrpg_prototype_item_unlocked('wily-program')){ $event_container_size++; }
-            if (mmrpg_prototype_item_unlocked('cossack-program')){ $event_container_size++; }
+            if (mmrpg_prototype_item_unlocked('challenge-permit')){ $event_container_size++; }
+            if (mmrpg_prototype_item_unlocked('stellar-beacon')){ $event_container_size++; }
 
             ?>
             <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
@@ -3791,7 +3791,7 @@ class rpg_player extends rpg_object {
 
                     ?>
 
-                    <? if(mmrpg_prototype_item_unlocked('wily-program')){ ?>
+                    <? if(mmrpg_prototype_item_unlocked('challenge-permit')){ ?>
 
                         <?
                         // Collect a list of applicable challenges from the database
@@ -4042,7 +4042,7 @@ class rpg_player extends rpg_object {
 
                     <? } ?>
 
-                    <? if(mmrpg_prototype_item_unlocked('cossack-program')){ ?>
+                    <? if(mmrpg_prototype_item_unlocked('stellar-beacon')){ ?>
 
                         <table class="full">
                             <colgroup>

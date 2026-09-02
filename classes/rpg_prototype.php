@@ -172,16 +172,16 @@ class rpg_prototype {
             || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
             // Random
-            $chapters_unlocked['5'] = true;
+            $chapters_unlocked['5'] = mmrpg_prototype_item_unlocked('random-bypass') ? true : false;
 
             // Players
-            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('light-program') ? true : false;
+            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('player-tracker') ? true : false;
 
             // Challenges
-            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('wily-program') ? true : false;
+            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('challenge-permit') ? true : false;
 
             // Stars
-            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('stellar-beacon') ? true : false;
 
         } else {
 
@@ -192,10 +192,10 @@ class rpg_prototype {
             $chapters_unlocked['6'] = false;
 
             // Challenges
-            $chapters_unlocked['8'] = false; //$prototype_complete_count >= 3 ? true : false;
+            $chapters_unlocked['8'] = false;
 
             // Stars
-            $chapters_unlocked['7'] = false; //mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+            $chapters_unlocked['7'] = false;
 
         }
 

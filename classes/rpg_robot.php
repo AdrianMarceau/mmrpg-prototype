@@ -5537,7 +5537,7 @@ class rpg_robot extends rpg_object {
                 $right_column_markup = array();
 
                 // Check to see if the player has unlocked the ability to swap players
-                $temp_player_swap_unlocked = mmrpg_prototype_item_unlocked('wily-program'); // && rpg_prototype::event_unlocked('dr-wily', 'chapter_one_complete');
+                $temp_player_swap_unlocked = true;
                 // If this player has unlocked the ability to let robots swap players
                 if ($temp_player_swap_unlocked){
                     ob_start();

@@ -918,7 +918,7 @@ if (!empty($this_shop_index['kalinka'])){
 
     // If the player has unlocked the Cossack Program, Kalinka's kiosk also has a Show Stars tab
     if ($this_battle_stars_count > 0
-        && mmrpg_prototype_item_unlocked('cossack-program')){
+        && mmrpg_prototype_item_unlocked('stellar-beacon')){
 
         // Add starshow data to Kalinka's Shop
         $this_shop_index['kalinka']['shop_kind_buying'][] = 'stars';

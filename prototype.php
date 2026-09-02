@@ -283,9 +283,9 @@ if ($ready_room_enabled){ $prototype_banner_image = 'prototype-banners_title-scr
         $has_points_overflow = $battle_points_count >= 999999999999 ? true : false;
         $has_zenny_overflow = $battle_zenny_count >= 999999999 ? true : false;
 
-        // If player battles have been unlocked (via the Light Program), make sure we collect the token count
+        // If player battles have been unlocked (via the Player Tracker), make sure we collect the token count
         $battle_tokens_count = 0;
-        if (mmrpg_prototype_item_unlocked('light-program')){
+        if (mmrpg_prototype_item_unlocked('player-tracker')){
             $battle_tokens_count = $db->get_value("SELECT
                 COUNT(battles.target_user_id) AS players_defeated
                 FROM mmrpg_battles AS battles

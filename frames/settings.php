@@ -48,7 +48,7 @@ $profile_background_options_markup = mmrpg_prototype_get_profile_background_opti
 
 // If the option has been unlocked, collect the proxy options as well
 $current_proxy_info = array();
-if (mmrpg_prototype_item_unlocked('light-program')){
+if (mmrpg_prototype_item_unlocked('player-tracker')){
 
     // Collect available proxy options given this user's current data and progress
     $proxy_image_options_markup = mmrpg_prototype_get_proxy_image_options($current_user_info, $allowed_proxy_image_options);
@@ -870,7 +870,7 @@ if (true){
 }
 
 // Generate markup for PROXY SETTINGS if applicable
-if (mmrpg_prototype_item_unlocked('light-program')){
+if (mmrpg_prototype_item_unlocked('player-tracker')){
 
     // Define the markup for this section
     //error_log('$current_proxy_info = '.print_r($current_proxy_info, true));

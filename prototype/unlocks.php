@@ -221,16 +221,16 @@ function generate_prototype_postgame_message($player_token){
 
     // Generate the markup for bonus chapters unlocks
     $temp_bonus_chapter_markup = array();
-    $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter lets you to refight past foes in unlikely pairings. These missions are perfect for trying out new strategies or grinding for cores!</p>';
-    if (mmrpg_prototype_item_unlocked('light-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
-    if (mmrpg_prototype_item_unlocked('cossack-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
-    if (mmrpg_prototype_item_unlocked('wily-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique missions designed by the MMRPG staff. These are hard but have great rewards! <span style="font-size: 70%;position: relative;bottom: 4px;left: 2px;">(Try the Endless Attack Mode!)</span></p>'; }
+    if (mmrpg_prototype_item_unlocked('random-bypass')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter lets you to refight past foes in unlikely pairings. These missions are perfect for trying out new strategies or grinding for cores!</p>'; }
+    if (mmrpg_prototype_item_unlocked('player-tracker')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
+    if (mmrpg_prototype_item_unlocked('challenge-permit')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
+    if (mmrpg_prototype_item_unlocked('stellar-beacon')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique missions designed by the MMRPG staff. These are hard but have great rewards! <span style="font-size: 70%;position: relative;bottom: 4px;left: 2px;">(Try the Endless Attack Mode!)</span></p>'; }
 
     // Generate the canvas markup with the player standing with and their team of robots
     $temp_console_markup = '';
     $temp_console_markup .= '<p>';
         $temp_console_markup .= '<strong>'.$player_info['player_name'].'</strong>\'s story has come to an end, but there\'s still more to do and discover!<br /> ';
-        $temp_console_markup .= 'As thanks for playing, <strong>'.count($temp_bonus_chapter_markup).' new bonus chapters</strong> have been unlocked in his campaign! ';
+        $temp_console_markup .= 'As thanks for playing, <strong>'.count($temp_bonus_chapter_markup).' new bonus chapter'.(count($temp_bonus_chapter_markup) !== 1 ? 's' : '').'</strong> have been unlocked in his campaign! ';
     $temp_console_markup .= '</p>';
     $temp_console_markup .= '<div style="padding: 10px; margin: 5px auto; border-top: 1px solid #212121; border-bottom: 1px solid #090909;">';
         $temp_console_markup .= implode('', $temp_bonus_chapter_markup);
@@ -371,8 +371,8 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 // UNLOCK PLAYER : DR. WILY
 
-// If Dr. Light has completed phase1 of his battles (or found the Wily Program early), unlock Dr. Wily
-if (!$unlock_flag_wily && (mmrpg_prototype_item_unlocked('wily-program') || mmrpg_prototype_complete('dr-light'))){
+// If the Wily Program has been found, we can unlock Dr. Wily
+if (!$unlock_flag_wily && mmrpg_prototype_item_unlocked('wily-program')){
 
     // Unlock Dr. Wily as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-wily'];
@@ -470,8 +470,8 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 // UNLOCK PLAYER : DR. COSSACK
 
-// If Dr. Light has completed phase1 of his battles, unlock Dr. Cossack
-if (!$unlock_flag_cossack && (mmrpg_prototype_item_unlocked('cossack-program') || mmrpg_prototype_complete('dr-wily'))){
+// If the Cossack Program has been found, we can unlock Dr. Cossack
+if (!$unlock_flag_cossack && mmrpg_prototype_item_unlocked('cossack-program')){
 
     // Unlock Dr. Cossack as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-cossack'];
@@ -581,10 +581,9 @@ if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
  * DR. LIGHT EVENT ITEMS
  */
 
-// Unlock the AUTO LINK after Dr. Light has completed all of Chapter One OR found one of his codes
+// Unlock the AUTO LINK after Dr. Light has found one of his codes
 if (!mmrpg_prototype_item_unlocked('auto-link')
-    && ($chapters_unlocked_light['1']
-        || mmrpg_prototype_item_unlocked('item-codes')
+    && (mmrpg_prototype_item_unlocked('item-codes')
         || mmrpg_prototype_item_unlocked('equip-codes')
     )){
 
@@ -602,6 +601,7 @@ if (!mmrpg_prototype_item_unlocked('auto-link')
     rpg_prototype::mark_robot_as_pending_entrance_animation('auto');
 
 }
+/*
 // Unlock the ITEM CODES immediately after the Auto Link has been unlocked
 if (mmrpg_prototype_item_unlocked('auto-link')
     && !mmrpg_prototype_item_unlocked('item-codes')){
@@ -635,15 +635,16 @@ if (!mmrpg_prototype_item_unlocked('equip-codes')
         ));
 
 }
+*/
 
-// Unlock the LIGHT/SHARE PROGRAM after Dr. Light has finished their campaign (when we unlock Dr. Wily)
+// Unlock the PLAYER TRACKER after Dr. Light has finished their campaign
 if (mmrpg_prototype_complete('dr-light')
-    && !mmrpg_prototype_item_unlocked('light-program')
+    && !mmrpg_prototype_item_unlocked('player-tracker')
     ){
 
-    // Unlock the Light Program and generate the required event details
-    mmrpg_game_unlock_item('light-program', array(
-        'event_text' => '{player} discovered how to share! <br /> The {item} has been activated!',
+    // Unlock the Player Tracker and generate the required event details
+    mmrpg_game_unlock_item('player-tracker', array(
+        'event_text' => '{player} developed a new item! <br /> The {item} has been activated!',
         'player_token' => 'dr-light',
         'show_images' => array('player'),
         'field_background' => 'light-laboratory',
@@ -657,10 +658,9 @@ if (mmrpg_prototype_complete('dr-light')
  * DR. WILY EVENT ITEMS
  */
 
-// Unlock the REGGAE LINK after Dr. Wily has completed all of Chapter One OR found one of its codes
+// Unlock the REGGAE LINK after Dr. Wily has found one of its codes
 if (!mmrpg_prototype_item_unlocked('reggae-link')
-    && ($chapters_unlocked_wily['1']
-        || mmrpg_prototype_item_unlocked('ability-codes')
+    && (mmrpg_prototype_item_unlocked('ability-codes')
         || mmrpg_prototype_item_unlocked('weapon-codes')
     )){
 
@@ -678,6 +678,7 @@ if (!mmrpg_prototype_item_unlocked('reggae-link')
     rpg_prototype::mark_robot_as_pending_entrance_animation('reggae');
 
 }
+/*
 // Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
 if (mmrpg_prototype_item_unlocked('reggae-link')
     && !mmrpg_prototype_item_unlocked('ability-codes')){
@@ -711,15 +712,16 @@ if (!mmrpg_prototype_item_unlocked('weapon-codes')
         ));
 
 }
+*/
 
-// Unlock the WILY/TRANSFER PROGRAM after Dr. Wily has finished their campaign (when we unlock Dr. Cossack)
+// Unlock the CHALLENGE PASS after Dr. Wily has finished their campaign
 if (mmrpg_prototype_complete('dr-wily')
-    && !mmrpg_prototype_item_unlocked('wily-program')
+    && !mmrpg_prototype_item_unlocked('challenge-permit')
     ){
 
-    // Unlock the Wily Program and generate the required event details
-    mmrpg_game_unlock_item('wily-program', array(
-        'event_text' => '{player} discovered how to transfer! <br /> The {item} has been activated!',
+    // Unlock the Challenge Pass and generate the required event details
+    mmrpg_game_unlock_item('challenge-permit', array(
+        'event_text' => '{player} developed a new item! <br /> The {item} can now be used!',
         'player_token' => 'dr-wily',
         'show_images' => array('player'),
         'field_background' => 'wily-castle',
@@ -733,10 +735,9 @@ if (mmrpg_prototype_complete('dr-wily')
  * DR. COSSACK EVENT ITEMS
  */
 
-// Unlock the KALINKA LINK after Dr. Cossack has completed at least half of Chapter One OR found one of her codes
+// Unlock the KALINKA LINK after Dr. Cossack has found one of her codes
 if (!mmrpg_prototype_item_unlocked('kalinka-link')
-    && ($chapters_unlocked_cossack['1']
-        || mmrpg_prototype_item_unlocked('master-codes')
+    && (mmrpg_prototype_item_unlocked('master-codes')
         || mmrpg_prototype_item_unlocked('dress-codes')
     )){
 
@@ -754,6 +755,7 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
     rpg_prototype::mark_player_as_pending_entrance_animation('kalinka');
 
 }
+/*
 // Unlock the MASTER CODES immediately after the Kalinka Link has been unlocked
 if (mmrpg_prototype_item_unlocked('kalinka-link')
     && !mmrpg_prototype_item_unlocked('master-codes')){
@@ -787,15 +789,16 @@ if (!mmrpg_prototype_item_unlocked('dress-codes')
         ));
 
 }
+*/
 
-// Unlock the COSSACK/SEARCH PROGRAM after Dr. Cossack has finished their campaign
+// Unlock the STELLAR BEACON after Dr. Cossack has finished their campaign
 if (mmrpg_prototype_complete('dr-cossack')
-    && !mmrpg_prototype_item_unlocked('cossack-program')
+    && !mmrpg_prototype_item_unlocked('stellar-beacon')
     ){
 
-    // Unlock the Cossack Program and generate the required event details
-    mmrpg_game_unlock_item('cossack-program', array(
-        'event_text' => '{player} discovered how to search! <br /> The {item} has been activated!',
+    // Unlock the Stellar Beacon and generate the required event details
+    mmrpg_game_unlock_item('stellar-beacon', array(
+        'event_text' => '{player} developed a new item! <br /> The {item} was sent into orbit!',
         'player_token' => 'dr-cossack',
         'show_images' => array('player'),
         'field_background' => 'cossack-citadel',
@@ -809,6 +812,7 @@ if (mmrpg_prototype_complete('dr-cossack')
  * MULTI DR. EVENT ITEMS
  */
 
+/*
 // If Light was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_light){
 
@@ -847,7 +851,9 @@ if ($unlock_flag_light){
     }
 
 }
+*/
 
+/*
 // If Wily was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_wily){
 
@@ -886,7 +892,9 @@ if ($unlock_flag_wily){
     }
 
 }
+*/
 
+/*
 // If Cossack was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_cossack){
 
@@ -925,6 +933,7 @@ if ($unlock_flag_cossack){
     }
 
 }
+*/
 
 // Unlock the OMEGA SEED after all three Drs. have completed the prototype
 if (!mmrpg_prototype_item_unlocked('omega-seed')

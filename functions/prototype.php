@@ -128,27 +128,28 @@ function mmrpg_prototype_apply_patches(){
 
 }
 
-// Define a function for calculating required experience points to the next level
-function mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level = 100, $min_experience = 1000){
-
-    $last_level = $this_level - 1;
-    $level_mod = $this_level / $max_level;
-    $this_experience = round($min_experience + ($last_level * $level_mod * $min_experience));
-
-    return $this_experience;
+// Define a function for calculating the MARGINAL experience required for a specific level
+function mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level = 100, $base_cost = 1000){
+    if ($this_level <= 1) { return 0; }
+    // We use a standard quadratic growth formula for smooth scaling
+    $total_for_current = $base_cost * pow(($this_level - 1), 2);
+    $total_for_previous = $base_cost * pow(($this_level - 2), 2);
+    // Return just the difference needed for this specific level-up
+    return $total_for_current - $total_for_previous;
 }
 
-// Define a function for calculating required experience points to the next level
-function mmrpg_prototype_calculate_shop_level_by_experience($this_experience, $max_level = 100, $min_experience = 1000){
-    $temp_total_experience = 0;
-    for ($this_level = 1; $this_level < $max_level; $this_level++){
-        $temp_experience = mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level, $min_experience);
-        $temp_total_experience += $temp_experience;
-        if ($temp_total_experience > $this_experience){
-            return $this_level - 1;
-        }
+// Define a function for calculating the CURRENT level based on total experience (zenny spent)
+function mmrpg_prototype_calculate_shop_level_by_experience($total_experience, $max_level = 100, $base_cost = 1000){
+    // We calculate the exact level instantly using a square root
+    // Level = 1 + sqrt(Total_Experience / Base_Cost)
+    $calculated_level = 1 + floor(sqrt($total_experience / $base_cost));
+    // Clamp the level between 1 and the maximum allowed for this shop
+    if ($calculated_level > $max_level) {
+        return $max_level;
+    } elseif ($calculated_level < 1) {
+        return 1;
     }
-    return $max_level;
+    return $calculated_level;
 }
 
 // Define a function for checking a player has completed the prototype
@@ -6048,7 +6049,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
     $_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'] = array();
 
     // Check if we're allowed and there is an ENDLESS ATTACK MODE savestate in the waveboard to load now
-    if (mmrpg_prototype_item_unlocked('wily-program')){
+    if (mmrpg_prototype_item_unlocked('challenge-permit')){
         global $db;
         global $flag_wap;
         $challenge_mode_savestate = $db->get_value("SELECT

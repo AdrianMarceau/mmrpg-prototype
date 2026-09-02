@@ -2220,14 +2220,6 @@ body.mobileFlag_landscapeMode #prototype.main_menu .option_wrapper_missions .cha
 #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra.first {
     margin-left: 2%;
 }
-body.windowFlag_landscapeMode #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra,
-body.mobileFlag_landscapeMode #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra {
-    width: 5%;
-}
-body.windowFlag_landscapeMode #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra.first,
-body.mobileFlag_landscapeMode #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra.first {
-    margin-left: 3%;
-}
 
 #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra:before {
     content: " ";
@@ -4487,6 +4479,9 @@ body[data-source="website"] #prototype .menu {
         font-size: 13px;
     }
     #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link.extra.first {
+        margin-left: auto;
+    }
+    #prototype.main_menu .option_wrapper_missions .chapter_select .chapter_link:not(.extra) + .chapter_link.extra {
         margin-left: 96px;
     }
     #prototype.main_menu .option_back {

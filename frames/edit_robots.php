@@ -215,9 +215,9 @@ $first_robot_token = isset($allowed_edit_robots[0]) ? $allowed_edit_robots[0] : 
 // Update game settings for this page
 gameSettings.userNumber = <?= MMRPG_REMOTE_GAME_ID ?>;
 gameSettings.allowEditing = <?= $global_allow_editing ? 'true' : 'false' ?>;
-gameSettings.shareProgramUnlocked = <?= mmrpg_prototype_item_unlocked('light-program') ? 'true' : 'false' ?>;
-gameSettings.transferProgramUnlocked = <?= mmrpg_prototype_item_unlocked('wily-program') ? 'true' : 'false' ?>;
-gameSettings.searchProgramUnlocked = <?= mmrpg_prototype_item_unlocked('cossack-program') ? 'true' : 'false' ?>;
+gameSettings.shareProgramUnlocked = <?= true ? 'true' : 'false' ?>;
+gameSettings.transferProgramUnlocked = <?= true ? 'true' : 'false' ?>;
+gameSettings.searchProgramUnlocked = <?= mmrpg_prototype_item_unlocked('stellar-beacon') ? 'true' : 'false' ?>;
 gameSettings.mmrpgIndexTypes = [<?= "'".implode("','", array_keys($mmrpg_database_types))."'" ?>];
 gameSettings.mmrpgIndexTypesForSort = [<?= "'".implode("','", $mmrpg_database_types_forsort)."'" ?>];
 var countRobotLinks = false;
