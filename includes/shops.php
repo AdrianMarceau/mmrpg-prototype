@@ -28,7 +28,9 @@ $this_shop_index['auto'] = array(
     'shop_items' => array(
         'items_selling' => array(),
         'items_buying' => array()
-        )
+        ),
+    'shop_max_level' => 10,
+    'shop_base_cost' => 1000
     );
 
 // REGGAE'S SHOP
@@ -58,7 +60,9 @@ $this_shop_index['reggae'] = array(
         ),
     'shop_items' => array(
         'items_buying' => array()
-        )
+        ),
+    'shop_max_level' => 20,
+    'shop_base_cost' => 15000
     );
 
 
@@ -80,7 +84,9 @@ $this_shop_index['kalinka'] = array(
     'shop_kind_buying' => array(),
     'shop_quote_selling' => array(),
     'shop_quote_buying' => array(),
-    'shop_alts' => array()
+    'shop_alts' => array(),
+    'shop_max_level' => 30,
+    'shop_base_cost' => 30000
     );
 
 
