@@ -7,6 +7,7 @@
 // Pull in the top file first so we have access to everything
 define('MMRPG_EXTERNAL_TOP_INCLUDE', true);
 define('MMRPG_EXCLUDE_GAME_LOGIC', true);
+define('MMRPG_EXCLUDE_SESSION', true);
 require('../top.php');
 
 // Define the root directory we'll be scanning for save data
