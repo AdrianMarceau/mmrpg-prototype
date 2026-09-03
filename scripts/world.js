@@ -497,7 +497,7 @@ class mmrpgWorldMap {
         _worldPlayer.position = _worldCursor.position || '0-0';
         _worldPlayer.direction = _worldCursor.direction || 'down-right';
         _worldPlayer.mobility = _config.playerMobility || 1;
-        _worldPlayer.zenny = _worldCursor.playerZenny || 0;
+        _worldPlayer.zenny = _config.playerZenny || 0;
         // If player robots were defined [list + index] in the predefined config, copy them over to the state
         let _playerRobots = _config.playerRobots;
         let _playerRobotsIndex = _config.playerRobotsIndex;
