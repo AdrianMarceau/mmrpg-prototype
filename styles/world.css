@@ -2714,36 +2714,107 @@ html, body {
 
 #world #canvas #popup-iframe {
     display: block;
+    position: absolute;
+    pointer-events: none;
+    z-index: 1020;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    opacity: 1.0;
+    background-color: transparent;
+    border: none;
+    transition: opacity 0.6s;
+}
+#world #canvas #popup-iframe.hidden {
+    opacity: 0;
+}
+#world #canvas #popup-iframe:not(.active) {
+    display: none;
+}
+#world #canvas #popup-iframe > .overlay {
+    display: block;
+    position: absolute;
+    pointer-events: all;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+}
+#world #canvas #popup-iframe > .wrapper {
+    display: block;
+    position: absolute;
+    z-index: 2;
     width: 768px;
     height: 410px;
     z-index: 1020;
     padding: 0;
     pointer-events: none;
+    top: auto;
+    left: 50%;
     bottom: -100%;
     filter: opacity(0);
     transform: translate(-50%, 50%);
-    transition: bottom 0.6s, filter 0.6s;
+    transition: bottom 1.2s, filter 1.2s;
+    background-color: transparent;
 }
-#world #canvas #popup-iframe.active {
+#world #canvas #popup-iframe:not(.hidden) > .wrapper {
     bottom: 50%;
-    left: 50%;
     right: auto;
     filter: opacity(1);
     pointer-events: auto;
 }
-#world #canvas #popup-iframe.hidden {
-    display: none;
-}
-#world #canvas #popup-iframe iframe {
+#world #canvas #popup-iframe > .wrapper iframe {
     width: 100%;
     height: 100%;
     overflow: hidden;
     border: 0 none transparent;
 }
+#world #canvas #popup-iframe > .close {
+    display: block;
+    position: absolute;
+    z-index: 1015;
+    width: auto;
+    height: auto;
+    background-color: #2b2b2b;
+    color: #fafafa;
+    border: 1px solid #202020;
+    border-radius: 9px;
+    padding: 6px 18px;
+    font-size: 13px;
+    line-height: 1.6;
+    pointer-events: auto;
+    cursor: pointer;
+    right: 20px;
+    bottom: 60px;
+    filter: opacity(1);
+    transition: filter 1.2s;
+}
+#world #canvas #popup-iframe.hidden > .close {
+    filter: opacity(0);
+}
+#world #canvas #popup-iframe > .close i {
+    display: inline-block;
+    margin-right: 4px;
+}
+#world #canvas #popup-iframe > .close strong {
+
+}
 #world.has_iframe #canvas #progress-tracker {
     top: 0px;
     transform: scale(1.25);
     transform-origin: right top;
+    z-index: 1025;
 }
 #world.has_iframe #canvas #zoom-controls,
 #world.has_iframe #canvas #minimap-overview {
