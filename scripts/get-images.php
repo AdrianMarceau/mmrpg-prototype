@@ -170,6 +170,7 @@ if ($must_regenerate){
 
     // Require the global config file
     define('MMRPG_EXCLUDE_GAME_LOGIC', true);
+    define('MMRPG_EXCLUDE_SESSION', true);
     define('MMRPG_INDEX_STYLES', true);
     require('../top.php');
 
