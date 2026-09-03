@@ -789,6 +789,9 @@ function updateItemQuantities(){
         var itemQuantity = thisShopData.itemQuantities[itemToken];
         updateItemQuantity(itemToken, itemQuantity);
     }
+    if (typeof parent.prototype_update_item_quantities === 'function'){
+        parent.prototype_update_item_quantities(thisShopData.itemQuantities);
+        }
 }
 // Define a function for updating a single item's quantity
 function updateItemQuantity(itemToken, itemQuantity){
