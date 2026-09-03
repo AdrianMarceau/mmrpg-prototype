@@ -579,7 +579,7 @@ if (!empty($this_shop_index['reggae'])){
                 }
                 $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
                 if (!isset($core_max_levels[$type])){ $core_max_levels[$type] = array('core_type' => $type, 'core_max' => 0); }
-                if ($level > $core_max_levels[$type]['core_max']){ $core_max_levels[$type]['core_max'] = $level; }
+                if (!in_array($token, $unlocked_ability_tokens) && $level > $core_max_levels[$type]['core_max']){ $core_max_levels[$type]['core_max'] = $level; }
             }
         }
         //error_log('$core_max_levels = '.print_r($core_max_levels, true));
