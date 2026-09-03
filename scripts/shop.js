@@ -726,11 +726,12 @@ $(document).ready(function(){
     $('#console .scroll_wrapper', thisShop).perfectScrollbar({suppressScrollX: true, scrollYMarginOffset: 6});
 
     // Automatically click the first shop link
+    var $firstShop = $('#canvas #links .sprite[data-token]').first();
     if (lastShopToken.length){
         var $lastShop = $('#canvas #links .sprite[data-token="'+lastShopToken[0]+'"]');
-        $lastShop.triggerSilentClick();
+        if ($lastShop && $lastShop.length){ $lastShop.triggerSilentClick(); }
+        else { $firstShop.triggerSilentClick(); }
         } else {
-        var $firstShop = $('#canvas #links .sprite[data-token]').first();
         $firstShop.triggerSilentClick();
         }
 

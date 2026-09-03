@@ -44,6 +44,9 @@ $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
 if (isset($_GET['edit']) && $_GET['edit'] == 'false'){ $global_allow_editing = false; }
 $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
+// Check if the world flag is set and collect the current shop
+$is_world_iframe = !empty($_GET['world']) && trim($_GET['world']) === 'true' ? true : false;
+$is_shop_token = !empty($_GET['shop']) ? trim($_GET['shop']) : false;
 
 // -- GENERATE EDITOR MARKUP
 
@@ -56,6 +59,12 @@ $prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_r
 $prototype_complete_counter = mmrpg_prototype_complete();
 $prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
 $allowed_edit_data_count = count($allowed_edit_data);
+
+// Validate requested shop token in case shenanigans
+if ($is_shop_token
+    && !isset($allowed_edit_data[$is_shop_token])){
+    $is_shop_token = false;
+}
 
 // HARD-CODE ZENNY FOR TESTING
 //$_SESSION[$session_token]['counters']['battle_zenny'] = 500000;
@@ -81,6 +90,7 @@ if (true){
     $key_counter = 0;
     $shop_counter = 0;
     foreach($allowed_edit_data AS $shop_token => $shop_info){
+        if ($is_shop_token && $shop_token !== $is_shop_token){ continue; }
         $shop_counter++;
         //echo '<td style="width: '.floor(100 / $allowed_edit_shop_count).'%;">'."\n";
         echo '<div class="wrapper wrapper_'.($shop_counter % 2 != 0 ? 'left' : 'right').' player_type player_type_empty" data-select="shops" data-shop="'.$shop_info['shop_token'].'">'."\n";
@@ -104,7 +114,11 @@ if (true){
         $shop_image_offset = ($shop_info['shop_image_size'] - 80) / 2;
         $shop_image_offset_x = -14 - $shop_image_offset;
         $shop_image_offset_y = -14 - $shop_image_offset;
-        echo '<a data-token="'.$shop_info['shop_token'].'" data-shop="'.$shop_info['shop_token'].'" style="background-image: url('.$shop_image_file_path.'); background-position: '.$shop_image_offset_x.'px '.$shop_image_offset_y.'px;" class="sprite sprite_player sprite_shop_'.$shop_token.' sprite_shop_sprite sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].' sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'_mugshot shop_status_active shop_position_active '.($shop_key == 0 ? 'sprite_shop_current ' : '').' player_type player_type_'.(!empty($shop_info['shop_colour']) ? $shop_info['shop_colour'] : 'none').'">'.$shop_info['shop_name'].'</a>'."\n";
+        echo '<a data-token="'.$shop_info['shop_token'].'" '.
+            'data-shop="'.$shop_info['shop_token'].'" '.
+            'style="background-image: url('.$shop_image_file_path.'); background-position: '.$shop_image_offset_x.'px '.$shop_image_offset_y.'px;" '.
+            'class="sprite sprite_player sprite_shop_'.$shop_token.' sprite_shop_sprite sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].' sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'_mugshot shop_status_active shop_position_active '.($shop_key === 0 ? 'sprite_shop_current ' : '').' player_type player_type_'.(!empty($shop_info['shop_colour']) ? $shop_info['shop_colour'] : 'none').'" '.
+            '>'.$shop_info['shop_name'].'</a>'."\n";
         $key_counter++;
         //echo '<a class="sort" data-shop="'.$shop_info['shop_token'].'">sort</a>';
         echo '</div>'."\n";
@@ -129,6 +143,7 @@ if (true){
     // Loop through the shops in the field edit data
     $robot_info = rpg_robot::get_index_info('robot');
     foreach($allowed_edit_data AS $shop_token => $shop_info){
+        if ($is_shop_token && $shop_token !== $is_shop_token){ continue; }
 
         // Update the player key to the current counter
         $shop_key = $key_counter;
@@ -383,7 +398,7 @@ if (true){
 </head>
 <body id="mmrpg" class="iframe" data-frame="shop" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
     <div id="prototype" class="hidden" style="opacity: 0; <?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
-        <div id="shop" class="menu" style="position: relative;">
+        <div id="shop" class="menu<?= $is_world_iframe ? ' is_world_iframe' : '' ?>" style="position: relative;">
             <div id="shop_overlay" style="border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background-color: rgba(0, 0, 0, 0.75); position: absolute; top: 50px; left: 6px; right: 4px; height: 340px; z-index: 9999; display: none;">&nbsp;</div>
             <?= $this_shop_markup ?>
         </div>

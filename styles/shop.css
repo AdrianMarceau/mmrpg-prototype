@@ -1040,6 +1040,16 @@
     background-color: #969696;
 }
 
+
+#shop.is_world_iframe > .header {
+    display: none;
+}
+#shop.is_world_iframe table.formatter colgroup col:first-child,
+#shop.is_world_iframe table.formatter tr td.canvas {
+    display: none;
+}
+
+
 /* -- WIDESCREEN 2k26 STYLES -- */
 
 @media (min-width: 1120px){
