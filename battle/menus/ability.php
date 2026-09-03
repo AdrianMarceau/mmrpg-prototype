@@ -12,6 +12,7 @@ ob_start();
     if ($num_robots_active < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX
         && empty($this_battle->flags['challenge_battle'])
         && empty($this_battle->flags['player_battle'])
+        && empty($this_battle->flags['world_battle'])
         && empty($this_player->flags['star_support_summoned'])
         && rpg_prototype::star_support_unlocked()){
         $star_support_force = rpg_prototype::get_star_support_force();
