@@ -272,6 +272,7 @@ function bindEventsToInputs($thisWorld){
         let _selfRef = this;
         let worldMapIsHidden = _self.worldMapIsHidden();
         let sideButtonsActive = $sideButtons.is('.active') ? true : false;
+        let popupFrameActive = $('#popup-iframe.active').length ? true : false;
         let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
         let robotsOverviewIsExpanded = $robotsOverview && $robotsOverview.length && $robotsOverview.is('.expanded') ? true : false;
         let currentRobotsOverviewPanel = $robotsOverview && $robotsOverview.length && robotsOverviewIsExpanded ? $robotsOverview.attr('data-view') : false;
@@ -909,6 +910,19 @@ function bindEventsToInputs($thisWorld){
             else if (activeInputs.Left || activeInputs.Right){
                 if (event){ event.preventDefault(); }
                 if ($sideButtons.is('.busy')){ return false; }
+                }
+            }
+        // If a popup iframe is currenty active, process relevant shortcut keys
+        if (popupFrameActive){
+            //console.log('let\'s start listening for popup frame inputs');
+            let $popupFrame = $('#popup-iframe', $thisCanvas);
+            let $closeButton = $('> .close', $popupFrame);
+            if (activeInputs.Start){
+                //console.log('%c' + ' key pressed! Dismiss iframe popup!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                if (!$popupFrame.is('.active')){ return false; }
+                $closeButton.trigger('click');
+                return true;
                 }
             }
         // Otherwise if the world map is NOT hidden, so the arrow keys must be controlling the player
