@@ -1290,6 +1290,8 @@ function bindEventsToInputs($thisWorld){
         autoStart: true,
         autoRunCallbacks: false,
         autoButtonMapping: true,
+        catchIframeInputs: true,
+        drillIframeInputs: true,
         gamepadLayout: gamepadLayout,
         });
     userInputWatcher.onUserInput(checkUserInputs);
