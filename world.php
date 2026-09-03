@@ -389,13 +389,17 @@ if (empty($this_prototype_data['this_player_star_force'])){
     $this_prototype_data['this_player_star_force'] = $unlocked_star_force;
 }
 
+// Pull the user's collected zenny values so we can pass them along to the javascript objects
+if (empty($this_prototype_data['this_player_zenny'])){
+    $unlocked_battle_zenny = rpg_game::zenny_unlocked();
+    $this_prototype_data['this_player_zenny'] = $unlocked_battle_zenny;
+}
 
 // Update the player's mobility with any character-specific bonuses or contextual modifiers
 if ($this_prototype_data['this_player_token'] === 'player'){ $this_prototype_data['this_player_mobility'] = -1; }
 else { $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; }
 // Update the player's max robots value so we can pass it off to the client-side script
 if ($this_prototype_data['this_player_token'] !== 'player'){ $this_prototype_data['this_player_robots_limit'] = $max_player_robots; }
-
 
 // Collect or define the current map token we'll be loading from
 $request_world_token = isset($_REQUEST['world']) && preg_match('/^([-_a-z0-9]+)$/i', $_REQUEST['world']) ? trim($_REQUEST['world']) : '';
@@ -1036,6 +1040,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
     _worldConfig.playerRobotsIndex = <?= json_encode($this_prototype_data['this_player_robots_index'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerRobotsLimit = <?= json_encode($this_prototype_data['this_player_robots_limit'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility'], JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.playerZenny = <?= json_encode($this_prototype_data['this_player_zenny'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerHistory = <?= json_encode($world_player_session_history, JSON_NUMERIC_CHECK) ?>;
     _worldConfig.backButtonURL = 'prototype.php';
     _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
