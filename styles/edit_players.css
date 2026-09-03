@@ -152,6 +152,10 @@ body.windowFlag_landscapeMode #prototype {
     background-color: rgb(80, 0, 80);
     background-color: rgba(160, 0, 160, 0.1);
 }
+#edit #canvas .wrapper_dr-lalinde {
+    background-color: rgb(63 97 54);
+    background-color: rgb(67 172 44 / 10%);
+}
 #edit #canvas .wrapper .event {
     width: 100%;
 }
@@ -188,6 +192,9 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .sprite_player_dr-cossack_current {
     border-color: rgb(144, 61, 190);
+}
+#edit #canvas .sprite_player_dr-lalinde_current {
+    border-color: rgb(72, 134, 56);
 }
 
 #edit #canvas .wrapper_left .sprite_player {
@@ -867,10 +874,15 @@ body.mobileFlag_landscapeMode #prototype #canvas {
         top: 220px;
         right: 75px;
         margin: 0;
+        height: 4px;
         transform: scale(4);
+    }
+    #edit #console .event .event_player_images .token {
+        margin-bottom: 2px;
     }
     #edit #console .event .event_player_images .sprite_wrapper .sprite.facing_left {
         display: block;
+        image-rendering: pixelated;
     }
     #edit #console .event .event_player_images .sprite_wrapper .sprite.facing_right {
         display: none;

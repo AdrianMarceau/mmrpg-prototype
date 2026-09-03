@@ -1502,6 +1502,7 @@ body[data-mode="viewer"] #edit #canvas .item_canvas a.item_name {
     }
     #edit #console .event .event_robot_images .sprite_wrapper .sprite.facing_left {
         display: block;
+        image-rendering: pixelated;
     }
     #edit #console .event .event_robot_summons {
         margin-top: 50px;
