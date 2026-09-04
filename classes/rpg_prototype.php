@@ -141,26 +141,29 @@ class rpg_prototype {
         // -- PHASE ONE -- //
 
         // Intro
-        $chapters_unlocked['0'] = true;
-        $chapters_unlocked['0b'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 1) ? true : false;
-        $chapters_unlocked['0c'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 2) ? true : false;
+        $chapters_unlocked['0'] = $player_unlocked ? true : false;
+        $chapters_unlocked['0b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 1) ? true : false;
+        $chapters_unlocked['0c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER0_MISSIONS + 2) ? true : false;
 
         // Masters
-        $chapters_unlocked['1'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['1'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT ? true : false;
 
         // Rivals
-        $chapters_unlocked['2'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['2'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER2_MISSIONCOUNT ? true : false;
 
 
         // -- PHASE TWO -- //
 
         // Fusions
-        $chapters_unlocked['3'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['3'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER3_MISSIONCOUNT ? true : false;
 
         // Finals
-        $chapters_unlocked['4a'] = $prototype_complete_flag || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
-        $chapters_unlocked['4b'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
-        $chapters_unlocked['4c'] = $prototype_complete_flag || $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
+        $chapters_unlocked['4a'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT ? true : false;
+        $chapters_unlocked['4b'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 1) ? true : false;
+        $chapters_unlocked['4c'] = $battle_complete_counter >= (MMRPG_SETTINGS_CHAPTER4_MISSIONCOUNT + 2) ? true : false;
+
+        // Post-Finals
+        $chapters_unlocked['4z'] = $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT ? true : false;
 
 
         // -- BONUS PHASE -- //
@@ -169,16 +172,16 @@ class rpg_prototype {
             || $battle_complete_counter >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
             // Random
-            $chapters_unlocked['5'] = true;
+            $chapters_unlocked['5'] = mmrpg_prototype_item_unlocked('random-bypass') ? true : false;
 
             // Players
-            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('light-program') ? true : false;
+            $chapters_unlocked['6'] = mmrpg_prototype_item_unlocked('player-tracker') ? true : false;
 
             // Challenges
-            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('wily-program') ? true : false;
+            $chapters_unlocked['8'] = mmrpg_prototype_item_unlocked('challenge-permit') ? true : false;
 
             // Stars
-            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+            $chapters_unlocked['7'] = mmrpg_prototype_item_unlocked('stellar-beacon') ? true : false;
 
         } else {
 
@@ -189,10 +192,10 @@ class rpg_prototype {
             $chapters_unlocked['6'] = false;
 
             // Challenges
-            $chapters_unlocked['8'] = false; //$prototype_complete_count >= 3 ? true : false;
+            $chapters_unlocked['8'] = false;
 
             // Stars
-            $chapters_unlocked['7'] = false; //mmrpg_prototype_item_unlocked('cossack-program') ? true : false;
+            $chapters_unlocked['7'] = false;
 
         }
 

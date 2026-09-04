@@ -27,6 +27,7 @@ $global_unlocked_alts = !empty($_SESSION[$session_token]['values']['robot_alts']
 $global_unlocked_robots_cores = array();
 $global_unlocked_abilities_types = array();
 $global_unlocked_items_tokens = !empty($global_unlocked_items) ? array_keys($global_unlocked_items) : 0;
+//error_log('$global_unlocked_robots = '.print_r($global_unlocked_robots, true));
 
 // -- DEFINE SHOP INDEXES -- //
 
@@ -192,10 +193,13 @@ if (!empty($this_shop_index)){
             // Otherwise, refresh the shop's level based on experience
             else {
                 $shop_array = $this_battle_shops[$shop_token];
+                $temp_max_level = $shop_info['shop_max_level'];
+                $temp_base_cost = $shop_info['shop_base_cost'];
                 $temp_experience = !empty($shop_array['shop_experience']) ? $shop_array['shop_experience'] : 1;
-                $temp_level = mmrpg_prototype_calculate_shop_level_by_experience($temp_experience);
+                $temp_level = mmrpg_prototype_calculate_shop_level_by_experience($temp_experience, $temp_max_level, $temp_base_cost);
                 $temp_level = floor($temp_level);
                 if ($temp_level > 100){ $temp_level = 100; }
+                elseif ($temp_level < 1){ $temp_level = 1; }
                 $shop_array['shop_level'] = $temp_level;
                 $this_battle_shops[$shop_token] = $shop_array;
             }
@@ -243,6 +247,13 @@ foreach ($this_shop_index AS $shop_token => $shop_info){
 
 }
 
+// Grab a list of all already-unlocked items and abilities for reference later
+mmrpg_prototype_items_unlocked(true, $items_unlocked);
+mmrpg_prototype_abilities_unlocked(false, false, $abilities_unlocked);
+$items_unlocked_keys = array_keys($items_unlocked);
+$abilities_unlocked_keys = array_keys($abilities_unlocked);
+//error_log('$items_unlocked = '.print_r($items_unlocked, true));
+//error_log('$abilities_unlocked = '.print_r($abilities_unlocked, true));
 
 // -- AUTO SHOP UNLOCKS -- //
 
@@ -285,7 +296,7 @@ if (!empty($this_shop_index['auto'])){
         rpg_object::save_cached_index('shop.auto', $cache_token, $unlocked_items);
     }
     $level = $this_shop_index['auto']['shop_level'];
-    $unlocked_items = !empty($unlocked_items) ? array_filter($unlocked_items, function($info) use ($level){
+    $unlocked_items = !empty($unlocked_items) ? array_filter($unlocked_items, function($info) use ($level, $items_unlocked){
         if (empty($info['item_shop_level'])){ return true; }
         elseif ($level >= $info['item_shop_level']){ return true; }
         return false;
@@ -306,7 +317,7 @@ if (!empty($this_shop_index['auto'])){
 
         // Add parts to the list of selling kinds and define the quote shown at the top
         $this_shop_index['auto']['shop_kind_selling'][] = 'parts';
-        $this_shop_index['auto']['shop_quote_selling']['parts'] = 'Great news! I\'ve cracked the code on holdable items and created new parts! See anything you like?';
+        $this_shop_index['auto']['shop_quote_selling']['parts'] = 'Great news! I\'ve cracked the code on holdable items and can now make copies of any that you find!';
 
         // Define base lists for sellable parts
         $base_parts_selling = array();
@@ -342,11 +353,28 @@ if (!empty($this_shop_index['auto'])){
             rpg_object::save_cached_index('shop.auto', $cache_token, $unlocked_parts);
         }
         $level = $this_shop_index['auto']['shop_level'];
-        $unlocked_parts = !empty($unlocked_parts) ? array_filter($unlocked_parts, function($info) use ($level){
+        /* $unlocked_parts = !empty($unlocked_parts) ? array_filter($unlocked_parts, function($info) use ($level){
             if (empty($info['item_shop_level'])){ return true; }
             elseif ($level >= $info['item_shop_level']){ return true; }
             return false;
+            }) : array(); */
+        $free_previews = 2;
+        $unlocked_parts = !empty($unlocked_parts) ? array_filter($unlocked_parts, function($info) use ($items_unlocked_keys, &$free_previews){
+            if (in_array($info['item_token'], $items_unlocked_keys)){ return true; }
+            else { if ($free_previews){ $free_previews--; return true; } return false; }
             }) : array();
+        $unlocked_parts_keys = array_keys($unlocked_parts);
+        uksort($unlocked_parts, function($a, $b) use ($items_unlocked_keys, $unlocked_parts_keys){
+            $a_owned = in_array($a, $items_unlocked_keys);
+            $b_owned = in_array($b, $items_unlocked_keys);
+            $a_index = array_search($a, $unlocked_parts_keys);
+            $b_index = array_search($b, $unlocked_parts_keys);
+            if ($a_owned && !$b_owned){ return -1; }
+            elseif (!$a_owned && $b_owned){ return 1; }
+            elseif ($a_index < $b_index){ return -1; }
+            elseif ($a_index > $b_index){ return 1; }
+            else { return 0; }
+            });
 
         // Use the pulled list of unlocked items to expand Auto's shop
         if (!empty($unlocked_parts)){
@@ -395,6 +423,7 @@ if (!empty($this_shop_index['auto'])){
 
 // Only continue if the shop has been unlocked
 $core_level_index = array();
+$core_max_levels = array();
 if (!empty($this_shop_index['reggae'])){
 
     // Define variables to hold the total number of available collectibles
@@ -519,8 +548,8 @@ if (!empty($this_shop_index['reggae'])){
         }
         $level = $this_shop_index['reggae']['shop_level'];
         $levels = $core_level_index;
-        //error_log('$unlocked_weapons = '.print_r($unlocked_weapons, true));
-        $core_max_levels = array();
+        //error_log('$core_level_index = '.print_r($core_level_index, true));
+        //error_log('$unlocked_weapons (A) = '.print_r($unlocked_weapons, true));
         if (!empty($unlocked_weapons)){
             // Loop through unlockable weapons and increase unlock levels for those from robot masters
             foreach ($unlocked_weapons AS $token => $info){
@@ -550,13 +579,11 @@ if (!empty($this_shop_index['reggae'])){
                 }
                 $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
                 if (!isset($core_max_levels[$type])){ $core_max_levels[$type] = array('core_type' => $type, 'core_max' => 0); }
-                if (!in_array($token, $unlocked_ability_tokens)){
-                    if ($level > $core_max_levels[$type]['core_max']){
-                        $core_max_levels[$type]['core_max'] = $level;
-                        }
-                    }
+                if (!in_array($token, $unlocked_ability_tokens) && $level > $core_max_levels[$type]['core_max']){ $core_max_levels[$type]['core_max'] = $level; }
             }
         }
+        //error_log('$core_max_levels = '.print_r($core_max_levels, true));
+        //error_log('$unlocked_weapons (B) = '.print_r($unlocked_weapons, true));
         $unlocked_weapons = !empty($unlocked_weapons) ? array_filter($unlocked_weapons, function($info) use ($level, $levels){
             $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
             $required = !empty($info['ability_shop_level']) ? $info['ability_shop_level'] : 0;
@@ -565,6 +592,7 @@ if (!empty($this_shop_index['reggae'])){
             elseif ($current >= $required){ return true; }
             return false;
             }) : array();
+        //error_log('$unlocked_weapons (C) = '.print_r($unlocked_weapons, true));
 
         // Update the actual shop index with our finalized weapons we're selling
         $reggae_weapons_selling = !empty($unlocked_weapons) ? array_keys($unlocked_weapons) : array();
@@ -753,7 +781,8 @@ if (!empty($this_shop_index['kalinka'])){
     if (mmrpg_prototype_item_unlocked('dress-codes')){
 
         // Generate the max tier of alts to sell based on level
-        $max_alt_tier_key = floor($this_shop_index['kalinka']['shop_level'] / 10);
+        $pseudo_shop_level = !empty($this_shop_index['kalinka']['shop_level']) ? $this_shop_index['kalinka']['shop_level'] : 1;
+        $max_alt_tier_key = floor($pseudo_shop_level / 10);
 
         // Collect the unlocked alts for this game file
         $alt_list_unlocked = !empty($_SESSION[$session_token]['values']['robot_alts']) ? $_SESSION[$session_token]['values']['robot_alts'] : array();
@@ -767,6 +796,8 @@ if (!empty($this_shop_index['kalinka'])){
         $discount_tokens = array('roll', 'disco', 'rhythm');
         $allowed_tokens = array_values($global_unlocked_robots);
         $allowed_tokens = array_diff_key($allowed_tokens, array_flip($banned_tokens));
+        //error_log('$global_unlocked_robots = '.print_r($global_unlocked_robots, true));
+        //error_log('$allowed_tokens = '.print_r($allowed_tokens, true));
 
         // Pull alt images from the database for the player's unlocked robots
         if (!empty($allowed_tokens)){
@@ -889,7 +920,7 @@ if (!empty($this_shop_index['kalinka'])){
 
     // If the player has unlocked the Cossack Program, Kalinka's kiosk also has a Show Stars tab
     if ($this_battle_stars_count > 0
-        && mmrpg_prototype_item_unlocked('cossack-program')){
+        && mmrpg_prototype_item_unlocked('stellar-beacon')){
 
         // Add starshow data to Kalinka's Shop
         $this_shop_index['kalinka']['shop_kind_buying'][] = 'stars';

@@ -152,6 +152,10 @@ body.windowFlag_landscapeMode #prototype {
     background-color: rgb(80, 0, 80);
     background-color: rgba(160, 0, 160, 0.1);
 }
+#edit #canvas .wrapper_dr-lalinde {
+    background-color: rgb(63 97 54);
+    background-color: rgb(67 172 44 / 10%);
+}
 #edit #canvas .wrapper .event {
     width: 100%;
 }
@@ -188,6 +192,9 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .sprite_player_dr-cossack_current {
     border-color: rgb(144, 61, 190);
+}
+#edit #canvas .sprite_player_dr-lalinde_current {
+    border-color: rgb(72, 134, 56);
 }
 
 #edit #canvas .wrapper_left .sprite_player {
@@ -674,6 +681,12 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
     height: 10px;
     z-index: 90;
 }
+#edit #console .event .event_player_images .sprite_wrapper .sprite.facing_right {
+    display: block;
+}
+#edit #console .event .event_player_images .sprite_wrapper .sprite.facing_left {
+    display: none;
+}
 #edit #console .event .event_player_summons {
     margin-top: 108px;
     height: 21px;
@@ -814,4 +827,65 @@ body.windowFlag_landscapeMode #edit #console .event a.ability_name {
 body.mobileFlag_portraitMode #prototype #canvas,
 body.mobileFlag_landscapeMode #prototype #canvas {
     width: 100% !important;
+}
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+
+    #edit .formatter colgroup col:first-child {
+        width: 140px;
+    }
+    #edit #canvas .wrapper_left {
+        float: left;
+        clear: left;
+    }
+    #edit #canvas .wrapper_right {
+        float: right;
+    }
+    #edit #console {
+        min-height: 300px;
+    }
+    #edit #console .event {
+        position: relative;
+    }
+    #edit #console .event .header,
+    #edit #console .event .body {
+        margin: 0 auto 0 0;
+        width: calc(100% - 200px);
+    }
+    #edit #console .event .header {
+
+    }
+    #edit #console .event .body {
+
+    }
+    #edit #console .event .event_player_mugshot {
+        position: absolute;
+        left: auto;
+        top: 76px;
+        right: 75px;
+        transform: scale(4);
+    }
+    #edit #console .event .event_player_images {
+        position: absolute;
+        left: auto;
+        top: 220px;
+        right: 75px;
+        margin: 0;
+        height: 4px;
+        transform: scale(4);
+    }
+    #edit #console .event .event_player_images .token {
+        margin-bottom: 2px;
+    }
+    #edit #console .event .event_player_images .sprite_wrapper .sprite.facing_left {
+        display: block;
+        image-rendering: pixelated;
+    }
+    #edit #console .event .event_player_images .sprite_wrapper .sprite.facing_right {
+        display: none;
+    }
+
 }

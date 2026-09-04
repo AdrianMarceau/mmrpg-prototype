@@ -95,6 +95,8 @@ class rpg_ability_damage extends rpg_damage {
         $options->damage_target = $this_robot;
         $options->damage_initiator = $target_robot;
         $options->damage_amount = $damage_amount;
+        $options->damage_type = $this_ability->damage_options['damage_type'];
+        $options->damage_type2 = $this_ability->damage_options['damage_type2'];
         $options->trigger_options = &$trigger_options;
         $options->event_options = &$event_options;
         $extra_objects = array(
@@ -123,7 +125,7 @@ class rpg_ability_damage extends rpg_damage {
 
         // Collect the damage amount argument from the function
         $this_ability->ability_results['this_amount'] = $options->damage_amount;
-        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none').' | type2:'.(!empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : 'none').'');
+        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | to('.$this_robot->robot_id.':'.$this_robot->robot_token.') vs from('.$target_robot->robot_id.':'.$target_robot->robot_token.') | damage_start_amount |<br /> '.'amount:'.$this_ability->ability_results['this_amount'].' | '.'percent:'.($this_ability->damage_options['damage_percent'] ? 'true' : 'false').' | '.'kind:'.$this_ability->damage_options['damage_kind'].' | type1:'.(!empty($options->damage_type) ? $options->damage_type : 'none').' | type2:'.(!empty($options->damage_type2) ? $options->damage_type2 : 'none').'');
 
         // Trigger this robot's item function if one has been defined for this context
         $this_robot->trigger_custom_function('rpg-ability_trigger-damage_before', $extra_objects_for_this_robot);
@@ -148,7 +150,7 @@ class rpg_ability_damage extends rpg_damage {
             if ($trigger_options['apply_type_modifiers'] != false && ($this_robot->robot_id != $target_robot->robot_id || $trigger_options['referred_damage'])){
 
                 // If target robot has affinity to the ability (based on type)
-                if ($this_robot->has_affinity($this_ability->damage_options['damage_type']) && !$this_robot->has_weakness($this_ability->damage_options['damage_type2'])){
+                if ($this_robot->has_affinity($options->damage_type) && !$this_robot->has_weakness($options->damage_type2)){
                     //$this_ability->ability_results['counter_affinities'] += 1;
                     //$this_ability->ability_results['flag_affinity'] = true;
                     return $this_robot->trigger_recovery($target_robot, $this_ability, $options->damage_amount);
@@ -157,14 +159,14 @@ class rpg_ability_damage extends rpg_damage {
                 }
 
                 // If target robot has affinity to the ability (based on type2)
-                if ($this_robot->has_affinity($this_ability->damage_options['damage_type2']) && !$this_robot->has_weakness($this_ability->damage_options['damage_type'])){
+                if ($this_robot->has_affinity($options->damage_type2) && !$this_robot->has_weakness($options->damage_type)){
                     $this_ability->ability_results['counter_affinities'] += 1;
                     $this_ability->ability_results['flag_affinity'] = true;
                     return $this_robot->trigger_recovery($target_robot, $this_ability, $options->damage_amount);
                 }
 
                 // If this robot has weakness to the ability (based on type)
-                if ($this_robot->has_weakness($this_ability->damage_options['damage_type']) && !$this_robot->has_affinity($this_ability->damage_options['damage_type2'])){
+                if ($this_robot->has_weakness($options->damage_type) && !$this_robot->has_affinity($options->damage_type2)){
                     $this_ability->ability_results['counter_weaknesses'] += 1;
                     $this_ability->ability_results['flag_weakness'] = true;
                 } else {
@@ -172,13 +174,13 @@ class rpg_ability_damage extends rpg_damage {
                 }
 
                 // If this robot has weakness to the ability (based on type2)
-                if ($this_robot->has_weakness($this_ability->damage_options['damage_type2']) && !$this_robot->has_affinity($this_ability->damage_options['damage_type'])){
+                if ($this_robot->has_weakness($options->damage_type2) && !$this_robot->has_affinity($options->damage_type)){
                     $this_ability->ability_results['counter_weaknesses'] += 1;
                     $this_ability->ability_results['flag_weakness'] = true;
                 }
 
                 // If target robot has resistance tp the ability (based on type)
-                if ($this_robot->has_resistance($this_ability->damage_options['damage_type'])){
+                if ($this_robot->has_resistance($options->damage_type)){
                     $this_ability->ability_results['counter_resistances'] += 1;
                     $this_ability->ability_results['flag_resistance'] = true;
                 } else {
@@ -186,13 +188,13 @@ class rpg_ability_damage extends rpg_damage {
                 }
 
                 // If target robot has resistance tp the ability (based on type2)
-                if ($this_robot->has_resistance($this_ability->damage_options['damage_type2'])){
+                if ($this_robot->has_resistance($options->damage_type2)){
                     $this_ability->ability_results['counter_resistances'] += 1;
                     $this_ability->ability_results['flag_resistance'] = true;
                 }
 
                 // If target robot has immunity to the ability (based on type)
-                if ($this_robot->has_immunity($this_ability->damage_options['damage_type'])){
+                if ($this_robot->has_immunity($options->damage_type)){
                     $this_ability->ability_results['counter_immunities'] += 1;
                     $this_ability->ability_results['flag_immunity'] = true;
                 } else {
@@ -200,7 +202,7 @@ class rpg_ability_damage extends rpg_damage {
                 }
 
                 // If target robot has immunity to the ability (based on type2)
-                if ($this_robot->has_immunity($this_ability->damage_options['damage_type2'])){
+                if ($this_robot->has_immunity($options->damage_type2)){
                     $this_ability->ability_results['counter_immunities'] += 1;
                     $this_ability->ability_results['flag_immunity'] = true;
                 }
@@ -226,8 +228,8 @@ class rpg_ability_damage extends rpg_damage {
             }
 
             // Collect this ability's type tokens if they exist
-            $ability_type_token = !empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none';
-            $ability_type_token2 = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
+            $ability_type_token = !empty($options->damage_type) ? $options->damage_type : 'none';
+            $ability_type_token2 = !empty($options->damage_type2) ? $options->damage_type2 : '';
 
             // Apply core boosts if allowed to
             if ($trigger_options['apply_core_modifiers'] != false){
@@ -389,8 +391,8 @@ class rpg_ability_damage extends rpg_damage {
             $field_multipliers = $this_robot->field->field_multipliers;
 
             // Collect the ability types else "none" for multipliers
-            $temp_ability_damage_type = !empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none';
-            $temp_ability_damage_type2 = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
+            $temp_ability_damage_type = !empty($options->damage_type) ? $options->damage_type : 'none';
+            $temp_ability_damage_type2 = !empty($options->damage_type2) ? $options->damage_type2 : '';
 
             // If there's a damage booster, apply that first
             if (isset($field_multipliers['damage'])){
@@ -424,8 +426,8 @@ class rpg_ability_damage extends rpg_damage {
         // Update the ability results with the the trigger kind and damage details
         $this_ability->ability_results['trigger_kind'] = 'damage';
         $this_ability->ability_results['damage_kind'] = $this_ability->damage_options['damage_kind'];
-        $this_ability->ability_results['damage_type'] = $this_ability->damage_options['damage_type'];
-        $this_ability->ability_results['damage_type2'] = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
+        $this_ability->ability_results['damage_type'] = $options->damage_type;
+        $this_ability->ability_results['damage_type2'] = !empty($options->damage_type2) ? $options->damage_type2 : '';
 
         // If the success rate was not provided, auto-calculate
         if ($this_ability->damage_options['success_rate'] == 'auto'){
@@ -797,8 +799,8 @@ class rpg_ability_damage extends rpg_damage {
                 ){
 
                 // Collect the ability types else "none" for multipliers
-                $temp_ability_damage_type = !empty($this_ability->damage_options['damage_type']) ? $this_ability->damage_options['damage_type'] : 'none';
-                $temp_ability_damage_type2 = !empty($this_ability->damage_options['damage_type2']) ? $this_ability->damage_options['damage_type2'] : '';
+                $temp_ability_damage_type = !empty($options->damage_type) ? $options->damage_type : 'none';
+                $temp_ability_damage_type2 = !empty($options->damage_type2) ? $options->damage_type2 : '';
 
                 // Pre-determine which attachment origin attachment modifiers we're allowed to apply
                 $apply_origin_attachment_modifiers = isset($trigger_options['apply_origin_attachment_modifiers']) && $trigger_options['apply_origin_attachment_modifiers'] == false ? false : true;
@@ -1438,14 +1440,14 @@ class rpg_ability_damage extends rpg_damage {
                     foreach ($this_robot_attachments AS $attachment_token => $attachment_info){
 
                         // Ensure this ability has a type before checking weaknesses, resistances, etc.
-                        if (!empty($this_ability->damage_options['damage_type'])
+                        if (!empty($options->damage_type)
                                 || (isset($attachment_info['attachment_weaknesses']) && in_array('*', $attachment_info['attachment_weaknesses']))){
 
                             // If this attachment has weaknesses defined and this ability is a match
                             if (!empty($attachment_info['attachment_weaknesses'])
                                 && (in_array('*', $attachment_info['attachment_weaknesses'])
-                                    || in_array($this_ability->damage_options['damage_type'], $attachment_info['attachment_weaknesses'])
-                                    || in_array($this_ability->damage_options['damage_type2'], $attachment_info['attachment_weaknesses'])
+                                    || in_array($options->damage_type, $attachment_info['attachment_weaknesses'])
+                                    || in_array($options->damage_type2, $attachment_info['attachment_weaknesses'])
                                     )
                                 && (!isset($attachment_info['attachment_weaknesses_trigger'])
                                     || $attachment_info['attachment_weaknesses_trigger'] === 'either'

@@ -33,6 +33,7 @@ $debug_flag_scanlines = true;
 // Collect the battle tokens from the URL
 $this_battle_id = isset($_GET['this_battle_id']) ? $_GET['this_battle_id'] : 0;
 $this_battle_token = isset($_GET['this_battle_token']) ? $_GET['this_battle_token'] : '';
+$this_star_token = isset($_GET['this_star_token']) ? $_GET['this_star_token'] : '';
 $this_field_id = isset($_GET['this_field_id']) ? $_GET['this_field_id'] : 0;
 $this_field_token = isset($_GET['this_field_token']) ? $_GET['this_field_token'] : '';
 $this_player_id = isset($_GET['this_player_id']) ? $_GET['this_player_id'] : 0;
@@ -41,16 +42,122 @@ $this_player_robots = isset($_GET['this_player_robots']) ? $_GET['this_player_ro
 $target_player_id = isset($_GET['target_player_id']) ? $_GET['target_player_id'] : 0;
 $target_player_token = isset($_GET['target_player_token']) ? $_GET['target_player_token'] : '';
 $flag_skip_fadein = isset($_GET['flag_skip_fadein']) && $_GET['flag_skip_fadein'] == 'true' ? true : false;
+//echo('<pre>$this_battle_token = '.print_r($this_battle_token, true).'</pre>');
+//exit();
+//error_log('----------');
+//error_log('$this_battle_token = '.print_r($this_battle_token, true));
+//error_log('$this_star_token = '.print_r($this_star_token, true));
 
 // Collect the battle index data if available
 if (!empty($this_battle_token)){
+
+    // MULTI-BATTLE-TOKEN-PRE-CHECK
+    // Pre-check to see if multiple battle tokens have been supplied (it's a world thing)
+    $multi_battle_tokens = false;
+    if (strstr($this_battle_token, ',')){
+        $multi_battle_tokens = explode(',', $this_battle_token);
+        $this_battle_token = $multi_battle_tokens[0];
+        //error_log('$multi_battle_tokens(1) = '.print_r($multi_battle_tokens, true));
+    }
+
+    // Collect the battle data from the index given whatever battle token was collected
     $this_battle_data = rpg_battle::get_index_info($this_battle_token);
     if (empty($this_battle_data['battle_id'])){
         $this_battle_id = !empty($this_battle_id) ? $this_battle_id : 1;
         $this_battle_data['battle_id'] = $this_battle_id;
     }
+
+    // Pre-emptively remove any lingering "guest" robots from previous multi-battle sessions
+    // This ensures a clean slate whether this is a new multi-battle or reverting to a single encounter
+    if (!empty($this_battle_data['battle_target_player']['player_robots'])){
+        $clean_target_robots = array();
+        foreach ($this_battle_data['battle_target_player']['player_robots'] AS $robot_data){
+            if (empty($robot_data['flags']['guest'])){
+                $clean_target_robots[] = $robot_data;
+            }
+        }
+        $this_battle_data['battle_target_player']['player_robots'] = $clean_target_robots;
+    }
+
+    // MULTI-BATTLE-TOKEN-POST-CHECK
+    // If multiple battle tokens were provided, loop through them and merge-in target robots, rewards, etc.
+    if ($multi_battle_tokens){
+        //error_log('has multi-battle-tokens, merging in data');
+        //error_log('$multi_battle_tokens(2) = '.print_r($multi_battle_tokens, true));
+        $temp_target_playerid = $this_battle_data['battle_target_player']['player_id'];
+        $combo_multiplier = count($multi_battle_tokens);
+        $exp_multiplier = 1 + ($combo_multiplier < 8 ? ($combo_multiplier * 0.1) : 1);
+        $new_battle_turns = 0;
+        $new_battle_zenny = 0;
+        $new_battle_rewards = array();
+        $new_target_robots = array();
+        foreach ($multi_battle_tokens AS $multi_key => $multi_token){
+            //if ($multi_key === 0){ continue; }
+            //error_log('checking $multi_token = '.print_r($multi_token, true));
+            $temp_battle_token = trim($multi_token);
+            $temp_battle_data = rpg_battle::get_index_info($temp_battle_token);
+            $temp_battle_turns = !empty($temp_battle_data['battle_turns']) ? $temp_battle_data['battle_turns'] : 0;
+            $temp_battle_zenny = !empty($temp_battle_data['battle_zenny']) ? $temp_battle_data['battle_zenny'] : 0;
+            $temp_target_player = !empty($temp_battle_data['battle_target_player']) ? $temp_battle_data['battle_target_player'] : array();
+            $temp_battle_rewards = !empty($temp_battle_data['battle_rewards']) ? $temp_battle_data['battle_rewards'] : array();
+            $temp_target_robots = !empty($temp_target_player['player_robots']) ? $temp_target_player['player_robots'] : array();
+            //error_log('$temp_battle_token = '.print_r($temp_battle_token, true));
+            //error_log('$temp_battle_data = '.print_r($temp_battle_data, true));
+            //error_log('$temp_battle_turns = '.print_r($temp_battle_turns, true));
+            //error_log('$temp_battle_zenny = '.print_r($temp_battle_zenny, true));
+            //error_log('$temp_target_player = '.print_r($temp_target_player, true));
+            //error_log('$temp_battle_rewards = '.print_r($temp_battle_rewards, true));
+            //error_log('$temp_target_robots = '.print_r($temp_target_robots, true));
+            if ($temp_battle_turns){ $new_battle_turns += $temp_battle_turns; }
+            if ($temp_battle_zenny){ $new_battle_zenny += ($temp_battle_zenny * $combo_multiplier); }
+            if (!empty($temp_battle_rewards)){
+                //error_log('merging in $temp_battle_rewards = '.print_r($temp_battle_rewards, true));
+                foreach ($temp_battle_rewards AS $kind => $rewards){
+                    if (!isset($new_battle_rewards[$kind])){ $new_battle_rewards[$kind] = array(); }
+                    $new_battle_rewards[$kind] = array_merge($new_battle_rewards[$kind], $rewards);
+                }
+            }
+            if (!empty($temp_target_robots)){
+                //error_log('merging in $temp_target_robots = '.print_r($temp_target_robots, true));
+                foreach ($temp_target_robots AS $temp_robot_data){
+                    if (!empty($temp_robot_data['flags']['guest'])){ continue; }
+                    elseif ($multi_key > 0){ $temp_robot_data['flags']['guest'] = true; }
+                    $temp_robot_data['values']['source_battle'] = $temp_battle_token;
+                    $robot_key = count($new_target_robots);
+                    $robot_info = rpg_robot::get_index_info($temp_robot_data['robot_token']);
+                    $robot_base_id = $robot_info['robot_id'];
+                    $temp_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_target_playerid, $robot_base_id, ($robot_key + 1));
+                    $temp_robot_data['robot_base_id'] = $robot_base_id;
+                    $new_target_robots[] = $temp_robot_data;
+                }
+            }
+        }
+        //$new_field_multipliers = !empty($this_battle_data['battle_field_base']['field_multipliers']) ? $this_battle_data['battle_field_base']['field_multipliers'] : array();
+        //$new_field_multipliers['experience'] = (!empty($new_field_multipliers['experience']) ? $new_field_multipliers['experience'] : 1) * $exp_multiplier;
+        $new_target_robots = array_slice($new_target_robots, 0, MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX);
+        $this_battle_data['battle_turns'] = $new_battle_turns;
+        $this_battle_data['battle_zenny'] = $new_battle_zenny;
+        $this_battle_data['battle_rewards'] = $new_battle_rewards;
+        //$this_battle_data['battle_field_base']['field_multipliers'] = $new_field_multipliers;
+        $this_battle_data['battle_target_player']['player_robots'] = $new_target_robots;
+        $this_battle_data['values']['multi_battle_tokens'] = $multi_battle_tokens;
+        $this_battle_data['values']['extra_field_multipliers'] = array('experience' => $exp_multiplier);
+        rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+        //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
+    }
+
+    // Prevent characters with a zero heart limit (e.g., Dr. LaLinde) from unlocking robot rewards
+    if (!empty($this_player_token) && !empty($this_battle_data['battle_rewards']['robots'])){
+        $heart_limit = mmrpg_prototype_limit_hearts_earned($this_player_token);
+        if (empty($heart_limit) || $this_player_token === 'dr-lalinde') {
+            unset($this_battle_data['battle_rewards']['robots']);
+            rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+        }
+    }
+
 }
 else {
+    //error_log('(battle.php) battle token was empty! redirecting home...');
     $this_battle_id = 0;
     $this_battle_token = '';
     $this_battle_data = array();
@@ -59,9 +166,16 @@ else {
     exit();
 }
 
+// Define some flags of what this battle is or isn't
+$this_is_challenge_battle = !empty($this_battle_data['flags']['challenge_battle']) ? true : false;
+$this_is_endless_battle = !empty($this_battle_data['flags']['endless_battle']) ? true : false;
+$this_is_player_battle = !empty($this_battle_data['flags']['player_battle']) ? true : false;
+$this_is_world_battle = !empty($this_battle_data['flags']['world_battle']) ? true : false;
+
 // Collect the field index if available
 $mmrpg_index_fields = rpg_field::get_index(true);
 // Collect the field index data if available
+//error_log('$this_battle_data = '.print_r($this_battle_data, true));
 if (!empty($this_field_token) && isset($mmrpg_index_fields[$this_field_token])){
     $this_field_data = rpg_field::parse_index_info($mmrpg_index_fields[$this_field_token]);
     if (empty($this_field_data['field_id'])){
@@ -84,6 +198,47 @@ else {
     $this_field_data = array();
 }
 
+// Remove any leftover boss stars added in previous sessions just-in-case
+if (!empty($this_battle_data['values']['field_star'])
+    && !empty($this_battle_data['values']['field_star']['star_kind'])
+    && $this_battle_data['values']['field_star']['star_kind'] === 'boss'){
+    //error_log('removing leftover boss star from previous session');
+    unset($this_battle_data['values']['field_star']);
+    rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+    //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
+}
+// Check to see if there's any star data included in the request headers
+$this_star_data = null;
+if (!empty($this_star_token)){
+
+    // Try to collect star data from the world class first as that's the likely source
+    if (strstr($this_star_token, 'world-star_')){
+        $this_star_data = rpg_world::get_star_info($this_star_token);
+        //error_log('$this_star_data = '.print_r($this_star_data, true));
+        if (!empty($this_star_data) && !empty($this_star_data['owner'])){
+            $boss_robot_info = rpg_robot::get_index_info($this_star_data['owner']);
+            $boss_field_star = array(
+                'star_token' => $boss_robot_info['robot_token'],
+                'star_name' => $boss_robot_info['robot_name'],
+                'star_kind' => 'boss',
+                'star_type' => $boss_robot_info['robot_core'],
+                'star_type2' => '',
+                'star_field' => $this_field_data['field_background'],
+                'star_field2' => $this_field_data['field_foreground'],
+                'star_player' => $this_player_token,
+                'star_date' => time(),
+                );
+            //error_log('adding boss star to battle index info');
+            //error_log('$boss_field_star = '.print_r($boss_field_star, true));
+            $this_battle_data['values']['field_star'] = $boss_field_star;
+            rpg_battle::update_index_info($this_battle_token, $this_battle_data);
+            //error_log('new $this_battle_data = '.print_r($this_battle_data, true));
+        }
+    }
+
+
+}
+
 // Collect this player's index data if available
 $temp_this_robot_classes = array();
 if (!empty($this_player_token)){
@@ -93,6 +248,7 @@ if (!empty($this_player_token)){
     $this_player_data['user_id'] = $temp_user_id;
     $this_player_data['player_id'] = $temp_player_id;
     if (!empty($this_player_robots)){
+        //error_log('(battle.php) -> $this_player_robots (before) = '.print_r($this_player_robots, true));
         $allowed_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
         $allowed_robots_parsed = array();
         $this_player_data['player_robots'] = array();
@@ -102,14 +258,16 @@ if (!empty($this_player_token)){
             $temp_robot_class = $temp_robot_data['robot_class'];
             if (!isset($temp_this_robot_classes[$temp_robot_class])){ $temp_this_robot_classes[$temp_robot_class] = 0; }
             $temp_this_robot_classes[$temp_robot_class] += 1;
-            if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token)){
-                $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $temp_robot_data['robot_id'], ($key + 1));
-                $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_token' => $robot_token);
+            if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_token, $robot_id)){
+                $temp_robot_id = strstr($robot_id, $temp_player_id) ? $robot_id : rpg_game::unique_robot_id($temp_player_id, $robot_id, ($key + 1));
+                $this_player_data['player_robots'][] = array('robot_id' => $temp_robot_id, 'robot_base_id' => $robot_id, 'robot_token' => $robot_token);
                 $allowed_robots_parsed[] = $temp_robot_id.'_'.$robot_token;
             }
         }
         $this_player_robots = implode(',', $allowed_robots_parsed);
         $this_player_data['player_robots'] = array_values($this_player_data['player_robots']);
+        //error_log('(battle.php) -> $this_player_robots (after) = '.print_r($this_player_robots, true));
+        //error_log('(battle.php) -> $this_player_data[\'player_robots\'] = '.print_r($this_player_data['player_robots'], true));
     }
 }
 else {
@@ -176,10 +334,57 @@ if (empty($this_player_robots)){
     }
 
     // We have to redirect back to the home page of the prototype
+    //error_log('(battle.php) player has no robots! redirecting home...');
     header('Location: '.$this_redirect);
     exit();
 }
 
+// As long as this is a non-competitive battle mode, we should save the team data to the history
+if (!empty($this_player_token)
+    && $this_player_token !== 'player'
+    && !$this_is_challenge_battle
+    && !$this_is_endless_battle){
+
+    // If the player token is empty, we can't save the team data
+    $session_token = rpg_game::session_token();
+    //error_log('debug in '.basename(__FILE__).' on line '.__LINE__.' : we should save this player\'s team data to the history');
+    //error_log('$this_player_token = '.print_r($this_player_token, true));
+    //error_log('$this_player_robots = '.print_r($this_player_robots, true));
+    $battle_history = !empty($_SESSION[$session_token]['values']['battle_history']) ? $_SESSION[$session_token]['values']['battle_history'] : array();
+    if (!isset($battle_history[$this_player_token])){ $battle_history[$this_player_token] = array(); }
+    if (!isset($battle_history[$this_player_token]['robots_summoned'])){ $battle_history[$this_player_token]['robots_summoned'] = array(); }
+    $robots_summoned_history = $battle_history[$this_player_token]['robots_summoned'];
+    $robots_summoned_tokens = array_map(function($token){ return explode('_', $token)[1]; }, explode(',', $this_player_robots));
+    //error_log('$robots_summoned_history = '.print_r($robots_summoned_history, true));
+    //error_log('$robots_summoned_tokens = '.print_r($robots_summoned_tokens, true));
+    if (!empty($robots_summoned_tokens)){
+        $robots_summoned_history = array_unique(array_merge($robots_summoned_tokens, $robots_summoned_history));
+        //error_log('(new) $robots_summoned_history = '.print_r($robots_summoned_history, true));
+        $battle_history[$this_player_token]['robots_summoned'] = $robots_summoned_history;
+    }
+    //error_log('(new) $battle_history = '.print_r($battle_history, true));
+    $_SESSION[$session_token]['values']['battle_history'] = $battle_history;
+
+    // If this is a world battle, we should also update the player's "last_robots" string
+    if ($this_is_world_battle){
+        $last_robots = array_map(function($token){
+            list($bid, $token) = explode('_', $token, 2);
+            if (empty($bid) || empty($token)){ return false; }
+            $info = rpg_robot::get_index_info($token);
+            if (empty($info)){ return false; }
+            return $info['robot_id'].'_'.$token;
+            }, explode(',', $this_player_robots));
+        $last_robots_string = implode(',', array_filter($last_robots));
+        //error_log('$last_robots = '.print_r($last_robots, true));
+        //error_log('$last_robots_string = '.print_r($last_robots_string, true));
+        $world_session_token = rpg_world::session_token();
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $WORLD_PLAYER_SESSION = &$WORLD_SESSION['player_sessions'][$this_player_token];
+        $WORLD_PLAYER_SESSION['last_robots'] = $last_robots_string;
+        //error_log('new $WORLD_PLAYER_SESSION = '.print_r($WORLD_PLAYER_SESSION, true));
+    }
+
+}
 
 // Collect the target player's index data if available
 if (!empty($target_player_token)){
@@ -230,6 +435,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/battle.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
@@ -249,6 +455,8 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
 
         <input type="hidden" name="this_field_id" value="<?= $this_field_data['field_id'] ?>" />
         <input type="hidden" name="this_field_token" value="<?= $this_field_data['field_token'] ?>" />
+
+        <input type="hidden" name="this_star_token" value="<?= $this_star_token ?>" />
 
         <input type="hidden" name="this_user_id" value="<?= $this_player_data['user_id'] ?>" />
         <input type="hidden" name="this_player_id" value="<?= $this_player_data['player_id'] ?>" />
@@ -271,7 +479,87 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             <div class="canvas_overlay_header canvas_overlay_hidden" style="">&nbsp;</div>
 
             <div id="animate" style="opacity: 0;"><a class="toggle paused" href="#" onclick=""><span><span>loading&hellip;</span></span></a></div>
-            <div class="event event_fieldback sticky" style="z-index: 1;">
+            <div class="event event_fieldback wide sticky" style="z-index: 1;">
+                <?
+
+                // If field data was provided, preload the background/foreground
+                if (!empty($this_field_data)){
+
+                    // Define an index to cache robot/mecha info
+                    $this_robot_index = array();
+
+                    // Define the paths for the different attachment types
+                    $class_paths = array('ability' => 'abilities', 'item' => 'items', 'battle' => 'battles', 'field' => 'fields', 'player' => 'players', 'robot' => 'robots', 'object' => 'objects');
+
+                    // Define the background layer properties
+                    $background_animate = array();
+                    if (!empty($this_field_data['field_background_frame'])){
+                        if (is_array($this_field_data['field_background_frame'])){ foreach ($this_field_data['field_background_frame'] AS $frame){ $background_animate[] = str_pad($frame, 2, '0', STR_PAD_LEFT);  } }
+                        else { $background_animate[] = str_pad($this_field_data['field_background_frame'], 2, '0', STR_PAD_LEFT); }
+                    }
+                    $background_data_animate = count($background_animate) > 1 ? implode(',', $background_animate) : false;
+
+                    // Display the markup of the background layer
+                    $field_background_class = 'background_canvas has_pixels background background_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_background_style = 'background-color: #000000;';
+                    if (!empty($this_field_data['field_background'])){
+                        $image_name = 'battle-field_background_base';
+                        $image_path = 'images/fields/'.$this_field_data['field_background'].'/';
+                        $image_path_full = $image_path.$image_name.'.gif';
+                        //error_log('$image_path_full = '.print_r($image_path_full, true));
+                        if (!empty($this_field_data['field_background_variant'])){
+                            $new_image_name = $image_name.'_'.$this_field_data['field_background_variant'];
+                            $new_image_path_full = $image_path.$new_image_name.'.gif';
+                            //error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            if (rpg_game::sprite_exists($new_image_path_full)){
+                                //error_log(basename($new_image_path_full).' exists!');
+                                $image_name = $new_image_name;
+                                $image_path_full = $new_image_path_full;
+                            }
+                        }
+                        $field_background_style .= ' background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    }
+                    echo '<div class="'.$field_background_class.'" style="'.$field_background_style.'" data-frame="00">&nbsp;</div>';
+
+                    // Define the foreground layer properties
+                    $foreground_animate = array();
+                    if (!empty($this_field_data['field_foreground_frame'])){
+                        if (is_array($this_field_data['field_foreground_frame'])){ foreach ($this_field_data['field_foreground_frame'] AS $frame){ $foreground_animate[] = str_pad($frame, 2, '0', STR_PAD_LEFT);  } }
+                        else { $foreground_animate[] = str_pad($this_field_data['field_foreground_frame'], 2, '0', STR_PAD_LEFT); }
+                    }
+                    $foreground_data_animate = count($foreground_animate) > 1 ? implode(',', $foreground_animate) : false;
+
+                    // Display the markup of the background layer
+                    $field_foreground_class = 'foreground_canvas has_pixels foreground foreground_00'.(!$flag_skip_fadein ? ' animate_fadein' : '');
+                    $field_foreground_style = '';
+                    if (!empty($this_field_data['field_foreground'])){
+                        $image_name = 'battle-field_foreground_base';
+                        $image_path = 'images/fields/'.$this_field_data['field_foreground'].'/';
+                        $image_path_full = $image_path.$image_name.'.png';
+                        //error_log('$image_path_full = '.print_r($image_path_full, true));
+                        if (!empty($this_field_data['field_foreground_variant'])){
+                            $new_image_name = $image_name.'_'.$this_field_data['field_foreground_variant'];
+                            $new_image_path_full = $image_path.$new_image_name.'.png';
+                            //error_log('$new_image_path_full = '.print_r($new_image_path_full, true));
+                            if (rpg_game::sprite_exists($new_image_path_full)){
+                                //error_log(basename($new_image_path_full).' exists!');
+                                $image_name = $new_image_name;
+                                $image_path_full = $new_image_path_full;
+                            }
+                        }
+                        $field_foreground_style .= ' background-image: url('.$image_path_full.'?'.MMRPG_CONFIG_CACHE_DATE.');';
+                    }
+                    echo '<div class="'.$field_foreground_class.'" style="'.$field_foreground_style.'" data-frame="00">&nbsp;</div>';
+
+                }
+                // Otherwise, simply print the ready message
+                else {
+                    echo 'Ready?';
+                }
+
+                ?>
+            </div>
+            <div class="event event_fieldback sticky" style="z-index: 2;">
                 <?
 
                 // If field data was provided, preload the background/foreground
@@ -427,16 +715,25 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     if (!empty($this_battle_data['values']['field_star'])){
 
                         // Check if this is a field star or fusion star
-                        $temp_star_kind = !empty($this_field_data['field_type2']) ? 'fusion' : 'field';
-                        $temp_star_name = $this_field_data['field_name'].' Star';
-                        $temp_field_type_1 = !empty($this_field_data['field_type']) ? $this_field_data['field_type'] : 'none';
-                        $temp_field_type_2 = !empty($this_field_data['field_type2']) ? $this_field_data['field_type2'] : $temp_field_type_1;
+                        $temp_field_star = $this_battle_data['values']['field_star'];
+                        $temp_star_token = !empty($temp_field_star['star_token']) ? $temp_field_star['star_token'] : 'undefined';
+                        $temp_star_kind = !empty($temp_field_star['star_kind']) ? $temp_field_star['star_kind'] : (!empty($this_field_data['field_type2']) ? 'fusion' : 'field');
+                        //$temp_star_name = $this_field_data['field_name'].' Star';
+                        if ($temp_star_kind === 'boss'){
+                            $temp_star_name = ucwords(str_replace('-', ' ', $temp_star_token)).' Star';
+                            $temp_field_type_1 = !empty($temp_field_star['star_type']) ? $temp_field_star['star_type'] : 'none';
+                            $temp_field_type_2 = !empty($temp_field_star['star_type2']) ? $temp_field_star['star_type2'] : $temp_field_type_1;
+                        } else {
+                            $temp_star_name = $this_field_data['field_name'].' Star';
+                            $temp_field_type_1 = !empty($this_field_data['field_type']) ? $this_field_data['field_type'] : 'none';
+                            $temp_field_type_2 = !empty($this_field_data['field_type2']) ? $this_field_data['field_type2'] : $temp_field_type_1;
+                        }
                         if ($temp_field_type_1 == $temp_field_type_2){ $temp_star_text = ucfirst($temp_field_type_1).' Type | '; }
                         else { $temp_star_text = ucfirst($temp_field_type_1).' / '.ucfirst($temp_field_type_1).' Type | '; }
                         $temp_star_text .= ucfirst($temp_star_kind).' Class';
 
                         // Generate the star image info based on the kind and type(s)
-                        $temp_star_image = $temp_star_kind.'-star';
+                        $temp_star_image = $temp_star_kind !== 'boss' ? $temp_star_kind.'-star' : 'field-star';
                         if (!empty($temp_field_type_1)){ $temp_star_image .= '_'.$temp_field_type_1; }
                         if (!empty($temp_field_type_2) && $temp_field_type_2 != $temp_field_type_1){ $temp_star_image .= '-'.$temp_field_type_2; }
 
@@ -456,7 +753,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             );
 
                         // Append the new field star to the foreground attachment array
-                        $temp_shadow_image = $temp_star_kind.'-star';
+                        $temp_shadow_image = $temp_star_kind !== 'boss' ? $temp_star_kind.'-star' : 'field-star';
                         $this_field_data['field_foreground_attachments'][$temp_star_kind.'-star_shadow'] = array(
                             'class' => 'item',
                             'is_shadow' => true,
@@ -473,6 +770,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                             );
 
                     }
+
                     // Check if this field has a challenge marker in it
                     if (!empty($this_battle_data['values']['challenge_marker'])){
 
@@ -731,7 +1029,7 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             $animation_effects_index = rpg_canvas::get_animation_effects_index();
 
             // Predefine the game speeds index so we can use it later
-            $game_speeds_index = array(
+            /* $game_speeds_index = array(
                 1600 => array('token' => 'super-slow', 'name' => 'Super Slow', 'value' => 1600),
                 1250 => array('token' => 'medium-slow', 'name' => 'Medium Slow', 'value' => 1250),
                 1000 => array('token' => 'normal-slow', 'name' => 'Normal Slow', 'value' => 1000),
@@ -740,16 +1038,11 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                 700 => array('token' => 'medium-fast', 'name' => 'Medium Fast', 'value' => 700),
                 600 => array('token' => 'super-fast', 'name' => 'Super Fast', 'value' => 600),
                 250 => array('token' => 'ultra-fast', 'name' => 'Ultra Fast', 'value' => 250)
-                );
-
-            // Predefine the render modes index
-            $render_modes_index = array(
-                'default' => array('token' => 'default', 'name' => 'Default', 'label' => 'Default'),
-                //'auto' => array('token' => 'auto', 'name' => 'Auto', 'label' => 'Browser "Auto"'),
-                //'smooth' => array('token' => 'smooth', 'name' => 'Smooth', 'label' => 'Browser "Smooth"'),
-                //'high-quality' => array('token' => 'high-quality', 'name' => 'High-Quality', 'label' => 'Browser "High-Quality"'),
-                'crisp-edges' => array('token' => 'crisp-edges', 'name' => 'Crisp-Edges', 'label' => 'Browser "Crisp-Edges"'),
-                'pixelated' => array('token' => 'pixelated', 'name' => 'Pixelated', 'label' => 'Browser "Pixelated"')
+                ); */
+            $game_speeds_index = array(
+                900 => array('token' => 'normal', 'name' => 'Slow', 'value' => 900),
+                600 => array('token' => 'super-fast', 'name' => 'Normal', 'value' => 600),
+                300 => array('token' => 'ultra-fast', 'name' => 'Fast', 'value' => 300)
                 );
 
             ?>
@@ -813,12 +1106,6 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                     echo('</a>');
                 }
 
-                // If there were less than eight buttons, we should print spacers
-                while ($block_num < 4){
-                    $block_num++;
-                    echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>');
-                }
-
                 // Manually add buttons for sub-menus related to animation
                 if (true){
 
@@ -846,37 +1133,12 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
                         echo('</span></label>');
                     echo('</a>');
 
-
                 }
 
-                // Manually add buttons for sub-menus related to animation
-                if (true){
-
-                    // Add a button for the SPRITE RENDERING submenu
+                // If there were less than eight buttons, we should print spacers
+                while ($block_num < 4){
                     $block_num++;
-                    $setting_name = 'Sprite Rendering';
-                    $setting_token = 'spriteRenderMode';
-                    $default_value = 'default';
-                    $current_value = $default_value;
-                    if (isset($_SESSION['GAME']['battle_settings'][$setting_token])){
-                        $value = $_SESSION['GAME']['battle_settings'][$setting_token];
-                        if (empty($value) || $value === 'false'){ $value = false; }
-                        elseif (!empty($value) && $value === 'true'){ $value = true; }
-                        $current_value = $value;
-                    }
-                    $current_value_title = ucwords(str_replace('-', ' ', $current_value));
-                    if (isset($render_modes_index[$current_value]['name'])){ $current_value_title = $render_modes_index[$current_value]['name']; }
-                    echo('<a data-order="'.$block_num.'" class="button action_option action_setting block_'.$block_num.'" type="button" data-panel="settings_'.$setting_token.'">');
-                        echo('<label><span class="multi">');
-                            echo('<span class="title">'.$setting_name.'</span>');
-                            echo('<br />');
-                            echo('<span class="value type type_explode">');
-                                echo($current_value_title);
-                            echo('</span>');
-                        echo('</span></label>');
-                    echo('</a>');
-
-
+                    echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>');
                 }
 
                 // If there were less than eight buttons, we should print spacers
@@ -890,33 +1152,15 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="option"><label>Back</label></a></div>
         </div>
         <div id="actions_settings_eventTimeout" class="actions_settings actions_settings_eventTimeout wrapper">
-            <div class="main_actions">
-                <? $block_num = 0;
-                foreach ($game_speeds_index as $value => $speed){ $block_num++; ?>
-                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_eventTimeout_<?= $speed['value'] ?>"><label><span class="multi"><?= $speed['name'] ?><br />(1f/<?= $speed['value'] ?>ms)</span></label></a>
-                <? } ?>
+            <div class="main_actions main_actions_hastitle">
+                <span class="main_actions_title">Select Game Speed</span>
+                <?
+                $block_num = 0;
+                foreach ($game_speeds_index as $value => $speed){ $block_num++; ?><a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_eventTimeout_<?= $speed['value'] ?>"><label><span class="multi"><?= $speed['name'] ?><br />(1f/<?= $speed['value'] ?>ms)</span></label></a><? }
+                while ($block_num < 4){ $block_num++; echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>'); }
+                while ($block_num < 8){ $block_num++; echo('<a class="button action_setting button_disabled block_'.$block_num.'" type="button">&nbsp;</a>'); }
+                ?>
             </div>
-            <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
-        </div>
-        <div id="actions_settings_spriteRenderMode" class="actions_settings actions_settings_spriteRenderMode wrapper">
-            <div class="main_actions">
-                <? $block_num = 0;
-                foreach ($render_modes_index as $token => $mode){ $block_num++; ?>
-                    <a data-order="<?= $block_num ?>" class="button action_setting block_<?= $block_num ?>" type="button" data-action="settings_spriteRenderMode_<?= $mode['token'] ?>"><label><span class="multi"><?= str_replace(' ', '<br />', str_replace('"', '&quot;', $mode['label'])) ?></span></label></a>
-                <? } ?>
-            </div>
-            <!--
-            <div class="main_actions">
-                <a data-order="1" class="button action_setting block_1" type="button" data-action="settings_spriteRenderMode_default"><label><span>Default</span></label></a>
-                <a data-order="2" class="button action_setting block_2" type="button" data-action="settings_spriteRenderMode_auto"><label><span class="multi">Browser<br />&quot;Auto&quot;</span></label></a>
-                <a data-order="3" class="button action_setting block_3" type="button" data-action="settings_spriteRenderMode_smooth"><label><span class="multi">Browser<br />&quot;Smooth&quot;</span></label></a>
-                <a data-order="4" class="button action_setting block_4" type="button" data-action="settings_spriteRenderMode_pixelated"><label><span class="multi">Browser<br />&quot;Pixelated&quot;</span></label></a>
-                <a data-order="5" class="button action_setting block_5" type="button" data-action="settings_spriteRenderMode_high-quality"><label><span class="multi">Browser<br />&quot;High-Quality&quot;</span></label></a>
-                <a data-order="6" class="button action_setting block_6" type="button" data-action="settings_spriteRenderMode_crisp-edges"><label><span class="multi">Browser<br />&quot;Crisp-Edges&quot;</span></label></a>
-                <a class="button action_setting button_disabled block_7" type="button">&nbsp;</a>
-                <a class="button action_setting button_disabled block_8" type="button">&nbsp;</a>
-            </div>
-            -->
             <div class="sub_actions"><a data-order="9" class="button action_back" type="button" data-panel="settings_animationEffects"><label>Back</label></a></div>
         </div>
         <div id="actions_event" class="actions_event wrapper">
@@ -947,26 +1191,29 @@ $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_playe
     </div>
 
 </div>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.battle.php'); ?>
 <script type="text/javascript" src="scripts/battle.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
 
 // Update relevent game settings and flags
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.idleAnimation = <?= $debug_flag_animation ? 'true' : 'false' ?>;
 gameSettings.fieldMusic = '<?= !strstr($this_field_data['field_music'], '/') ? 'fields/'.$this_field_data['field_music'] : $this_field_data['field_music'] ?>';
 gameSettings.customIndex.animationEffects = <?= json_encode($animation_effects_index) ?>;
 gameSettings.customIndex.gameSpeeds = <?= json_encode($game_speeds_index) ?>;
-gameSettings.customIndex.renderModes = <?= json_encode($render_modes_index) ?>;
 gameSettings.currentBattleData = <?= json_encode($this_battle_data) ?>;
+gameSettings.playVictoryMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>;
+gameSettings.playDefeatMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>;
 
 // Create the document ready events
 $(document).ready(function(){
 
     // Make sure the music button is in the appropriate place
     top.mmrpg_music_context('battle');
+
+    // Start playing the appropriate stage music
+    let restartMusic = <?= !$this_is_world_battle ? 'true' : 'false' ?>; // in case we're in free-roam
+    parent.mmrpg_music_load(gameSettings.fieldMusic, restartMusic, false);
 
 <?
 // Preload the target player robot sprites first because we see them first

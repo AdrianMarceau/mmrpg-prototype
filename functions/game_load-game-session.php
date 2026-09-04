@@ -1,6 +1,7 @@
 <?
 // Define a function for loading the game session
 function mmrpg_load_game_session(){
+    //error_log('mmrpg_load_game_session() called!');
 
     // Reference global variables
     global $db;
@@ -25,163 +26,266 @@ function mmrpg_load_game_session(){
 
     // If this is NOT demo mode, load from database
     $is_demo_mode = rpg_game::is_demo();
-    if (!$is_demo_mode && !empty($login_user_id)){
+    if ($is_demo_mode || empty($login_user_id)){ return false; }
 
-        // Define a function for replacing legacy strings (names) in save data
-        $temp_replace_legacy_strings = function($raw_json_string){
-            $new_json_string = $raw_json_string;
-            // Legacy ABILITY string replacements
-            $new_json_string = str_replace('"repair-mode"', '"energy-mode"', $new_json_string);
-            // Legacy ITEM string replacements
-            $new_json_string = str_replace('"locking-module"', '"guard-module"', $new_json_string);
-            // Legacy FIELD string replacements
-            $new_json_string = str_replace('"lightning-control"', '"lighting-control"', $new_json_string);
-            // Return the cleaned string
-            return $new_json_string;
-            };
+    // Define a function for replacing legacy strings (names) in save data
+    $temp_replace_legacy_strings = function($raw_json_string){
+        $new_json_string = $raw_json_string;
+        // Legacy ABILITY string replacements
+        $new_json_string = str_replace('"repair-mode"', '"energy-mode"', $new_json_string);
+        // Legacy ITEM string replacements
+        $new_json_string = str_replace('"locking-module"', '"guard-module"', $new_json_string);
+        // Legacy FIELD string replacements
+        $new_json_string = str_replace('"lightning-control"', '"lighting-control"', $new_json_string);
+        // Return the cleaned string
+        return $new_json_string;
+        };
 
-        // LOAD DATABASE INFO
+    // LOAD DATABASE INFO
 
-        // Collect the user and save info from the database
+    // 1. ALWAYS load the user base record from the database (we need IPs, roles, dates, etc.)
+    $temp_user_fields = rpg_user::get_index_fields(true, 'users');
+    $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
+    $this_database_user = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$login_user_id}' LIMIT 1");
 
+    // (Fixed a bug here: $temp_matches was undefined in the original script)
+    if (empty($this_database_user)){ die('could not load user for user_id '.$login_user_id.' on line '.__LINE__); }
+
+    // 2. Determine Data Source (JSON Cache vs. Database)
+    $pending_save_file = MMRPG_CONFIG_ROOTDIR . '.saves/save_' . $login_user_id . '.json';
+    $loaded_from_cache = false;
+
+    // Initialize our variables so they exist for the rest of the script regardless of source
+    $this_database_save = array();
+    $this_database_world = array();
+    $user_save_counters = array();
+    $user_unlocked_items = array();
+    $user_unlocked_abilities = array();
+    $user_unlocked_stars = array();
+    $user_robot_records = array();
+
+    if (file_exists($pending_save_file)){
+        // A deferred save exists! Load this data directly instead of querying the DB.
+        $fresh_data = json_decode(file_get_contents($pending_save_file), true);
+
+        if (!empty($fresh_data)){
+            // Route the JSON data into the variables the script expects
+            $this_database_save = $fresh_data['save_array'];
+            $this_database_world = !empty($fresh_data['world_data']) ? $fresh_data['world_data'] : array();
+
+            // Extract the sub-tables we saved in the payload
+            $user_save_counters = !empty($fresh_data['user_tables']['counters']) ? $fresh_data['user_tables']['counters'] : array();
+            $user_unlocked_items = !empty($fresh_data['user_tables']['battle_items']) ? $fresh_data['user_tables']['battle_items'] : array();
+            $user_unlocked_abilities = !empty($fresh_data['user_tables']['battle_abilities']) ? $fresh_data['user_tables']['battle_abilities'] : array();
+            $user_unlocked_stars = !empty($fresh_data['user_tables']['battle_stars']) ? $fresh_data['user_tables']['battle_stars'] : array();
+            $user_robot_records = !empty($fresh_data['user_tables']['robot_database']) ? $fresh_data['user_tables']['robot_database'] : array();
+
+            $loaded_from_cache = true;
+        }
+    }
+
+    if (!$loaded_from_cache){
+        // Normal Database Queries
         $this_database_save = $db->get_array("SELECT * FROM mmrpg_saves WHERE user_id = {$login_user_id} LIMIT 1");
-        if (empty($this_database_save)){ die('could not load save for file '.$temp_matches[2].' and path '.$temp_matches[1].' on line '.__LINE__); }
+        if (empty($this_database_save)){ die('could not load save for user_id '.$login_user_id.' on line '.__LINE__); }
 
-        $temp_user_fields = rpg_user::get_index_fields(true, 'users');
-        $temp_user_role_fields = rpg_user_role::get_index_fields(true, 'roles');
-        $this_database_user = $db->get_array("SELECT {$temp_user_fields}, {$temp_user_role_fields} FROM mmrpg_users AS users LEFT JOIN mmrpg_roles AS roles ON roles.role_id = users.role_id WHERE users.user_id = '{$login_user_id}' LIMIT 1");
-        if (empty($this_database_user)){ die('could not load user for '.$this_database_save['user_id'].' on line '.__LINE__); }
+        // Pull the world data early so we have it ready
+        $this_database_world = $db->get_array("SELECT
+            `last_world_token`, `last_map_token`, `last_player_token`,
+            `player_sessions`, `robot_sessions`, `mecha_sessions`,
+            `world_maps`, `world_buttons`, `world_switches`, `world_gates`, `world_locks`,
+            `world_blocks`, `world_hazards`, `world_items`, `world_abilities`,
+            `world_encounters`, `world_pickups`, `world_actors`, `world_symbols`,
+            `world_events`, `world_battles`
+            FROM `mmrpg_users_worlds`
+            WHERE `user_id` = {$login_user_id}
+            LIMIT 1;");
 
-
-        // Update the game session with database extracted variables
-        $new_game_data = array();
-
-        $new_game_data['CACHE_DATE'] = $this_database_save['save_cache_date'];
-
-        $new_game_data['USER'] = mmrpg_prototype_format_user_data_for_session($this_database_user);
-
+        // Run the DB pulls for the sub-tables
         rpg_user::pull_save_counters($login_user_id, $user_save_counters);
-        if (!empty($user_save_counters)){
-            $new_game_data['counters'] = $user_save_counters;
-        } else {
-            // Legacy support / remove once new methods confirmed working
-            $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
-        }
-
-        $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();
-
-        if (!isset($this_database_save['save_values_battle_index'])){
-            $new_game_data['values']['battle_index'] = array();
-        }
-
-        if (!empty($this_database_save['save_values_battle_complete'])){
-            $new_game_data['values']['battle_complete'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_complete']), true);
-            $new_game_data['values']['battle_complete_hash'] = md5($this_database_save['save_values_battle_complete']);
-        }
-
-        if (!empty($this_database_save['save_values_battle_failure'])){
-            $new_game_data['values']['battle_failure'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_failure']), true);
-            $new_game_data['values']['battle_failure_hash'] = md5($this_database_save['save_values_battle_failure']);
-        }
-
-        if (!empty($this_database_save['save_values_battle_rewards'])){
-            $new_game_data['values']['battle_rewards'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_rewards']), true);
-            $new_game_data['values']['battle_rewards_hash'] = md5($this_database_save['save_values_battle_rewards']);
-        }
-
-        if (!empty($this_database_save['save_values_battle_settings'])){
-            $new_game_data['values']['battle_settings'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_settings']), true);
-            $new_game_data['values']['battle_settings_hash'] = md5($this_database_save['save_values_battle_settings']);
-        }
-
         rpg_user::pull_unlocked_items($login_user_id, $user_unlocked_items);
-        if (!empty($user_unlocked_items)){
-            $new_game_data['values']['battle_items'] = $user_unlocked_items;
-            $new_game_data['values']['battle_items_hash'] = md5(json_encode($user_unlocked_items));
-        } elseif (!empty($this_database_save['save_values_battle_items'])){
-            // Legacy support / remove once new methods confirmed working
-            $new_game_data['values']['battle_items'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_items']), true);
-            $new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
-        }
-
         rpg_user::pull_unlocked_abilities($login_user_id, $user_unlocked_abilities);
-        if (!empty($user_unlocked_abilities)){
-            $new_game_data['values']['battle_abilities'] = $user_unlocked_abilities;
-            $new_game_data['values']['battle_abilities_hash'] = md5(json_encode($user_unlocked_abilities));
-        } elseif (!empty($this_database_save['save_values_battle_abilities'])){
-            // Legacy support / remove once new methods confirmed working
-            $new_game_data['values']['battle_abilities'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_abilities']), true);
-            $new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
-        }
-
         rpg_user::pull_unlocked_stars($login_user_id, $user_unlocked_stars);
-        if (!empty($user_unlocked_stars)){
-            $new_game_data['values']['battle_stars'] = $user_unlocked_stars;
-            $new_game_data['values']['battle_stars_hash'] = md5(json_encode($user_unlocked_stars));
-        } elseif (!empty($this_database_save['save_values_battle_stars'])){
-            // Legacy support / remove once new methods confirmed working
-            $new_game_data['values']['battle_stars'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_stars']), true);
-            $new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
-        }
-
-        if (!empty($this_database_save['save_values_robot_alts'])){
-            $new_game_data['values']['robot_alts'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_alts']), true);
-            $new_game_data['values']['robot_alts_hash'] = md5($this_database_save['save_values_robot_alts']);
-        }
-
         rpg_user::pull_robot_records($login_user_id, $user_robot_records);
-        if (!empty($user_robot_records)){
-            $new_game_data['values']['robot_database'] = $user_robot_records;
-            $new_game_data['values']['robot_database_hash'] = md5(json_encode($user_robot_records));
-        } elseif (!empty($this_database_save['save_values_robot_database'])){
-            // Legacy support / remove once new methods confirmed working
-            $new_game_data['values']['robot_database'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_database']), true);
-            $new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
+    }
+
+
+    // Update the game session with extracted variables (Source Agnostic)
+    $new_game_data = array();
+
+    $new_game_data['CACHE_DATE'] = $this_database_save['save_cache_date'];
+
+    $new_game_data['USER'] = mmrpg_prototype_format_user_data_for_session($this_database_user);
+
+    if (!empty($user_save_counters)){
+        $new_game_data['counters'] = $user_save_counters;
+    } else {
+        // Legacy support / remove once new methods confirmed working
+        $new_game_data['counters'] = !empty($this_database_save['save_counters']) ? json_decode($this_database_save['save_counters'], true) : array();
+    }
+
+    $new_game_data['values'] = !empty($this_database_save['save_values']) ? json_decode($this_database_save['save_values'], true) : array();
+
+    if (!isset($this_database_save['save_values_battle_index'])){
+        $new_game_data['values']['battle_index'] = array();
+    }
+
+    if (!empty($this_database_save['save_values_battle_complete'])){
+        $new_game_data['values']['battle_complete'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_complete']), true);
+        //$new_game_data['values']['battle_complete_hash'] = md5($this_database_save['save_values_battle_complete']);
+    }
+
+    if (!empty($this_database_save['save_values_battle_failure'])){
+        $new_game_data['values']['battle_failure'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_failure']), true);
+        //$new_game_data['values']['battle_failure_hash'] = md5($this_database_save['save_values_battle_failure']);
+    }
+
+    if (!empty($this_database_save['save_values_battle_rewards'])){
+        $new_game_data['values']['battle_rewards'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_rewards']), true);
+        //$new_game_data['values']['battle_rewards_hash'] = md5($this_database_save['save_values_battle_rewards']);
+    }
+
+    if (!empty($this_database_save['save_values_battle_settings'])){
+        $new_game_data['values']['battle_settings'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_settings']), true);
+        //$new_game_data['values']['battle_settings_hash'] = md5($this_database_save['save_values_battle_settings']);
+    }
+
+    //rpg_user::pull_unlocked_items($login_user_id, $user_unlocked_items);
+    if (!empty($user_unlocked_items)){
+        $new_game_data['values']['battle_items'] = $user_unlocked_items;
+        //$new_game_data['values']['battle_items_hash'] = md5(json_encode($user_unlocked_items));
+    } elseif (!empty($this_database_save['save_values_battle_items'])){
+        // Legacy support / remove once new methods confirmed working
+        $new_game_data['values']['battle_items'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_items']), true);
+        //$new_game_data['values']['battle_items_hash'] = md5($this_database_save['save_values_battle_items']);
+    }
+
+    //rpg_user::pull_unlocked_abilities($login_user_id, $user_unlocked_abilities);
+    if (!empty($user_unlocked_abilities)){
+        $new_game_data['values']['battle_abilities'] = $user_unlocked_abilities;
+        //$new_game_data['values']['battle_abilities_hash'] = md5(json_encode($user_unlocked_abilities));
+    } elseif (!empty($this_database_save['save_values_battle_abilities'])){
+        // Legacy support / remove once new methods confirmed working
+        $new_game_data['values']['battle_abilities'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_abilities']), true);
+        //$new_game_data['values']['battle_abilities_hash'] = md5($this_database_save['save_values_battle_abilities']);
+    }
+
+    //rpg_user::pull_unlocked_stars($login_user_id, $user_unlocked_stars);
+    if (!empty($user_unlocked_stars)){
+        $new_game_data['values']['battle_stars'] = $user_unlocked_stars;
+        //$new_game_data['values']['battle_stars_hash'] = md5(json_encode($user_unlocked_stars));
+    } elseif (!empty($this_database_save['save_values_battle_stars'])){
+        // Legacy support / remove once new methods confirmed working
+        $new_game_data['values']['battle_stars'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_battle_stars']), true);
+        //$new_game_data['values']['battle_stars_hash'] = md5($this_database_save['save_values_battle_stars']);
+    }
+
+    if (!empty($this_database_save['save_values_robot_alts'])){
+        $new_game_data['values']['robot_alts'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_alts']), true);
+        //$new_game_data['values']['robot_alts_hash'] = md5($this_database_save['save_values_robot_alts']);
+    }
+
+    //rpg_user::pull_robot_records($login_user_id, $user_robot_records);
+    if (!empty($user_robot_records)){
+        $new_game_data['values']['robot_database'] = $user_robot_records;
+        //$new_game_data['values']['robot_database_hash'] = md5(json_encode($user_robot_records));
+    } elseif (!empty($this_database_save['save_values_robot_database'])){
+        // Legacy support / remove once new methods confirmed working
+        $new_game_data['values']['robot_database'] = json_decode($temp_replace_legacy_strings($this_database_save['save_values_robot_database']), true);
+        //$new_game_data['values']['robot_database_hash'] = md5($this_database_save['save_values_robot_database']);
+    }
+
+    $new_game_data['flags'] = !empty($this_database_save['save_flags']) ? json_decode($this_database_save['save_flags'], true) : array();
+
+    $new_game_data['battle_settings'] = !empty($this_database_save['save_settings']) ? json_decode($this_database_save['save_settings'], true) : array();
+
+
+    // LOAD WORLD INFO
+
+    /*
+    // Collect the world save info from the database
+    $this_database_world = $db->get_array("SELECT
+        `last_world_token`,
+        `last_map_token`,
+        `last_player_token`,
+        `player_sessions`,
+        `robot_sessions`,
+        `mecha_sessions`,
+        `world_maps`,
+        `world_buttons`,
+        `world_switches`,
+        `world_gates`,
+        `world_locks`,
+        `world_blocks`,
+        `world_hazards`,
+        `world_items`,
+        `world_abilities`,
+        `world_encounters`,
+        `world_pickups`,
+        `world_actors`,
+        `world_symbols`,
+        `world_events`,
+        `world_battles`
+        FROM `mmrpg_users_worlds`
+        WHERE `user_id` = {$login_user_id}
+        LIMIT 1;");
+    */
+
+    // Initialize the world session in case it's new/empty
+    rpg_world::init_session();
+    $world_session_token = rpg_world::session_token();
+    if (!empty($this_database_world)){
+
+        // Extract the battle data for later
+        $world_battles = !empty($this_database_world['world_battles']) ? $this_database_world['world_battles'] : '';
+        $world_battles = !empty($world_battles) ? json_decode($world_battles, true) : array();
+        unset($this_database_world['world_battles']);
+
+        // Loop through world data and assign to world session
+        foreach ($this_database_world AS $key => $value){
+            if (empty($value) || !isset($_SESSION[$world_session_token][$key])){ continue; }
+            if (!is_numeric($value)
+                && (substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}')
+                || (substr($value, 0, 1) === '[' && substr($value, -1, 1) === ']')){
+                $value = json_decode($value, true);
+                }
+            $_SESSION[$world_session_token][$key] = $value;
         }
 
-        $new_game_data['flags'] = !empty($this_database_save['save_flags']) ? json_decode($this_database_save['save_flags'], true) : array();
-
-        $new_game_data['battle_settings'] = !empty($this_database_save['save_settings']) ? json_decode($this_database_save['save_settings'], true) : array();
-
-        // Update the session with the new save info
-        $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
-        unset($new_game_data);
-
-        // Unset the player selection to restart at the player select screen
-        if (mmrpg_prototype_players_unlocked() > 1){ $_SESSION[$session_token]['battle_settings']['this_player_token'] = false; }
-
-        // Expand user's current IP list, then add a new entry and filter unique
-        $local_ips = array('0.0.0.0', '127.0.0.1');
-        $ip_list = !empty($this_database_user['user_ip_addresses']) ? $this_database_user['user_ip_addresses'] : '';
-        $ip_list = strstr($ip_list, ',') ? explode(',', $ip_list) : array($ip_list);
-        $ip_list = array_filter(array_map('trim', $ip_list));
-        $ip_list[] = $_SERVER['REMOTE_ADDR'];
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){ $ip_list[] = array_pop(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])); }
-        foreach ($ip_list AS $k => $ip){ if (empty($ip) || in_array($ip, $local_ips)){ unset($ip_list[$k]); } }
-        $ip_list = array_unique($ip_list);
-
-        // Update the user table in the database if not done already
-        if (empty($_SESSION[$session_token]['DEMO'])){
-            $db->update('mmrpg_users', array(
-                'user_ip_addresses' => implode(',', $ip_list)
-                ), "user_id = {$this_database_user['user_id']}");
+        // Push world battles into the game data battle index
+        if (!isset($new_game_data['values']['battle_index'])){ $new_game_data['values']['battle_index'] = array(); }
+        foreach ($world_battles AS $token => $battle){
+            $new_game_data['values']['battle_index'][$token] = json_encode($battle, JSON_NUMERIC_CHECK);
         }
-
-        /*
-        // Update the user table in the database if not done already
-        if (empty($_SESSION[$session_token]['DEMO'])){
-            $db->update('mmrpg_users', array(
-                'user_last_login' => time(),
-                'user_backup_login' => $this_database_user['user_last_login'],
-                'user_ip_addresses' => implode(',', $ip_list)
-                ), "user_id = {$this_database_user['user_id']}");
-        }
-        */
-
-        // Clear the pending login ID
-        unset($_SESSION[$session_token]['PENDING_LOGIN_ID']);
 
     }
+
+    // Update the session with the new save info
+    $_SESSION[$session_token] = array_merge($_SESSION[$session_token], $new_game_data);
+    unset($new_game_data);
+
+    // Unset the player selection to restart at the player select screen
+    if (mmrpg_prototype_players_unlocked() > 1){ $_SESSION[$session_token]['battle_settings']['this_player_token'] = false; }
+
+    // Expand user's current IP list, then add a new entry and filter unique
+    $local_ips = array('0.0.0.0', '127.0.0.1');
+    $ip_list = !empty($this_database_user['user_ip_addresses']) ? $this_database_user['user_ip_addresses'] : '';
+    $ip_list = strstr($ip_list, ',') ? explode(',', $ip_list) : array($ip_list);
+    $ip_list = array_filter(array_map('trim', $ip_list));
+    $ip_list[] = $_SERVER['REMOTE_ADDR'];
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){ $ip_list[] = array_pop(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])); }
+    foreach ($ip_list AS $k => $ip){ if (empty($ip) || in_array($ip, $local_ips)){ unset($ip_list[$k]); } }
+    $ip_list = array_unique($ip_list);
+
+    // Update the user table in the database if not done already
+    if (empty($_SESSION[$session_token]['DEMO'])){
+        $db->update('mmrpg_users', array(
+            'user_ip_addresses' => implode(',', $ip_list)
+            ), "user_id = {$this_database_user['user_id']}");
+    }
+
+    // Clear the pending login ID
+    unset($_SESSION[$session_token]['PENDING_LOGIN_ID']);
 
     // Update the last saved value
     $_SESSION[$session_token]['values']['last_load'] = time();

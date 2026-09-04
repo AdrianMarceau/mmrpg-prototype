@@ -2,6 +2,14 @@
 BrowserMatchNoCase SemrushBot bad_bot
 BrowserMatchNoCase MJ12Bot bad_bot
 BrowserMatchNoCase DotBot bad_bot
+BrowserMatchNoCase "BLEXBot/1.0" bad_bot
+BrowserMatchNoCase "claudebot" bad_bot
+BrowserMatchNoCase "ClaudeBot" bad_bot
+BrowserMatchNoCase "ClaudeBot/1.0" bad_bot
+BrowserMatchNoCase "Elisabot" bad_bot
+BrowserMatchNoCase "UptimeRobot" bad_bot
+BrowserMatchNoCase "UptimeRobot/1.0" bad_bot
+BrowserMatchNoCase "UptimeRobot/2.0" bad_bot
 Order Deny,Allow
 Deny from env=bad_bot
 
@@ -45,6 +53,10 @@ RewriteEngine on
 # -- LEGACY PAGE/ASSET REWRITES -- #
 ####################################
 
+# Redirect the private directories to 404s
+RewriteRule ^.git(/.*)?$ - [R=404,NC,L]
+RewriteRule ^.not-git(/.*)?$ - [R=404,NC,L]
+
 # Redirect the non-existant pages to better places
 RewriteRule ^home/?$ / [R,L]
 RewriteRule ^updates/?$ /community/news/ [R,L]
@@ -67,11 +79,18 @@ RewriteRule ^images/abilities/attachment-defeat/(.*)?$ /images/objects/defeat-ex
 RewriteRule ^images/abilities/attachment-([a-z]+)/(.*)?$ /images/objects/$1/$2 [R,L]
 
 ####################################
+# -- CACHE & EXPORT REWRITES -- #
+####################################
+
+# Redirect requests for the script that deletes cached files and/or folders
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^\-cache/(.*)?$ scripts/clear-cache.php?path=$1 [L,QSA]
+
+####################################
 # -- EVENT BANNER REWRITES -- #
 ####################################
 
 # Redirect requests for dynamic event banners to the script responsible
-
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^images/events/([a-zA-Z0-9-]+)-banner_([a-zA-Z0-9-]+)_([a-zA-Z0-9-]+)\.([a-z0-9]{2,4})$ scripts/get-banner.php?kind=$1&$1=$2&player=$3&format=$4 [L,QSA]
 
@@ -80,7 +99,6 @@ RewriteRule ^images/events/([a-zA-Z0-9-]+)-banner_([a-zA-Z0-9-]+)_([a-zA-Z0-9-]+
 ####################################
 
 # Redirect requests for composite images to the script responsible
-
 RewriteRule ^images/(abilities|fields|items|skills|players|robots)/all/([^/]+)/(.*)$ /scripts/get-images.php?kind=composite&type=$1&args=$2&file=$3 [L,QSA]
 RewriteRule ^images/(abilities|fields|items|skills|players|robots)/all/(.*)$ /scripts/get-images.php?kind=composite&type=$1&file=$2 [L,QSA]
 
@@ -117,12 +135,18 @@ RewriteRule  ^images/(_raw|database|gallery|misc|theme|types)/(.*)$  https://cdn
 ###################################
 
 # Redirect the XML requests to their dynamic counterparts
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
 RewriteRule ^mmrpg-info\.xml$ mmrpg-info.php [L]
 RewriteRule ^mmrpg-ranking\.xml$ mmrpg-ranking.php [L]
-RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^content/all\.js(\?.*?)?$ content/index.js.php [L]
+RewriteRule ^content/all\.json(\?.*?)?$ content/index.json.php [L]
+RewriteRule ^content/all\.css(\?.*?)?$ content/index.css.php [L]
 RewriteRule ^styles/style\.css$ styles/style.php?files=fonts.css,style.css,types.css [L]
 RewriteRule ^styles/robots\.css$ styles/style.php?file=robots.css [L]
-
+RewriteRule ^scripts/gamesettings\.js$ scripts/gamesettings.all.php?return=javascript [L]
+RewriteRule ^scripts/gamesettings\.main\.js(\?.*?)?$ scripts/gamesettings.main.js.php?return=javascript&$1 [L,QSA]
+RewriteRule ^scripts/gamesettings\.music\.js(\?.*?)?$ scripts/gamesettings.music.js.php?return=javascript&$1 [L,QSA]
+RewriteRule ^scripts/gamesettings\.sounds\.js(\?.*?)?$ scripts/gamesettings.sounds.js.php?return=javascript&$1 [L,QSA]
 
 ################################
 # -- BACK-END PAGE REWRITES -- #

@@ -81,6 +81,11 @@ class rpg_field extends rpg_object {
         $this->field_foreground_variant = isset($this_fieldinfo['field_foreground_variant']) ? $this_fieldinfo['field_foreground_variant'] : '';
         $this->field_music = isset($this_fieldinfo['field_music']) ? $this_fieldinfo['field_music'] : 'field';
 
+        // If the battle itself has any extra field multipliers, apply them to the current field
+        if (!empty($this->battle->values['extra_field_multipliers'])){
+            $this->field_multipliers = array_merge($this->field_multipliers, $this->battle->values['extra_field_multipliers']);
+        }
+
         // Define the internal field base values using the fields index array
         $this->field_base_name = isset($this_fieldinfo['field_base_name']) ? $this_fieldinfo['field_base_name'] : $this->field_name;
         $this->field_base_token = isset($this_fieldinfo['field_base_token']) ? $this_fieldinfo['field_base_token'] : $this->field_token;
@@ -346,6 +351,18 @@ class rpg_field extends rpg_object {
             }
         }
         return $index;
+    }
+
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $field_index_byid = false;
+        if ($field_index_byid === false){
+            $field_index_byid = array();
+            $field_index = self::get_index(true, true);
+            if (empty($field_index)){ $field_index = array(); }
+            foreach ($field_index AS $token => $field){ $field_index_byid[$field['field_id']] = $token; }
+        }
+        return $field_index_byid;
     }
 
     // Define a public function for collecting index data from the database
@@ -1457,6 +1474,7 @@ class rpg_field extends rpg_object {
         $temp_field_master = !empty($field_info['field_master']) ? $mmrpg_database_robots[$field_info['field_master']] : false;
         $temp_field_mechas = !empty($field_info['field_mechas']) ? $field_info['field_mechas'] : array();
         foreach ($temp_field_mechas AS $key => $token){
+            if (!isset($mmrpg_database_robots[$token])){ continue; }
             $temp_mecha = $mmrpg_database_robots[$token];
             if (!empty($temp_mecha)){ $temp_field_mechas[$key] = $temp_mecha['robot_name'];  }
             else { unset($temp_field_mechas[$key]); }

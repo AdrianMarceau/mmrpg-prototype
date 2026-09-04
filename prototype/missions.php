@@ -6,12 +6,14 @@
  * so at this time (the player is requesting missions)
  */
 
+
 // Only generate out mission markup data if conditions allow or do not exist
 if (!defined('MMRPG_SCRIPT_REQUEST') ||
     ($this_data_select == 'this_battle_token' && in_array('this_player_token='.$this_prototype_data['this_player_token'], $this_data_condition))){
+    //error_log('Generating mission select data for player '.$this_prototype_data['this_player_token'].'...');
 
     // Collect the robot index for quick use
-    $mmrpg_indedx_players = rpg_player::get_index();
+    $mmrpg_index_players = rpg_player::get_index();
     $mmrpg_index_robots = rpg_robot::get_index(true);
     $mmrpg_index_fields = rpg_field::get_index();
 
@@ -85,7 +87,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '0';
 
     // If the player has completed at least zero battles, display the starter battle
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['0'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['0'])){
 
         // EVENT MESSAGE : CHAPTER ONE
         $this_prototype_data['battle_options'][] = array(
@@ -189,7 +191,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '1';
 
     // Only continue if the player has defeated first 1 battle
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['1'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['1'])){
 
         // EVENT MESSAGE : CHAPTER TWO
         $this_prototype_data['battle_options'][] = array(
@@ -328,7 +330,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '2';
 
     // If the first 1 + 8 battles are complete, unlock the ninth and recollect markup
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['2'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['2'])){
 
         // EVENT MESSAGE : CHAPTER THREE
         $this_prototype_data['battle_options'][] = array(
@@ -633,7 +635,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '3';
 
     // Only continue if the player has defeated the first 1 + 8 + 1 battles
-    if ($this_prototype_data['prototype_complete'] || !empty($this_prototype_data['this_chapter_unlocked']['3'])){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['3'])){
 
         // EVENT MESSAGE : CHAPTER FOUR
         $this_prototype_data['battle_options'][] = array(
@@ -795,8 +797,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '4';
 
     // Only continue if the player has defeated the first 1 + 8 + 1 + 4 + 1 + 8 + 1 + 4 battles
-    if ($this_prototype_data['prototype_complete']
-        || !empty($this_prototype_data['this_chapter_unlocked']['4'])
+    if (!empty($this_prototype_data['this_chapter_unlocked']['4'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4a'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4b'])
         || !empty($this_prototype_data['this_chapter_unlocked']['4c'])){
@@ -1173,7 +1174,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     $this_prototype_data['this_current_chapter'] = '7';
 
     // Only continue if the player has unlocked this extra chapter
-    if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['7']){
+    if (!empty($this_prototype_data['this_chapter_unlocked']['7'])){
 
         // EVENT MESSAGE : BONUS CHAPTER
         $next_key = count($this_prototype_data['battle_options']);
@@ -1664,6 +1665,160 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
     }
 
+    // If we're allowed to unlock chapters at the moment
+    $allow_unlock_chapters = true;
+    if ($allow_unlock_chapters){
+
+        // Define the index of chapter-relavant players and their chapter details
+        $chapter_unlock_players = array('dr-light', 'dr-wily', 'dr-cossack');
+        $chapter_unlock_players_config = array(
+            'dr-light' => array(
+                'welcome' => 'Welcome to the Prototype!',
+                'letsgo_robot' => array('token' => 'mega-man', 'name' => 'Mega Man'),
+                'letsgo_template' => 'Let\'s go {ROBOT}!<br /> I\'m right here beside you!'
+                ),
+            'dr-wily' => array(
+                'welcome' => 'Rivals of the Prototype!',
+                'letsgo_robot' => array('token' => 'bass', 'name' => 'Bass'),
+                'letsgo_template' => 'It\'s time, {ROBOT}!<br /> Show them your power!'
+                ),
+            'dr-cossack' => array(
+                'welcome' => 'Hacking the Prototype!',
+                'letsgo_robot' => array('token' => 'proto-man', 'name' => 'Proto Man'),
+                'letsgo_template' => 'Alright {ROBOT}!<br /> There\'s work to be done!'
+                )
+            );
+        $chapter_unlock_popup_index = array();
+
+        // Unlock the LIGHT BUSTER / WILY BUSTER / COSSACK BUSTER if the player has unlocked at least three robots (hero + support + robot master)
+        foreach ($chapter_unlock_players AS $player_token){
+            if ($player_token !== $this_prototype_data['this_player_token']){ continue; } // continue if not current player
+            // If the player has a doctor unlocked without also having their buster, unlock it now
+            $buster_token = str_replace('dr-', '', $player_token).'-buster';
+            if (mmrpg_prototype_player_unlocked($player_token)
+                && !mmrpg_prototype_ability_unlocked($player_token, '', $buster_token)
+                && mmrpg_prototype_robots_unlocked($player_token) >= 3){
+                //error_log('unlocking '.$buster_token.' for '.$player_token.' apparently ');
+                $unlock_player_info = $mmrpg_index_players[$player_token];
+                mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => $buster_token), true);
+            }
+        }
+
+        // Main-Game Chapters
+        $chapter_unlock_popup_index[] = array('chapter_key' => '0', 'chapter_token' => 'chapter-1', 'chapter_name' => 'Chapter 1', 'chapter_subname' => 'Chapter One : An Unexpected Attack', 'chapter_rewards_heart' => 2);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival', 'chapter_rewards_heart' => 3);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers', 'chapter_rewards_heart' => 4);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => 'chapter-4', 'chapter_name' => 'Chapter 4', 'chapter_subname' => 'Chapter Four : Battle Field Fusions', 'chapter_rewards_heart' => 5);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles', 'chapter_rewards_heart' => 6, 'chapter_is_endgame' => true);
+
+        // Post-Game Chapters
+        $chapter_unlock_popup_index[] = array('chapter_key' => '6', 'chapter_token' => 'chapter-random', 'chapter_name' => 'Random', 'chapter_subname' => 'Bonus Chapter : Mission Randomizer', 'chapter_is_bonus' => true);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '7', 'chapter_token' => 'chapter-stars', 'chapter_name' => 'Stars', 'chapter_subname' => 'Bonus Chapter : Star Fields', 'chapter_is_bonus' => true);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => 'chapter-players', 'chapter_name' => 'Players', 'chapter_subname' => 'Bonus Chapter : Player Battles', 'chapter_is_bonus' => true);
+        $chapter_unlock_popup_index[] = array('chapter_key' => '8', 'chapter_token' => 'chapter-challenges', 'chapter_name' => 'Challenges', 'chapter_subname' => 'Bonus Chapter : Challenge Mode', 'chapter_is_bonus' => true);
+
+        // Loop through each unlocked player and get ready to process their chapters
+        //error_log('checking player chapter unlocks');
+        foreach ($chapter_unlock_players AS $player_key => $player_token){
+            if (!mmrpg_prototype_player_unlocked($player_token)){ continue; } // continue if player not unlocked yet
+            if ($player_token !== $this_prototype_data['this_player_token']){ continue; } // continue if not current player
+
+            // Now loop through and display chapter unlock messages where relevant
+            foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
+                $prev_chapter_info = $key > 0 ? $chapter_unlock_popup_index[$key - 1] : false;
+                $chapter_key = $chapter_info['chapter_key'];
+                $chapter_token = $chapter_info['chapter_token'];
+                $chapter_name = $chapter_info['chapter_name'];
+                $chapter_subname = $chapter_info['chapter_subname'];
+                $chapter_is_intro = $chapter_key === '0' ? true : false;
+                $chapter_is_endgame = !empty($chapter_info['chapter_is_endgame']) ? true : false;
+                $chapter_is_bonus = !empty($chapter_info['chapter_is_bonus']) ? true : false;
+                $chapter_rewards_heart = !empty($chapter_info['chapter_rewards_heart']) ? true : false;
+                $chapter_unlock_text = $chapter_is_intro ? 'starts' : 'unlocked';
+                $next_chapter_info = isset($chapter_unlock_popup_index[$key + 1]) ? $chapter_unlock_popup_index[$key + 1] : false;
+                $next_chapter_key = isset($next_chapter_info['chapter_key']) ? $next_chapter_info['chapter_key'] : false;
+                if (!$chapters_unlocked_index[$player_token][$chapter_key]){ continue; } // continue if chapter not unlocked yet
+                $temp_event_flag = $player_token.'_'.$chapter_token.'-unlocked';
+                //error_log('checking for $temp_game_flags[\'events\']['.$temp_event_flag.']');
+                //error_log('-> w/ $chapter_info = '.print_r($chapter_info, true));
+                if (empty($temp_game_flags['events'][$temp_event_flag])){
+                    $temp_game_flags['events'][$temp_event_flag] = true;
+                    if (!$chapter_is_bonus && $next_chapter_key !== false && $chapters_unlocked_index[$player_token][$next_chapter_key]){ continue; } // continue if already unlocked next and not bonus
+                    elseif ($chapter_is_endgame && mmrpg_prototype_complete($player_token)){ continue; } // continue if final chapter but player has already completed prototype
+                    $chapter_unlock_config = $chapter_unlock_players_config[$player_token];
+                    $player_info = $mmrpg_index_players[$player_token];
+                    $player_name = $player_info['player_name'];
+                    $player_type = $player_info['player_type'];
+                    $banner_image_path = 'images/events/event-banner_'.$chapter_token.'-unlocked_'.$player_token.'.png?'.MMRPG_CONFIG_CACHE_DATE;
+                    $headline_text = $chapter_is_intro ? $chapter_unlock_config['welcome'] : 'Congratulations!';
+                    $temp_canvas_markup = '';
+                    $temp_canvas_markup .= '<div class="sprite event_banner sprite_80x80 smooth-scaling" style="background-image: url('.$banner_image_path.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+                    $temp_console_markup = '';
+                    $temp_console_markup .= '<p class="headline ability_type ability_type_'.$player_type.'"><strong>'.$headline_text.'</strong></p>';
+                    $temp_console_markup .= '<div class="inset_panel">';
+                        $temp_console_markup .= '<p class="bigtext centertext"><strong class="ability_type ability_type_'.$player_type.'">'.$player_name.'</strong> '.$chapter_unlock_text.' a new chapter!</p>';
+                        $temp_console_markup .= '<p class="bigtext centertext">&quot;<strong>'.$chapter_subname.'</strong>&quot;'.(!$chapter_is_intro ? '<br /> is now available!' : '').'</p>';
+                    $temp_console_markup .= '</div>';
+                    if (!$chapter_is_bonus){
+                        if (!$chapter_is_intro){
+                            $temp_limit_hearts = mmrpg_prototype_limit_hearts_earned($player_token);
+                            $temp_limit_hearts_icons = trim(str_repeat('<i class="fa fa-heart"></i> ', $temp_limit_hearts));
+                            $temp_console_markup .= '<div class="inset_panel compact">';
+                                $temp_console_markup .= '<p class="smalltext centertext">The doctor also earned a '.rpg_type::print_span('copy', '<i class="fa fas fa-heart"></i> Limit Heart').' for his progress!</p>';
+                                $temp_console_markup .= '<p class="smalltext centertext">He feels strong enough to bring <strong>'.$temp_limit_hearts.' robots '.$temp_limit_hearts_icons.'</strong> into battle now!</p>';
+                            $temp_console_markup .= '</div>';
+                        } else {
+                            $letsgo_template_text = $chapter_unlock_config['letsgo_template'];
+                            $letsgo_robot_token = $chapter_unlock_config['letsgo_robot']['token'];
+                            $letsgo_robot_name = $chapter_unlock_config['letsgo_robot']['name'];
+                            $letsgo_text = str_replace('{ROBOT}', ' '.rpg_type::print_span('copy', $letsgo_robot_name).' ', $letsgo_template_text);
+                            $temp_console_markup .= '<div class="inset_panel compact">';
+                                $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_taunt float_left" style="background-image: url(images/players/'.$player_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
+                                $temp_console_markup .= '<p class="smalltext centertext">'.$letsgo_text.'</p>';
+                                $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_defend float_right" style="background-image: url(images/robots/'.$letsgo_robot_token.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
+                            $temp_console_markup .= '</div>';
+                        }
+                    }
+                    array_push($_SESSION[$session_token]['EVENTS'], array(
+                        'canvas_markup' => $temp_canvas_markup,
+                        'console_markup' => $temp_console_markup,
+                        'player_token' => $player_token,
+                        'event_type' => 'new-chapter'
+                        ));
+                }
+            }
+
+        }
+
+        //  Unlock LIMIT HEARTs if the player has earned but not unlocked them yet (necessary for progression)
+        $robot_database_records = mmrpg_prototype_robot_database();
+        foreach ($chapter_unlock_players AS $player_token){
+            if ($player_token !== $this_prototype_data['this_player_token']){ continue; } // continue if not current player
+            if (!mmrpg_prototype_player_unlocked($player_token)){ continue; } // continue if not unlocked
+            // Generate a list of limit hearts we should be unlocking for this player
+            $player_prefix = str_replace('dr-', '', $player_token);
+            $limit_heart_token = $player_prefix.'-heart';
+            $unlock_limit_hearts = array();
+            if ($chapters_unlocked_index[$player_token]['0']){ $unlock_limit_hearts[1] = $limit_heart_token.'__1';  }
+            if ($chapters_unlocked_index[$player_token]['1']){ $unlock_limit_hearts[2] = $limit_heart_token.'__2';  }
+            if ($chapters_unlocked_index[$player_token]['2']){ $unlock_limit_hearts[3] = $limit_heart_token.'__3';  }
+            if ($chapters_unlocked_index[$player_token]['3']){ $unlock_limit_hearts[4] = $limit_heart_token.'__4';  }
+            if ($chapters_unlocked_index[$player_token]['4a']){ $unlock_limit_hearts[5] = $limit_heart_token.'__5';  }
+            if ($chapters_unlocked_index[$player_token]['4z']){ $unlock_limit_hearts[6] = $limit_heart_token.'__6';  }
+            if (!empty($robot_database_records['quint']['robot_defeated'])){ $unlock_limit_hearts[7] = $limit_heart_token.'__7'; }
+            if (!empty($robot_database_records['sunstar']['robot_defeated'])){ $unlock_limit_hearts[8] = $limit_heart_token.'__8'; }
+            // If the player has a doctor unlocked without also having their heart, unlock it now
+            foreach ($unlock_limit_hearts AS $heart_num => $heart_token){
+                if (mmrpg_prototype_item_unlocked($heart_token)){ continue; }
+                error_log('unlocking '.$heart_token.' for '.$player_token.' apparently ');
+                $print_options = array('player_token' => $player_token);
+                if ($heart_num === 1){ $print_options = false; }
+                else { $print_options['event_text'] = 'Another {item} was unlocked!'; }
+                mmrpg_game_unlock_item($heart_token, $print_options);
+            }
+        }
+
+    }
 
 }
 

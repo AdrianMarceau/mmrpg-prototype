@@ -44,6 +44,9 @@ $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
 if (isset($_GET['edit']) && $_GET['edit'] == 'false'){ $global_allow_editing = false; }
 $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'prototype';
 
+// Check if the world flag is set and collect the current shop
+$is_world_iframe = !empty($_GET['world']) && trim($_GET['world']) === 'true' ? true : false;
+$is_shop_token = !empty($_GET['shop']) ? trim($_GET['shop']) : false;
 
 // -- GENERATE EDITOR MARKUP
 
@@ -56,6 +59,12 @@ $prototype_player_counter = !empty($_SESSION[$session_token]['values']['battle_r
 $prototype_complete_counter = mmrpg_prototype_complete();
 $prototype_battle_counter = mmrpg_prototype_battles_complete('dr-light');
 $allowed_edit_data_count = count($allowed_edit_data);
+
+// Validate requested shop token in case shenanigans
+if ($is_shop_token
+    && !isset($allowed_edit_data[$is_shop_token])){
+    $is_shop_token = false;
+}
 
 // HARD-CODE ZENNY FOR TESTING
 //$_SESSION[$session_token]['counters']['battle_zenny'] = 500000;
@@ -81,6 +90,7 @@ if (true){
     $key_counter = 0;
     $shop_counter = 0;
     foreach($allowed_edit_data AS $shop_token => $shop_info){
+        if ($is_shop_token && $shop_token !== $is_shop_token){ continue; }
         $shop_counter++;
         //echo '<td style="width: '.floor(100 / $allowed_edit_shop_count).'%;">'."\n";
         echo '<div class="wrapper wrapper_'.($shop_counter % 2 != 0 ? 'left' : 'right').' player_type player_type_empty" data-select="shops" data-shop="'.$shop_info['shop_token'].'">'."\n";
@@ -104,7 +114,11 @@ if (true){
         $shop_image_offset = ($shop_info['shop_image_size'] - 80) / 2;
         $shop_image_offset_x = -14 - $shop_image_offset;
         $shop_image_offset_y = -14 - $shop_image_offset;
-        echo '<a data-token="'.$shop_info['shop_token'].'" data-shop="'.$shop_info['shop_token'].'" style="background-image: url('.$shop_image_file_path.'); background-position: '.$shop_image_offset_x.'px '.$shop_image_offset_y.'px;" class="sprite sprite_player sprite_shop_'.$shop_token.' sprite_shop_sprite sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].' sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'_mugshot shop_status_active shop_position_active '.($shop_key == 0 ? 'sprite_shop_current ' : '').' player_type player_type_'.(!empty($shop_info['shop_colour']) ? $shop_info['shop_colour'] : 'none').'">'.$shop_info['shop_name'].'</a>'."\n";
+        echo '<a data-token="'.$shop_info['shop_token'].'" '.
+            'data-shop="'.$shop_info['shop_token'].'" '.
+            'style="background-image: url('.$shop_image_file_path.'); background-position: '.$shop_image_offset_x.'px '.$shop_image_offset_y.'px;" '.
+            'class="sprite sprite_player sprite_shop_'.$shop_token.' sprite_shop_sprite sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].' sprite_'.$shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'].'_mugshot shop_status_active shop_position_active '.($shop_key === 0 ? 'sprite_shop_current ' : '').' player_type player_type_'.(!empty($shop_info['shop_colour']) ? $shop_info['shop_colour'] : 'none').'" '.
+            '>'.$shop_info['shop_name'].'</a>'."\n";
         $key_counter++;
         //echo '<a class="sort" data-shop="'.$shop_info['shop_token'].'">sort</a>';
         echo '</div>'."\n";
@@ -129,6 +143,7 @@ if (true){
     // Loop through the shops in the field edit data
     $robot_info = rpg_robot::get_index_info('robot');
     foreach($allowed_edit_data AS $shop_token => $shop_info){
+        if ($is_shop_token && $shop_token !== $is_shop_token){ continue; }
 
         // Update the player key to the current counter
         $shop_key = $key_counter;
@@ -147,6 +162,7 @@ if (true){
             }
         }
         $shop_image_file_path = $shop_info['shop_image_path'].'sprite_right_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
+        $shop_image_file_path2 = $shop_info['shop_image_path'].'sprite_left_'.($shop_info['shop_image_size'].'x'.$shop_info['shop_image_size']).'.png?'.MMRPG_CONFIG_CACHE_DATE;
 
         // Collect a temp robot object for printing items
         $player_info = $mmrpg_database_players[$shop_info['shop_player']];
@@ -158,10 +174,11 @@ if (true){
         // Collect and print the editor markup for this player
         ?>
 
-            <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>">
+            <div class="event event_double event_<?= $shop_key == 0 ? 'visible' : 'hidden' ?>" data-token="<?= $shop_info['shop_token']?>" data-level="<?= $shop_info['shop_level'] ?>">
 
                 <div class="this_sprite sprite_left" style="background-image: url(images/fields/<?= $shop_info['shop_field']?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>);">
-                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00" style="background-image: url(<?= $shop_image_file_path ?>); "><?= $shop_info['shop_name']?></div>
+                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00 facing_right" style="background-image: url(<?= $shop_image_file_path ?>); "><?= $shop_info['shop_name']?></div>
+                    <div class="sprite sprite_player sprite_shop_sprite sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?> sprite_<?= $shop_info['shop_image_size'].'x'.$shop_info['shop_image_size'] ?>_00 facing_left" style="background-image: url(<?= $shop_image_file_path2 ?>); "><?= $shop_info['shop_name']?></div>
                 </div>
 
                 <?
@@ -181,17 +198,6 @@ if (true){
                         //error_log('$composite_sprite_image_markup = '.print_r($composite_sprite_image_markup, true));
 
                         // Loop through all elements and display gauge's for relevant ones
-                        if (empty($core_max_levels)){
-                            $core_max_levels = $db->get_array_list("SELECT
-                                (CASE WHEN ability_type = '' THEN 'none' ELSE ability_type END) AS core_type,
-                                MAX(ability_shop_level) AS core_max
-                                FROM mmrpg_index_abilities
-                                WHERE ability_flag_published = 1 AND ability_flag_complete = 1 AND ability_shop_tab = 'reggae/weapons'
-                                GROUP BY ability_type
-                                ORDER BY core_max DESC
-                                ;", 'core_type');
-                        }
-                        //error_log('$core_max_levels = '.(isset($core_max_levels) ? print_r($core_max_levels, true) : '---'));
                         $core_type_list = array_keys($mmrpg_database_types);
                         unset($core_type_list[array_search('copy', $core_type_list)]);
                         unset($core_type_list[array_search('none', $core_type_list)]);
@@ -332,14 +338,14 @@ if (true){
             <span class="count">
                 <i class="fa fas fa-shopping-cart"></i>
                 Item Shop
-                <span class="progress">(<span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span> Zenny)</span>
+                <span class="progress"><span id="zenny_counter"><?= number_format($global_zenny_counter, 0, '.', ',') ?></span></span>
             </span>
         </span>
 
         <div style="float: left; width: 100%;">
             <table class="formatter" style="width: 100%; table-layout: fixed;">
                 <colgroup>
-                    <col width="70" />
+                    <col width="74" />
                     <col width="" />
                 </colgroup>
                 <tbody>
@@ -383,6 +389,7 @@ if (true){
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/shop.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -391,23 +398,17 @@ if (true){
 </head>
 <body id="mmrpg" class="iframe" data-frame="shop" style="<?= !$global_allow_editing ? 'width: 100% !important; max-width: 1000px !important; ' : '' ?>">
     <div id="prototype" class="hidden" style="opacity: 0; <?= !$global_allow_editing ? 'width: 100% !important; ' : '' ?>">
-        <div id="shop" class="menu" style="position: relative;">
+        <div id="shop" class="menu<?= $is_world_iframe ? ' is_world_iframe' : '' ?>" style="position: relative;">
             <div id="shop_overlay" style="border-radius: 0.5em; -moz-border-radius: 0.5em; -webkit-border-radius: 0.5em; background-color: rgba(0, 0, 0, 0.75); position: absolute; top: 50px; left: 6px; right: 4px; height: 340px; z-index: 9999; display: none;">&nbsp;</div>
             <?= $this_shop_markup ?>
         </div>
     </div>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
 <script type="text/javascript" src="scripts/shop.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
-
 // Update game settings for this page
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-gameSettings.autoScrollTop = false;
 gameSettings.allowShopping = true;
-
 // Update the player and player count by counting elements
 thisShopData.unlockedPlayers = <?= json_encode(array_keys($_SESSION[$session_token]['values']['battle_rewards'])) ?>;
 thisShopData.zennyCounter = <?= $global_zenny_counter ?>;
@@ -416,11 +417,9 @@ thisShopData.itemQuantities = <?= json_encode($global_item_quantities) ?>;
 <?= isset($_SESSION['GAME']['battle_settings']['last_shop_token'])
     ? "thisShopData.lastShopToken = '{$_SESSION['GAME']['battle_settings']['last_shop_token']}';".PHP_EOL
     : '' ?>
-
 // Define the global arrays to hold the shop console and canvas markup
 var shopCanvasMarkup = '<?= str_replace("'", "\'", $shop_canvas_markup) ?>';
 var shopConsoleMarkup = '<?= str_replace("'", "\'", $shop_console_markup) ?>';
-
 </script>
 <?
 

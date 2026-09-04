@@ -14,10 +14,14 @@ if (!rpg_user::is_member()){ exit('You should not be here...'); }
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
-require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
-require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
+//require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
+$mmrpg_database_types = rpg_type::get_index(true);
+$mmrpg_database_players = rpg_player::get_index(true);
+$mmrpg_database_robots = rpg_robot::get_index(true);
+$mmrpg_database_items = rpg_item::get_index(true);
 
 // Collect the editor flag if set
 $global_allow_editing = !defined('MMRPG_REMOTE_GAME') ? true : false;
@@ -44,7 +48,7 @@ $profile_background_options_markup = mmrpg_prototype_get_profile_background_opti
 
 // If the option has been unlocked, collect the proxy options as well
 $current_proxy_info = array();
-if (mmrpg_prototype_item_unlocked('light-program')){
+if (mmrpg_prototype_item_unlocked('player-tracker')){
 
     // Collect available proxy options given this user's current data and progress
     $proxy_image_options_markup = mmrpg_prototype_get_proxy_image_options($current_user_info, $allowed_proxy_image_options);
@@ -302,8 +306,8 @@ if (!empty($form_actions)){
 
         };
 
-    // Define an update function for the "Extra Settings" tab
-    $update_functions['game_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
+    // Define an update function for the "Game Settings" tab
+    $update_functions['misc_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
         global $db, $current_user_id, $current_user_info;
 
         $form_data = array();
@@ -311,9 +315,6 @@ if (!empty($form_actions)){
         $form_data['masterVolume'] = !empty($_POST['masterVolume']) && is_numeric($_POST['masterVolume']) ? $_POST['masterVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME;
         $form_data['musicVolume'] = isset($_POST['musicVolume']) && is_numeric($_POST['musicVolume']) ? $_POST['musicVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME;
         $form_data['effectVolume'] = isset($_POST['effectVolume']) && is_numeric($_POST['effectVolume']) ? $_POST['effectVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME;
-
-        $allowed_render_modes = array('default', 'crisp-edges', 'pixelated');
-        $form_data['spriteRenderMode'] = !empty($_POST['spriteRenderMode']) && in_array($_POST['spriteRenderMode'], $allowed_render_modes) ? $_POST['spriteRenderMode'] : $allowed_render_modes[0];
 
         $allowed_button_modes = array('default', 'classic');
         $form_data['battleButtonMode'] = !empty($_POST['battleButtonMode']) && in_array($_POST['battleButtonMode'], $allowed_button_modes) ? $_POST['battleButtonMode'] : $allowed_button_modes[0];
@@ -326,15 +327,11 @@ if (!empty($form_actions)){
         $audioBalanceConfig['effectVolume'] = $form_data['effectVolume'] >= 0 && $form_data['effectVolume'] <= 1 ? $form_data['effectVolume'] : MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME;
         //error_log('$audioBalanceConfig = '.print_r($audioBalanceConfig, true));
 
-        $spriteRenderMode = !empty($form_data['spriteRenderMode']) ? $form_data['spriteRenderMode'] : $allowed_render_modes[0];
-        //error_log('$spriteRenderMode = '.print_r($spriteRenderMode, true));
-
         $battleButtonMode = !empty($form_data['battleButtonMode']) ? $form_data['battleButtonMode'] : $allowed_button_modes[0];
         //error_log('$battleButtonMode = '.print_r($battleButtonMode, true));
 
         $session_token = rpg_game::session_token();
         $_SESSION[$session_token]['battle_settings']['audioBalanceConfig'] = $audioBalanceConfig;
-        $_SESSION[$session_token]['battle_settings']['spriteRenderMode'] = $spriteRenderMode;
         $_SESSION[$session_token]['battle_settings']['battleButtonMode'] = $battleButtonMode;
 
         //error_log('(A) $_SESSION[$session_token][\'battle_settings\'][\'audioBalanceConfig\'] = '.print_r($_SESSION[$session_token]['battle_settings']['audioBalanceConfig'], true));
@@ -344,7 +341,7 @@ if (!empty($form_actions)){
         };
 
     // Define an update function for the "Player Settings" tab
-    $update_functions['player_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data, &$current_proxy_info){
+    $update_functions['proxy_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data, &$current_proxy_info){
         global $db, $current_user_id, $current_user_info;
 
         $form_data = array();
@@ -392,6 +389,42 @@ if (!empty($form_actions)){
 
         };
 
+    // Define an update function for the "Performance Settings" tab
+    $update_functions['performance_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
+        global $db, $current_user_id, $current_user_info;
+
+        $session_token = rpg_game::session_token();
+        $form_data = array();
+        //error_log('$_POST = '.print_r($_POST, true));
+
+        // allowReadyRoomSprites, readyRoomSpriteMotion, readyRoomSpriteLimit
+        if (isset($_POST['allowReadyRoomSprites'])){ $form_data['allowReadyRoomSprites'] = $_POST['allowReadyRoomSprites'] === '0' ? 0 : 1; }
+        if (isset($_POST['readyRoomSpriteMotion'])){ $form_data['readyRoomSpriteMotion'] = $_POST['readyRoomSpriteMotion'] === '0' ? 0 : 1; }
+        if (isset($_POST['readyRoomSpriteLimit'])){
+            $form_data['readyRoomSpriteLimit'] = intval($_POST['readyRoomSpriteLimit']);
+            if ($form_data['readyRoomSpriteLimit'] <= 0){ $form_data['readyRoomSpriteLimit'] = 1; }
+            if ($form_data['readyRoomSpriteLimit'] >= 100){ $form_data['readyRoomSpriteLimit'] = 100; }
+        }
+        $readyRoomConfig = rpg_game::get_readyRoomConfig(true);
+        $readyRoomConfig['allowReadyRoomSprites'] = $form_data['allowReadyRoomSprites'];
+        $readyRoomConfig['readyRoomSpriteMotion'] = $form_data['readyRoomSpriteMotion'];
+        $readyRoomConfig['readyRoomSpriteLimit'] = $form_data['readyRoomSpriteLimit'];
+        //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
+        $_SESSION[$session_token]['battle_settings']['readyRoomConfig'] = $readyRoomConfig;
+
+        // menuButtonSpriteMotion, menuBackgroundImageMotion
+        if (isset($_POST['menuButtonSpriteMotion'])){ $form_data['menuButtonSpriteMotion'] = $_POST['menuButtonSpriteMotion'] === '0' ? 0 : 1; }
+        if (isset($_POST['menuBackgroundImageMotion'])){ $form_data['menuBackgroundImageMotion'] = $_POST['menuBackgroundImageMotion'] === '0' ? 0 : 1; }
+        $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
+        $menuButtonConfig['menuButtonSpriteMotion'] = $form_data['menuButtonSpriteMotion'];
+        $menuButtonConfig['menuBackgroundImageMotion'] = $form_data['menuBackgroundImageMotion'];
+        //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
+        $_SESSION[$session_token]['battle_settings']['menuButtonConfig'] = $menuButtonConfig;
+
+        return true;
+
+        };
+
     /*
     // Define an update function for the "Extra Settings" tab
     $update_functions['extra_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
@@ -423,123 +456,67 @@ if (!empty($form_actions)){
 
 }
 
-
 // -- GENERATE TAB MARKUP -- //
 
 // Define an array to hold settings tabs and content
-$settings_tabs = array();
+$settings_tabs_index = array();
+$settings_tabs_order = array(
+    'account_settings',
+    'profile_settings',
+    'audio_settings',
+    'performance_settings',
+    'misc_settings',
+    'advanced_settings',
+    'proxy_settings',
+    'omega_settings',
+    );
 
-// Generate markup for GAME SETTINGS if applicable
+
+// Generate markup for AUDIO SETTINGS if applicable
 if (true){
 
     // Define the markup for this section
-    $tab_token = 'game_settings';
-    $tab_name = 'Game Settings';
+    $tab_token = 'audio_settings';
+    $tab_name = 'Audio'; // 'Audio Settings';
     ob_start();
     ?>
 
-        <div class="game-settings">
+        <div class="game-settings audio-settings">
+
+            <p class="description">
+                <strong class="label">Audio Balancing</strong>
+                Control master volumn levels and/or set relative volume levels for the game's music and special effects.
+                Note that some devices may not support sound effects, in which case only music will play.
+            </p>
 
             <?
 
             // Collect current values if they exist so we can display them as such
             $session_token = rpg_game::session_token();
             $battleSettings = $_SESSION[$session_token]['battle_settings'];
-            $spriteRenderMode = isset($battleSettings['spriteRenderMode']) ? $battleSettings['spriteRenderMode'] : 'default';
-            $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
             $audioBalanceConfig = isset($battleSettings['audioBalanceConfig']) ? $battleSettings['audioBalanceConfig'] : array(
                 'masterVolume' => MMRPG_SETTINGS_AUDIODEFAULT_MASTERVOLUME,
                 'musicVolume' => MMRPG_SETTINGS_AUDIODEFAULT_MUSICVOLUME,
                 'effectVolume' => MMRPG_SETTINGS_AUDIODEFAULT_EFFECTVOLUME,
                 );
-
             ?>
 
-            <div class="field" data-setting="audioBalanceConfig">
-                <div class="label">
+            <div class="field fullsize" data-setting="audioBalanceConfig">
+                <div class="label hidden">
                     <strong>Audio Balancing</strong>
                 </div>
                 <div class="subfield input-group">
                     <div class="subfield">
                         <label class="label" for="masterVolume">Master Volume</label>
-                        <input class="slider" type="range" name="masterVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['masterVolume'] ?>">
+                        <input class="slider" type="range" name="masterVolume" min="0" max="1" step="0.01" data-percent="true" data-min-text="Muted" value="<?= $audioBalanceConfig['masterVolume'] ?>">
                     </div>
                     <div class="subfield">
                         <label class="label" for="musicVolume">Music Volume</label>
-                        <input class="slider" type="range" name="musicVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['musicVolume'] ?>">
+                        <input class="slider" type="range" name="musicVolume" min="0" max="1" step="0.01" data-percent="true" data-min-text="Muted" value="<?= $audioBalanceConfig['musicVolume'] ?>">
                     </div>
                     <div class="subfield">
                         <label class="label" for="effectVolume">SFX Volume <sup class="help">* on supported devices</sup></label>
-                        <input class="slider" type="range" name="effectVolume" min="0" max="1" step="0.01" value="<?= $audioBalanceConfig['effectVolume'] ?>">
-                    </div>
-                </div>
-            </div>
-
-            <div class="field" data-setting="spriteRenderMode">
-                <div class="label">
-                    <strong>Sprite Rendering</strong>
-                </div>
-                <div class="subfield input-group">
-                    <? $active = empty($spriteRenderMode) || $spriteRenderMode === 'default'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="spriteRenderMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="default">Auto</label>
-                    </div>
-                    <? $active = $spriteRenderMode === 'crisp-edges'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="spriteRenderMode" value="crisp-edges" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="crisp-edges">Crisp Edges</label>
-                    </div>
-                    <? $active = $spriteRenderMode === 'pixelated'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="spriteRenderMode" value="pixelated" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="pixelated">Pixelated</label>
-                    </div>
-                </div>
-                <div id="canvas" class="samples">
-                    <?
-                    // Print out some sample sprites to show how things look
-                    $samples = array();
-                    $samples[40] = 'images/robots/mega-man/sprite_right_40x40.png';
-                    $samples[80] = 'images/robots/proto-man/sprite_right_80x80.png';
-                    foreach ($samples AS $size => $path){
-                        ?>
-                        <div class="group of2" data-base="<?= $size ?>">
-                            <?
-                            for ($i = 0; $i <= 3; $i++){
-                                $s = 40 + (20 * ($i * 1));
-                                ?>
-                                <div class="sprite" style="
-                                    background-image: url('<?= $path ?>');
-                                    width: <?= $s ?>px;
-                                    height: <?= $s ?>px;
-                                    bottom: 0;
-                                    left: <?= -10 + ($i * ($s / 2)) - ($i * $i * 3) ?>px;
-                                    "></div>
-                                <?
-                            }
-                            ?>
-                        </div>
-                        <?
-                    }
-                    ?>
-                </div>
-            </div>
-
-            <div class="field" data-setting="battleButtonMode">
-                <div class="label">
-                    <strong>Mission Buttons</strong>
-                </div>
-                <div class="subfield input-group">
-                    <? $active = empty($battleButtonMode) || $battleButtonMode === 'default'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="battleButtonMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="default">Default &nbsp;(Aesthetic)</label>
-                    </div>
-                    <? $active = $battleButtonMode === 'classic'; ?>
-                    <div class="radiofield <?= $active ? 'active' : '' ?>">
-                        <input type="radio" name="battleButtonMode" value="classic" <?= $active ? 'checked="checked"' : '' ?> />
-                        <label for="classic">Classic &nbsp;(Detailed)</label>
+                        <input class="slider" type="range" name="effectVolume" min="0" max="1" step="0.01" data-percent="true" data-min-text="Muted" value="<?= $audioBalanceConfig['effectVolume'] ?>">
                     </div>
                 </div>
             </div>
@@ -549,12 +526,138 @@ if (true){
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup
         );
     }
+
+}
+
+// Generate markup for PERFORMACE TWEAKS if applicable
+if (true){
+
+    // Define the markup for this section
+    $tab_token = 'performance_settings';
+    $tab_name = 'Performance'; // 'Performance Tweaks';
+    ob_start();
+    ?>
+
+        <div class="game-settings performance-settings">
+
+            <p class="description">
+                <strong class="label">Performance Tweaks</strong>
+                Disable special effects and/or adjust display limits to improve performance on lower-end devices.
+            </p>
+
+            <?
+
+            // Collect current values if they exist so we can display them as such
+            $session_token = rpg_game::session_token();
+            $battleSettings = $_SESSION[$session_token]['battle_settings'];
+            $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
+            $readyRoomConfig = rpg_game::get_readyRoomConfig(true);
+            $menuButtonConfig = rpg_game::get_menuButtonConfig(true);
+            //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
+            //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
+
+            ?>
+
+            <div class="field" data-setting="performanceTweaks">
+
+                <div class="subwrap" style="margin-bottom: 10px;">
+
+                    <div class="label">
+                        <strong>Main Menu</strong>
+                    </div>
+
+                    <div class="subfield input-group is-yes-no">
+                        <label class="label" for="menuButtonSpriteMotion">Animate Menu Sprites</label>
+                        <? $active = !empty($menuButtonConfig['menuButtonSpriteMotion']); ?>
+                        <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="menuButtonSpriteMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="menuButtonSpriteMotion[0]">Yes</label>
+                        </div>
+                        <? $active = empty($menuButtonConfig['menuButtonSpriteMotion']); ?>
+                        <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="menuButtonSpriteMotion" value="0" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="menuButtonSpriteMotion[1]">No</label>
+                        </div>
+                    </div>
+                    <div class="subfield input-group is-yes-no">
+                        <label class="label" for="menuBackgroundImageMotion">Animate Menu Backgrounds</label>
+                        <? $active = !empty($menuButtonConfig['menuBackgroundImageMotion']); ?>
+                        <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="menuBackgroundImageMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="menuBackgroundImageMotion[0]">Yes</label>
+                        </div>
+                        <? $active = empty($menuButtonConfig['menuBackgroundImageMotion']); ?>
+                        <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="menuBackgroundImageMotion" value="0" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="menuBackgroundImageMotion[1]">No</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="subwrap">
+
+                    <div class="label">
+                        <strong>Ready Room</strong>
+                    </div>
+
+                    <div class="subfield input-group is-yes-no">
+                        <label class="label" for="allowReadyRoomSprites">Ready Room</label>
+                        <? $active = !empty($readyRoomConfig['allowReadyRoomSprites']); ?>
+                        <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="allowReadyRoomSprites" value="1" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="allowReadyRoomSprites[0]">Enabled</label>
+                        </div>
+                        <? $active = empty($readyRoomConfig['allowReadyRoomSprites']); ?>
+                        <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="allowReadyRoomSprites" value="0" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="allowReadyRoomSprites[1]">Disabled</label>
+                        </div>
+                    </div>
+                    <div class="subfield input-group is-yes-no">
+                        <label class="label" for="readyRoomSpriteMotion">Animate Ready Room Sprites</label>
+                        <? $active = !empty($readyRoomConfig['readyRoomSpriteMotion']); ?>
+                        <div class="radiofield is-yes <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="readyRoomSpriteMotion" value="1" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="readyRoomSpriteMotion[0]">Yes</label>
+                        </div>
+                        <? $active = empty($readyRoomConfig['readyRoomSpriteMotion']); ?>
+                        <div class="radiofield is-no <?= $active ? 'active' : '' ?>">
+                            <input type="radio" name="readyRoomSpriteMotion" value="0" <?= $active ? 'checked="checked"' : '' ?> />
+                            <label for="readyRoomSpriteMotion[1]">No</label>
+                        </div>
+                    </div>
+                    <div class="subfield input-group">
+                        <div class="subfield">
+                            <label class="label" for="readyRoomSpriteLimit">Limit Ready Room Sprites <sup class="help">(per player)</sup></label>
+                            <input class="slider" type="range" name="readyRoomSpriteLimit" min="1" max="100" data-max-text="No Limit" step="1" value="<?= $readyRoomConfig['readyRoomSpriteLimit'] ?>">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    <?
+    $tab_markup = trim(ob_get_clean());
+    if (!empty($tab_markup)){
+        $settings_tabs_index[$tab_token] = array(
+        'token' => $tab_token,
+        'name' => $tab_name,
+        'markup' => $tab_markup,
+        //'icon' => '<i class="fa fas fa-cogs"></i>',
+        //'class' => 'float_right icon_only'
+        );
+    }
+
 }
 
 // Generate markup for ACCOUNT SETTINGS if applicable
@@ -562,92 +665,106 @@ if (true){
 
     // Define the markup for this section
     $tab_token = 'account_settings';
-    $tab_name = 'Account Settings';
+    $tab_name = 'Account'; //'Account Settings';
     ob_start();
     ?>
 
-        <div class="field required">
-            <div class="label">
-                <strong>Login Username</strong>
-                <em>cannot be changed</em>
-            </div>
-            <input type="hidden" name="user_name_clean" value="<?= encode_form_value($current_user_info['user_name_clean']) ?>" readonly="readonly" />
-            <input class="textbox" type="text" name="user_name" value="<?= encode_form_value($current_user_info['user_name']) ?>" maxlength="64" readonly="readonly" disabled="disabled" />
-        </div>
+        <div class="game-settings account-settings">
 
-        <? /*
-        <div class="field">
-            <div class="label">
-                <strong>Account Type</strong>
-            </div>
-            <input type="hidden" name="role_name" value="<?= $current_user_info['role_id'] ? >" readonly="readonly" />
-            <input class="textbox" type="text" name="role_name" value="<?= $current_user_info['role_name_full'] ? >" maxlength="64" readonly="readonly" disabled="disabled" />
-        </div>
-        */ ?>
+            <p class="description">
+                <strong class="label">Account Settings</strong>
+                Update your login credentials and/or manage your personal information using the fields below.
+            </p>
 
-        <div class="field">
-            <div class="label">
-                <strong>Display Username</strong>
-            </div>
-            <input class="textbox" type="text" name="user_name_public" value="<?= encode_form_value($current_user_info['user_name_public']) ?>" maxlength="64" />
-        </div>
+            <div class="subwrap">
 
-        <div class="field required">
-            <div class="label">
-                <strong>Email Address</strong>
-                <em>used for account validation</em>
-            </div>
-            <input class="textbox" type="email" name="user_email_address" value="<?= encode_form_value($current_user_info['user_email_address']) ?>" maxlength="128" required="required" />
-        </div>
+                <div class="field required">
+                    <div class="label">
+                        <strong>Login Username</strong>
+                        <em>cannot be changed</em>
+                    </div>
+                    <input type="hidden" name="user_name_clean" value="<?= encode_form_value($current_user_info['user_name_clean']) ?>" readonly="readonly" />
+                    <input class="textbox" type="text" name="user_name" value="<?= encode_form_value($current_user_info['user_name']) ?>" maxlength="64" readonly="readonly" disabled="disabled" />
+                </div>
 
-        <? /*
-        <div class="field required">
-            <div class="label">
-                <strong>Date of Birth</strong>
-                <em>used for age verification</em>
-            </div>
-            <input class="textbox" type="date" name="user_date_birth" value="<?= !empty($current_user_info['user_date_birth']) ? date('Y-m-d', $current_user_info['user_date_birth']) : '' ? >" required="required" maxlength="10" placeholder="YYYY-MM-DD" />
-        </div>
-        */ ?>
+                <? /*
+                <div class="field">
+                    <div class="label">
+                        <strong>Account Type</strong>
+                    </div>
+                    <input type="hidden" name="role_name" value="<?= $current_user_info['role_id'] ? >" readonly="readonly" />
+                    <input class="textbox" type="text" name="role_name" value="<?= $current_user_info['role_name_full'] ? >" maxlength="64" readonly="readonly" disabled="disabled" />
+                </div>
+                */ ?>
 
-        <div class="field">
-            <div class="label">
-                <strong>Gender Identity</strong>
-            </div>
-            <select class="select" name="user_gender">
-                <option value="" <?= empty($current_user_info['user_gender']) ? 'selected="selected"' : '' ?>>-</option>
-                <option value="male" <?= $current_user_info['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
-                <option value="female" <?= $current_user_info['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
-                <option value="other" <?= $current_user_info['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
-                <option value="none" <?= $current_user_info['user_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
-            </select>
-        </div>
+                <div class="field">
+                    <div class="label">
+                        <strong>Display Username</strong>
+                    </div>
+                    <input class="textbox" type="text" name="user_name_public" value="<?= encode_form_value($current_user_info['user_name_public']) ?>" maxlength="64" />
+                </div>
 
-        <div class="field">
-            <div class="label">
-                <strong>Change Password</strong>
-                <em>6 - 32 characters</em>
-            </div>
-            <input class="textbox" type="password" name="user_password_new" value="" minlength="6" maxlength="32" autocomplete="new-password" />
-        </div>
+                <div class="field required">
+                    <div class="label">
+                        <strong>Email Address</strong>
+                        <em>used for account validation</em>
+                    </div>
+                    <input class="textbox" type="email" name="user_email_address" value="<?= encode_form_value($current_user_info['user_email_address']) ?>" maxlength="128" required="required" />
+                </div>
 
-        <div class="field">
-            <div class="label">
-                <strong>Retype Password</strong>
-                <em>if changing</em>
+                <? /*
+                <div class="field required">
+                    <div class="label">
+                        <strong>Date of Birth</strong>
+                        <em>used for age verification</em>
+                    </div>
+                    <input class="textbox" type="date" name="user_date_birth" value="<?= !empty($current_user_info['user_date_birth']) ? date('Y-m-d', $current_user_info['user_date_birth']) : '' ? >" required="required" maxlength="10" placeholder="YYYY-MM-DD" />
+                </div>
+                */ ?>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Gender Identity</strong>
+                    </div>
+                    <select class="select" name="user_gender">
+                        <option value="" <?= empty($current_user_info['user_gender']) ? 'selected="selected"' : '' ?>>-</option>
+                        <option value="male" <?= $current_user_info['user_gender'] == 'male' ? 'selected="selected"' : '' ?>>Male</option>
+                        <option value="female" <?= $current_user_info['user_gender'] == 'female' ? 'selected="selected"' : '' ?>>Female</option>
+                        <option value="other" <?= $current_user_info['user_gender'] == 'other' ? 'selected="selected"' : '' ?>>Other</option>
+                        <option value="none" <?= $current_user_info['user_gender'] == 'none' ? 'selected="selected"' : '' ?>>None</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Change Password</strong>
+                        <em>6 - 32 characters</em>
+                    </div>
+                    <input class="textbox" type="password" name="user_password_new" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+                </div>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Retype Password</strong>
+                        <em>if changing</em>
+                    </div>
+                    <input class="textbox" type="password" name="user_password_new2" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+                </div>
+
             </div>
-            <input class="textbox" type="password" name="user_password_new2" value="" minlength="6" maxlength="32" autocomplete="new-password" />
+
         </div>
 
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup
         );
     }
+
 }
 
 // Generate markup for PROFILE SETTINGS if applicable
@@ -655,82 +772,95 @@ if (true){
 
     // Define the markup for this section
     $tab_token = 'profile_settings';
-    $tab_name = 'Profile Settings';
+    $tab_name = 'Profile'; // 'Profile Settings';
     ob_start();
     ?>
 
-        <div class="field">
-            <strong class="label">Profile Avatar</strong>
-            <select class="select" name="user_image_path">
-                <?= str_replace(
-                    'value="'.$current_user_info['user_image_path'].'"',
-                    'value="'.$current_user_info['user_image_path'].'" selected="selected"',
-                    $profile_avatar_options_markup
-                    ) ?>
-            </select>
-        </div>
+        <div class="game-settings profile-settings">
 
-        <div class="field">
-            <strong class="label">Profile Background</strong>
-            <select class="select" name="user_background_path">
-                <?= str_replace(
-                    'value="'.$current_user_info['user_background_path'].'"',
-                    'value="'.$current_user_info['user_background_path'].'" selected="selected"',
-                    $profile_background_options_markup
-                    ) ?>
-            </select>
-        </div>
+            <p class="description">
+                <strong class="label">Profile Settings</strong>
+                Customize your in-game interface colours and personalize your leaderboard profile on the main site.
+            </p>
 
-        <?
-        $prototype_complete = mmrpg_prototype_complete();
-        $profile_colour_two_unlocked = $prototype_complete >= 3 ? true : false;
-        ?>
+            <div class="subwrap">
+                <div class="field">
+                    <strong class="label">Profile Avatar</strong>
+                    <select class="select" name="user_image_path">
+                        <?= str_replace(
+                            'value="'.$current_user_info['user_image_path'].'"',
+                            'value="'.$current_user_info['user_image_path'].'" selected="selected"',
+                            $profile_avatar_options_markup
+                            ) ?>
+                    </select>
+                </div>
 
-        <div class="field">
-            <strong class="label">Profile Colour <?= $profile_colour_two_unlocked ? '#1' : '' ?></strong>
-            <select class="select" name="user_colour_token">
-                <?= str_replace(
-                    'value="'.$current_user_info['user_colour_token'].'"',
-                    'value="'.$current_user_info['user_colour_token'].'" selected="selected"',
-                    $profile_colour_options_markup
-                    ) ?>
-            </select>
-        </div>
+                <div class="field">
+                    <strong class="label">Profile Background</strong>
+                    <select class="select" name="user_background_path">
+                        <?= str_replace(
+                            'value="'.$current_user_info['user_background_path'].'"',
+                            'value="'.$current_user_info['user_background_path'].'" selected="selected"',
+                            $profile_background_options_markup
+                            ) ?>
+                    </select>
+                </div>
 
-        <? if ($profile_colour_two_unlocked){ ?>
-            <div class="field">
-                <strong class="label">Profile Colour #2</strong>
-                <select class="select" name="user_colour_token2">
-                    <?= str_replace(
-                        'value="'.$current_user_info['user_colour_token2'].'"',
-                        'value="'.$current_user_info['user_colour_token2'].'" selected="selected"',
-                        $profile_colour_options_markup
-                        ) ?>
-                </select>
+                <?
+                $prototype_complete = mmrpg_prototype_complete();
+                $profile_colour_two_unlocked = $prototype_complete >= 3 ? true : false;
+                ?>
+
+                <div class="field">
+                    <strong class="label">Profile Colour <?= $profile_colour_two_unlocked ? '#1' : '' ?></strong>
+                    <select class="select" name="user_colour_token">
+                        <?= str_replace(
+                            'value="'.$current_user_info['user_colour_token'].'"',
+                            'value="'.$current_user_info['user_colour_token'].'" selected="selected"',
+                            $profile_colour_options_markup
+                            ) ?>
+                    </select>
+                </div>
+
+                <? if ($profile_colour_two_unlocked){ ?>
+                    <div class="field">
+                        <strong class="label">Profile Colour #2</strong>
+                        <select class="select" name="user_colour_token2">
+                            <?= str_replace(
+                                'value="'.$current_user_info['user_colour_token2'].'"',
+                                'value="'.$current_user_info['user_colour_token2'].'" selected="selected"',
+                                $profile_colour_options_markup
+                                ) ?>
+                        </select>
+                    </div>
+                <? } ?>
+
+                <div class="field">
+                    <div class="label">
+                        <strong>Website Address</strong>
+                    </div>
+                    <input class="textbox" type="text" name="user_website_address" value="<?= encode_form_value($current_user_info['user_website_address']) ?>" maxlength="128" />
+                </div>
+
+                <? /*
+                <div class="field fullsize">
+                    <div class="label">
+                        <strong>Profile Text</strong>
+                        <em>public, also displayed on leaderboard page</em>
+                    </div>
+                    <textarea class="textarea" name="user_profile_text" rows="6"><?= encode_form_value($current_user_info['user_profile_text']) ?></textarea>
+                </div>
+                */ ?>
+
             </div>
-        <? } ?>
 
-        <div class="field">
-            <div class="label">
-                <strong>Website Address</strong>
-            </div>
-            <input class="textbox" type="text" name="user_website_address" value="<?= encode_form_value($current_user_info['user_website_address']) ?>" maxlength="128" />
         </div>
 
-        <? /*
-        <div class="field fullsize">
-            <div class="label">
-                <strong>Profile Text</strong>
-                <em>public, also displayed on leaderboard page</em>
-            </div>
-            <textarea class="textarea" name="user_profile_text" rows="6"><?= encode_form_value($current_user_info['user_profile_text']) ?></textarea>
-        </div>
-        */ ?>
 
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup
@@ -739,22 +869,22 @@ if (true){
 
 }
 
-// Generate markup for PLAYER SETTINGS if applicable
-if (mmrpg_prototype_item_unlocked('light-program')){
+// Generate markup for PROXY SETTINGS if applicable
+if (mmrpg_prototype_item_unlocked('player-tracker')){
 
     // Define the markup for this section
     //error_log('$current_proxy_info = '.print_r($current_proxy_info, true));
-    $tab_token = 'player_settings';
-    $tab_name = 'Player Settings';
+    $tab_token = 'proxy_settings';
+    $tab_name = 'Proxy'; // 'Proxy Settings';
     ob_start();
     ?>
 
-        <div class="player-settings">
+        <div class="game-settings proxy-settings">
 
             <p class="description">
-                Your <strong>Player Settings</strong> are used whenever another user challenges your ghost data to a Player Battle.
-                Use the fields below to customize how your proxy behaves, or leave the dropdowns blank to let the system bots
-                automatically decide for you.  Have fun!
+                <strong class="label">Proxy Settings</strong>
+                Used whenever another player challenges your ghost data to a Player Battle.
+                Customize your proxy's avatar, stats, field, and robots using the dropdowns below or leave them blank to let the system decide.
             </p>
 
             <div class="subwrap">
@@ -835,46 +965,199 @@ if (mmrpg_prototype_item_unlocked('light-program')){
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
-        'markup' => $tab_markup
+        'markup' => $tab_markup,
+        'icon' => '<i class="fa fas fa-mask"></i>',
+        'class' => 'float_right icon_only'
         );
     }
+
 }
 
-// Generate markup for ADVANCED SETTINGS if applicable
+// Generate markup for MISC SETTINGS if applicable
 if (true){
 
     // Define the markup for this section
-    $tab_token = 'advanced_settings';
-    $tab_name = 'Advanced Settings';
+    $tab_token = 'misc_settings';
+    $tab_name = 'Other'; // 'Game Settings';
     ob_start();
     ?>
 
-        <p class="description">
-            <strong>Stop!</strong> Please be careful.
-            The options below should only be used if you know what you're doing.
-            Proceed at your own risk!
-        </p>
+        <div class="game-settings misc-settings">
 
-        <div class="field buttons">
-            <div class="label">
-                <strong>Save File Options</strong>
+            <p class="description">
+                <strong class="label">Other Options</strong>
+                Options that don't fit anywhere else but nonetheless change gameplay or visuals in some way.
+            </p>
+
+            <?
+
+            // Collect current values if they exist so we can display them as such
+            $session_token = rpg_game::session_token();
+            $battleSettings = rpg_game::get_battleSettings(true);
+            $battleButtonMode = isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default';
+            //error_log('$readyRoomConfig = '.print_r($readyRoomConfig, true));
+            //error_log('$menuButtonConfig = '.print_r($menuButtonConfig, true));
+
+            ?>
+
+            <div class="field" data-setting="battleButtonMode">
+                <div class="label">
+                    <strong>Mission Buttons</strong>
+                </div>
+                <div class="subfield input-group">
+                    <? $active = empty($battleButtonMode) || $battleButtonMode === 'default'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="battleButtonMode" value="default" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="default">Default &nbsp;(Aesthetic)</label>
+                    </div>
+                    <? $active = $battleButtonMode === 'classic'; ?>
+                    <div class="radiofield <?= $active ? 'active' : '' ?>">
+                        <input type="radio" name="battleButtonMode" value="classic" <?= $active ? 'checked="checked"' : '' ?> />
+                        <label for="classic">Classic &nbsp;(Detailed)</label>
+                    </div>
+                </div>
             </div>
-            <div class="wrapper">
-                <input class="button type type_flame button_reset" type="button" name="reset" value="Reset Entire Game" onclick="javascript:parent.window.mmrpg_trigger_reset(true);" />
-            </div>
+
         </div>
 
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
+        'token' => $tab_token,
+        'name' => $tab_name,
+        'markup' => $tab_markup
+        );
+    }
+
+}
+
+// Generate markup for ADVANCED SETTINGS if applicable
+if (true){
+
+    // Pre-check to see if we have any progress to actually reset
+    $session_token = rpg_game::session_token();
+
+    // Check to see if we can show the New Game + section at all
+    $completed_campaigns = mmrpg_prototype_complete();
+    $battles_complete = mmrpg_prototype_battle_tokens_complete();
+    //error_log('$battles_complete = '.print_r($battles_complete, true));
+    $new_game_plus_visible = $completed_campaigns >= 1 ? true : false;
+    if (MMRPG_CONFIG_IS_LIVE === false){ $new_game_plus_visible = true; } // Force visible for local testing
+    $new_game_plus_available = array('dr-light', 'dr-wily', 'dr-cossack', 'dr-lalinde');
+    $new_game_plus_options = '';
+    if ($new_game_plus_visible){
+
+        // Start the output buffer to collect new game plus options
+        ob_start();
+        ?>
+            <?
+            // Loop through available players and display active or disabled buttoned given allowances
+            foreach ($new_game_plus_available AS $temp_playerkey => $temp_playertoken){
+            //foreach ($mmrpg_database_players AS $temp_playertoken => $temp_playerinfo){
+            //foreach ($new_game_plus_available AS $new_game_player => $new_game_allowed){
+                $new_game_player = $temp_playertoken;
+                $new_game_player_short = preg_replace('/^([a-z0-9]+\-)/', '', $new_game_player);
+                $new_game_player_info = array();
+                $new_game_allowed = false;
+                $temp_buttonsize = $new_game_player === 'proxy' ? 'fullsize' : 'halfsize';
+                if (isset($mmrpg_database_players[$new_game_player])){
+                    $new_game_player_info = $mmrpg_database_players[$new_game_player];
+                    $new_game_allowed = mmrpg_prototype_complete($new_game_player) ? true : false;
+                }
+                if ($new_game_allowed && !empty($new_game_player_info)){
+                    ?>
+                    <button type="button"
+                        class="button <?= $temp_buttonsize ?> no-fade type type_<?= $new_game_player_info['player_type'] ?> button_reset button_reset_player button_reset_<?= $new_game_player_short ?>"
+                        onclick="javascript:parent.window.mmrpg_trigger_new_game_plus(this, '<?= $new_game_player ?>', '<?= $new_game_player_info['player_name'] ?>');"
+                        >
+                        <strong><?= $new_game_player_info['player_name'] ?> &bull; New Game <i class="fa fas fa-plus-circle"></i></strong>
+                        <em>(restart campaign but keep all other progress)</em>
+                    </button>
+                    <?
+                } else {
+                    ?>
+                    <button type="button" class="button <?= $temp_buttonsize ?> type type_empty button_reset button_reset_player button_reset_<?= $new_game_player_short ?> disabled" disabled="disabled">
+                        <strong>???</strong>
+                        <em>(&hellip;)</em>
+                    </button>
+                    <?
+                }
+            }
+            ?>
+
+        <?
+        // Collect the output buffer and add it to the main output buffer
+        $new_game_plus_options .= trim(ob_get_clean());
+
+    }
+
+    // Only show the next part if the user has unlocked completed at least one game
+    $reset_game_sub_options = '';
+    if (true){
+
+        // Start the output buffer to collect new game plus options
+        ob_start();
+        ?>
+            <button type="button"
+                name="reset"
+                class="button fullsize type type_flame button_reset button_reset_all"
+                onclick="javascript:parent.window.mmrpg_trigger_reset(true);"
+                >
+                <strong><i class="fa fas fa-trash"></i> Reset Game</strong>
+                <em>(delete literally everything and start from scratch)</em>
+            </button>
+        <?
+        // Collect the output buffer and add it to the main output buffer
+        $reset_game_sub_options .= trim(ob_get_clean());
+
+    }
+
+    // Define the markup for this section
+    $tab_token = 'advanced_settings';
+    $tab_name = 'Restart'; // 'Advanced Settings';
+    ob_start();
+    ?>
+
+        <div class="game-settings advanced-settings">
+
+            <? if ($new_game_plus_visible){ ?>
+                <p class="description">
+                    <strong class="label">New Game +</strong>
+                    Restart any of the available campaigns from the beginning while keeping all of your other progress intact.
+                </p>
+
+                <div class="field buttons sub-buttons" data-setting="newGamePlus">
+                    <div class="wrapper">
+                        <?= $new_game_plus_options ?>
+                    </div>
+                </div>
+            <? } ?>
+
+            <p class="description">
+                <strong class="label">Reset Game</strong>
+                Delete <em>everything</em> and start from scratch.  Please be absolutely sure you want to do this before proceeding.
+            </p>
+
+            <div class="field buttons sub-buttons" data-setting="newGamePlus">
+                <div class="wrapper">
+                    <?= $reset_game_sub_options ?>
+                </div>
+            </div>
+
+        </div>
+
+    <?
+    $tab_markup = trim(ob_get_clean());
+    if (!empty($tab_markup)){
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup,
-        'icon' => '<i class="fa fas fa-exclamation-triangle"></i>',
+        'icon' => '<i class="fa fas fa-recycle"></i>',
         'class' => 'float_right icon_only hide_tab_buttons'
         );
     }
@@ -886,45 +1169,46 @@ if (mmrpg_prototype_item_unlocked('omega-seed')){
 
     // Define the markup for this section
     $tab_token = 'omega_settings';
-    $tab_name = 'Omega Settings';
+    $tab_name = 'Omega'; // 'Omega Settings';
     ob_start();
     ?>
 
-        <p class="description">
-            Your <strong>Omega Sequence</strong> influences which <em>Omega Factors</em> are assigned to the doctors, robots, and shop keepers in your game.
-            Omega Factors are mysterious elemental forces that affect different characters and abilities in different ways.
-        </p>
+        <div class="game-settings omega-settings">
 
-        <p class="description">
-            Your default Omega Sequence is based on the username you first signed up with, but you can generate a new one by entering a custom <strong>Omega Seed</strong> value below.
-            Check the robot editor and shop tabs to see which Omega Factors have been assigned to which characters.
-        </p>
+            <p class="description">
+                <strong class="label">Omega Sequence</strong>
+                A hidden string of letters and numbers randomly-generated during account creation and assigned to your profile.
+                Used by the system to calculate which elemental powers ("Omega Factors") influence each of the playable characters, robot masters, and shop keepers within your game.
+                If you are unsatisfied with your current spread, or just want to try something new, enter a new seed value into the field below and save to regenerate.
+            </p>
 
-        <div>
+            <div class="subfield">
 
-            <div class="field">
-                <div class="label">
-                    <strong>Omega Seed</strong>
-                    <em>enter new to regenerate</em>
+                <div class="field">
+                    <div class="label">
+                        <strong>Omega Sequence</strong>
+                    </div>
+                    <input type="hidden" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" />
+                    <input class="textbox" type="text" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" disabled="disabled" maxlength="32" />
                 </div>
-                <input class="textbox" type="text" name="user_omega_seed" value="" minlength="6" maxlength="32" />
-            </div>
 
-            <div class="field">
-                <div class="label">
-                    <strong>Omega Sequence</strong>
+                <div class="field">
+                    <div class="label">
+                        <strong>Omega Seed</strong>
+                        <em>enter new to regenerate</em>
+                    </div>
+                    <input class="textbox" type="text" name="user_omega_seed" value="" minlength="6" maxlength="32" />
                 </div>
-                <input type="hidden" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" />
-                <input class="textbox" type="text" name="user_omega" value="<?= $current_user_info['user_omega'] ?>" disabled="disabled" maxlength="32" />
-            </div>
 
+
+            </div>
 
         </div>
 
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup,
@@ -950,7 +1234,7 @@ if (true){
     <?
     $tab_markup = trim(ob_get_clean());
     if (!empty($tab_markup)){
-        $settings_tabs[] = array(
+        $settings_tabs_index[$tab_token] = array(
         'token' => $tab_token,
         'name' => $tab_name,
         'markup' => $tab_markup
@@ -961,8 +1245,8 @@ if (true){
 */
 
 // Check to see which tab token is the "current" one
-$current_tab_token = $settings_tabs[0]['token'];
-$allowed_tab_tokens = array_map(function($a){ return $a['token']; }, $settings_tabs);
+$current_tab_token = $settings_tabs_order[0];
+$allowed_tab_tokens = array_map(function($a){ return $a['token']; }, $settings_tabs_index);
 if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allowed_tab_tokens)){
     $current_tab_token = $_REQUEST['current_tab'];
 } elseif (!empty($_SESSION['mmrpg_forms']['current_tab']) && in_array($_SESSION['mmrpg_forms']['current_tab'], $allowed_tab_tokens)){
@@ -970,7 +1254,12 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
     unset($_SESSION['mmrpg_forms']['current_tab']);
 }
 
+
 // DEBUG DEBUG DEBUG
+//$current_tab_token = 'advanced_settings';
+//error_log('$settings_tabs_order = '.print_r($settings_tabs_order, true));
+//error_log('$settings_tabs_index = '.print_r($settings_tabs_index, true));
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -987,6 +1276,7 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/settings.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -1012,7 +1302,9 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
                         <input type="hidden" name="current_tab" value="<?= $current_tab_token ?>" />
 
                         <div class="tab_links">
-                            <? foreach ($settings_tabs AS $tab_key => $tab_info){ ?>
+                            <? foreach ($settings_tabs_order AS $tab_key => $tab_token){ ?>
+                                <? if (!isset($settings_tabs_index[$tab_token])){ continue; } ?>
+                                <? $tab_info = $settings_tabs_index[$tab_token]; ?>
                                 <a class="link<?= $tab_info['token'] === $current_tab_token ? ' active' : '' ?><?= !empty($tab_info['class']) ? ' '.$tab_info['class'] : '' ?>" data-tab="<?= $tab_info['token'] ?>">
                                     <span class="name"><?= $tab_info['name'] ?></span>
                                     <?= !empty($tab_info['icon']) ? '<span class="icon">'.$tab_info['icon'].'</span>' : '' ?>
@@ -1022,7 +1314,9 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 
                         <div class="tab_sections">
                             <? mmrpg_print_form_messages() ?>
-                            <? foreach ($settings_tabs AS $tab_key => $tab_info){ ?>
+                            <? foreach ($settings_tabs_order AS $tab_key => $tab_token){ ?>
+                                <? if (!isset($settings_tabs_index[$tab_token])){ continue; } ?>
+                                <? $tab_info = $settings_tabs_index[$tab_token]; ?>
                                 <div class="section<?= $tab_info['token'] === $current_tab_token ? ' active' : '' ?>" data-tab="<?= $tab_info['token'] ?>">
                                     <input type="hidden" name="form_actions[]" value="<?= $tab_info['token'] ?>" />
                                     <div>
@@ -1047,19 +1341,12 @@ if (!empty($_REQUEST['current_tab']) && in_array($_REQUEST['current_tab'], $allo
 
         </div>
     </div>
-    <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-    <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-    <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
     <script type="text/javascript" src="scripts/settings.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript">
-    // Update game settings for this page
-    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-    gameSettings.autoScrollTop = false;
-    </script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
     <script type="text/javascript">
     // Print out profile settings in case we need to update parent frame
-    var profileSettings = <?= json_encode(array(
+    let profileSettings = <?= json_encode(array(
         'user_name_display' => (!empty($current_user_info['user_name_public']) ? $current_user_info['user_name_public'] : $current_user_info['user_name']),
         'user_image_path' => $current_user_info['user_image_path'],
         'user_background_path' => $current_user_info['user_background_path'],

@@ -50,7 +50,7 @@ $(document).ready(function(){
         $('.starchart .grouplist .arrow', thisContext).live('mouseenter', function(){
             playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
-        $('.starchart .grouplist .group .robots .icon', thisContext).live('mouseenter', function(){
+        $('.starchart .grouplist .group .icon', thisContext).live('mouseenter', function(){
             playSoundEffect.call(this, 'icon-hover', {volume: 0.5});
             });
 
@@ -92,7 +92,118 @@ $(document).ready(function(){
         window.location.href = $(this).attr('href');
         });
 
-    // Define click events for the prev and next buttons
+    // Define the click events for the view toggle buttons in the header
+    let $viewToggle = $('.toggle[data-view]', thisPrototype);
+    let $viewContent = $('.content[data-view]', thisPrototype);
+    if ($viewToggle && $viewToggle.length
+        && $viewContent && $viewContent.length){
+        let switchContentView = function(newView){
+            let currentView = $viewContent.attr('data-view');
+            if (newView === currentView){ return; }
+            $viewToggle.attr('data-view', newView);
+            $viewContent.attr('data-view', newView);
+            };
+        $('.option[data-view]', $viewToggle).bind('click', function(){
+            let $option = $(this);
+            let view = $option.attr('data-view');
+            switchContentView(view);
+            });
+        }
+
+    // Expose the pagination function so the resize handler can call it
+    window.showStarListPage = function(pageNum){
+        $starListPages.attr('data-current-page', pageNum);
+        $('a[data-page]', $starListPages).removeClass('active');
+        $starListPages.find('a[data-page="' + pageNum + '"]').addClass('active');
+        let numPerPage = parseInt($starListPages.attr('data-per-page')) || 32;
+        let layoutMode = $starListPages.attr('data-layout-mode') || 'narrow';
+        // Calculate the slice indexes for the current page
+        let minIndex = (pageNum - 1) * numPerPage;
+        let maxIndex = (pageNum * numPerPage) - 1;
+        // Grab all robots, but filter out unknowns if we are in wide mode
+        let $allRobots = $('.robot', $starListRobots);
+        let $targetRobots = layoutMode === 'wide' ? $allRobots.not('.unknown') : $allRobots;
+        // Hide absolutely everything first
+        $allRobots.addClass('hidden');
+        // Loop through our filtered targets and reveal only the ones that fall within our page slice
+        $targetRobots.each(function(index){
+            if (index >= minIndex && index <= maxIndex){
+                $(this).removeClass('hidden');
+                }
+            });
+        };
+
+    // Define click events for the prev, next, and page buttons in the starlist
+    let $starList = $('.starlist', thisBody);
+    if (!$starList || !$starList.length){ $starList = null; }
+    let $starListPages = $starList ? $('.pages', $starList) : null;
+    if (!$starListPages || !$starListPages.length){ $starListPages = null; }
+    let $starListRobots = $starList ? $('.robots', $starList) : null;
+    if (!$starListRobots || !$starListRobots.length){ $starListRobots = null; }
+    if ($starList && $starListPages){
+        // Use .delegate() for low jquery version compatibility
+        $starListPages.delegate('a[data-page]', 'click', function(e){
+            e.preventDefault();
+            let $pageLink = $(this);
+            let pageNum = $pageLink.attr('data-page');
+            if (pageNum === 'prev' || pageNum === 'next'){
+                let shiftDirection = pageNum;
+                let currentPageNum = $starListPages.is('[data-current-page]') ? parseInt($starListPages.attr('data-current-page')) : 1;
+                // Dynamically check the current amount of page buttons
+                let maxPageNum = $('a[data-page]:not(.arrow)', $starListPages).length || 1;
+                let newPageNum = shiftDirection === 'prev' ? currentPageNum - 1 : currentPageNum + 1;
+                if (newPageNum < 1){ newPageNum = maxPageNum; }
+                else if (newPageNum > maxPageNum){ newPageNum = 1; }
+                window.showStarListPage(newPageNum);
+                } else {
+                let newPageNum = parseInt(pageNum);
+                window.showStarListPage(newPageNum);
+                }
+            });
+        window.showStarListPage(1);
+        }
+    /*
+    if ($starList && $starListPages){
+        let showStarListPage = function(pageNum){
+            //console.log('showStarListPage() w/ pageNum =', pageNum);
+            $starListPages.attr('data-current-page', pageNum);
+            $('a[data-page]', $starListPages).removeClass('active');
+            $starListPages.find('a[data-page="' + pageNum + '"]').addClass('active');
+            let numPerPage = $starListPages.is('[data-per-page]') ? parseInt($starListPages.attr('data-per-page')) : 1;
+            let minKey = (pageNum - 1) * numPerPage;
+            let maxKey = (pageNum * numPerPage) - 1;
+            $('.robot[data-key]', $starListRobots).each(function(){
+                let $robot = $(this);
+                let key = parseInt($robot.attr('data-key'));
+                if (key >= minKey && key <= maxKey){ $robot.removeClass('hidden'); }
+                else { $robot.addClass('hidden'); }
+                });
+            };
+        $('a[data-page]', $starListPages).bind('click', function(e){
+            e.preventDefault();
+            let $pageLink = $(this);
+            let pageNum = $pageLink.attr('data-page');
+            //console.log('starlist page clicked, pageNum =', pageNum);
+            if (pageNum === 'prev' || pageNum === 'next'){
+                let shiftDirection = pageNum;
+                let currentPageNum = $starListPages.is('[data-current-page]') ? parseInt($starListPages.attr('data-current-page')) : 1;
+                let maxPageNum = (function(){ let $realPages = $('a[data-page]:not(.arrow)', $starListPages); return $realPages ? $realPages.length : 0; })();
+                let newPageNum = shiftDirection === 'prev' ? currentPageNum - 1 : currentPageNum + 1;
+                if (newPageNum < 1){ newPageNum = maxPageNum; }
+                else if (newPageNum > maxPageNum){ newPageNum = 1; }
+                //console.log('moving', shiftDirection, 'from', currentPageNum, 'to', newPageNum);
+                showStarListPage(newPageNum);
+                }
+            else {
+                let newPageNum = parseInt(pageNum);
+                showStarListPage(newPageNum);
+                }
+            });
+
+        }
+    */
+
+    // Define click events for the prev and next arrow buttons in the starchart
     var groupLists = $('.starchart .grouplist', thisBody);
     $('.arrow[data-dir]', groupLists).bind('click', function(e){
         e.preventDefault();
@@ -177,6 +288,47 @@ $(document).ready(function(){
 
 // Create the windowResize event for this page
 function windowResizeStarforce(){
+    // Check window width to determine layout mode (>= 1120px)
+    let isWideMode = $(window).width() >= gameSettings.wideWindowWidth;
+    let newPerPage = isWideMode ? 64 : 32;
+    let layoutMode = isWideMode ? 'wide' : 'narrow';
+    let $starList = $('.starlist', thisBody);
+    let $starListPages = $('.pages', $starList);
+    let $starListRobots = $('.robots', $starList);
+    if ($starListPages.length && $starListRobots.length){
+        let currentPerPage = parseInt($starListPages.attr('data-per-page')) || 32;
+        let currentLayout = $starListPages.attr('data-layout-mode');
+        // Only regenerate if the layout mode or capacity has actually changed
+        if (newPerPage !== currentPerPage || layoutMode !== currentLayout){
+            $starListPages.attr('data-per-page', newPerPage);
+            $starListPages.attr('data-layout-mode', layoutMode);
+            // Count ONLY the robots we intend to show in this mode
+            let $targetRobots = isWideMode ? $('.robot:not(.unknown)', $starListRobots) : $('.robot', $starListRobots);
+            let totalRobots = $targetRobots.length;
+            let numPages = Math.ceil(totalRobots / newPerPage);
+            // Rebuild the pagination HTML dynamically
+            let pageLinksHtml = '<a class="arrow prev" data-page="prev"></a>';
+            for (let i = 1; i <= numPages; i++){
+                pageLinksHtml += '<a class="page' + (i === 1 ? ' active' : '') + '" data-page="' + i + '">Page ' + i + '</a>';
+                }
+            pageLinksHtml += '<a class="arrow next" data-page="next"></a>';
+            $starListPages.html(pageLinksHtml);
+            // Ensure the current page doesn't exceed the new total page count
+            let currentPage = parseInt($starListPages.attr('data-current-page')) || 1;
+            if (currentPage > numPages) { currentPage = numPages; }
+            // Apply the correct visibilities
+            if (typeof window.showStarListPage === 'function'){
+                window.showStarListPage(currentPage);
+                }
+            }
+        }
+    refreshStarchart();
+    return true;
+}
+
+/*
+// Create the windowResize event for this page
+function windowResizeStarforce(){
     //console.log('windowResizeStarforce()');
 
 
@@ -185,6 +337,7 @@ function windowResizeStarforce(){
     return true;
 
 }
+*/
 
 // Define a function for updating the star menu elements
 function refreshStarchart(){
@@ -209,9 +362,9 @@ function refreshStarchart(){
 
     // Loop through current groups and collect keys
     currentGroups.each(function(){
-        var thisGroup = $(this);
-        var thisGroupRobots = thisGroup.find('.robot');
-        thisGroupRobots.each(function(){
+        let thisGroup = $(this);
+        let thisGroupOptions = thisGroup.find('.option');
+        thisGroupOptions.each(function(){
             var thisRobot = $(this);
             var thisRobotIcon = thisRobot.find('.icon');
             if (thisRobotIcon.attr('data-top-key') != undefined){
@@ -263,4 +416,133 @@ function refreshArrowButtons(){
         if (thisButtonEnabled){ $thisButton.removeClass('disabled'); }
         else { $thisButton.addClass('disabled'); }
         });
+}
+
+// Define a star-specific function to call when polling user input variables
+function checkUserInputsForStarsFrame(kind, event, activeInputs, userInputs){
+    //console.log('%c' + 'prototypeReady.checkUserInputsForStarsFrame()', 'color: magenta;');
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
+    //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
+
+    // Collect references to available containers, views, and buttons before starting
+    let $thisViewsToggle = $('.header_types .toggle[data-view]', $thisPrototype);
+    let $availableViews = $('.option[data-view]', $thisViewsToggle);
+    let currentView = $thisViewsToggle.attr('data-view');
+    let $thisStarsContent = $('.content.stars', $thisPrototype);
+    let $availableContainers = $('.wrapper .container', $thisStarsContent);
+    let $availableContainersFiltered;
+    if (currentView === 'list'){ $availableContainersFiltered = $availableContainers.filter(function(){ return $(this).is('.starlist') || $(this).is('.starchart'); }); }
+    else if (currentView === 'stats'){ $availableContainersFiltered = $availableContainers.filter(function(){ return $(this).is('.starforce'); }); }
+    //console.log('-> $thisViewsToggle:', ($thisViewsToggle ? $thisViewsToggle.length : 0), typeof $thisViewsToggle, $thisViewsToggle);
+    //console.log('-> $availableViews:', ($availableViews ? $availableViews.length : 0), typeof $availableViews, $availableViews);
+    //console.log('-> currentView:', typeof currentView, currentView);
+    //console.log('-> $thisStarsContent:', ($thisStarsContent ? $thisStarsContent.length : 0), typeof $thisStarsContent, $thisStarsContent);
+    //console.log('-> $availableContainers:', ($availableContainers ? $availableContainers.length : 0), typeof $availableContainers, $availableContainers);
+    //console.log('-> $availableContainersFiltered:', ($availableContainersFiltered ? $availableContainersFiltered.length : 0), typeof $availableContainersFiltered, $availableContainersFiltered);
+
+    // COMMON CONTROLS: Try to keep these consistent!
+
+    // If the user pressed the X button, we should scroll through visible containers
+    if (activeInputs.X){
+        //console.log('%c' + 'X button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeContainer = $availableContainersFiltered.filter('.container_active');
+        let activeContainerIndex = $activeContainer && $activeContainer.length ? $availableContainersFiltered.index($activeContainer) : -1;
+        let maxContainerIndex = $availableContainersFiltered.length - 1;
+        let nextContainerIndex = activeContainerIndex + 1;
+        if (nextContainerIndex > maxContainerIndex){ nextContainerIndex = 0; }
+        let $nextContainer = $availableContainersFiltered.eq(nextContainerIndex);
+        if ($nextContainer && $nextContainer.length){
+            //$nextContainer.trigger('mouseenter');
+            //$nextContainer.trigger('click');
+            $availableContainers.removeClass('container_active');
+            $nextContainer.addClass('container_active');
+            playSoundEffect('icon-click-mini');
+            }
+        return;
+        }
+
+    // If the user pressed the L2/R2 button2, we should scroll through visible views
+    if (activeInputs.L2 || activeInputs.R2){
+        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeView = $availableViews.filter('.option[data-view="' + currentView + '"]');
+        let activeViewIndex = $activeView && $activeView.length ? $availableViews.index($activeView) : -1;
+        let maxViewIndex = $availableViews.length - 1;
+        let nextViewIndex = activeInputs.L2 ? 0 : maxViewIndex;
+        if (nextViewIndex > maxViewIndex){ nextViewIndex = 0; }
+        let $nextView = $availableViews.eq(nextViewIndex);
+        if ($nextView && $nextView.length){
+            $nextView.trigger('mouseenter');
+            $nextView.trigger('click');
+            }
+        return;
+        }
+
+    // STARFORCE CONTROLS: These controls only apply to the star menu
+
+    // If the user pressed a directional button, we should try to scroll through pages
+    if (activeInputs.Up || activeInputs.Down
+        || activeInputs.Left || activeInputs.Right){
+        let whichDirection = activeInputs.Up ? 'up' : activeInputs.Down ? 'down' : activeInputs.Left ? 'left' : activeInputs.Right ? 'right' : '';
+        //console.log('%c' + 'Directional button (' + whichDirection.toUpperCase() + ') pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeContainer, activeContainerKind;
+        $activeContainer = $availableContainersFiltered.filter('.container_active');
+        //console.log('-> $activeContainer:', ($activeContainer ? $activeContainer.length : 0), typeof $activeContainer, $activeContainer);
+        if (!$activeContainer || !$activeContainer.length){ return; }
+        if ($activeContainer.is('.starlist')){  activeContainerKind = 'starlist'; }
+        else if ($activeContainer.is('.starchart')){  activeContainerKind = 'starchart'; }
+        //console.log('activeContainerKind = ', activeContainerKind);
+        if (!activeContainerKind){ return; }
+        let $scrollButtons = {};
+        if (activeContainerKind === 'starlist'){
+            $scrollButtons.left = $('.pages .arrow.prev', $activeContainer);
+            $scrollButtons.right = $('.pages .arrow.next', $activeContainer);
+            } else if (activeContainerKind === 'starchart'){
+            $scrollButtons.up = $('.grouplist.sidebar .arrow.prev', $activeContainer);
+            $scrollButtons.down = $('.grouplist.sidebar .arrow.next', $activeContainer);
+            $scrollButtons.left = $('.grouplist.topbar .arrow.prev', $activeContainer);
+            $scrollButtons.right = $('.grouplist.topbar .arrow.next', $activeContainer);
+            }
+        let $clickButton;
+        if (typeof $scrollButtons[whichDirection] === 'object'
+            && $scrollButtons[whichDirection].length > 0
+            && !$scrollButtons[whichDirection].is('.disabled')){
+            $clickButton = $scrollButtons[whichDirection];
+            }
+        if (!$clickButton || !$clickButton.length){ return; }
+        $clickButton.trigger('mouseenter');
+        $clickButton.trigger('click');
+        return;
+        }
+
+    /*
+    // If the user pressed the A button, we should ?????
+    if (activeInputs.A){
+        //console.log('%c' + 'A button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    // If the user pressed the B button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.Y){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+
+        return;
+        }
+    */
+
+
 }

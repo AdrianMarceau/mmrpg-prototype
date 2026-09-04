@@ -1,0 +1,114 @@
+#---------------------------#
+# DEBUG AREA 1W2 (NATURE)
+@token    = debug-area-1w2
+@name     = DEBUG Area 1W2
+@level    = 30
+@size     = 20 x 25
+@sheet    = mmrpg-overworld-2k25-v2
+#---------------------------#
+@field      = preserved-forest
+#---------------------------#
+@portals[]  = spawn(14-22, hidden)
+#---------------------------#
+@portals[]  = subspace-portal(13-16, debug-area-0__forest-portal, green-alt)
+@locks[]    = nature-portal-flower(13-16, portal-flower, nature, items:nature-core, x10, locked)
+#---------------------------#
+@portals[]  = east-exit(20-22, debug-area-1w__west-exit, right-only)
+@portals[]  = south-exit(5-25, debug-area-1sw__north-exit, down-only)
+#---------------------------#
+@field      = preserved-forest
+@music[]    = default(plant-man-mm6)
+#---------------------------#
+@pickups      = nature-core(10),attack-pellet(2),attack-capsule(1),defense-pellet(2),defense-capsule(1),speed-pellet(2),speed-capsule(1)
+#---------------------------#
+@encounters = batton(20),monking-r(10),eggalodon(5),petal-anne(20),petit-snakey(10),bombomboy(5),kabuton(5),merserker(5)
+@groups[]   = no-encounters_da1w-exit-buffer(13-21...15-23)
+@groups[]   = no-encounters_da1sw-exit-buffer(4-23...6-25)
+#---------------------------#
+@actors[]     = purple-reset-dude(15-24, robot, anti-eddie, -, default)
+#---------------------------#
+@terrain[]   = ground(preserved-forest)
+@terrain[]   = grass(gentle-countryside)
+@terrain[]   = water(rainy-sewers)
+#---------------------------#
+@habitats[] = batton(ground)
+@habitats[] = monking-r(ground)
+@habitats[] = eggalodon(ground)
+@habitats[] = petal-anne(grass)
+@habitats[] = petit-snakey(grass)
+@habitats[] = bombomboy(grass)
+@habitats[] = kabuton(water)
+@habitats[] = merserker(void)
+#---------------------------#
+@bosses[]    = roaming-boss-1(6-4, slash-man)
+@bosses[]    = roaming-boss-2(15-4, tengu-man)
+@bosses[]    = roaming-boss-3(17-20, wood-man)
+@bosses[]    = roaming-boss-4(5-15, snake-man)
+@bosses[]    = roaming-boss-5(19-7, blade-man)
+@bosses[]    = roaming-boss-6(11-7, cut-man)
+@bosses[]    = roaming-boss-7(2-7, needle-man)
+@bosses[]    = roaming-boss-8(14-13, burner-man)
+@bosses[]    = roaming-boss-9(9-21, plant-man)
+#---------------------------#
+@items[]    = boss-star-1(6-4, nature-star, slash-man)
+@items[]    = boss-star-2(15-4, wind-star, tengu-man)
+@items[]    = boss-star-3(17-20, nature-star, wood-man)
+@items[]    = boss-star-4(5-15, nature-star, snake-man)
+@items[]    = boss-star-5(19-7, cutter-star, blade-man)
+@items[]    = boss-star-6(11-7, cutter-star, cut-man)
+@items[]    = boss-star-7(2-7, cutter-star, needle-man)
+@items[]    = boss-star-8(14-13, flame-star, burner-man)
+@items[]    = boss-star-9(9-21, nature-star, plant-man)
+#---------------------------#
+@buttons[]   = waterway-button(3-21, green, up, set-group-terrain, waterway-path, grass)
+#---------------------------#
+@groups[]    = waterway-path(5-21, 6-21, 7-21, 8-21)
+@groups[]    = waterway-path-ends(4-21, 9-21)
+@groups[]    = around-waterway-button(2-21, 4-21, 3-20, 3-22, 2-20, 2-22, 4-20, 4-22)
+@groups[]    = no-encounters(around-waterway-button, waterway-path, waterway-path-ends)
+#---------------------------#
+#@items[]     = wily-heart-3(17-19, wily-heart__3)
+#@items[]     = wily-heart-4(6-17, wily-heart__4)
+#@items[]     = wily-heart-5(5-4, wily-heart__5)
+#@items[]     = wily-heart-6(16-4, wily-heart__6)
+#---------------------------#
+@hazards[]    = bramble-hazard-01(16-24, bramble-patch)
+@hazards[]    = bramble-hazard-02(16-23, bramble-patch)
+@hazards[]    = bramble-hazard-03(15-23, bramble-patch)
+@hazards[]    = bramble-hazard-04(15-22, bramble-patch)
+@hazards[]    = bramble-hazard-05(14-22, bramble-patch)
+@hazards[]    = bramble-hazard-06(14-21, bramble-patch)
+@hazards[]    = bramble-hazard-07(13-21, bramble-patch)
+@hazards[]    = bramble-hazard-08(13-20, bramble-patch)
+@hazards[]    = bramble-hazard-09(4-14, bramble-patch)
+@hazards[]    = bramble-hazard-10(6-14, bramble-patch)
+@hazards[]    = bramble-hazard-11(4-16, bramble-patch)
+@hazards[]    = bramble-hazard-12(6-16, bramble-patch)
+#---------------------------#
+#---------------------------#
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__]
+[__],[30],[__],[30],[30],[30],[30],[30],[__],[__],[30],[__],[30],[30],[30],[30],[30],[__],[30],[__]
+[__],[30],[__],[__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__],[30],[__]
+[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__]
+[__],[__],[30],[__],[30],[__],[__],[__],[30],[__],[__],[30],[__],[__],[30],[__],[__],[__],[30],[__]
+[__],[__],[30],[__],[30],[__],[30],[30],[30],[__],[30],[30],[30],[__],[30],[__],[30],[__],[30],[__]
+[__],[30],[30],[30],[30],[__],[30],[__],[__],[__],[30],[__],[30],[30],[30],[30],[30],[30],[30],[__]
+[__],[__],[__],[30],[30],[__],[30],[__],[__],[30],[30],[__],[__],[__],[30],[__],[30],[__],[__],[__]
+[__],[__],[30],[30],[30],[30],[30],[30],[__],[30],[__],[__],[30],[30],[30],[__],[30],[30],[__],[__]
+[__],[30],[30],[30],[20],[30],[30],[30],[30],[30],[30],[__],[30],[30],[30],[30],[30],[__],[30],[__]
+[__],[30],[__],[20],[20],[20],[20],[20],[30],[__],[30],[30],[30],[30],[30],[__],[30],[30],[30],[__]
+[__],[30],[90],[20],[20],[20],[30],[20],[30],[90],[30],[30],[30],[30],[30],[90],[20],[30],[30],[__]
+[__],[30],[90],[20],[20],[20],[30],[30],[30],[90],[30],[20],[20],[30],[90],[90],[20],[20],[30],[__]
+[__],[30],[90],[90],[20],[20],[20],[30],[90],[90],[90],[90],[90],[30],[90],[20],[20],[20],[30],[__]
+[__],[30],[30],[90],[30],[20],[20],[30],[90],[90],[90],[90],[90],[90],[90],[20],[20],[20],[30],[__]
+[__],[30],[90],[90],[90],[90],[90],[90],[90],[90],[90],[90],[90],[90],[20],[20],[20],[20],[30],[__]
+[__],[30],[30],[30],[30],[90],[90],[90],[90],[90],[20],[20],[20],[20],[20],[20],[20],[20],[30],[__]
+[__],[30],[30],[30],[90],[90],[90],[90],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[30],[__]
+[__],[30],[30],[30],[30],[90],[90],[90],[90],[90],[90],[20],[20],[20],[20],[20],[20],[20],[30],[30]
+[__],[30],[30],[30],[30],[90],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[30],[__]
+[__],[__],[__],[30],[30],[90],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+#---------------------------#

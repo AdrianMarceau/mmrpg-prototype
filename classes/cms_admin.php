@@ -65,9 +65,14 @@ class cms_admin {
         error_log('$output = '.print_r($output, true));
         error_log('$return = '.print_r($return, true));
         */
-        $command = "php -l {$file_name}";
+        //$command = "php -l {$file_name}";
+        //$command = "php -l ".escapeshellarg($file_name)." 2>&1";
+        $command = MMRPG_CONFIG_PHP_DIR." -l ".escapeshellarg($file_name)." 2>&1";
         exec($command, $output, $return);
+        // If syntax is invalid, log the exact error so it's not a mystery
         $output = trim(implode(PHP_EOL, $output));
+        if ($return !== 0){ error_log("cms_admin::is_valid_php_syntax() syntax validation failed: " . $output); }
+        //else { error_log("cms_admin::is_valid_php_syntax() validation success: " . $output); }
         //error_log('$command = '.print_r($command, true));
         //error_log('$output = '.print_r($output, true));
         //error_log('$return = '.print_r($return, true));

@@ -10,6 +10,21 @@ User-agent: Semrushbot-SI
 Disallow: /
 User-agent: AhrefsBot
 Disallow: /
+User-Agent: Claudebot
+Disallow: /
+User-agent: anthropic-ai
+Disallow: /
+User-agent: BLEXBot/1.0
+User-agent: CCBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: ClaudeBot/1.0
+User-agent: Elisabot
+User-agent: GPTBot
+User-agent: UptimeRobot
+User-agent: UptimeRobot/1.0
+User-agent: UptimeRobot/2.0
+Disallow: /
 
 # General Access
 User-agent: *

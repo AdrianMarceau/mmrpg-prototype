@@ -1,8 +1,5 @@
 <?
 
-// Require the global config file
-require('../top.php');
-
 // Pre-collect request arguments provided in a different syntax
 $request_args = !empty($_GET['args']) ? $_GET['args'] : array();
 //error_log('$request_args (before) = '.print_r($request_args, true));
@@ -31,6 +28,7 @@ if (!empty($request_args)){
 $allowed_kinds = array('composite');
 $allowed_types = array('players', 'robots', 'abilities', 'items', 'skills', 'fields');
 $allowed_types_classes = array('robots' => array('mecha', 'master', 'boss'));
+$allowed_directions = array('left', 'right', 'both');
 $allowed_file_regex = '/^([-_a-z0-9]+)\.([a-z0-9]{3,})$/i';
 $request_kind = isset($_GET['kind']) && in_array($_GET['kind'], $allowed_kinds) ? $_GET['kind'] : false;
 $request_type = isset($_GET['type']) && in_array($_GET['type'], $allowed_types) ? $_GET['type'] : false;
@@ -41,11 +39,17 @@ $request_file = isset($_GET['file']) && preg_match($allowed_file_regex, $_GET['f
 $request_size = !empty($_GET['size']) && is_numeric($_GET['size']) ? (int)($_GET['size']) : false;
 $request_alt = !empty($_GET['alt']) && preg_match('/^[-_a-z0-9]+$/', $_GET['alt']) ? $_GET['alt'] : 0;
 $request_crop = !empty($_GET['crop']) && $_GET['crop'] === 'false' ? false : true;
+$request_zoomed = !empty($_GET['zoom']) && $_GET['zoom'] === 'true' ? true : false;
 $request_frame = !empty($_GET['frame']) && is_numeric($_GET['frame']) ? (int)($_GET['frame']) : 0;
+$request_dir = !empty($_GET['dir']) && in_array($_GET['dir'], $allowed_directions) ? $_GET['dir'] : false;
 $force_refresh = !empty($_GET['refresh']) && $_GET['refresh'] === 'true' ? true : false;
 if (is_numeric($request_alt)){ $request_alt = (int)($request_alt); }
 if (is_numeric($request_editor)){ $request_editor = (int)($request_editor); }
+if (empty($request_dir) && strstr($request_file, 'left_')){ $request_dir = 'left'; }
+elseif (empty($request_dir) && strstr($request_file, 'right_')){ $request_dir = 'right'; }
 if (!$request_crop){ $request_frame = 'all'; }
+$cached_file_hash = md5($request_kind.$request_type.$request_sub_type.$request_token.$request_editor.$request_file.$request_size.$request_alt.$request_crop.$request_frame.$request_dir);
+//error_log('// ----- new get-images.php request @'.date('Ymd-His').' -----/');
 //error_log('$request_kind = '.print_r($request_kind, true));
 //error_log('$request_type = '.print_r($request_type, true));
 //error_log('$request_sub_type = '.print_r($request_sub_type, true));
@@ -55,8 +59,11 @@ if (!$request_crop){ $request_frame = 'all'; }
 //error_log('$request_size = '.print_r($request_size, true));
 //error_log('$request_alt = '.print_r($request_alt, true));
 //error_log('$request_crop = '.print_r($request_crop, true));
+//error_log('$request_zoomed = '.print_r(($request_zoomed ? 'true' : 'false'), true));
 //error_log('$request_frame = '.print_r($request_frame, true));
+//error_log('$request_dir = '.print_r($request_dir, true));
 //error_log('$force_refresh = '.print_r($force_refresh, true));
+//exit();
 
 // If required fields were empty or not provided, immediately error out with a 404 header
 if (empty($request_kind) || empty($request_type) || empty($request_file)){
@@ -77,8 +84,14 @@ if ($request_file_ext === 'json'){ $request_format = 'index'; }
 else { $request_format = 'image'; }
 //error_log('$request_format = '.print_r($request_format, true));
 
+// Manually define the root dir based on this script's location
+// (because we don't want to load the top file until we have to)
+$root_dir = rtrim(dirname(dirname(__FILE__)), '/').'/';
+
 // Given what we know above, construct the filename for the cached file
-$composite_base_path = MMRPG_CONFIG_CACHE_PATH.'sprites/';
+$root_cache_dir = $root_dir.'.cache/';
+$composite_base_path = $root_cache_dir.'sprites/';
+//$composite_base_path = MMRPG_CONFIG_CACHE_PATH.'sprites/';
 if (!file_exists($composite_base_path)){ mkdir($composite_base_path, 0777, true); }
 $composite_base_token = str_replace('_', '-', $request_file_name);
 if (!empty($request_size)){ $composite_base_token .= '_s-'.$request_size; }
@@ -86,17 +99,22 @@ if (!empty($request_alt)){ $composite_base_token .= '_a-'.$request_alt; }
 if (!empty($request_frame)){ $composite_base_token .= '_f-'.$request_frame; }
 if (!empty($request_editor)){ $composite_base_token .= '_e-'.$request_editor; }
 if (!empty($request_token)){ $composite_base_token .= '_t-'.preg_replace('/[^-a-z0-9]+/i', '-', $request_token); }
+if (!empty($request_zoomed)){ $composite_base_token .= '_x2'; }
 $composite_image_binary_path = $request_type.'_'.$composite_base_token.'.png';
 $composite_image_index_path = $request_type.'_'.$composite_base_token.'.json';
+//error_log('$composite_base_token = '.print_r($composite_base_token, true));
 //error_log('$composite_base_path = '.print_r($composite_base_path, true));
 //error_log('$composite_image_binary_path = '.print_r($composite_image_binary_path, true));
 //error_log('$composite_image_index_path = '.print_r($composite_image_index_path, true));
 
 // Define the sprite object path given the request type
-$sprite_object_dir = MMRPG_CONFIG_CONTENT_PATH.$request_type.'/';
+$root_content_dir = $root_dir.'content/';
+$sprite_object_dir = $root_content_dir.$request_type.'/';
+//$sprite_object_dir = MMRPG_CONFIG_CONTENT_PATH.$request_type.'/';
 
 // Collect the global cache time and break it down to an exact time
-list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
+//list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
+list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours')));
 $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
 $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
 $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
@@ -145,17 +163,26 @@ $composite_index = array();
 $object_xname = $request_type;
 $object_name = rtrim($object_xname, 's');
 $object_frame_index = array();
-if ($request_type === 'abilities'){ $object_name = 'ability'; }
-if ($request_type === 'players'){ $object_frame_index = MMRPG_SETTINGS_PLAYER_FRAMEINDEX; }
-elseif ($request_type === 'robots'){ $object_frame_index = MMRPG_SETTINGS_ROBOT_FRAMEINDEX; }
-elseif ($request_type === 'abilities'){ $object_frame_index = MMRPG_SETTINGS_ABILITY_FRAMEINDEX; }
-elseif ($request_type === 'items'){ $object_frame_index = MMRPG_SETTINGS_ITEM_FRAMEINDEX; }
-elseif ($request_type === 'skills'){ $object_frame_index = MMRPG_SETTINGS_SKILL_FRAMEINDEX; }
-elseif ($request_type === 'fields'){ $object_frame_index = 'base'; }
-$object_frame_index = strstr($object_frame_index, '/') ? explode('/', $object_frame_index) : array($object_frame_index);
 
 // If we must regenerate everything, we should do it now
 if ($must_regenerate){
+    //error_log('Must regenerate the composite index and/or image now for '.$request_type.' ('.$request_file.')');
+
+    // Require the global config file
+    define('MMRPG_EXCLUDE_GAME_LOGIC', true);
+    define('MMRPG_EXCLUDE_SESSION', true);
+    define('MMRPG_INDEX_STYLES', true);
+    require('../top.php');
+
+    // Populate the object details index based on the request type
+    if ($request_type === 'abilities'){ $object_name = 'ability'; }
+    if ($request_type === 'players'){ $object_frame_index = MMRPG_SETTINGS_PLAYER_FRAMEINDEX; }
+    elseif ($request_type === 'robots'){ $object_frame_index = MMRPG_SETTINGS_ROBOT_FRAMEINDEX; }
+    elseif ($request_type === 'abilities'){ $object_frame_index = MMRPG_SETTINGS_ABILITY_FRAMEINDEX; }
+    elseif ($request_type === 'items'){ $object_frame_index = MMRPG_SETTINGS_ITEM_FRAMEINDEX; }
+    elseif ($request_type === 'skills'){ $object_frame_index = MMRPG_SETTINGS_SKILL_FRAMEINDEX; }
+    elseif ($request_type === 'fields'){ $object_frame_index = 'base'; }
+    $object_frame_index = strstr($object_frame_index, '/') ? explode('/', $object_frame_index) : array($object_frame_index);
 
     // First, pull in the index of all objects given the type requested
     if ($request_type === 'players'){
@@ -173,15 +200,19 @@ if ($must_regenerate){
     }
 
     // If the user requested only a specific token, filter the list
+    $request_tokens = array();
     if (!empty($request_token)
+        && $request_token !== 'all'
         && !empty($composite_objects)){
         $request_tokens = strstr($request_token, ',') ? explode(',', $request_token) : array($request_token);
-        //error_log('filter by $request_tokens = '.print_r(array_keys($request_tokens), true));
+        //error_log('filter by $request_tokens = '.print_r($request_tokens, true));
         $composite_objects = array_filter($composite_objects, function($object) use ($object_name, $request_tokens){
             $allow = false;
             if (in_array($object[$object_name.'_token'], $request_tokens)){ $allow = true; }
             return $allow;
             });
+    } else {
+        //error_log('request token empty or not a filter ($request_token: '.print_r($request_token, true).')');
     }
 
     // If the user requested only a specific sub type of object, filter the list by object class = sub type
@@ -282,7 +313,9 @@ if ($must_regenerate){
             }
             // Now check to see if the file actually exists, else unset for that too
             else {
-                $size_string = $object_info['image_size'].'x'.$object_info['image_size'];
+                $image_size = $object_info['image_size'];
+                if ($request_zoomed){ $image_size *= 2; }
+                $size_string = $image_size.'x'.$image_size;
                 $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
                 $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
                 $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $request_file_name).'.png';
@@ -294,15 +327,17 @@ if ($must_regenerate){
             }
         }
     }
-    //error_log('$composite_objects (filtered) = '.print_r($composite_objects, true));
+    //error_log('$composite_objects (filtered) = '.print_r( array_map(function($a){ return json_encode($a, true); }, $composite_objects), true));
 
     // Loop through the objects one more time to find the max width and height
     $max_sprite_width = 0;
     $max_sprite_height = 0;
     if (!empty($composite_objects)){
         foreach ($composite_objects AS $object_token => $object_info){
-            if ($object_info['image_size'] > $max_sprite_width){ $max_sprite_width = $object_info['image_size']; }
-            if ($object_info['image_size'] > $max_sprite_height){ $max_sprite_height = $object_info['image_size']; }
+            $image_size = $object_info['image_size'];
+            if ($request_zoomed){ $image_size *= 2; }
+            if ($image_size > $max_sprite_width){ $max_sprite_width = $image_size; }
+            if ($image_size > $max_sprite_height){ $max_sprite_height = $image_size; }
         }
     }
     //error_log('$max_sprite_width = '.print_r($max_sprite_width, true));
@@ -328,9 +363,16 @@ if ($must_regenerate){
             // Define flags for whether or not certain types of alts are required
             $elemental_alts_required = false;
             $elemental_fusion_alts_required = false;
-            if ($request_type === 'robots'){ $elemental_alts_required = true; }
-            if ($request_type === 'items' && (in_array('field-star', $request_tokens) || in_array('fusion-star', $request_tokens))){ $elemental_alts_required = true; }
-            if ($request_type === 'items' && in_array('fusion-star', $request_tokens)){ $elemental_fusion_alts_required = true; }
+            if ($request_type === 'robots'){
+                $elemental_alts_required = true;
+            }
+            if ($request_type === 'items'){
+                if ($request_token === 'all' || in_array('field-star', $request_tokens) || in_array('fusion-star', $request_tokens)){ $elemental_alts_required = true; }
+                //if ($request_token === 'all' || in_array('fusion-star', $request_tokens)){ $elemental_fusion_alts_required = true; }
+                if (in_array('fusion-star', $request_tokens)){ $elemental_fusion_alts_required = true; }
+            }
+            //error_log('$elemental_alts_required = '.print_r($elemental_alts_required, true));
+            //error_log('$elemental_fusion_alts_required = '.print_r($elemental_fusion_alts_required, true));
 
             // Before we start, grab the types index and generate some alt templates
             $mmrpg_types_index = rpg_type::get_index();
@@ -366,15 +408,18 @@ if ($must_regenerate){
 
             //error_log('$request_type = '.print_r($request_type, true));
             //error_log('$composite_objects = '.print_r($composite_objects, true));
+            //error_log('$mmrpg_alt_templates = '.print_r($mmrpg_alt_templates, true));
             foreach ($composite_objects AS $object_token => $object_info){
                 //error_log('$object_info = '.print_r($object_info, true));
                 if (empty($object_info['image_alts'])){
-                    //error_log($object_token.' doesnt have alts so that means we gotta generate them');
+                    //error_log($object_token.' doesnt have alts but we might have to generate them');
                     // Define an array to hold the new image alts
                     $new_image_alts = array();
                     //error_log('$object_info = '.print_r($object_info, true));
                     // If this is a ROBOT object and is also COPY type, we can generate elemental alts
-                    if ($request_type === 'robots' && $object_info['core'] === 'copy'){
+                    if ($request_type === 'robots'
+                        && $object_info['core'] === 'copy'
+                        && !empty($mmrpg_alt_templates['base'])){
                         //error_log('generate elemental base alts for copy core robots');
                         $base_image_alts = array_map(function($type_info) use ($object_info){
                             $type_token = $type_info['token'];
@@ -385,7 +430,9 @@ if ($must_regenerate){
                         $new_image_alts = array_merge($new_image_alts, $base_image_alts);
                     }
                     // If this is an ITEM object and is also a FIELD STAR or a FUSION STAR, we can generate elemental alts
-                    if ($request_type === 'items' && ($object_token === 'field-star' || $object_token === 'fusion-star')){
+                    if ($request_type === 'items'
+                        && ($object_token === 'field-star' || $object_token === 'fusion-star')
+                        && !empty($mmrpg_alt_templates['base'])){
                         //error_log('generate elemental base alts for field/fusion star items');
                         $base_image_alts = array_map(function($type_info) use ($object_info){
                             $type_token = $type_info['token'];
@@ -396,7 +443,9 @@ if ($must_regenerate){
                         $new_image_alts = array_merge($new_image_alts, $base_image_alts);
                     }
                     // If this is an ITEM object and is also a FIELD STAR or a FUSION STAR, we can generate elemental alts
-                    if ($request_type === 'items' && $object_token === 'fusion-star'){
+                    if ($request_type === 'items'
+                        && $object_token === 'fusion-star'
+                        && !empty($mmrpg_alt_templates['fusion'])){
                         //error_log('generate elemental fusion alts for fusion star items');
                         $fusion_image_alts = array_map(function($type_info) use ($object_info){
                             $type_token = $type_info['token'];
@@ -422,9 +471,11 @@ if ($must_regenerate){
     if (!empty($composite_objects)){
         foreach ($composite_objects AS $object_token => $object_info){
             $sprite_objects_num++; // count the object itself
+            if ($request_dir === 'both'){ $sprite_objects_num++; } // count the opposite direction if requested
             if ($request_alt === 'all' && !empty($object_info['image_alts'])){
                 // Count all the alts for this object
                 $sprite_objects_num += count($object_info['image_alts']);
+                if ($request_dir === 'both'){ $sprite_objects_num += count($object_info['image_alts']); } // same as above
             }
         }
     }
@@ -468,39 +519,53 @@ if ($must_regenerate){
     // Loop through the objects again and pull out relevant image data for the index
     if (!empty($composite_objects)){
         $object_key = -1;
+        //$object_directions = $request_dir === 'both' ? array('left', 'right') : array($request_dir);
+        if ($request_dir !== 'both'){ $object_directions = array($request_dir); }
+        elseif (strstr($request_file_name, '_left_')) { $object_directions = array('left', 'right'); }
+        elseif (strstr($request_file_name, '_right_')) { $object_directions = array('right', 'left'); }
+        else { $object_directions = array('left', 'right'); } // hopefully this isn't needed
+        // VERSION 3 (with better direction support when multi-characters)
         foreach ($composite_objects AS $object_token => $object_info){
-            $object_key++;
-            $position = $calculate_position($object_key, $sprite_objects_grid_width, $sprite_objects_grid_height, $target_sprite_width, $target_sprite_height);
-            $size_string = $object_info['image_size'].'x'.$object_info['image_size'];
-            $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
-            $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
-            $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $request_file_name).'.png';
-            $source_path_full = $src_base.$src_file;
-            $source_path_relative = str_replace(MMRPG_CONFIG_ROOTDIR, '', $source_path_full);
-            $composite_config = array(
-                'token' => $object_info['token'],
-                'image' => $object_info['image'],
-                'file' => $request_file_name,
-                'source' => $source_path_relative,
-                'size' => $object_info['image_size'],
-                'position' => array('col' => $position['col'], 'row' => $position['row']),
-                'offset' => array('x' => $position['x'], 'y' => $position['y'])
-                );
-            $composite_index[$object_token] = $composite_config;
-            // If the player has requested all alts for this object, we have to add them
-            if ($request_alt === 'all'
-                && !empty($object_info['image_alts'])){
-                foreach ($object_info['image_alts'] AS $alt_key => $alt_info){
-                    $object_key++;
-                    $position = $calculate_position($object_key, $sprite_objects_grid_width, $sprite_objects_grid_height, $target_sprite_width, $target_sprite_height);
-                    $composite_alt_token = $object_token.'_'.$alt_info['token'];
-                    $composite_alt_config = $composite_config;
-                    $composite_alt_config['token'] = $composite_config['token'].'_'.$alt_info['token'];
-                    $composite_alt_config['image'] = $composite_config['image'].'_'.$alt_info['token'];
-                    $composite_alt_config['source'] = str_replace('/sprites/', '/sprites_'.$alt_info['token'].'/', $composite_config['source']);
-                    $composite_alt_config['position'] = array('col' => $position['col'], 'row' => $position['row']);
-                    $composite_alt_config['offset'] = array('x' => $position['x'], 'y' => $position['y']);
-                    $composite_index[$composite_alt_token] = $composite_alt_config;
+            foreach ($object_directions AS $object_direction){
+                $object_key++;
+                $opposite_direction = $object_direction === 'left' ? 'right' : 'left';
+                $object_file = str_replace('_'.$opposite_direction.'_', '_'.$object_direction.'_', $request_file_name);
+                $position = $calculate_position($object_key, $sprite_objects_grid_width, $sprite_objects_grid_height, $target_sprite_width, $target_sprite_height);
+                $image_size = $object_info['image_size'];
+                if ($request_zoomed){ $image_size *= 2; }
+                $size_string = $image_size.'x'.$image_size;
+                $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
+                $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
+                $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $object_file).'.png';
+                $source_path_full = $src_base.$src_file;
+                $source_path_relative = str_replace(MMRPG_CONFIG_ROOTDIR, '', $source_path_full);
+                $composite_config = array(
+                    'token' => $object_info['token'],
+                    'image' => $object_info['image'],
+                    'file' => $object_file,
+                    'source' => $source_path_relative,
+                    'size' => $image_size,
+                    'position' => array('col' => $position['col'], 'row' => $position['row']),
+                    'offset' => array('x' => $position['x'], 'y' => $position['y'])
+                    );
+                $composite_token = $object_token;
+                if ($request_dir === 'both'){ $composite_token .= '_'.$object_direction; }
+                $composite_index[$composite_token] = $composite_config;
+                // If the player has requested all alts for this object, we have to add them
+                if ($request_alt === 'all'
+                    && !empty($object_info['image_alts'])){
+                    foreach ($object_info['image_alts'] AS $alt_key => $alt_info){
+                        $object_key++;
+                        $position = $calculate_position($object_key, $sprite_objects_grid_width, $sprite_objects_grid_height, $target_sprite_width, $target_sprite_height);
+                        $composite_alt_config = $composite_config;
+                        $composite_alt_config['token'] = $composite_config['token'].'_'.$alt_info['token'];
+                        $composite_alt_config['image'] = $composite_config['image'].'_'.$alt_info['token'];
+                        $composite_alt_config['source'] = str_replace('/sprites/', '/sprites_'.$alt_info['token'].'/', $composite_config['source']);
+                        $composite_alt_config['position'] = array('col' => $position['col'], 'row' => $position['row']);
+                        $composite_alt_config['offset'] = array('x' => $position['x'], 'y' => $position['y']);
+                        $composite_alt_token = $composite_token.'_'.$alt_info['token'];
+                        $composite_index[$composite_alt_token] = $composite_alt_config;
+                    }
                 }
             }
         }
@@ -675,6 +740,7 @@ if ($must_regenerate && !empty($composite_index)){
 // If the requested file already exists, we can just return it verbatim
 if ($request_format === 'image' && file_exists($composite_base_path.$composite_image_binary_path)
     || $request_format === 'index' && file_exists($composite_base_path.$composite_image_index_path)){
+    //error_log('Composite '.($request_format === 'index' ? 'Index' : 'Image').' File Already Exists, Setting Cache Headers');
 
     // Define and set the cache headers for this file
     $cache_time = 24 * 60 * 60; // hours * minutes * seconds
@@ -685,9 +751,9 @@ if ($request_format === 'image' && file_exists($composite_base_path.$composite_i
 
 }
 
-
 // If the requested file already exists, we can just return it verbatim
 if ($request_format === 'image' && file_exists($composite_base_path.$composite_image_binary_path)){
+    //error_log('Composite Image File Already Exists, Returning Existing File');
 
     // Gather the composite image properties, update the headers, return the file
     $full_path = $composite_base_path.$composite_image_binary_path;
@@ -702,6 +768,7 @@ if ($request_format === 'image' && file_exists($composite_base_path.$composite_i
 
 
 } elseif ($request_format === 'index' && file_exists($composite_base_path.$composite_image_index_path)){
+    //error_log('Composite Image Index Already Exists, Returning Existing File');
 
     // Pull the file's content into memory, update the headers, return the file
     $full_path = $composite_base_path.$composite_image_index_path;

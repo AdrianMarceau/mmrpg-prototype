@@ -279,12 +279,13 @@ class rpg_mission_double extends rpg_mission {
 
         // Define the omega variables for level, zenny, turns, and random encounter rate
         $omega_robot_level_max = $this_start_level + 4;
-        if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
+        $omega_robot_level_limit_break = mmrpg_prototype_allow_limit_break() ? true : false;
+        if ($omega_robot_level_max >= 100 && !$omega_robot_level_limit_break){ $omega_robot_level_max = 100; }
         $omega_robot_level = $this_start_level;
         if (!empty($temp_option_completed) && !empty($temp_option_completed)){ $omega_robot_level += $temp_option_completed; }
         if (!empty($phase_level_boost)){ $omega_robot_level += $phase_level_boost; }
         if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
-        if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
+        if ($omega_robot_level >= 100 && !$omega_robot_level_limit_break){ $omega_robot_level = 100; }
 
         // Also, fill the empty spots with minor enemy robots
         if (true){

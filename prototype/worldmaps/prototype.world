@@ -1,0 +1,182 @@
+#---------------------------#
+# PROTOTYPE WORLD
+@token    = prototype
+@name     = Prototype World
+@size     = 23 x 18 @ 14 x 14 ^ 14
+@sheet    = mmrpg-overworld-2k25
+@image    = mmrpg-minimap-2025_prototype-world.png
+#---------------------------#
+#---------------------------#
+@areas[]  = boot-area-0(12-7)
+#---------------------------#
+#---------------------------#
+@areas[]  = light-area-1(12-8)
+@areas[]  = light-area-1e(13-8)
+@areas[]  = light-area-1s(12-9)
+@areas[]  = light-area-1w(11-8)
+#---------------------------#
+@areas[]  = wily-area-1(19-14)
+@areas[]  = wily-area-1n(19-13)
+@areas[]  = wily-area-1w(18-14)
+@areas[]  = wily-area-1w2(17-14)
+#---------------------------#
+@areas[]  = cossack-area-1(5-14)
+@areas[]  = cossack-area-1n(5-13)
+@areas[]  = cossack-area-1e(6-14)
+@areas[]  = cossack-area-1e2(7-14)
+#---------------------------#
+#@areas[]  = lalinde-area-1(12-18)
+#@areas[]  = lalinde-area-1n(12-17)
+#@areas[]  = lalinde-area-1e(13-18)
+#@areas[]  = lalinde-area-1w(11-18)
+#---------------------------#
+#---------------------------#
+@areas[]  = storage-area-1(23-7)
+@areas[]  = storage-area-2(23-6)
+#---------------------------#
+@areas[]  = storage-area-1s(23-9)
+#---------------------------#
+@areas[]  = control-area-1(1-7)
+@areas[]  = control-area-2(1-6)
+#---------------------------#
+@areas[]  = control-area-1s(1-9)
+#---------------------------#
+@areas[]  = security-area-1(14-16)
+@areas[]  = security-area-2(15-16)
+@areas[]  = security-area-3(16-16)
+#---------------------------#
+@areas[]  = research-area-1(10-16)
+@areas[]  = research-area-2(9-16)
+@areas[]  = research-area-3(8-16)
+#---------------------------#
+#---------------------------#
+@areas[]  = hunter-area-1(17-4)
+@areas[]  = hunter-area-2(17-3)
+@areas[]  = hunter-area-3(17-2)
+#---------------------------#
+@areas[]  = genesis-area-1(7-4)
+@areas[]  = genesis-area-2(7-3)
+@areas[]  = genesis-area-3(7-2)
+#---------------------------#
+#---------------------------#
+@areas[]  = hifi-area-1(20-4)
+@areas[]  = hifi-area-2(20-3)
+#---------------------------#
+@areas[]  = stellar-area-1(22-2)
+@areas[]  = stellar-area-2(23-2)
+@areas[]  = stellar-area-3(23-1)
+#---------------------------#
+#---------------------------#
+@areas[]  = lofi-area-1(4-4)
+@areas[]  = lofi-area-2(4-3)
+#---------------------------#
+@areas[]  = paradox-area-1(2-2)
+@areas[]  = paradox-area-2(1-2)
+@areas[]  = paradox-area-3(1-1)
+#---------------------------#
+#---------------------------#
+@areas[]  = explode-area-1(15-8)
+@areas[]  = explode-area-1e(16-8)
+@areas[]  = explode-area-1s(15-9)
+@areas[]  = explode-area-1w(14-8)
+#---------------------------#
+@areas[]  = impact-area-1(12-11)
+@areas[]  = impact-area-1n(12-10)
+@areas[]  = impact-area-1s(12-12)
+@areas[]  = impact-area-1w(11-11)
+#---------------------------#
+@areas[]  = cutter-area-1(9-8)
+@areas[]  = cutter-area-1e(10-8)
+@areas[]  = cutter-area-1s(9-9)
+@areas[]  = cutter-area-1w(8-8)
+#---------------------------#
+@areas[]  = flame-area-1(18-8)
+@areas[]  = flame-area-1e(19-8)
+@areas[]  = flame-area-1s(18-9)
+@areas[]  = flame-area-1w(17-8)
+#---------------------------#
+@areas[]  = swift-area-1(12-13)
+@areas[]  = swift-area-1n(11-13)
+@areas[]  = swift-area-1e(13-13)
+@areas[]  = swift-area-1w(11-13)
+#---------------------------#
+@areas[]  = freeze-area-1(6-8)
+@areas[]  = freeze-area-1e(7-8)
+@areas[]  = freeze-area-1s(6-9)
+@areas[]  = freeze-area-1w(5-8)
+#---------------------------#
+@areas[]  = wind-area-1(18-6)
+@areas[]  = wind-area-1e(19-6)
+@areas[]  = wind-area-1s(18-7)
+@areas[]  = wind-area-1w(17-6)
+#---------------------------#
+@areas[]  = shadow-area-1(21-8)
+@areas[]  = shadow-area-1n(21-7)
+@areas[]  = shadow-area-1s(21-9)
+@areas[]  = shadow-area-1w(20-8)
+#---------------------------#
+@areas[]  = electric-area-1(18-11)
+@areas[]  = electric-area-1n(18-10)
+@areas[]  = electric-area-1e(19-11)
+@areas[]  = electric-area-1w(17-11)
+#---------------------------#
+@areas[]  = crystal-area-1(15-13)
+@areas[]  = crystal-area-1n(15-12)
+@areas[]  = crystal-area-1s(15-14)
+@areas[]  = crystal-area-1w(14-13)
+#---------------------------#
+@areas[]  = time-area-1(12-15)
+@areas[]  = time-area-1n(12-14)
+@areas[]  = time-area-1e(13-15)
+@areas[]  = time-area-1w(11-15)
+#---------------------------#
+@areas[]  = missile-area-1(9-13)
+@areas[]  = missile-area-1n(9-12)
+@areas[]  = missile-area-1e(10-13)
+@areas[]  = missile-area-1s(9-14)
+#---------------------------#
+@areas[]  = nature-area-1(6-6)
+@areas[]  = nature-area-1e(7-6)
+@areas[]  = nature-area-1s(6-7)
+@areas[]  = nature-area-1w(5-6)
+#---------------------------#
+@areas[]  = water-area-1(6-11)
+@areas[]  = water-area-1n(6-10)
+@areas[]  = water-area-1e(7-11)
+@areas[]  = water-area-1w(5-11)
+#---------------------------#
+@areas[]  = earth-area-1(3-8)
+@areas[]  = earth-area-1n(3-7)
+@areas[]  = earth-area-1e(4-8)
+@areas[]  = earth-area-1s(3-9)
+#---------------------------#
+#---------------------------#
+@areas[]  = space-area-1(12-5)
+#---------------------------#
+@areas[]  = space-area-1e(13-4)
+@areas[]  = space-area-1e2(14-4)
+@areas[]  = space-area-1e3(15-4)
+#---------------------------#
+@areas[]  = space-area-1w(11-4)
+@areas[]  = space-area-1w2(10-4)
+@areas[]  = space-area-1w3(9-4)
+#---------------------------#
+@areas[]  = space-area-2(12-2)
+@areas[]  = space-area-2n(12-1)
+#---------------------------#
+@areas[]  = space-area-2e(14-2)
+@areas[]  = space-area-2e2(15-2)
+#---------------------------#
+@areas[]  = space-area-2w(10-2)
+@areas[]  = space-area-2w2(9-2)
+#---------------------------#
+#---------------------------#
+@areas[]  = laser-area-1(21-16)
+@areas[]  = laser-area-1e(22-16)
+@areas[]  = laser-area-1ne(22-15)
+#---------------------------#
+@areas[]  = shield-area-1(3-16)
+@areas[]  = shield-area-1s(3-17)
+@areas[]  = shield-area-1se(4-17)
+#---------------------------#
+#---------------------------#

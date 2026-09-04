@@ -1,0 +1,66 @@
+#---------------------------#
+# DEBUG AREA 1W (GROUND)
+@token    = debug-area-1w
+@name     = DEBUG Area 1W
+@type     = earth
+@level    = 30
+@size     = 20 x 15
+@sheet    = mmrpg-overworld-2k25-v2
+#---------------------------#
+@field    = maniacal-hideaway
+#---------------------------#
+@portals[]  = spawn(17-4, hidden)
+#---------------------------#
+@portals[]  = subspace-portal(3-10, debug-area-0__hideaway-portal, red-alt)
+@locks[]    = earth-portal-flower(3-10, portal-flower, earth, items:earth-core, x10, locked)
+#---------------------------#
+@portals[]  = east-exit(20-4, debug-area-1__west-exit, right-only)
+@portals[]  = west-exit(1-13, debug-area-1w2__east-exit, left-only)
+#---------------------------#
+@pickups      = earth-core(10),attack-pellet(6),weapon-pellet(4),attack-capsule(2),small-screw(1)
+#---------------------------#
+@encounters   = drill-mole,molier,rockscotch
+@groups[]     = no-encounters_da1-exit-buffer(15-3...20-5)
+@groups[]     = no-encounters_da1w2-exit-buffer(3-9...5-11)
+#---------------------------#
+@actors[]     = purple-reset-dude(19-11, robot, anti-eddie, -, default)
+#---------------------------#
+@bosses[]    = roamin-boss-1(6-4, drill-man)
+@bosses[]    = roaming-boss-2(15-10, ground-man)
+#---------------------------#
+@items[]    = boss-star-1(6-4, earth-star, drill-man)
+@items[]    = boss-star-2(15-10, earth-star, ground-man)
+#---------------------------#
+@events[]    = wily-platform-left(5-2, wilypad-left, any, drop-zone, item:wily-program, activate-player-platform)
+@events[]    = wily-platform-middle(6-2, wilypad-middle, any, drop-zone, item:wily-heart, activate-player-platform)
+@events[]    = wily-platform-right(7-2, wilypad-right, any, drop-zone, item:copy-core, activate-player-platform)
+#---------------------------#
+@items[]     = wily-init-program(14-10, wily-program, anchored)
+@items[]     = wily-init-heart(6-3, wily-heart__1, anchored)
+@items[]     = wily-init-core(11-7, copy-core, anchored)
+#---------------------------#
+@hazards[]    = fire-hazard-01(12-4, flame-pillar)
+@hazards[]    = fire-hazard-02(9-4, flame-pillar)
+@hazards[]    = fire-hazard-03(3-4, flame-pillar)
+@hazards[]    = fire-hazard-04(6-8, flame-pillar)
+@hazards[]    = fire-hazard-05(5-10, flame-pillar)
+@hazards[]    = fire-hazard-06(11-11, flame-pillar)
+@hazards[]    = fire-hazard-07(19-7, flame-pillar)
+#---------------------------#
+#---------------------------#
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[__],[__]
+[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30]
+[__],[30],[__],[30],[30],[30],[30],[30],[__],[__],[30],[__],[30],[30],[30],[30],[30],[30],[__],[__]
+[__],[30],[__],[__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__]
+[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[30],[__]
+[__],[30],[30],[30],[__],[30],[__],[__],[__],[__],[__],[__],[30],[30],[30],[30],[30],[__],[30],[__]
+[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__]
+[__],[30],[30],[30],[__],[__],[__],[__],[__],[__],[30],[__],[30],[30],[30],[30],[30],[__],[30],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+#---------------------------#

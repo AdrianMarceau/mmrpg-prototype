@@ -14,7 +14,7 @@ if (empty($image_url) || empty($image_hash)){
 
 // If the URL in question is not a valid image file, die now
 $type_matches = array();
-if (!preg_match('/\.(jpg|jpeg|png|ico|bmp|svg)(\?(.*)?)?$/i', $image_url, $type_matches)){
+if (!preg_match('/\.(jpg|jpeg|png|ico|bmp|svg|gif)(\?(.*)?)?$/i', $image_url, $type_matches)){
     header('HTTP/1.0 404 Not Found');
     header('Details: Not a Valid Image URL');
     exit;

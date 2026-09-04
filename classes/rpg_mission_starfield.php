@@ -179,10 +179,11 @@ class rpg_mission_starfield extends rpg_mission {
             $omega_robot_level = $this_start_level;
         } else {
             $omega_robot_level_max = $this_start_level + 7;
-            if ($omega_robot_level_max >= 100){ $omega_robot_level_max = 100; }
+            $omega_robot_level_limit_break = mmrpg_prototype_allow_limit_break() ? true : false;
+            if ($omega_robot_level_max >= 100 && !$omega_robot_level_limit_break){ $omega_robot_level_max = 100; }
             $omega_robot_level = $this_start_level + (!empty($this_prototype_data['battles_complete']) ? $this_prototype_data['battles_complete'] - MMRPG_SETTINGS_CHAPTER1_MISSIONCOUNT : 0);
             if ($omega_robot_level >= $omega_robot_level_max){ $omega_robot_level = $omega_robot_level_max; }
-            if ($omega_robot_level >= 100){ $omega_robot_level = 100; }
+            if ($omega_robot_level >= 100 && !$omega_robot_level_limit_break){ $omega_robot_level = 100; }
         }
 
         // Define the battle rewards based on above data

@@ -1,12 +1,16 @@
-// Create the globale context variables
-var thisBody = false;
-var thisPrototype = false;
-var thisFalloff = false;
-var thisWindow = false;
-var thisReadyRoom = false;
+// Create the globale context variables and methods
+let $thisWindow = null;
+let $mmrpgWrapper = null;
+let $mmrpgElements = {};
+let mmrpgPrototype = {};
+//let $thisPrototype = false; // TODO: remove global and use $mmrpgElements.get()
+//let $thisBanner = false; // TODO: remove global and use $mmrpgElements.get()
 
-// Create the prototype battle options object
-gameSettings.fadeIn = false;
+// Define the prototype game settings
+if (typeof gameSettings === 'undefined' || !gameSettings){ window.gameSettings = {}; }
+mmrpgPrototype.gameSettings = gameSettings;
+gameSettings.gameHasLoaded = false;
+gameSettings.prototypeLoaded = false;
 gameSettings.totalRobotLimit = 8;
 gameSettings.totalMissionsComplete = 1;
 gameSettings.totalPlayerOptions = 1;
@@ -17,88 +21,150 @@ gameSettings.nextSlideDirection = 'left';
 gameSettings.startLink = 'home';
 gameSettings.skipPlayerSelect = false;
 gameSettings.menuFramesSeen = [];
-gameSettings.readyRoomUnlocked = false;
+gameSettings.readyRoomEnabled = false;
+gameSettings.readyRoomSpriteMotion = true;
+gameSettings.readyRoomSpriteLimit = 100;
 gameSettings.readyRoomActive = false;
-var battleOptions = {};
+gameSettings.perfectScrollbar = {wheelSpeed:0.3,suppressScrollX:true,scrollYMarginOffset:6};
+gameSettings.fadeIn = false;
 
-// Define the perfect scrollbar settings
-var thisScrollbarSettings = {wheelSpeed:0.3};
+// Define the prototype battle options
+if (typeof battleOptions === 'undefined' || !battleOptions){ window.battleOptions = {}; }
+mmrpgPrototype.battleOptions = battleOptions;
+battleOptions.this_player_id = 0;
+battleOptions.this_player_token = '';
+battleOptions.this_player_robots = [];
+battleOptions.this_battle_token = '';
+
+// Define the prototype context variables
+let prototypeIsHome = false;
+let prototypeIsFramed = false;
+let prototypeIsTopmenu = false;
+let prototypeIsSubmenu = false;
+
+// Define a global ready room variable for later
+let thisReadyRoom = false;
 
 // When the document is ready, assign events
 $(document).ready(function(){
 
     // Update the global reference variables
-    thisBody = $('#mmrpg');
-    thisPrototype = $('#prototype', thisBody);
-    thisFalloff = $('#falloff', thisBody);
-    thisWindow = $(window);
+    $thisWindow = $(window);
+    $mmrpgWrapper = $('#mmrpg');
+    let $thisPrototype = $('#prototype', $mmrpgWrapper);
+    let $thisBanner = $('> .banner', $thisPrototype);
+    let $thisBannerOverlay = $('> .banner_overlay', $thisBanner);
+    let $thisFalloff = $('#falloff', $mmrpgWrapper);
+    $mmrpgElements.thisWindow = $thisWindow;
+    $mmrpgElements.thisWrapper = $mmrpgWrapper;
+    $mmrpgElements.thisPrototype = $thisPrototype;
+    $mmrpgElements.thisBanner = $thisBanner;
+    $mmrpgElements.thisBannerOverlay = $thisBannerOverlay;
+    $mmrpgElements.thisFalloff = $thisFalloff;
+
+    // Check if this instance has been loaded in an iframe
+    //prototypeIsHome = window.top === window.self && !$('#mmrpg').hasClass('iframe') ? true : false;
+    prototypeIsHome = !$('#mmrpg').hasClass('iframe') ? true : false;
+    prototypeIsFramed = window.top !== window.self ? true : false;
+    prototypeIsTopmenu = !$('#mmrpg').hasClass('iframe') && $thisPrototype.is('[data-step-name]') ? $thisPrototype.attr('data-step-name') : false;
+    prototypeIsSubmenu = $('#mmrpg').hasClass('iframe') ? $('#mmrpg').attr('data-frame') : false;
+    if (prototypeIsSubmenu){ prototypeIsTopmenu = false; }
+    else if (!prototypeIsTopmenu){ prototypeIsTopmenu = 'home'; }
+    //console.log('prototypeIsHome =', prototypeIsHome);
+    //console.log('prototypeIsFramed =', prototypeIsFramed);
+    //console.log('prototypeIsTopmenu =', prototypeIsTopmenu);
+    //console.log('prototypeIsSubmenu =', prototypeIsSubmenu);
+    mmrpgPrototype.prototypeIsHome = prototypeIsHome;
+    mmrpgPrototype.prototypeIsFramed = prototypeIsFramed;
+    mmrpgPrototype.prototypeIsTopmenu = prototypeIsTopmenu;
+    mmrpgPrototype.prototypeIsSubmenu = prototypeIsSubmenu;
+
+    // Update the ready room ref with the global object if exists
     thisReadyRoom = typeof window.mmrpgReadyRoom !== 'undefined' ? window.mmrpgReadyRoom : false;
+    mmrpgPrototype.thisReadyRoom = thisReadyRoom;
 
     // If we're not in an iframe, adjust background
-    if (window.top == window.self){
-        $('html').css({backgroundColor:'#262626'});
+    if (!prototypeIsFramed){ $('html').css({backgroundColor:'#262626'}); }
+
+    // Bind an event to the window resize so we can check devicePixelRatio and adjust rendering if needed
+    let $mmrpgDiv = $('#mmrpg');
+    $(window).bind('resize', function(e){
+        //console.log('%c' + 'Prototype window resize event!', 'color: cyan;');
+        //e.preventDefault();
+        //e.stopPropagation();
+        //console.log('-> event:', e);
+        //console.log('-> window.devicePixelRatio:', window.devicePixelRatio);
+        let pixelRatio = window.devicePixelRatio || 1;
+        let imageRendering = pixelRatio === 1 || pixelRatio % 2 === 0 ? 'pixelated' : 'auto';
+        //console.log('-> pixelRatio:', pixelRatio, '\n', '-> imageRendering:', imageRendering);
+        $mmrpgDiv.attr('data-rendering', imageRendering);
+        }).trigger('resize');
+
+    // Define some interaction sound effects for the prototype main menu
+    let playSoundEffect = function(){};
+    if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+
+        // Define a quick local function for routing sound effect plays to the parent
+        playSoundEffect = function(soundName, options){
+            if (this instanceof jQuery || this instanceof Element){
+                if ($(this).data('silentClick')){ return; }
+                if ($(this).is('.disabled')){ return; }
+                if ($(this).is('.option_disabled')){ return; }
+                }
+            top.mmrpg_play_sound_effect(soundName, options);
+            };
+
         }
+    mmrpgPrototype.playSoundEffect = playSoundEffect;
 
     // Define the prototype context
-    var thisContext = $('#prototype');
-    if (thisContext.length){
+    if ($thisPrototype.length){
 
         // Define the window resize event so we can adapt to changes
-        thisWindow.resize(function(){ windowResizePrototype(); });
+        $thisWindow.resize(function(){ windowResizePrototype(); });
         setTimeout(function(){ windowResizePrototype(); }, 2000);
-        //$('.banner .link', thisPrototype).live('click', function(){ windowResizePrototype(); });
+        //$('.banner .link', $thisPrototype).live('click', function(){ windowResizePrototype(); });
 
         // -- SOUND EFFECT FUNCTIONALITY -- //
 
         // Define some interaction sound effects for the prototype main menu
-        var playSoundEffect = function(){};
-        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-
-            // Define a quick local function for routing sound effect plays to the parent
-            playSoundEffect = function(soundName, options){
-                if (this instanceof jQuery || this instanceof Element){
-                    if ($(this).data('silentClick')){ return; }
-                    if ($(this).is('.disabled')){ return; }
-                    if ($(this).is('.option_disabled')){ return; }
-                    }
-                top.mmrpg_play_sound_effect(soundName, options);
-                };
+        if (typeof playSoundEffect !== 'undefined'){
 
             // HOME LINKS
 
             // Add hover and click sounds to the links in the main menu
-            $('.banner .options_fullmenu .link', thisContext).live('mouseenter', function(){
+            $('.banner .options_fullmenu .link', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.banner .options_fullmenu .link', thisContext).live('click', function(){
+            $('.banner .options_fullmenu .link', $thisPrototype).live('click', function(){
                 if ($(this).is('.link_home')){ playSoundEffect.call(this, 'link-click-special'); }
                 else { playSoundEffect.call(this, 'link-click'); }
                 });
 
             // Add hover and click sounds to the user config button in the main menu
-            $('.banner .options_userinfo[data-step]', thisContext).live('mouseenter', function(){
+            $('.banner .options_userinfo[data-step]', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.banner .options_userinfo[data-step]', thisContext).live('click', function(){
+            $('.banner .options_userinfo[data-step]', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'link-click');
                 });
 
             // Add hover and click sounds to the leaderboard button in the main menu
-            $('.banner .points[data-step]', thisContext).live('mouseenter', function(){
+            $('.banner .points[data-step]', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.banner .points[data-step]', thisContext).live('click', function(){
+            $('.banner .points[data-step]', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'link-click');
                 });
 
             // CHAPTER SELECT
 
             // Add hover and click sounds to the chapter select buttons
-            $('.menu .chapter_select .chapter_link', thisContext).live('mouseenter', function(){
+            $('.menu .chapter_select .chapter_link', $thisPrototype).live('mouseenter', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
                 playSoundEffect.call(this, 'icon-hover');
                 });
-            $('.menu .chapter_select .chapter_link', thisContext).live('click', function(){
+            $('.menu .chapter_select .chapter_link', $thisPrototype).live('click', function(){
                 if ($(this).is('.chapter_link_disabled')){ return; }
                 playSoundEffect.call(this, 'link-click');
                 });
@@ -106,43 +172,43 @@ $(document).ready(function(){
             // PLAYER SELECT
 
             // Add hover and click sounds to the player select buttons
-            $('.menu .option_this-player-select', thisContext).live('mouseenter', function(){
+            $('.menu .option_this-player-select', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.menu .option_this-player-select', thisContext).live('click', function(){
+            $('.menu .option_this-player-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'lets-go');
                 });
 
             // MISSION SELECT (BATTLE SELECT)
 
             // Add hover and click sounds to the battle select buttons
-            $('.menu .option_this-battle-select', thisContext).live('mouseenter', function(){
+            $('.menu .option_this-battle-select', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'link-hover');
                 });
-            $('.menu .option_this-battle-select', thisContext).live('click', function(){
+            $('.menu .option_this-battle-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'lets-go');
                 });
 
             // ROBOT SELECT
 
             // Add hover and click sounds to the robot select buttons
-            $('.menu .option_this-robot-select', thisContext).live('mouseenter', function(){
+            $('.menu .option_this-robot-select', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'icon-hover');
                 });
-            $('.menu .option_this-robot-select', thisContext).live('click', function(){
+            $('.menu .option_this-robot-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'link-click-robot');
                 });
-            $('.menu .option_this-team-select', thisContext).live('click', function(){
+            $('.menu .option_this-team-select', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'lets-go-robots');
                 });
 
             // BACK BUTTON(s)
 
             // Add hover and click sounds to any back buttons
-            $('.menu .option_back', thisContext).live('mouseenter', function(){
+            $('.menu .option_back', $thisPrototype).live('mouseenter', function(){
                 playSoundEffect.call(this, 'back-hover');
                 });
-            $('.menu .option_back', thisContext).live('click', function(){
+            $('.menu .option_back', $thisPrototype).live('click', function(){
                 playSoundEffect.call(this, 'back-click');
                 setTimeout(function(){
                     playSoundEffect.call(this, 'back-click-loading');
@@ -152,18 +218,17 @@ $(document).ready(function(){
             // READY ROOM GLASS
 
             // Add a click sound to the ready-room glass if it exists
-            $('.ready_room .wrapper.inner > .clicker', thisContext).live('click', function(){
+            $('.ready_room .wrapper.inner > .clicker', $thisPrototype).live('click', function(){
                 //console.log('testing 123');
                 playSoundEffect.call(this, 'glass-klink');
                 });
-
 
             }
 
 
         // -- MENU FUNCTIONALITY -- //
 
-        $('.option_wrapper', thisContext).scroll(function(e){
+        $('.option_wrapper', $thisPrototype).scroll(function(e){
             var scrollTop = $(this).scrollTop();
             var wrapperHeight = $(this).height();
             var scrollHeight = scrollTop + wrapperHeight;
@@ -172,75 +237,48 @@ $(document).ready(function(){
             windowResizePrototype();
             });
 
-        // Define the chapter message click events for space-saving
-        /*$('.option_message', thisContext).live('click', function(){
-            // Create reference to the key elements
-            var thisMessage = $(this);
-            // Check if this message is already collapsed or not
-            var thisCollapsed = thisMessage.hasClass('option_message_collapsed') ? true : false;
-            if (!thisCollapsed){
-                // This message has not been collapsed yet, so let's do so now
-                //console.log('not collapsed, hiding content now');
-                thisMessage.addClass('option_message_collapsed');
-                var nextButton = thisMessage.next('.option');
-                while (nextButton.length && !nextButton.hasClass('option_message') && !nextButton.hasClass('option_spacer')){
-                    nextButton.css({display:'none'});
-                    nextButton = nextButton.next('.option');
-                    }
-                } else {
-                // This message was already collapsed when clicked, so let's open it
-                //console.log('already collapsed, showing content now');
-                thisMessage.removeClass('option_message_collapsed');
-                var nextButton = thisMessage.next('.option');
-                while (nextButton.length && !nextButton.hasClass('option_message') && !nextButton.hasClass('option_spacer')){
-                    nextButton.css({display:''});
-                    nextButton = nextButton.next('.option');
-                    }
-                }
-            });*/
-
         // Define the action for the page link
-        $('.banner .link[data-href]', thisContext).live('click', function(e){
+        $('.banner .link[data-href]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype redirect function
-            prototype_trigger_redirect(thisContext, this);
+            prototype_trigger_redirect($thisPrototype, this);
             });
 
         // Create click events for the battle redirect links
-        $('a[data-redirect]', thisContext).live('click', function(e){
+        $('a[data-redirect]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype redirect function
-            prototype_trigger_redirect(thisContext, this);
+            prototype_trigger_redirect($thisPrototype, this);
             });
 
         // Define the action for the banner step links
-        $('.banner .link[data-step]', thisContext).live('click', function(e){
+        $('.banner .link[data-step]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype step function
-            prototype_menu_click_step(thisContext, this);
+            prototype_menu_click_step($thisPrototype, this);
             });
 
         // Define the action for the banner step divs
-        $('.banner div[data-step]', thisContext).live('click', function(e){
+        $('.banner div[data-step]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype step function
-            prototype_menu_click_step(thisContext, this);
+            prototype_menu_click_step($thisPrototype, this);
             });
 
         // Define the confirmation event for the exit action
-        $('.banner .link_exit', thisContext).live('click', function(e){
+        $('.banner .link_exit', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype exit function
-            prototype_trigger_exit(thisContext, this);
+            prototype_trigger_exit($thisPrototype, this);
             });
 
         // Define the confirmation event for the reset action
-        $('.banner .link_reset', thisContext).live('click', function(e){
+        $('.banner .link_reset', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the game reset function
@@ -248,13 +286,13 @@ $(document).ready(function(){
             });
 
         // Load content into any requested elements
-        $('.menu[data-source]', thisContext).each(function(){
+        $('.menu[data-source]', $thisPrototype).each(function(){
             // Trigger the prototype source function
-            prototype_menu_preload_source(thisContext, this);
+            prototype_menu_preload_source($thisPrototype, this);
             });
 
         // Define the click event for menu items that require a reload
-        $('.menu a[data-reload="true"]', thisContext).live('click', function(e){
+        $('.menu a[data-reload="true"]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Collect the parent variables
@@ -281,8 +319,8 @@ $(document).ready(function(){
 
         // If this script is being loaded from within an iframe, let the parent prototype window know
         if (gameSettings.allowEditing){
-            if (thisBody.hasClass('iframe')){
-                var frameToken = thisBody.is('[data-frame]') ? thisBody.attr('data-frame') : 'unknown';
+            if ($mmrpgWrapper.hasClass('iframe')){
+                var frameToken = $mmrpgWrapper.is('[data-frame]') ? $mmrpgWrapper.attr('data-frame') : 'unknown';
                 //top.console.log('we have loaded '+frameToken+' from within an iframe');
                 if (typeof parent.prototype_menu_frame_seen !== 'undefined'){ parent.prototype_menu_frame_seen(frameToken); }
                 if (typeof parent.prototype_menu_links_refresh !== 'undefined'){ parent.prototype_menu_links_refresh(); }
@@ -295,7 +333,7 @@ $(document).ready(function(){
             }
 
         // Define the click event for the chapter select menu links
-        var thisChapterSelects = $('.option_wrapper_missions .chapter_select', thisContext);
+        var thisChapterSelects = $('.option_wrapper_missions .chapter_select', $thisPrototype);
         if (thisChapterSelects.length){
             // Attach a live click event to the chapter link buttons
             $('.chapter_link[data-chapter]', thisChapterSelects).live('click', function(e){
@@ -327,13 +365,12 @@ $(document).ready(function(){
             firstChapterLink.triggerSilentClick();
             }
 
-
-
         // Create the click events for the prototype menu option buttons
-        $('.option[data-token]', thisContext).live('click', function(e){
+        $('.option[data-token]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
-            //alert('option clicked!');
+            //console.log('option clicked!');
+
             // If we're already loading another option click, return false
             if (typeof gameSettings.customValues.optionClicked !== 'undefined'){ return false; }
             // If this option is in the banner, return false
@@ -350,20 +387,22 @@ $(document).ready(function(){
                 clearTimeout(gameSettings.customValues.optionClicked);
                 delete gameSettings.customValues.optionClicked;
                 }, 1000);
+
             // Trigger the prototype option function
-            prototype_menu_click_option(thisContext, this, function(){
+            prototype_menu_click_option($thisPrototype, this, function(){
                 //console.log('onComplete triggered for optionClicked');
                 clearTimeout(gameSettings.customValues.optionClicked);
                 delete gameSettings.customValues.optionClicked;
                 });
+
             });
 
         // Create the click events for the prototype menu back button
-        $('.option[data-back]', thisContext).live('click', function(e){
+        $('.option[data-back]', $thisPrototype).live('click', function(e){
             // Prevent the default click action
             e.preventDefault();
             // Trigger the prototype back function
-            prototype_menu_click_back(thisContext, this);
+            prototype_menu_click_back($thisPrototype, this);
             });
 
         // Check if the player token has already been selected
@@ -377,7 +416,7 @@ $(document).ready(function(){
 
             //alert('player selected : '+battleOptions['this_player_token']);
             gameSettings.skipPlayerSelect = true;
-            var thisMenu = $('.menu[data-select="this_player_token"]', thisContext);
+            var thisMenu = $('.menu[data-select="this_player_token"]', $thisPrototype);
             $('.option[data-token="'+battleOptions['this_player_token']+'"]', thisMenu).triggerSilentClick();
 
             if (dataStepNumber === 1){ dataStepNumber = 2; }
@@ -385,8 +424,8 @@ $(document).ready(function(){
             }
 
         // Update the prototype element with the data attributes for styling
-        thisPrototype.attr('data-step-name', dataStepName);
-        thisPrototype.attr('data-step-number', dataStepNumber);
+        $thisPrototype.attr('data-step-name', dataStepName);
+        $thisPrototype.attr('data-step-number', dataStepNumber);
         //console.log('dataStepName =>', typeof dataStepName, dataStepName);
         //console.log('dataStepNumber =>', typeof dataStepNumber, dataStepNumber);
 
@@ -400,39 +439,35 @@ $(document).ready(function(){
             // Fade in the prototype screen slowly if allowed
             if (gameSettings.fadeIn == true){
                 //alert('gameSettings.fadeIn == true? '+(gameSettings.fadeIn ? 'true' : 'false'));
-                thisContext.waitForImages(function(){
+                $thisPrototype.waitForImages(function(){
                     var tempTimeout = setTimeout(function(){
-                        thisContext.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
+                        $thisPrototype.css({opacity:0}).removeClass('hidden').animate({opacity:1.0}, 800, 'swing');
                         windowResizePrototype();
+                        gameSettings.prototypeLoaded = true;
+                        gameSettings.gameHasLoaded = true;
+                        $('#mmrpg').removeClass('loading');
                         topFrame.mmrpg_toggle_index_loaded(true);
                         gameSettings.startLink = 'home';
-                        if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
-                            || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
-                            //topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-                            //console.log('trying to topFrame.windowEventsPull() [A]');
-                            topFrame.windowEventsPull();
-                            }
+                        triggerWindowEventsPull();
                         }, 1000);
                     }, false, true);
                 } else {
                 //alert('gameSettings.fadeIn == false');
                 // Trigger the prototype step function if not home
-                thisContext.css({opacity:1}).removeClass('hidden');
+                $thisPrototype.css({opacity:1}).removeClass('hidden');
                 windowResizePrototype();
+                gameSettings.prototypeLoaded = true;
+                gameSettings.gameHasLoaded = true;
+                $('#mmrpg').removeClass('loading');
                 topFrame.mmrpg_toggle_index_loaded(true);
                 gameSettings.startLink = 'home';
-                if ((gameSettings.windowEventsCanvas != undefined && gameSettings.windowEventsCanvas.length)
-                    || (gameSettings.windowEventsMessages != undefined && gameSettings.windowEventsMessages.length)){
-                    //topFrame.windowEventCreate(gameSettings.windowEventsCanvas, gameSettings.windowEventsMessages);
-                    //console.log('trying to topFrame.windowEventsPull() [B]');
-                    topFrame.windowEventsPull();
-                    }
+                triggerWindowEventsPull();
                 }
             };
 
         /*
         // Define the event for the password prompt's click unlock sequence
-        $('.banner .sprite_player', thisPrototype).live('click', function(){
+        $('.banner .sprite_player', $thisPrototype).live('click', function(){
             gameSettings.passwordUnlocked++;
             //console.log('counter = '+gameSettings.passwordUnlocked);
             if (gameSettings.passwordUnlocked >= 5){
@@ -443,6 +478,7 @@ $(document).ready(function(){
                 if (thisToken == 'drlight'){ var thisPromptText = 'Oh, hello there! What can I help you with today?'; }
                 else if (thisToken == 'drwily'){ var thisPromptText = 'Eh? You want something from me?'; }
                 else if (thisToken == 'drcossack'){ var thisPromptText = 'Greetings.  How can I assist you today?'; }
+                else if (thisToken == 'drlalinde'){ var thisPromptText = 'Um, hello?  Where did you get this number?'; }
                 var thisPassword = prompt(thisPromptText);
                 if (thisPassword != undefined && thisPassword.length){
                     thisPassword = thisPassword.toLowerCase().replace(/[^a-z0-9]+/ig, '');
@@ -459,7 +495,7 @@ $(document).ready(function(){
         */
 
         // Define the live Rogue Star ticker functionality if present
-        var $rogueStar = $('.banner .rogue_star', thisPrototype);
+        var $rogueStar = $('.banner .rogue_star', $thisPrototype);
         if ($rogueStar.length){
 
             // Collect the details of this rogue star
@@ -516,8 +552,8 @@ $(document).ready(function(){
         // Trigger the prototype step function if not home
         if (gameSettings.startLink !== 'home'){
             //gameSettings.skipPlayerSelect = true;
-            var thisLink = $('.banner .link[data-step="'+gameSettings.startLink+'"]', thisContext);
-            prototype_menu_click_step(thisContext, thisLink, thisFadeCallback, 10); //CHECKPOINT
+            var thisLink = $('.banner .link[data-step="'+gameSettings.startLink+'"]', $thisPrototype);
+            prototype_menu_click_step($thisPrototype, thisLink, thisFadeCallback, 10); //CHECKPOINT
             //prototype_menu_switch({stepName:gameSettings.startLink,onComplete:thisFadeCallback,slideDuration:600});
             } else {
             //gameSettings.skipPlayerSelect = true;
@@ -525,14 +561,10 @@ $(document).ready(function(){
             }
 
         // Make sure we always poll the server for popup events after loading
-        //console.log('queuing the windowEventsPull event (via prototype)');
-        if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
-            window.top.mmrpg_queue_for_game_start(function(){
-                //console.log('i guess the game has started');
-                setTimeout(function(){ windowEventsPull(); }, 1000);
-                });
-            }
+        triggerWindowEventsPull();
 
+        // Start watching for user input (the function will handle context queues)
+        initUserInputWatcher();
 
         }
 
@@ -542,15 +574,15 @@ $(document).ready(function(){
     // -- READY ROOM INIT AND TRANSITIONS -- //
 
     // If we're on the actual prototype parent frame, load the ready room now
-    if (!$('#mmrpg').hasClass('iframe')){
+    if (!(prototypeIsFramed && prototypeIsSubmenu)){
         // Only add the ready room to the banner after the player has unlocked their first homebase
-        if (gameSettings.readyRoomUnlocked){
+        if (thisReadyRoom !== false
+            && gameSettings.readyRoomEnabled){
 
             // Initialize the ready room on prototype home page load
-            var $thisPrototype = $('#prototype');
-            var $thisBanner = $('.banner', $thisPrototype);
             var playersIndex = typeof gameSettings.customIndex.unlockedPlayersIndex !== 'undefined' ? gameSettings.customIndex.unlockedPlayersIndex : {};
             var robotsIndex = typeof gameSettings.customIndex.unlockedRobotsIndex !== 'undefined' ? gameSettings.customIndex.unlockedRobotsIndex : {};
+            var extraConfig = { spriteLimit: gameSettings.readyRoomSpriteLimit, framesPerSecond: 1 };
             thisReadyRoom.preloadCharacterIndex('player', playersIndex);
             thisReadyRoom.preloadCharacterIndex('robot', robotsIndex);
             thisReadyRoom.init($thisBanner, function(){
@@ -562,63 +594,502 @@ $(document).ready(function(){
                     }
 
                 // Start the actual ready room animation when it's appropriate to do so
-                thisReadyRoom.startAnimation();
-                gameSettings.readyRoomActive = true;
+                if (gameSettings.readyRoomSpriteMotion){
+                    thisReadyRoom.startAnimation();
+                    gameSettings.readyRoomActive = true;
+                    }
 
-                });
+                }, extraConfig);
             }
         }
-
 
     // -- end of document ready markup -- //
 
 });
 
+// Define a function for checking if mmrpg is busy right now
+function mmrpg_is_busy(){
+    if (!gameSettings.gameHasLoaded){ return true; }
+    if (!gameSettings.prototypeLoaded){ return true; }
+    if (getPendingEventsCount() > 0){ return true; }
+    return false;
+}
+
+// Define a quick function for initializing the user input watcher
+// as well as custom instructions for what to do based on context
+function initUserInputWatcher(){
+    //console.log('%c' + 'prototypeReady.initUserInputWatcher()', 'color: magenta;');
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    let $thisBannerMenu = $('> .options_fullmenu', $thisBanner);
+    let $thisLeaderboardLink = $('> .points[data-step="leaderboard"]', $thisBanner);
+    let $thisSettingsLink = $('> .options_userinfo[data-step="file_save"]', $thisBanner);
+    //console.log('$thisPrototype =', $thisPrototype);
+    //console.log('$thisBanner =', $thisBanner);
+    //console.log('$thisBannerMenu =', $thisBannerMenu);
+
+    // Define the relevant user input watches for each subframe
+    let checkUserInputsForFrame = {};
+    checkUserInputsForFrame['shop'] = 'checkUserInputsForShopFrame';
+    checkUserInputsForFrame['edit_robots'] = 'checkUserInputsForRobotsFrame';
+    checkUserInputsForFrame['edit_players'] = 'checkUserInputsForPlayersFrame';
+    checkUserInputsForFrame['abilities'] = 'checkUserInputsForAbilitiesFrame';
+    checkUserInputsForFrame['items'] = 'checkUserInputsForItemsFrame';
+    checkUserInputsForFrame['stars'] = 'checkUserInputsForStarsFrame';
+    checkUserInputsForFrame['database'] = 'checkUserInputsForDatabaseFrame';
+    checkUserInputsForFrame['leaderboard'] = 'checkUserInputsForLeaderboardFrame';
+    checkUserInputsForFrame['settings'] = 'checkUserInputsForSettingsFrame';
+
+    // Define a function to run each time user inputs are updated so we can react
+    let listenForInput = function(){ return Date.now() >= nextInputAllowedTime; }, nextInputAllowedTime = 0;
+    let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; nextInputAllowedTime = Date.now() + delay; };
+    let userInputVars = {};
+    let checkUserInputs = function(kind, event, activeInputs, userInputs){
+        //console.log('%c' + 'mmrpgPrototype.checkUserInputs(kind:' + kind + ', event, activeInputs, userInputs)', 'color: cyan;');
+        //console.log('-> event:', e);
+        if (!listenForInput()){ return false; }
+        if (mmrpg_is_busy()){ return false; }
+        if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
+        //console.log('-> activeInputs:', activeInputs);
+        ignoreInputFor();
+
+        // COLLECT CONTEXT INFO
+        let prototypeIsHome = mmrpgPrototype.prototypeIsHome;
+        let prototypeIsFramed = mmrpgPrototype.prototypeIsFramed;
+        let prototypeIsTopmenu = mmrpgPrototype.prototypeIsTopmenu;
+        let prototypeIsSubmenu = mmrpgPrototype.prototypeIsSubmenu;
+        //console.log('-> prototypeIsHome:', prototypeIsHome);
+        //console.log('-> prototypeIsFramed:', prototypeIsFramed);
+        //console.log('-> prototypeIsTopmenu:', prototypeIsTopmenu);
+        //console.log('-> prototypeIsSubmenu:', prototypeIsSubmenu);
+
+        // MMRPG BANNER MENU TRIGGERS (ALWAYS ON)
+        if ($thisBannerMenu && $thisBannerMenu.length){
+            //console.log('MMRPG BANNER MENU TRIGGERS (ALWAYS ON)');
+
+            // If the user has pressed the SELECT key, we click the leaderboard button
+            if (activeInputs.Select){
+                //console.log('%c' + 'Select key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                $thisLeaderboardLink.trigger('click');
+                return;
+                }
+
+            // If the user has pressed the START key, we click the settings button
+            if (activeInputs.Start){
+                //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                $thisSettingsLink.trigger('click');
+                return;
+                }
+
+            // If the user has pressed the L1 or R1 trigger key, we move through the menu buttons
+            if (activeInputs.L1 || activeInputs.R1){
+                //console.log('%c' + (activeInputs.L1 ? 'L1' : 'R1') + ' trigger key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let $focusedMenuLink, $gotoMenuLink;
+                let $availableMenuLinks = $('.link[data-step]:visible', $thisBannerMenu);
+                let maxMenuLinkIndex = $availableMenuLinks.length - 1;
+                //console.log('$availableMenuLinks =', $availableMenuLinks);
+                //console.log('maxMenuLinkIndex =', maxMenuLinkIndex);
+                if (!$thisBannerMenu.hasClass('hovered')){
+                    //console.log('-> banner menu not hovered yet, hovering it now');
+                    $thisBannerMenu.addClass('hovered');
+                    //playSoundEffect.call($thisBannerMenu, 'link-hover');
+                    let $activeMenuLink, $nextMenuLink, $prevMenuLink;
+                    $activeMenuLink = $('.link_active', $thisBannerMenu).first();
+                    //console.log('$activeMenuLink =', typeof $activeMenuLink, $activeMenuLink);
+                    if (!$activeMenuLink || !$activeMenuLink.length){ $activeMenuLink = null; }
+                    $focusedMenuLink = $activeMenuLink;
+                    //console.log('setting $focusedMenuLink to $activeMenuLink');
+                    } else {
+                    //console.log('-> banner already hovered, what now?');
+                    let $hoveredMenuLink, $nextMenuLink, $prevMenuLink;
+                    $hoveredMenuLink = $('.link[data-step].hovered', $thisBannerMenu).first();
+                    //console.log('$hoveredMenuLink =', typeof $hoveredMenuLink, $hoveredMenuLink);
+                    if (!$hoveredMenuLink || !$hoveredMenuLink.length){ $hoveredMenuLink = null; }
+                    $focusedMenuLink = $hoveredMenuLink;
+                    //console.log('setting $focusedMenuLink to $hoveredMenuLink');
+                    }
+                if (!$focusedMenuLink || typeof $focusedMenuLink === 'undefined'){
+                    if (activeInputs.R1){ $focusedMenuLink = $('.link[data-step]', $thisBannerMenu).last(); }
+                    else if (activeInputs.L1){ $focusedMenuLink = $('.link[data-step]', $thisBannerMenu).first(); }
+                    $('.link[data-step]', $thisBannerMenu).removeClass('link_active hovered');
+                    }
+                if ($focusedMenuLink && $focusedMenuLink.length){
+                    let focusedLinkIndex = $availableMenuLinks.index($focusedMenuLink);
+                    //console.log('using $focusedMenuLink to find next/prev from index ', focusedLinkIndex, '...');
+                    if (activeInputs.R1){
+                        let nextIndex = focusedLinkIndex + 1;
+                        if (nextIndex > maxMenuLinkIndex){ nextIndex = 0; }
+                        else if (nextIndex < 0){ nextIndex = maxMenuLinkIndex; }
+                        //console.log('nextIndex =', nextIndex);
+                        $nextMenuLink = $availableMenuLinks.eq(nextIndex);
+                        //console.log('$nextMenuLink =', typeof $nextMenuLink, $nextMenuLink);
+                        if ($nextMenuLink && $nextMenuLink.length){ $gotoMenuLink = $nextMenuLink; }
+                        } else if (activeInputs.L1){
+                        let prevIndex = focusedLinkIndex - 1;
+                        if (prevIndex < 0){ prevIndex = maxMenuLinkIndex; }
+                        else if (prevIndex > maxMenuLinkIndex){ prevIndex = 0; }
+                        //console.log('prevIndex =', prevIndex);
+                        $prevMenuLink = $availableMenuLinks.eq(prevIndex);
+                        //console.log('$prevMenuLink =', typeof $prevMenuLink, $prevMenuLink);
+                        if ($prevMenuLink && $prevMenuLink.length){ $gotoMenuLink = $prevMenuLink; }
+                        }
+                    }
+                //console.log('$gotoMenuLink =', typeof $gotoMenuLink, $gotoMenuLink);
+                if (typeof userInputVars.bannerMenuTimeout !== 'undefined'){ clearTimeout(userInputVars.bannerMenuTimeout); }
+                if ($gotoMenuLink && $gotoMenuLink.length){
+                    $('.link[data-step]', $thisBannerMenu).removeClass('hovered');
+                    $gotoMenuLink.trigger('mouseenter');
+                    $gotoMenuLink.addClass('hovered');
+                    userInputVars.bannerMenuTimeout = setTimeout(function(){
+                        //console.log('bannerMenuTimeout() triggered! time to click the hovered link');
+                        $thisBannerMenu.removeClass('hovered');
+                        let $hoveredMenuLink = $('.link[data-step].hovered', $thisBannerMenu).first();
+                        if (!$hoveredMenuLink || !$hoveredMenuLink.length){ return; }
+                        $hoveredMenuLink.removeClass('hovered');
+                        $hoveredMenuLink.trigger('click');
+                        }, 900);
+                    }
+
+                // Regardless, return so L1/R1 don't do anything else
+                return;
+                }
+
+            }
+
+        // MMRPG MISSION MENU TRIGGERS (HOME-STEP ONLY)
+        if (prototypeIsHome && prototypeIsTopmenu === 'home'){
+            //console.log('MMRPG MISSION MENU TRIGGERS (HOME-STEP ONLY)');
+
+            // Collect a reference to the main menu itself
+            let $thisBattleMenu = $('> .menu:not(.menu_hide)', $thisPrototype).first();
+            let $thisOptionWrapper = $('> .option_wrapper:not(.option_wrapper_hidden)', $thisBattleMenu).first();
+            //console.log('-> $thisBattleMenu:', typeof $thisBattleMenu, $thisBattleMenu);
+            //console.log('-> $thisOptionWrapper:', typeof $thisOptionWrapper, $thisOptionWrapper);
+
+            // If the user pressed the A button, we should try to click whatever is currently hovered
+            if (activeInputs.A){
+                //console.log('%c' + 'A button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let $hoveredMenuButton = $('.option[data-token].hovered', $thisOptionWrapper);
+                if ($hoveredMenuButton && $hoveredMenuButton.length){ $hoveredMenuButton.trigger('click'); }
+                return;
+                }
+
+            // If the user pressed the B button, we should try to click whichever back button is visible
+            if (activeInputs.B){
+                //console.log('%c' + 'B button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                // Check if the reselect button exists in the header of the current menu
+                let $reselectButton = $('.header .reselect', $thisBattleMenu);
+                // Check if it's actually active by ensuring it lacks the 'hidden' class and is visible
+                let isReselectVisible = $reselectButton.length &&  !$reselectButton.hasClass('hidden') &&  $reselectButton.is(':visible');
+                // If the reselect button is active, click it and immediately return so we don't hit the back button
+                if (isReselectVisible){ $reselectButton.trigger('click'); return; }
+                // Otherwise, proceed with the standard back button logic
+                let $currentBackButton = $('.option_back', $thisBattleMenu);
+                if ($currentBackButton && $currentBackButton.length){ $currentBackButton.trigger('click'); }
+                return;
+                }
+
+            // If the user pressed the Y button, check for and click any info tooltips on the hovered option
+            if (activeInputs.Y){
+                //console.log('%c' + 'Y button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                // Find the currently hovered menu option
+                let $hoveredMenuButton = $('.option.hovered', $thisOptionWrapper);
+                if ($hoveredMenuButton && $hoveredMenuButton.length){
+                    // Look for the info tooltip span inside this specific hovered button
+                    let $infoButton = $('.info[data-click-tooltip]', $hoveredMenuButton);
+                    // If the info button exists, trigger a click on it
+                    if ($infoButton && $infoButton.length){ $infoButton.trigger('click'); }
+                    }
+                // Return so the Y button doesn't trigger anything else
+                return;
+                }
+
+            // If the user pressed the L2 or R2 bumpers, we should try to shift between different chapters
+            if (activeInputs.L2 || activeInputs.R2){
+                //console.log('%c' + (activeInputs.L2 ? 'L2' : 'R2') + ' bumper pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let shiftDirection = activeInputs.R2 ? 'next' : 'back';
+                let $currentChaptersAvailable = $('.chapter_select .chapter_link:not(.chapter_link_disabled)', $thisOptionWrapper);
+                if (!$currentChaptersAvailable || !$currentChaptersAvailable.length){ return; }
+                let $currentChapterActive = $currentChaptersAvailable.filter('.chapter_link_active');
+                let currentChapterActiveIndex = $currentChaptersAvailable.index($currentChapterActive);
+                let nextChapterActiveIndex = currentChapterActiveIndex + (shiftDirection === 'next' ? 1 : -1);
+                let maxChapterActiveIndex = $currentChaptersAvailable.length - 1;
+                if (nextChapterActiveIndex > maxChapterActiveIndex){ nextChapterActiveIndex = 0; }
+                if (nextChapterActiveIndex < 0){ nextChapterActiveIndex = maxChapterActiveIndex; }
+                $currentChaptersAvailable.eq(nextChapterActiveIndex).trigger('click');
+                return;
+                }
+
+            // Otherwise if the user has pressed any of the directional buttons, we shift the current hover
+            if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+                //console.log('%c' + Object.keys(activeInputs).join('/') + ' directional button(s) pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                let shiftDirection = activeInputs.Down || activeInputs.Right ? 'next' : 'back';
+                let $currentOptionsAvailable = $('.option[data-token]:visible', $thisOptionWrapper);
+                let $currentOptionHovered = $currentOptionsAvailable.filter('.hovered');
+                //console.log('-> shiftDirection:', shiftDirection);
+                //console.log('-> $currentOptionsAvailable:', typeof $currentOptionsAvailable, $currentOptionsAvailable);
+                //console.log('-> $currentOptionHovered:', typeof $currentOptionHovered, $currentOptionHovered);
+                $thisOptionWrapper.find('.option[data-token]').removeClass('hovered');
+                if (!$currentOptionHovered || !$currentOptionHovered.length){
+                    if (shiftDirection === 'next'){ $currentOptionsAvailable.first().addClass('hovered'); }
+                    else if (shiftDirection === 'back'){ $currentOptionsAvailable.last().addClass('hovered'); }
+                    } else {
+                    let currentOptionHoveredIndex = $currentOptionsAvailable.index($currentOptionHovered);
+                    let shiftAmount = 1;
+                    if (activeInputs.Up || activeInputs.Down){
+                        if ($currentOptionHovered.is('.starfield')){ shiftAmount = 4; }
+                        else if ($currentOptionHovered.is('.versus')){ shiftAmount = 2; }
+                        else if ($currentOptionHovered.is('.option_this-robot-select')){ shiftAmount = 4; }
+                        }
+                    let nextOptionHoveredIndex = currentOptionHoveredIndex + (shiftDirection === 'next' ? shiftAmount : (-1 * shiftAmount));
+                    let maxOptionHoveredIndex = $currentOptionsAvailable.length - 1;
+                    if (nextOptionHoveredIndex > maxOptionHoveredIndex){ nextOptionHoveredIndex = 0; }
+                    if (nextOptionHoveredIndex < 0){ nextOptionHoveredIndex = maxOptionHoveredIndex; }
+                    //$currentOptionsAvailable.eq(nextOptionHoveredIndex).addClass('hovered');
+                    let $newHoveredOption = $currentOptionsAvailable.eq(nextOptionHoveredIndex);
+                    $newHoveredOption.addClass('hovered');
+                    $newHoveredOption.trigger('mouseenter');
+                    // Find the closest parent that actually handles the scrolling (e.g., the perfectScrollbar .wrap)
+                    // If it's the sticky button outside the wrap, this grabs .option_wrapper instead
+                    let $scrollContainer = $newHoveredOption.closest('.wrap, .option_wrapper');
+                    let scrollContainer = $scrollContainer[0];
+                    // Only attempt to scroll if the container is actually scrollable
+                    if (scrollContainer && scrollContainer.scrollHeight > scrollContainer.clientHeight){
+                        // Get the top and bottom edges of the visible container
+                        let containerTop = $scrollContainer.offset().top;
+                        let containerBottom = containerTop + $scrollContainer.innerHeight();
+                        // Get the top and bottom edges of the newly highlighted option
+                        let optionTop = $newHoveredOption.offset().top;
+                        let optionBottom = optionTop + $newHoveredOption.outerHeight();
+                        // Define a small padding so the item doesn't stop exactly on the pixel edge
+                        let scrollPadding = 10;
+                        let currentScroll = $scrollContainer.scrollTop();
+                        // If the option is hiding above the visible area, scroll up
+                        if (optionTop < containerTop){
+                            let scrollDistance = containerTop - optionTop;
+                            $scrollContainer.scrollTop(currentScroll - scrollDistance - scrollPadding);
+                            // $scrollContainer.trigger('perfect-scrollbar-update');
+                            }
+                        // Else if the option is hiding below the visible area, scroll down
+                        else if (optionBottom > containerBottom){
+                            let scrollDistance = optionBottom - containerBottom;
+                            $scrollContainer.scrollTop(currentScroll + scrollDistance + scrollPadding);
+                            // $scrollContainer.trigger('perfect-scrollbar-update');
+                            }
+                        }
+                    }
+                }
+            }
+
+        // MMRPG FRAMED SUBMENU TRIGGERS (iFRAME-STEPS ONLY)
+        if (!prototypeIsHome
+            && prototypeIsSubmenu
+            && typeof checkUserInputsForFrame[prototypeIsSubmenu] !== 'undefined'
+            && typeof window[checkUserInputsForFrame[prototypeIsSubmenu]] !== 'undefined'){
+            //console.log('MMRPG ' + prototypeIsSubmenu.toUpperCase() + ' MENU TRIGGERS (SUB-FRAME ONLY)');
+            let checkUserInputsFunction = window[checkUserInputsForFrame[prototypeIsSubmenu]];
+            checkUserInputsFunction.call(this, kind, event, activeInputs, userInputs);
+            }
+
+        };
+
+    // Start the user input watcher and collect reference to active inputs
+    let userInputWatcher, userInputWatcherConfig;
+    let gamepadLayout = null; // TODO: pull this from settings later
+    let prototypeIsHome = mmrpgPrototype.prototypeIsHome;
+    //console.log('gamepadLayout =', gamepadLayout);
+    //console.log('prototypeIsHome =', prototypeIsHome);
+    if (mmrpgPrototype.prototypeIsHome){
+        userInputWatcherConfig = {
+            autoStart: true,
+            autoRunCallbacks: false,
+            autoButtonMapping: true, // map buttons based on gamepad layout
+            catchIframeInputs: true,
+            drillIframeInputs: true,
+            gamepadLayout: gamepadLayout, // pass in case custom settings
+            };
+        } else {
+        userInputWatcherConfig = {
+            autoStart: true,
+            autoRunCallbacks: false,
+            autoButtonMapping: true,
+            catchIframeInputs: true,
+            listenToIframeInputs: true,
+            gamepadLayout: gamepadLayout, // pass in case custom settings
+            };
+        }
+    userInputWatcher = new mmrpgUserInputWatcher(userInputWatcherConfig);
+    if (userInputWatcher){
+        userInputWatcher.onUserInput(checkUserInputs);
+        userInputWatcher.startWatching();
+        let checkUserInputWatcher = function(){
+            userInputWatcher.checkUserInputs();
+            requestAnimationFrame(checkUserInputWatcher);
+            };
+        checkUserInputWatcher();
+        }
+
+}
+
+// Define a quick function for polling the server for new events (but only if we can actually show them)
+function triggerWindowEventsPull(afterDelay){
+    //console.log('%c' + 'prototypeReady.triggerWindowEventsPull()', 'color: magenta;');
+    afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
+    //console.log('queuing the windowEventsPull event (via prototype)');
+    let topFrame = window.top !== window.self ? window.top : window.parent;
+    if (typeof topFrame.mmrpg_queue_for_game_start !== 'undefined'){
+        topFrame.mmrpg_queue_for_game_start(function(){
+            //console.log('i guess the game has started?');
+            setTimeout(function(){
+                //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                let result = topFrame.windowEventsPull(true);
+                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                //else { console.log('windowEventsPull returned successfully: ' + result); }
+                }, afterDelay);
+            });
+        }
+    else if (typeof topFrame.windowEventsPull !== 'undefined'){
+        //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+        setTimeout(function(){
+            let result = topFrame.windowEventsPull(true);
+            if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+            //else { console.log('windowEventsPull returned successfully: ' + result); }
+            }, afterDelay);
+        }
+    else {
+        console.warn('no windowEventsPull function found');
+        }
+    // Return no specific result
+    return;
+}
+
 // Create the windowResize event for this page
 function windowResizePrototype(){
+    //console.log('%c' + 'windowResizePrototype() called!', 'color: orange;');
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    let $thisFalloff = $mmrpgElements.thisFalloff;
 
-    //alert('windowResizePrototype()');
-
-    var windowWidth = thisWindow.width();
-    var windowHeight = thisWindow.height();
-    var bodyInnerHeight = thisBody.innerHeight();
-
-    //alert('windowWidth = '+windowWidth+' \nwindowHeight = '+windowHeight+' \nbodyInnerHeight = '+bodyInnerHeight);
-    //alert('ummmmm');
+    var windowWidth = $thisWindow.width();
+    var windowHeight = $thisWindow.height();
+    var bodyInnerHeight = $mmrpgWrapper.innerHeight();
 
     if (bodyInnerHeight < windowHeight){ windowHeight = bodyInnerHeight; }
 
-    var bannerHeight = $('.banner', thisBody).outerHeight(true);
-    var headerHeight = $('.menu .header', thisPrototype).height() + $('.menu .header', thisPrototype).outerHeight(true);
+    var bannerHeight = $('.banner', $mmrpgWrapper).outerHeight(true);
+    var headerHeight = $('.menu .header', $thisPrototype).height() + $('.menu .header', $thisPrototype).outerHeight(true);
 
     var newBodyHeight = windowHeight;
     var newBodyWidth = windowWidth;
     var newFrameHeight = newBodyHeight - bannerHeight;
     var newWrapperHeight = newBodyHeight - bannerHeight - headerHeight;
 
-    thisBody.css({height:newBodyHeight+'px'});
-    thisPrototype.css({height:newBodyHeight+'px'});
-    thisFalloff.css({width:newBodyWidth+'px'});
-    $('iframe', thisPrototype).css({height:newFrameHeight+'px'}).attr('height', newFrameHeight);
+    $mmrpgWrapper.css({height:newBodyHeight+'px'});
+    if ($thisPrototype){ $thisPrototype.css({height:newBodyHeight+'px'}); }
+    if ($thisPrototype){ $('iframe', $thisPrototype).css({height:newFrameHeight+'px'}).attr('height', newFrameHeight); }
+    if ($thisFalloff){ $thisFalloff.css({width:newBodyWidth+'px'}); }
 
 }
 
 // Define a function to trigger when resetting data
 function mmrpg_trigger_reset(fullReset){
     // Define the confirmation text string
+    var confirmTitle = 'Confirm Reset Game';
+    confirmTitle = (confirmTitle).toUpperCase() + ' \n';
     var fullReset = typeof fullReset !== 'boolean' ? false : true;
-    var confirmText = 'Are you sure you want to reset your entire game?\nAll progress will be lost and cannot be restored including any and all unlocked missions, robots, and abilities. Continue?';
-    var confirmText2 = 'Let me repeat that one more time.\nIf you reset your game ALL unlocks and progress with be lost. \nEverything. \nReset anyway?';
+    var confirmText = confirmTitle + 'Are you sure you want to RESET your ENTIRE game? \n';
+    confirmText += 'ALL progress will be lost and CANNOT be restored, \n';
+    confirmText += 'including ALL missions, robots, abilities, items, etc. \n';
+    confirmText += 'Continue reset anyway?';
+    var confirmText2 = confirmTitle + 'Let me repeat that one more time. \n';
+    confirmText2 += 'If you reset your game ALL unlocks and progress with be lost. \n';
+    confirmText2 += 'Everything.  You will be starting from scratch. \n';
+    confirmText2 += 'Reset anyway?';
     // Attempt to confirm with the user of they want to reset
-    thisReadyRoom.updateRobot('all', {frame: 'damage'}); // damage
-    thisReadyRoom.stopAnimation();
+    if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'damage'}); }
+    if (thisReadyRoom){ thisReadyRoom.stopAnimation(); }
     if (confirm(confirmText) && confirm(confirmText2)){
         // Redirect the user to the prototype reset page
         var postURL = 'prototype.php?action=reset';
         if (fullReset){ postURL += '&full_reset=true'; }
         $.post(postURL, function(){
             //alert('reset complete!');
-            thisReadyRoom.updateRobot('all', {frame: 'defeat'}); // defeat
+            if (thisReadyRoom){ thisReadyRoom.updateRobot('all', {frame: 'defeat'}); }
+            $('#mmrpg').css({opacity:1}).animate({opacity:0}, 1000, 'swing');
+            if (window.self != window.parent){ window.location = 'prototype.php'; }
+            else { window.location = window.location.href; }
+            });
+        return true;
+        } else {
+        // Return false
+        if (thisReadyRoom){ thisReadyRoom.startAnimation(); }
+        return false;
+        }
+}
+
+// Define a function to trigger when resetting data
+function mmrpg_trigger_new_game_plus(buttonObject, playerToken, playerName){
+    //console.log('mmrpg_trigger_new_game_plus()');
+
+    if (typeof buttonObject === 'undefined' || !buttonObject){ return false; }
+    if (typeof playerToken === 'undefined' || !playerToken){ return false; }
+    if (typeof playerName === 'undefined' || !playerName){ return false; }
+    var playerNameClean = playerName.replace('Dr. ', '');
+    var playerCarePronouns = ['their', 'them'];
+    if (playerToken.match(/\-(light|wily|cossack)$/i)){ playerCarePronouns = ['his', 'him']; }
+    else if (playerToken.match(/-lalinde/i)){ playerCarePronouns = ['her', 'her']; }
+    var filterPlayerFunction = function(token, info){ return info.player === playerToken || info.currentPlayer === playerToken || info.currentPlayer === 'all'; };
+    var filterOtherPlayersFunction = function(token, info){ return info.player !== playerToken && info.currentPlayer !== playerToken && info.currentPlayer !== 'all'; };
+
+    // Define the confirmation text string
+    var confirmTitle = 'Confirm New Game Plus ('+playerNameClean+' Story)';
+    confirmTitle = (confirmTitle).toUpperCase();
+    var confirmText = '';
+    confirmText += confirmTitle + '\n';
+    confirmText += 'Are you sure you want '+playerName+' to start a New Game Plus? \n';
+    confirmText += '- Any mission-related progress in '+playerNameClean+'\'s story will be reset \n';
+    confirmText += '- Any '+playerNameClean+'-owned robots not-currently under '+playerCarePronouns[0]+' care will \n';
+    confirmText += '   be recalled and returned to '+playerCarePronouns[1]+' (vice-versa for others) \n';
+    confirmText += '- You\'ll still keep everything else you\'ve collected including \n';
+    confirmText += '   zenny, items, abilities, stars, tokens, medallions, etc. \n';
+    //confirmText += '\n';
+    confirmText += '[ Continue? ]';
+    var confirmText2 = '';
+    confirmText2 += 'RE-'+confirmTitle + '\n';
+    confirmText2 += 'Let\'s repeat that one more time, just-in-case ... \n';
+    confirmText2 += 'If you start a New Game Plus w/ '+playerName+' right now; \n';
+    confirmText2 += '- Any mission-related progress in '+playerCarePronouns[0]+' story will be reset \n';
+    confirmText2 += '- Any '+playerNameClean+'-owned robots will be recalled and vice-versa \n';
+    confirmText2 += '- You\'ll still keep all items, abilities, etc. you\'ve collected \n';
+    confirmText2 += 'So with all that said again... \n';
+    confirmText2 += '[ Continue Anyway? ]';
+    // Attempt to confirm with the user of they want to reset
+    if (thisReadyRoom){
+        thisReadyRoom.updatePlayer(filterPlayerFunction, {frame: 'damage'});
+        thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'damage'});
+        thisReadyRoom.stopAnimation();
+        }
+    //console.log('test confirm text');
+    if (confirm(confirmText) && confirm(confirmText2)){
+        //console.log('confirmed');
+        // Redirect the user to the prototype new-game-plus page
+        var postURL = 'prototype.php?action=new-game-plus&player='+playerToken;
+        //console.log('postURL = ', postURL);
+        $.post(postURL, function(){
+            alert('new-game-plus for '+playerToken+' complete!');
+            if (thisReadyRoom){
+                thisReadyRoom.updatePlayer(filterPlayerFunction, {frame: 'defend'});
+                thisReadyRoom.updateRobot(filterPlayerFunction, {frame: 'defend'});
+                }
             if (window.self != window.parent){
                 window.location = 'prototype.php';
                 } else {
@@ -627,46 +1098,14 @@ function mmrpg_trigger_reset(fullReset){
             });
         return true;
         } else {
+        //console.log('not confirmed');
         // Return false
-        thisReadyRoom.startAnimation();
+        if (thisReadyRoom){
+            thisReadyRoom.startAnimation();
+            }
         return false;
         }
-}
 
-// Define a function to trigger when resetting player missions
-function mmrpg_trigger_reset_missions(playerToken, playerName){
-    // Define the confirmation text string
-    var confirmText = 'Are you sure you want to reset all mission progress in '+playerName+'\'s game file? Unlocked robots and abilities will be untouched, but all completed missions will be reset and cannot be undone. Continue?';
-    // Attempt to confirm with the user of they want to resey
-    if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
-        // Redirect the user to the prototype reset page
-        var postURL = 'prototype.php?action=reset-missions&player='+playerToken;
-        $.post(postURL, function(){
-            window.location = 'prototype.php';
-            });
-        return true;
-        } else {
-        // Return false
-        return false;
-        }
-}
-
-// Define a function to trigger when resetting player robots
-function mmrpg_trigger_reset_robots(playerToken, playerName){
-    // Define the confirmation text string
-    var confirmText = 'Are you sure you want to reset all unlocked robots in '+playerName+'\'s game file? All robots will be reset to level one and abilities reset to default. Continue?';
-    // Attempt to confirm with the user of they want to resey
-    if (navigator.userAgent.match(/Android/i) != null || confirm(confirmText)){
-        // Redirect the user to the prototype reset page
-        var postURL = 'prototype.php?action=reset-robots&player='+playerToken;
-        $.post(postURL, function(){
-            window.location = 'prototype.php';
-            });
-        return true;
-        } else {
-        // Return false
-        return false;
-        }
 }
 
 // Define a function for triggering the game's exit function
@@ -708,12 +1147,14 @@ function prototype_trigger_redirect(thisContext, thisLink){
 // Define a function for automatically going to the next menu, if defined
 function prototype_menu_loaded(){
     //console.log('prototype_menu_loaded()');
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    let $thisBannerOverlay = $mmrpgElements.thisBannerOverlay;
     // If the nextMenu value is not empty, switch to the next menu tab
     if (gameSettings.nextStepName.length
-            && gameSettings.nextSlideDirection.length){
+        && gameSettings.nextSlideDirection.length){
         // SWITCH TO NEXT MENU
         //console.log('SWITCH TO NEXT MENU '+gameSettings.nextStepName);
-        var bannerOverlay = $('.banner_overlay', thisPrototype);
         prototype_menu_switch({stepName:gameSettings.nextStepName,slideDirection:gameSettings.nextSlideDirection,onComplete:function(){
             var animateReadyRoom = true;
             if (animateReadyRoom){
@@ -727,14 +1168,15 @@ function prototype_menu_loaded(){
                 else if (gameSettings.nextStepName === 'database'){ newRobotFrame = 'base2'; } // base2
                 else if (parseInt(gameSettings.nextStepName) > 0){ newRobotFrame = 'victory'; } // victory
                 else { newRobotFrame = 'defend'; } // defend
-                thisReadyRoom.updateRobot('most', {frame: newRobotFrame});
+                if (thisReadyRoom){ thisReadyRoom.updateRobot('most', {frame: newRobotFrame}); }
                 }
             gameSettings.nextStepName = false;
             gameSettings.nextSlideDirection = false;
             // Fade out the overlay to prevent clicking other banner links
-            $('.banner .points, .banner .subpoints, .banner .options, .banner .tooltip', thisPrototype).stop().animate({opacity:1},500,'swing');
-            bannerOverlay.stop().css({opacity:0.33}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){
-                $(this).addClass('overlay_hidden');
+            //console.log('$thisBannerOverlay =', $thisBannerOverlay.length, $thisBannerOverlay);
+            $('.points, .subpoints, .options, .tooltip', $thisBanner).stop().animate({opacity:1},500,'swing');
+            $thisBannerOverlay.stop().css({opacity:0.33}).animate({opacity:0.0},{duration:1000,easing:'swing',queue:false,complete:function(){
+                $thisBannerOverlay.addClass('overlay_hidden');
                 }});
             }});
         }
@@ -758,6 +1200,8 @@ function prototype_menu_preload_source(thisContext, thisMenu){
 // Define a function for triggering a prototype step link
 function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlideDuration){
     //console.log('prototype_menu_click_step(thisContext:', thisContext, ', thisLink:', thisLink, ', thisCallback:', typeof thisCallback, ', thisSlideDuration:', thisSlideDuration, ')');
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
 
     // Collect information about the previous and current link
     var thisLink = $(thisLink);
@@ -781,20 +1225,17 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     var stepMusic = thisLink.attr('data-music') != undefined ? thisLink.attr('data-music') : false;
     var stepSource = thisLink.attr('data-source') != undefined ? thisLink.attr('data-source') : false;
 
-    // Only clear banner options if we're not in demo mode or there's only one player
-    if (gameSettings.demo != true && gameSettings.totalPlayerOptions > 1){
-        // Clear any select options from the banner
-        $('.banner .option[data-select]', thisContext).animate({opacity:0},600,'swing',function(){
-            var thisSelect = $(this).attr('data-select');
-            $(this).remove();
-            var remainingOptions = $('.banner .option', thisContext).length;
-            if (remainingOptions < 1){
-                $('.banner .is_shifted', thisContext).removeClass('is_shifted').animate({opacity:1.0},600,'swing');
-                $('.menu .option_wrapper[data-condition]', thisContext).css({display:''});
-                battleOptions[thisSelect] = undefined;
-                }
-            });
-    }
+    // Clear any select options from the banner
+    $('.banner .option[data-select]', thisContext).animate({opacity:0},600,'swing',function(){
+        var thisSelect = $(this).attr('data-select');
+        $(this).remove();
+        var remainingOptions = $('.banner .option', thisContext).length;
+        if (remainingOptions < 1){
+            $('.banner .is_shifted', thisContext).removeClass('is_shifted').animate({opacity:1.0},600,'swing');
+            $('.menu .option_wrapper[data-condition]', thisContext).css({display:''});
+            battleOptions[thisSelect] = undefined;
+            }
+        });
 
     // If there was music requested, start playing it
     if (stepMusic.length){ parent.mmrpg_music_load(stepMusic, true); }
@@ -834,15 +1275,14 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
     // Switch the direction of the robot loading sprite by using the slide direction
     var removeClass = 'sprite_40x40_'+(slideDirection)+'_00';
     var addClass = 'sprite_40x40_'+(slideDirection == 'left' ? 'right' : 'left')+'_00';
-    $('.menu[data-step=loading]', thisPrototype).find('.sprite').removeClass(removeClass).addClass(addClass);
+    $('.menu[data-step=loading]', $thisPrototype).find('.sprite').removeClass(removeClass).addClass(addClass);
     // Fade in the overlay when moving from HOME to LOADING to prevent clicking other banner links
     if (gameSettings.startLink == 'home'){
 
-        var bannerOverlay = $('.banner_overlay', thisPrototype);
+        var bannerOverlay = $('.banner_overlay', $thisPrototype);
         bannerOverlay.stop().css({opacity:0.00}).removeClass('overlay_hidden').animate({opacity:0.33},{duration:1000,easing:'swing',queue:false});
-        var thisBanner = $('.banner', thisPrototype);
-        $('.canvas_overlay_footer', thisBanner).remove();
-        $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:0},500,'swing');
+        $('.canvas_overlay_footer', $thisBanner).remove();
+        $('.points, .subpoints, .options, .tooltip', $thisBanner).stop().animate({opacity:0},500,'swing');
 
     }
     // Switch to the loading menu, and wait for the next menu to finish loading
@@ -869,6 +1309,9 @@ function prototype_menu_click_step(thisContext, thisLink, thisCallback, thisSlid
 // Define a function for triggering a prototype option link
 function prototype_menu_click_option(thisContext, thisOption, onComplete){
     //console.log('prototype_menu_click_option(thisContext:', thisContext, ', thisOption:', thisOption, ', onComplete:', onComplete, ')');
+    //console.log('prototype_menu_click_option() called!');
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
 
     // If this option is disabled, ignore its input
     if ($(this).hasClass('option_disabled')
@@ -905,7 +1348,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     if (!thisToken.length){
         onComplete();
         return false;
-    }
+        }
 
     // If the next limit was set, apply to the next step
     if (nextLimit){
@@ -918,6 +1361,8 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
 
     // If this is a child token, update the parent
     if (typeof thisOption.attr('data-child') !== 'undefined'){
+
+        // Used for: ROBOT SELECT team robot robots select option_this-team-select
 
         // Find the parent token container
         var tokenParent = $('.option[data-parent]', thisParent);
@@ -967,10 +1412,10 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         // If robots have not been selected, hide the reselector
         if (tokenParentCount < 1){
             //alert('hide reselect '+tokenParentCount);
-            $('.reselect', thisParent).css({opacity:0});
+            $('.reselect', thisParent).addClass('hidden');
             } else {
             //alert('show reselect '+tokenParentCount);
-            $('.reselect', thisParent).css({opacity:1});
+            $('.reselect', thisParent).removeClass('hidden');
             }
 
         /*
@@ -1025,9 +1470,16 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
 
             // Count the number of available missions right now
             var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
+            //console.log('availableMissions =', availableMissions);
             $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
             $('.menu[data-select="this_battle_token"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
             $('.menu[data-select="this_player_robots"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
+
+            // If a temporary/psuedo player token was clicked, make sure we auto-clear it
+            if (battleOptions['this_player_token'] === 'player'){
+                battleOptions['this_player_token'] = '';
+                battleOptions['this_player_id'] = 0;
+                }
 
             break;
             }
@@ -1059,7 +1511,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             //console.log('tempWrapper = ', tempWrapper.html());
 
             // Apply the perfect scrollbar if an inner wrap exists
-            if (tempInnerWrapper.length){ tempInnerWrapper.perfectScrollbar(thisScrollbarSettings); }
+            if (tempInnerWrapper.length){ tempInnerWrapper.perfectScrollbar(gameSettings.perfectScrollbar); }
 
             // Update the start button's counter text
             $('.option[data-parent]', tempMenu).find('.count').html('0/'+gameSettings.nextRobotLimit+' Select');
@@ -1078,7 +1530,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
                     $('.option[data-parent] .sprite:not(.sticky)', tempMenu).remove();
                     $('.sprite_40x40_placeholder', tempMenu).css({display:''});
                     delete battleOptions['this_player_robots'];
-                    $(this).css({opacity:0});
+                    $(this).addClass('hidden');
                     return true;
                     });
                 tempMenuHeader.append(tempReselect);
@@ -1092,10 +1544,10 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             // If robots have not been selected, hide the reselector
             if (battleOptions['this_player_robots'] === undefined || battleOptions['this_player_robots'].length < 1){
                 //console.log('hide reselect');
-                $('.reselect', tempMenuHeader).css({opacity:0});
+                $('.reselect', tempMenuHeader).addClass('hidden');
                 } else {
                 //console.log('show reselect');
-                $('.reselect', tempMenuHeader).css({opacity:1});
+                $('.reselect', tempMenuHeader).removeClass('hidden');
                 }
 
             // Generate the placeholder sprite markup
@@ -1142,28 +1594,18 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     if (typeof thisOption.attr('data-child') === 'undefined'){
 
         // Collect the context for the banner area and remove and foregrounds
-
-        var thisBanner = $('.banner', thisContext);
-        /*
-        //console.log('get ready to fade credits to '+creditsOpacity+'!');
-        var creditsOpacity = ((gameSettings.demo == true || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && thisSelect == 'this_player_token')) ? 1.0 : 0.0);
-        $('.banner_credits', thisBanner).removeClass('is_shifted').animate({opacity:creditsOpacity},{duration:600,easing:'swing',sync:false,complete:function(){
-            //console.log('credits have been animated to '+creditsOpacity);
-            $(this).addClass('is_shifted');
-            }});
-        */
-        $('.banner_foreground:not(.is_shifted)', thisBanner).css({opacity:0.6}).animate({opacity:1.0},{duration:600,easing:'swing',sync:false,complete:function(){
+        $('.banner_foreground:not(.is_shifted)', $thisBanner).css({opacity:0.6}).animate({opacity:1.0},{duration:600,easing:'swing',sync:false,complete:function(){
             $(this).addClass('is_shifted');
             }});
 
         // Count the number of other options in the banner
-        var numOptions = $('.option', thisBanner).length;
+        var numOptions = $('.option', $thisBanner).length;
 
         // Remove any options for the same select parent
-        var previousOption = $('.option[data-select="'+thisSelect+'"]', thisBanner);
+        var previousOption = $('.option[data-select="'+thisSelect+'"]', $thisBanner);
         if (previousOption.length){
             previousOption.animate({opacity:0},600,'swing',function(){
-                $('.option:gt('+previousOption.eq()+')', thisBanner).remove();
+                $('.option:gt('+previousOption.eq()+')', $thisBanner).remove();
                 $(this).remove();
                 });
             numOptions--;
@@ -1173,7 +1615,8 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         var thisPosition = numOptions + 1;
 
         // Only append to banner if not a team select option
-        if (!thisOption.hasClass('option_this-team-select')){
+        if (!thisOption.hasClass('option_this-team-select')
+            && !thisOption.hasClass('option_free-roam')){
 
             // Append this option object to the main banner window
             var cloneOption = thisOption.clone();
@@ -1193,7 +1636,7 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
                 //top:(10 + (78 * numOptions))+'px',
                 top:(15 + (80 * numOptions))+'px',
                 opacity:0,
-                //marginLeft:'-'+(thisBanner.outerWidth() + 100)+'px',
+                //marginLeft:'-'+($thisBanner.outerWidth() + 100)+'px',
                 borderWidth:'1px',
                 border:'1px solid rgba(0, 0, 0, 0.6)',
                 width: cloneWidth+'%'
@@ -1205,20 +1648,20 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
                 width: 'auto'
                 });
             cloneOption.unbind('click');
-            thisBanner.append(cloneOption);
+            $thisBanner.append(cloneOption);
             if (!gameSettings.skipPlayerSelect){ cloneOption.animate({opacity:1,marginLeft:'0'},600,'linear'); }
             else { cloneOption.css({opacity:1,marginLeft:'0'}); }
 
             }
 
         // If this was a mission select, update the banner background image
-        if (thisSelect == 'this_battle_token'){
+        if (thisSelect === 'this_battle_token'){
             // Change the background image based on the current option data
             var newBackgroundToken = thisOption.attr('data-background');
             var backgroundFileToken = 'battle-field_background_base';
             if (typeof thisOption.attr('data-background-variant') !== 'undefined'){ backgroundFileToken += '_'+thisOption.attr('data-background-variant'); }
             var newBackgroundImage = 'url(images/fields/'+newBackgroundToken+'/'+backgroundFileToken+'.gif?'+gameSettings.cacheTime+')';
-            var oldBannerBackground = $('.banner_background', thisBanner);
+            var oldBannerBackground = $('.banner_background', $thisBanner);
             oldBannerBackground.stop();
             var newBannerBackground = $('<div class="sprite background banner_background" style="opacity: 0; z-index: 11; background-position: center -30px; background-image: '+newBackgroundImage+';">&nbsp;</div>');
             newBannerBackground.insertAfter(oldBannerBackground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerBackground.remove(); $(this).css({zIndex:''}); }});
@@ -1227,24 +1670,24 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
             var foregroundFileToken = 'battle-field_foreground_base';
             if (typeof thisOption.attr('data-foreground-variant') !== 'undefined'){ foregroundFileToken += '_'+thisOption.attr('data-foreground-variant'); }
             var newForegroundImage = 'url(images/fields/'+newForegroundToken+'/'+foregroundFileToken+'.png?'+gameSettings.cacheTime+')';
-            var oldBannerForeground = $('.banner_foreground', thisBanner);
+            var oldBannerForeground = $('.banner_foreground', $thisBanner);
             oldBannerForeground.stop();
             var newBannerForeground = $('<div class="sprite background banner_foreground" style="opacity: 0; z-index: 21; background-position: center -30px; background-image: '+newForegroundImage+';">&nbsp;</div>');
             newBannerForeground.insertAfter(oldBannerForeground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerForeground.remove(); $(this).css({zIndex:''}); }});
             // Fade in the overlay to prevent clicking on banner links
-            var bannerOverlay = $('.banner_overlay', thisBanner);
-            //thisBanner.stop().removeClass('banner_compact').animate({height:'124px'},{duration:1000,easing:'swing',queue:false});
+            var bannerOverlay = $('.banner_overlay', $thisBanner);
+            //$thisBanner.stop().removeClass('banner_compact').animate({height:'124px'},{duration:1000,easing:'swing',queue:false});
             bannerOverlay.stop().removeClass('overlay_hidden').animate({opacity:0.33},{duration:1000,easing:'swing',queue:false});
-            $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
+            $('.points, .subpoints, .options, .tooltip', $thisBanner).stop().animate({opacity:0},{duration:500,easing:'swing',queue:false});
             // Add the canvas overlay footer to the canvas with multipliers
             var thisFieldName = thisOption.attr('data-field');
             var thisBattleDescription = thisOption.attr('data-description').replace('-', '&#8209;');
             var thisFieldMultipliers = thisOption.attr('data-multipliers');
             var thisFieldMultipliersLength = thisFieldMultipliers.length != undefined ? thisFieldMultipliers.length : 0;
-            thisBanner.append('<div class="canvas_overlay_footer"><div class="overlay_title">'+thisFieldName+'</div><div class="overlay_description">'+thisBattleDescription+'</div></div>');
+            $thisBanner.append('<div class="canvas_overlay_footer"><div class="overlay_title">'+thisFieldName+'</div><div class="overlay_description">'+thisBattleDescription+'</div></div>');
             if (thisFieldMultipliers.length){
-                $('.canvas_overlay_footer', thisBanner).append('<div class="overlay_title" style="top: 4px; padding: 2px 10px 0; font-size: 8px; margin-bottom: -2px;">Field Multipliers</div>');
-                $('.canvas_overlay_footer', thisBanner).append('<div class="overlay_multipliers"></div>');
+                $('.canvas_overlay_footer', $thisBanner).append('<div class="overlay_title" style="top: 4px; padding: 2px 10px 0; font-size: 8px; margin-bottom: -2px;">Field Multipliers</div>');
+                $('.canvas_overlay_footer', $thisBanner).append('<div class="overlay_multipliers"></div>');
                 thisFieldMultipliers = thisFieldMultipliers.split('|');
                 for (var i in thisFieldMultipliers){
                     var thisPair = thisFieldMultipliers[i].split('*');
@@ -1252,10 +1695,10 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
                     var thisMultiplier = parseFloat(thisPair[1]);
                     if (thisMultiplier === 1){ continue; }
                     var thisTypeName = thisType.charAt(0).toUpperCase() + thisType.slice(1);
-                    $('.canvas_overlay_footer .overlay_multipliers', thisBanner).append('<span class="field_multiplier field_multiplier_'+thisType+' field_multiplier_count_'+thisFieldMultipliersLength+' field_type field_type_'+thisType+'"><span class="text">'+thisTypeName+' <span class="cross" style="">x</span> '+thisMultiplier+'</span></span>');
+                    $('.canvas_overlay_footer .overlay_multipliers', $thisBanner).append('<span class="field_multiplier field_multiplier_'+thisType+' field_multiplier_count_'+thisFieldMultipliersLength+' field_type field_type_'+thisType+'"><span class="text">'+thisTypeName+' <span class="cross" style="">x</span> '+thisMultiplier+'</span></span>');
                     }
                 } else {
-                    //$('.canvas_overlay_footer', thisBanner).append('<span class="field_multiplier field_multiplier_none field_multiplier_count_0 field_type field_type_none"><span class="text">- none -</span></span>');
+                    //$('.canvas_overlay_footer', $thisBanner).append('<span class="field_multiplier field_multiplier_none field_multiplier_count_0 field_type field_type_none"><span class="text">- none -</span></span>');
                 }
 
             }
@@ -1270,17 +1713,27 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
     //var thisRedirect = 'battle.new.php?wap='+(gameSettings.wapFlag ? 'true' : 'false');
     for (var key in battleOptions){ thisRedirect += '&'+key+'='+battleOptions[key]; }
 
+    // If this was a player select, make sure we re-pull window events just in case new stuff happened
+    if (thisSelect === 'this_player_token'){
+        let oldOnComplete = onComplete;
+        let newOnComplete = function(){
+            triggerWindowEventsPull();
+            oldOnComplete();
+            };
+        onComplete = newOnComplete;
+        };
+
     // If this was a mission select, make sure we re-flow the robot select when ready
-    if (thisSelect == 'this_battle_token'){
-        var oldOnComplete = onComplete;
-        var newOnComplete = function(){
+    if (thisSelect === 'this_battle_token'){
+        let oldOnComplete = onComplete;
+        let newOnComplete = function(){
             var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
             var $tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
             var $tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', $tempMenu);
             var $tempInnerWrapper = $tempWrapper.find('> .wrap');
             if ($tempInnerWrapper.length){
                 $tempInnerWrapper.scrollTop(1);
-                $tempInnerWrapper.perfectScrollbar(thisScrollbarSettings);
+                $tempInnerWrapper.perfectScrollbar(gameSettings.perfectScrollbar);
                 }
             oldOnComplete();
             };
@@ -1330,6 +1783,8 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
 // Define a function for triggering a prototype back link
 function prototype_menu_click_back(thisContext, thisLink){
     // Collect the parent menu and option fields
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
     var thisLink = $(thisLink);
     var backStep = parseInt(thisLink.attr('data-back'));
     var backParent = $('.menu[data-step="'+(backStep)+'"]', thisContext);
@@ -1364,7 +1819,7 @@ function prototype_menu_click_back(thisContext, thisLink){
                 }
                 // Change the background image back to the default
                 var newBackgroundImage = 'url(images/menus/menu-banner_this-battle-select.png?'+gameSettings.cacheTime+')';
-                var oldBannerBackground = $('.banner_background', thisBanner);
+                var oldBannerBackground = $('.banner_background', $thisBanner);
                 oldBannerBackground.stop();
                 var newBannerBackground = $('<div class="sprite background banner_background" style="opacity: 0; z-index: 11; background-image: '+newBackgroundImage+';">&nbsp;</div>');
                 newBannerBackground.insertAfter(oldBannerBackground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerBackground.remove(); $(this).css({zIndex:''}); }});
@@ -1374,16 +1829,16 @@ function prototype_menu_click_back(thisContext, thisLink){
                 var randomBackgroundKey = Math.floor(Math.random() * numBackgroundOptions);
                 var newForegroundImage = 'url(images/menus/'+gameSettings.prototypeBanners[randomBackgroundKey]+'?'+gameSettings.cacheTime+')';
                 //var newForegroundImage = 'url(images/menus/menu-banner_title-screen-01.png?'+gameSettings.cacheTime+')';
-                var oldBannerForeground = $('.banner_foreground', thisBanner);
+                var oldBannerForeground = $('.banner_foreground', $thisBanner);
                 oldBannerForeground.stop();
                 var newBannerForeground = $('<div class="sprite background banner_foreground" style="opacity: 0; z-index: 21; background-position: center -10px; background-image: '+newForegroundImage+';">&nbsp;</div>');
                 newBannerForeground.insertAfter(oldBannerForeground).animate({opacity:1.0},{duration:1000,easing:'swing',queue:false,complete:function(){ oldBannerForeground.remove(); $(this).css({zIndex:''}); }});
                 // Fade out the overlay to allow clicking on banner links
-                var bannerOverlay = $('.banner_overlay', thisBanner).stop().animate({opacity:0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});
-                $('.points, .subpoints, .options, .tooltip', thisBanner).stop().animate({opacity:1},500,'swing');
+                var bannerOverlay = $('.banner_overlay', $thisBanner).stop().animate({opacity:0},{duration:1000,easing:'swing',queue:false,complete:function(){ $(this).addClass('overlay_hidden'); }});
+                $('.points, .subpoints, .options, .tooltip', $thisBanner).stop().animate({opacity:1},500,'swing');
                 //alert(newBackgroundImage);
                 // Remove the field details overlay
-                $('.canvas_overlay_footer', thisBanner).remove();
+                $('.canvas_overlay_footer', $thisBanner).remove();
             break;
             }
         default: {
@@ -1391,14 +1846,13 @@ function prototype_menu_click_back(thisContext, thisLink){
             }
         }
     // Clear any of this select's options in the banner
-    var thisBanner = $('.banner', thisContext);
-    $('.option[data-select="'+backSelect+'"]', thisBanner).animate({opacity:0},600,'swing',function(){
+    $('.option[data-select="'+backSelect+'"]', $thisBanner).animate({opacity:0},600,'swing',function(){
         $(this).remove();
-            var remainingOptions = $('.option', thisBanner).length;
+            var remainingOptions = $('.option', $thisBanner).length;
             //alert(remainingOptions);
             if (remainingOptions < 1){
                 //alert('no options');
-                $('.is_shifted', thisBanner).removeClass('is_shifted').animate({opacity:1.0},600,'swing');
+                $('.is_shifted', $thisBanner).removeClass('is_shifted').animate({opacity:1.0},600,'swing');
                 }
         });
     // Trigger the menu switch for the new step
@@ -1411,6 +1865,7 @@ function prototype_menu_click_back(thisContext, thisLink){
 var menuSwitchTimeout = false;
 function prototype_menu_switch(switchOptions){
     //console.log('prototype_menu_switch(switchOptions:', switchOptions, ')');
+    if (mmrpgPrototype.prototypeIsSubmenu){ return false; }
 
     // Clear any existing timeout and then set a new one a little bit in the future
     if (menuSwitchTimeout){ clearTimeout(menuSwitchTimeout); }
@@ -1421,6 +1876,7 @@ function prototype_menu_switch(switchOptions){
 // Create a function for switching to a specific menu step
 function prototype_menu_switch_action(switchOptions){
     //console.log('prototype_menu_switch_action(switchOptions:', switchOptions, ')');
+    if (mmrpgPrototype.prototypeIsSubmenu){ return false; }
 
     // Redefine the options array populating defaults
     switchOptions = {
@@ -1430,17 +1886,33 @@ function prototype_menu_switch_action(switchOptions){
         autoSkip: switchOptions.autoSkip || 'false',
         slideDirection: switchOptions.slideDirection || 'left',
         slideDuration: switchOptions.slideDuration || 600,
-        onComplete: switchOptions.onComplete || function(){}
+        onComplete: switchOptions.onComplete || function(){},
+        beforeOnComplete: switchOptions.beforeOnComplete || function(){}
         };
 
     //console.log('prototype_menu_switch(switchOptions) w/', switchOptions);
 
-    // Define the prototype context
-    var thisContext = $('#prototype');
-    var thisBanner = $('.banner', thisContext);
+    // Collect context references
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    var $thisBanner = $mmrpgElements.thisBanner;
+    var $thisBannerOverlay = $mmrpgElements.thisBannerOverlay;
 
     // Collect the current step token
-    var currentStepToken = $('.menu[data-step]:not(.menu_hide)', thisContext).attr('data-step');
+    var currentStepToken = $('.menu[data-step]:not(.menu_hide)', $thisPrototype).attr('data-step');
+
+    // Unload the previous menu's iframe after the slide animation finishes
+    if (currentStepToken && currentStepToken !== switchOptions.stepName && currentStepToken !== switchOptions.stepNumber){
+        var cleanupDuration = (switchOptions.slideDuration || 600) + 100; // slide duration + 100ms buffer
+        setTimeout(function(){
+            var $oldMenu = $('.menu[data-step="' + currentStepToken + '"]', $thisPrototype);
+            var $oldIframe = $oldMenu.find('iframe');
+            // If an active source iframe exists, replace it with the default blank state
+            if ($oldIframe.length
+                && $oldIframe.attr('src') !== 'blank.php'){
+                $oldMenu.empty().append('<iframe name="' + currentStepToken + '" class="blank" src="blank.php" width="100%" height="340" frameborder="1" scrolling="no"></iframe>');
+                }
+            }, cleanupDuration);
+        }
 
     // Update the prototype element with data attributes for styling
     //console.log('johto');
@@ -1486,33 +1958,40 @@ function prototype_menu_switch_action(switchOptions){
     else if (dataStepName !== 'home'){
         dataStepNumber = 0;
         }
-    thisPrototype.attr('data-step-name', dataStepName);
-    thisPrototype.attr('data-step-number', dataStepNumber);
+    $thisPrototype.attr('data-step-name', dataStepName);
+    $thisPrototype.attr('data-step-number', dataStepNumber);
+    mmrpgPrototype.prototypeIsTopmenu = dataStepName;
     //console.log('dataStepName =>', typeof switchOptions.stepName, switchOptions.stepName, '=>', typeof dataStepName, dataStepName);
     //console.log('dataStepNumber =>', typeof switchOptions.stepNumber, switchOptions.stepNumber, '=>', typeof dataStepNumber, dataStepNumber);
     // If we're on the mission select screen, let's shrink the spriteBounds a bit for the ready room, else revert to default
     if (thisReadyRoom){
         if (dataStepName === 'home'
             && dataStepNumber === 2){
-            thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80});
+            if (thisReadyRoom){ thisReadyRoom.updateSpriteBounds({minX: 20, maxX: 80}); }
             } else {
-            thisReadyRoom.resetSpriteBounds();
+            if (thisReadyRoom){ thisReadyRoom.resetSpriteBounds(); }
             }
         }
 
 
     // Only proceed normally if the current start link is home
-    if (gameSettings.startLink != 'home'){
+    if (gameSettings.startLink !== 'home'){
         var stepToken = switchOptions.stepNumber || switchOptions.stepName;
-        if (stepToken != gameSettings.startLink){ return false; }
-        //else if (stepToken == currentStepToken){ return false; }
-        //else if (stepToken == gameSettings.startLink){ gameSettings.startLink = 'home'; }
-        //gameSettings.startLink = 'home';
+        if (stepToken !== gameSettings.startLink){ return false; }
         }
+
+    // Add a class to the banner so it knows it's current switching
+    $thisBanner.addClass('is-switching');
+    let beforeOnComplete = switchOptions.beforeOnComplete;
+    switchOptions.beforeOnComplete = function(){
+        $thisBanner.removeClass('is-switching');
+        return beforeOnComplete.call(this, );
+        };
 
     // Prevent switching to the same menu twice
     if (switchOptions.stepNumber == currentStepToken || switchOptions.stepName == currentStepToken){
         //alert('they are the same');
+        $thisBanner.addClass('is-switching');
         return switchOptions.onComplete();
         }
 
@@ -1524,36 +2003,37 @@ function prototype_menu_switch_action(switchOptions){
     if (switchOptions.stepName == 'loading'){
         var newHeight = 124;
         //console.log('Shrinking the banner height to '+newHeight);
-        thisBanner.removeClass('fullsize').addClass('compact').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
-        //var thisLoadingMenu = $('.menu[data-step=loading]', thisPrototype);
+        $thisBanner.removeClass('fullsize').addClass('compact').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
+        //var thisLoadingMenu = $('.menu[data-step=loading]', $thisPrototype);
         //thisLoadingMenu.css({height:'800px',border:'2px solid red'});
         //$('.option_wrapper', thisLoadingMenu).css({height:'800px',border:'2px solid blue'});
-        //$('.banner_credits', thisBanner).animate({opacity:0},{duration:500,easing:'swing',queue:false,complete:function(){ $(this).css({display:'none'}); } });
+        //$('.banner_credits', $thisBanner).animate({opacity:0},{duration:500,easing:'swing',queue:false,complete:function(){ $(this).css({display:'none'}); } });
         }
 
     // Else if this is the HOME screen, expand the banner height
-    if ((switchOptions.stepName == '1' || switchOptions.stepNumber == 1)
-        || (gameSettings.demo == true && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
-        || (gameSettings.demo != true && gameSettings.totalPlayerOptions == 1 && (switchOptions.stepName == '2' || switchOptions.stepNumber == 2))
-        ){
+    if (switchOptions.stepName == '1' || switchOptions.stepNumber == 1){
         var newHeight = 184;
         //console.log('Expanding the banner height to '+newHeight);
-        thisBanner.removeClass('compact').addClass('fullsize').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
-        //$('.banner_credits', thisBanner).removeClass('is_shifted').css({display:'block'}).animate({opacity:1},{duration:500,easing:'swing',queue:false});
+        $thisBanner.removeClass('compact').addClass('fullsize').animate({height:newHeight+'px'},{duration:500,easing:'swing',queue:false});
+        //$('.banner_credits', $thisBanner).removeClass('is_shifted').css({display:'block'}).animate({opacity:1},{duration:500,easing:'swing',queue:false});
         }
 
     // Change the background music to the appropriate file
     if (switchOptions.stepNumber == 1){
         parent.mmrpg_music_load('misc/player-select', true, false);
         } else if (switchOptions.stepNumber == 2){
-        var newMusicToken = $('.select_this_player .option_this-player-select[data-token="'+battleOptions['this_player_token']+'"]', thisContext).attr('data-music-token');
-        //console.log('newMusicToken = '+newMusicToken);
-        var newMusicPath = newMusicToken.indexOf('/') === -1 ? 'misc/'+newMusicToken : newMusicToken;
-        parent.mmrpg_music_load(newMusicPath, true, false);
+        var $select = $('.select_this_player', $thisPrototype),
+            $option = $('.option_this-player-select[data-token="'+battleOptions['this_player_token']+'"]', $select);
+        if ($option.is('[data-music-token]')){
+            var newMusicToken = $option.attr('data-music-token');
+            //console.log('newMusicToken = '+newMusicToken);
+            var newMusicPath = newMusicToken.indexOf('/') === -1 ? 'misc/'+newMusicToken : newMusicToken;
+            parent.mmrpg_music_load(newMusicPath, true, false);
+            }
         }
 
     // Define the prototype context events
-    if (thisContext.length){
+    if ($thisPrototype.length){
 
         //windowResizePrototype();
 
@@ -1575,7 +2055,7 @@ function prototype_menu_switch_action(switchOptions){
 
 
         // Collect a reference to the current menus
-        var currentMenu = $('.menu[data-step="'+(switchOptions.stepNumber || switchOptions.stepName)+'"]', thisContext);
+        var currentMenu = $('.menu[data-step="'+(switchOptions.stepNumber || switchOptions.stepName)+'"]', $thisPrototype);
         var currentMenuTitle = currentMenu.attr('data-title');
 
         // Collect the step, select, and condition for this
@@ -1590,6 +2070,7 @@ function prototype_menu_switch_action(switchOptions){
         //console.log('hoenn');
         var tempReadyRoomFunction = function(loadState){
             //console.log('tempReadyRoomFunction(loadState:', typeof loadState, loadState, ')');
+            if (!thisReadyRoom){ return false; }
             if (typeof loadState === 'undefined'){ loadState = ''; }
 
             // Define some quick filter functions for dealing with player-specific robots
@@ -1685,7 +2166,7 @@ function prototype_menu_switch_action(switchOptions){
                 //console.log('RELOAD TRIGGERED for "'+currentMenuTitle+'" with currentMenuStep = '+currentMenuStep+', currentMenuSelect = '+currentMenuSelect+', currentMenuCondition = '+currentMenuCondition+'!');
 
                 // Check to see if there are conditional wrappers to populate
-                if (!currentMenu.find('.option_wrapper').length){
+                if (!currentMenu.find('.option_wrapper:not(.option_wrapper_start)').length){
 
                     // DEBUG
                     //console.log('AJAX POST to MENU-TOP :');
@@ -1719,7 +2200,7 @@ function prototype_menu_switch_action(switchOptions){
                 } else {
 
                     // Option wrappers were found, so loop through each and update markup
-                    $('.option_wrapper', currentMenu).not('.option_wrapper_hidden').each(function(){
+                    $('.option_wrapper:not(.option_wrapper_start):not(.option_wrapper_hidden)', currentMenu).each(function(){
 
                         // Collect the condition for this particular wrapper
                         var tempMenuWrapper = $(this);
@@ -1856,14 +2337,13 @@ function prototype_menu_switch_action(switchOptions){
                 if (switchOptions.stepNumber !== false){
 
                     // Collect the main banner title
-                    var thisBanner = $('.banner', thisContext);
-                    var thisBannerTitle = thisBanner.attr('title');
+                    var bannerTitle = $thisBanner.attr('title');
                     // Collect a reference to the current menus
-                    var thisMenu = $('.menu[data-step="'+switchOptions.stepNumber+'"]', thisContext);
+                    var thisMenu = $('.menu[data-step="'+switchOptions.stepNumber+'"]', $thisPrototype);
                     var thisMenuTitle = thisMenu.attr('data-title');
 
                     // Update the banner text with this menu subtitle
-                    //$('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
+                    //$('.title', $thisBanner).html(bannerTitle+' : '+thisMenuTitle);
                     // Check how many choices are available
                     var thisMenuChoices = $('.option[data-token]:not(.option_disabled):not(.option[data-parent])', thisMenu);
                     //console.log('Menu choices : '+thisMenuChoices.length);
@@ -1881,13 +2361,12 @@ function prototype_menu_switch_action(switchOptions){
                     } else if (switchOptions.stepName !== false){
 
                     // Collect the main banner title
-                    var thisBanner = $('.banner', thisContext);
-                    var thisBannerTitle = thisBanner.attr('title');
+                    var bannerTitle = $thisBanner.attr('title');
                     // Collect a reference to the current menus
-                    var thisMenu = $('.menu[data-step="'+switchOptions.stepName+'"]', thisContext);
+                    var thisMenu = $('.menu[data-step="'+switchOptions.stepName+'"]', $thisPrototype);
                     var thisMenuTitle = thisMenu.attr('data-title');
                     // Update the banner text with this menu subtitle
-                    //$('.title', thisBanner).html(thisBannerTitle+' : '+thisMenuTitle);
+                    //$('.title', $thisBanner).html(bannerTitle+' : '+thisMenuTitle);
                     // Unhide the current menu so the user can pick
                     thisMenu.css(slideInAnimation).removeClass('menu_hide').animate({opacity:1.0,marginLeft:'0',marginRight:'0'}, 400, 'swing');
 
@@ -1897,7 +2376,7 @@ function prototype_menu_switch_action(switchOptions){
                     //console.log('Triggering redirect to '+switchOptions.redirectLink);
 
                     // Fade the prototype out of view and redirect on completion
-                    thisContext.animate({opacity:0}, 500, 'swing', function(){
+                    $thisPrototype.animate({opacity:0}, 500, 'swing', function(){
                         // Loop through all battle options and generate request data
                         var requestType = 'session';
                         var requestData = '';
@@ -1924,12 +2403,12 @@ function prototype_menu_switch_action(switchOptions){
                 };
 
             // Automatically fade-out the previous menu screen
-            $('.menu[data-step]:not(.menu_hide)', thisContext).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFunction);
+            $('.menu[data-step]:not(.menu_hide)', $thisPrototype).animate(slideOutAnimation, switchOptions.slideDuration, 'swing', tempFadeoutFunction);
 
             // Remove any running classes from the player sprites in the banner until we know they're needed
             // (do not remove if the next step is undefined / aka we are entering a battle)
             if (switchOptions.stepNumber !== false){
-                $('.banner .option_this-player-select', thisContext).removeClass('is_running');
+                $('.banner .option_this-player-select', $thisPrototype).removeClass('is_running');
                 }
 
             // Execute option-specific commands for special cases
@@ -1940,13 +2419,13 @@ function prototype_menu_switch_action(switchOptions){
 
                     // Prevent the player from fighting themselves in battle
                     var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
-                    var tempMenu = $('.menu[data-select="this_battle_token"]', thisContext);
+                    var tempMenu = $('.menu[data-select="this_battle_token"]', $thisPrototype);
                     var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var availableMissions = $('.option[data-token]', tempShowOptionWrapper);
                     $('.header', tempMenu).find('.count').html('Mission Select ('+(availableMissions.length == 1 ? '1 Mission' : availableMissions.length+' Missions')+')');
-                    $('.menu[data-select="this_battle_token"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
-                    $('.menu[data-select="this_player_robots"] .header', thisContext).attr('data-player', battleOptions['this_player_token']);
+                    $('.menu[data-select="this_battle_token"] .header', $thisPrototype).attr('data-player', battleOptions['this_player_token']);
+                    $('.menu[data-select="this_player_robots"] .header', $thisPrototype).attr('data-player', battleOptions['this_player_token']);
 
                     // Break when done this case
                     break;
@@ -1955,11 +2434,11 @@ function prototype_menu_switch_action(switchOptions){
                 case 'this_player_robots': {
 
                     // Update the player option in the banner to the "running" sprite
-                    $('.banner .option_this-player-select', thisContext).addClass('is_running');
+                    $('.banner .option_this-player-select', $thisPrototype).addClass('is_running');
 
                     // Prevent the player from fighting themselves in battle
                     var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
-                    var tempMenu = $('.menu[data-select="this_player_robots"]', thisContext);
+                    var tempMenu = $('.menu[data-select="this_player_robots"]', $thisPrototype);
                     var tempHideOptionWrapper = $('.option_wrapper[data-condition!="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var tempShowOptionWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
                     var tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', tempMenu);
@@ -2002,19 +2481,25 @@ function prototype_menu_switch_action(switchOptions){
 
 // Define a function for updating the zenny amount in the prototype banner
 function prototype_update_zenny(newZenny){
-    var thisZennyContainer = $('.banner .subpoints .amount.zenny', thisPrototype);
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    var thisZennyContainer = $('.subpoints .amount.zenny', $thisBanner);
     thisZennyContainer.html(newZenny);
 }
 
 // Define a function for updating the battle point amount in the prototype banner
 function prototype_update_battle_points(newPoints){
-    var thisPointsContainer = $('.banner .points .amount .value', thisPrototype);
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    var thisPointsContainer = $('.points .amount .value', $thisBanner);
     thisPointsContainer.html(newPoints);
 }
 
 // Define a function for updating the ranking position in the prototype banner
 function prototype_update_leaderboard_rank(newRank){
-    var thisRankContainer = $('.banner .points .amount .place', thisPrototype);
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    var thisRankContainer = $('.points .amount .place', $thisBanner);
     thisRankContainer.html(newRank);
 }
 
@@ -2023,13 +2508,14 @@ function prototype_update_profile_settings(newSettings){
     if (typeof newSettings === 'undefined'){ return false; }
     //console.log('prototype_update_profile_settings(newSettings)', newSettings);
     // Collect references to profile-affected elements in the prototype banner
-    var $protoBanner = $('.banner', thisPrototype);
-    var $userInfo = $('.options_userinfo', $protoBanner);
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
+    var $userInfo = $('.options_userinfo', $thisBanner);
     var $userNameDisplay = $('.info_username label', $userInfo);
     var $userImageSprite = $('.sprite_wrapper .sprite.base', $userInfo);
     var $userImageShadow = $('.sprite_wrapper .sprite.shadow', $userInfo);
-    var $fieldTypeElements = $('.field_type', $protoBanner);
-    var $headerTypeElements = $('.menu .header.header_types', thisPrototype);
+    var $fieldTypeElements = $('.field_type', $thisBanner);
+    var $headerTypeElements = $('.menu .header.header_types', $thisPrototype);
     //console.log('$userInfo.length = ', $userInfo.length);
     //console.log('$userNameDisplay.length = ', $userNameDisplay.length);
     //console.log('$userImageSprite.length = ', $userImageSprite.length);
@@ -2105,9 +2591,10 @@ function prototype_menu_frame_seen(frameToken){
 function prototype_menu_links_refresh(){
     //console.log('prototype_menu_links_refresh()');
     //console.log('gameSettings.menuFramesSeen =', gameSettings.menuFramesSeen);
-    var $thisPrototype = $('#prototype');
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let $thisBanner = $mmrpgElements.thisBanner;
     if ($thisPrototype.length){
-        var $bannerLinks = $('.banner .link[data-step]', $thisPrototype);
+        var $bannerLinks = $('.link[data-step]', $thisBanner);
         $bannerLinks.each(function(){
             var $bannerLink = $(this);
             var stepToken = $bannerLink.attr('data-step');
@@ -2122,19 +2609,17 @@ function prototype_menu_links_refresh(){
 }
 
 // Define a function for updating prototype game settings from anywhere
-function prototype_update_game_settings(newSettings){
+function prototype_update_game_settings(newSettings, saveSetting){
     //console.log('prototype_update_game_settings(newSettings) w/ newSettings:', newSettings);
-
-    // If provided, update the spriteRenderMode in the prototype settings and markup
-    if (typeof newSettings.spriteRenderMode !== 'undefined'){
-        gameSettings.spriteRenderMode = newSettings.spriteRenderMode;
-        $('#prototype').attr('data-render-mode', gameSettings.spriteRenderMode);
-        }
+    if (typeof saveSetting === 'undefined'){ saveSetting = true; }
 
     // If provided, update the battleButtonMode in the prototype settings and markup
     if (typeof newSettings.battleButtonMode !== 'undefined'){
-        gameSettings.battleButtonMode = newSettings.battleButtonMode;
-        $('#prototype').attr('data-button-mode', gameSettings.battleButtonMode);
+        var oldButtonMode = gameSettings.battleButtonMode;
+        var newButtonMode = newSettings.battleButtonMode;
+        $mmrpgWrapper.removeClassByRegex(/^battleButtonMode_/);
+        $mmrpgWrapper.addClass('battleButtonMode_'+newButtonMode);
+        if (saveSetting){ gameSettings.battleButtonMode = newButtonMode; }
         }
 
 }

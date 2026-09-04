@@ -22,7 +22,7 @@ $hidden_database_robots_count = !empty($hidden_database_robots) ? count($hidden_
 // Collect the robot database files from the cache or manually
 $cache_token = md5('database/robots/website');
 $cached_index = rpg_object::load_cached_index('database.robots', $cache_token);
-if (!empty($cached_index)){
+if (!empty($cached_index) && empty($_GET['refresh'])){
 
     // Collect the cached data for robots, robot count, and robot numbers
     $mmrpg_database_robots = $cached_index['mmrpg_database_robots'];
@@ -37,6 +37,8 @@ if (!empty($cached_index)){
     $mmrpg_database_fields = rpg_field::get_index(true, false);
 
     // Collect the database robots
+    $robot_where = "robots.robot_token <> 'robot' AND robots.robot_class = 'master' AND robots.robot_flag_published = 1";
+    if (defined('FORCE_INCLUDE_TEMPLATE_ROBOT')){ $robot_where = "({$robot_where}) OR robots.robot_token = 'robot' "; }
     $robot_fields = rpg_robot::get_index_fields(true, 'robots');
     $mmrpg_database_robots = $db->get_array_list("SELECT
         {$robot_fields},
@@ -46,10 +48,9 @@ if (!empty($cached_index)){
         LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
         LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
         LEFT JOIN mmrpg_index_fields AS fields ON fields.field_token = robots.robot_field
-        WHERE robots.robot_token <> 'robot'
-        AND robots.robot_class = 'master'
-        AND robots.robot_flag_published = 1
+        WHERE {$robot_where}
         ORDER BY
+        robots.robot_class DESC,
         groups.group_order ASC,
         tokens.token_order ASC
         ;", 'robot_token');
@@ -91,7 +92,8 @@ if (!empty($cached_index)){
             $temp_info = rpg_robot::parse_index_info($temp_info);
 
             // Collect this robot's key in the index
-            $temp_info['robot_key'] = $mmrpg_database_robots_numbers[$temp_token]['robot_key'];
+            if (!isset($mmrpg_database_robots_numbers[$temp_token])){ $temp_info['robot_key'] = -1; }
+            else { $temp_info['robot_key'] = $mmrpg_database_robots_numbers[$temp_token]['robot_key']; }
 
             // Ensure this robot's image exists, else default to the placeholder
             if ($temp_info['robot_flag_complete'] || ($is_preview_mode === true && $temp_token === $this_current_token)){ $temp_info['robot_image'] = $temp_token; }
@@ -164,7 +166,8 @@ if (isset($filter_mmrpg_database_robots)
 if (!empty($mmrpg_database_robots)){
     foreach ($mmrpg_database_robots AS $temp_token => $temp_info){
         if (!empty($temp_info['robot_flag_hidden'])
-            && $temp_info['robot_token'] !== $this_current_token){
+            && $temp_info['robot_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_ROBOTS')){
             unset($mmrpg_database_robots[$temp_token]);
         }
     }

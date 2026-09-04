@@ -18,7 +18,7 @@ $hidden_database_abilities_count = !empty($hidden_database_abilities) ? count($h
 // Collect the ability database files from the cache or manually
 $cache_token = md5('database/abilities/website');
 $cached_index = rpg_object::load_cached_index('database.abilities', $cache_token);
-if (!empty($cached_index)){
+if (!empty($cached_index) && empty($_GET['refresh'])){
 
     // Collect the cached data for abilities, ability count, and ability numbers
     $mmrpg_database_abilities = $cached_index['mmrpg_database_abilities'];
@@ -29,6 +29,8 @@ if (!empty($cached_index)){
 } else {
 
     // Collect the database abilities
+    $ability_where = "abilities.ability_token <> 'ability' AND abilities.ability_flag_published = 1 AND abilities.ability_class = 'master' ";
+    if (defined('FORCE_INCLUDE_TEMPLATE_ABILITY')){ $ability_where = "({$ability_where}) OR abilities.ability_token = 'ability' "; }
     $ability_fields = rpg_ability::get_index_fields(true, 'abilities');
     $mmrpg_database_abilities = $db->get_array_list("SELECT
         {$ability_fields},
@@ -37,10 +39,7 @@ if (!empty($cached_index)){
         FROM mmrpg_index_abilities AS abilities
         LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
         LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
-        WHERE abilities.ability_token <> 'ability'
-        AND abilities.ability_class <> 'system'
-        AND abilities.ability_class = 'master'
-        AND abilities.ability_flag_published = 1
+        WHERE {$ability_where}
         ORDER BY
         FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
         groups.group_order ASC,
@@ -86,7 +85,8 @@ if (!empty($cached_index)){
             $temp_info = rpg_ability::parse_index_info($temp_info);
 
             // Collect this ability's key in the index
-            $temp_info['ability_key'] = $mmrpg_database_abilities_numbers[$temp_token]['ability_key'];
+            if (!isset($mmrpg_database_abilities_numbers[$temp_token])){ $temp_info['ability_key'] = -1; }
+            else { $temp_info['ability_key'] = $mmrpg_database_abilities_numbers[$temp_token]['ability_key']; }
 
             // Ensure this ability's image exists, else default to the placeholder
             $temp_image_token = isset($temp_info['ability_image']) ? $temp_info['ability_image'] : $temp_token;
@@ -140,7 +140,8 @@ if (isset($update_mmrpg_database_abilities)
 if (!empty($mmrpg_database_abilities)){
     foreach ($mmrpg_database_abilities AS $temp_token => $temp_info){
         if (!empty($temp_info['ability_flag_hidden'])
-            && $temp_info['ability_token'] !== $this_current_token){
+            && $temp_info['ability_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_ABILITIES')){
             unset($mmrpg_database_abilities[$temp_token]);
         } elseif (!defined('DATA_DATABASE_SHOW_MECHAS')
             && $temp_info['ability_class'] === 'mecha'){

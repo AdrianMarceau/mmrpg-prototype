@@ -11,6 +11,7 @@ class rpg_disabled {
         // Pull in the global variable
         global $db;
         global $mmrpg_index_players;
+        $session_token = rpg_game::session_token();
         if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
 
         // Generate default trigger options if not set
@@ -90,8 +91,9 @@ class rpg_disabled {
 
             // Show the target robot being disabled
             $this_robot->flags[$disabled_message_flag] = true;
+            $target_or_rescue = !empty($this_robot->flags['robot_is_rescue']) ? 'imperiled' : 'target';
             $event_header = ($this_player->player_token != 'player' ? $this_player->player_name.'&#39;s ' : '').$this_robot->robot_name;
-            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The target ').' '.$this_robot->print_name().' was disabled!<br />';
+            $event_body = ($this_player->player_token != 'player' ? $this_player->print_name().'&#39;s ' : 'The '.$target_or_rescue.' ').' '.$this_robot->print_name().' was disabled!<br />';
             if (isset($this_robot->robot_quotes['battle_defeat'])){
                 $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                 $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $this_robot->robot_name);
@@ -139,6 +141,7 @@ class rpg_disabled {
 
             // Define the item info based on token and load into memory
             $item_token = $this_robot->get_item();
+            $item_equipped_token = $item_token.'__equipped';
             $item_info = array(
                 'flags' => array('is_part' => true),
                 'part_token' => 'item_'.$item_token,
@@ -210,11 +213,23 @@ class rpg_disabled {
                 if (!empty($temp_recovery_amount)){ $this_robot->trigger_recovery($this_robot, $this_item, $temp_recovery_amount); }
 
                 // Also remove this robot's item from the session, we're done with it
-                if ($this_player->player_side == 'left' && empty($this_battle->flags['player_battle']) && empty($this_battle->flags['challenge_battle'])){
-                    $ptoken = $this_player->player_token;
-                    $rtoken = $this_robot->robot_token;
-                    if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                        $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                $is_human_player = $this_player->player_side == 'left' ? true : false;
+                $is_player_battle = !empty($this_battle->flags['player_battle']) ? true : false;
+                $is_challenge_battle = !empty($this_battle->flags['challenge_battle']) ? true : false;
+                $is_competitive_battle = $is_player_battle || $is_challenge_battle ? true : false;
+                if ($is_human_player && !$is_competitive_battle){
+                    $battleSettingExist = isset($_SESSION[$session_token]['values']['battle_settings']);
+                    $battleItemsExist = isset($_SESSION[$session_token]['values']['battle_items']);
+                    if ($battleSettingExist && $battleItemsExist){
+                        $battleSettings = &$_SESSION[$session_token]['values']['battle_settings'];
+                        $battleItems = &$_SESSION[$session_token]['values']['battle_items'];
+                        if (!isset($battleItems[$item_token])){ $battleItems[$item_token] = 1; }
+                        if (!isset($battleItems[$item_equipped_token])){ $battleItems[$item_equipped_token] = 1; }
+                        $battleItems[$item_token] -= 1;
+                        if (empty($battleItems[$item_token]) || $battleItems[$item_token] < $battleItems[$item_equipped_token]){
+                            $battleItems[$item_token] = $battleItems[$item_equipped_token];
+                            $battleSettings[$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'] = '';
+                        }
                     }
                 }
 
@@ -1178,14 +1193,21 @@ class rpg_disabled {
 
                             // If this ability is already unlocked, continue
                             if (mmrpg_prototype_ability_unlocked($target_player->player_token, $temp_robot_token, $ability_reward_info['token'])){ continue; }
+
                             // If we're in DEMO mode, continue
                             if (!empty($_SESSION['GAME']['DEMO'])){ continue; }
+
+                            // Collect the ability info from the index
+                            $ability_info = $temp_abilities_index[$ability_reward_info['token']];
+
+                            // If this ability is not actually complete yet, we shouldn't unlock it...
+                            if (empty($ability_info['ability_flag_published'])){ continue; }
+                            if (empty($ability_info['ability_flag_complete'])){ continue; }
+                            if (empty($ability_info['ability_flag_unlockable'])){ continue; }
 
                             // Check if the required level has been met by this robot
                             if ($temp_new_level >= $ability_reward_info['level']){
 
-                                // Collect the ability info from the index
-                                $ability_info = $temp_abilities_index[$ability_reward_info['token']];
                                 // Create the temporary ability object for event creation
                                 $temp_ability = rpg_game::get_ability($this_robot->battle, $target_player, $temp_target_robot, $ability_info);
 
@@ -1227,6 +1249,13 @@ class rpg_disabled {
                                 if ($temp_robot_info['robot_original_player'] == $temp_player_info['player_token']){ mmrpg_game_unlock_ability($temp_player_info, false, $this_reward); }
                                 else { mmrpg_game_unlock_ability(array('player_token' => $temp_robot_info['robot_original_player']), false, $this_reward, true); }
                                 //$_SESSION['GAME']['values']['battle_rewards'][$target_player_token]['player_robots'][$temp_robot_token]['robot_abilities'][$temp_ability_token] = $this_reward;
+
+                                // If there's room on this robot's ability roster, make sure we equip it
+                                if (count($temp_target_robot->robot_abilities) < MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){
+                                    $abilities = $temp_target_robot->get_abilities();
+                                    $abilities[] = $temp_ability_token;
+                                    $temp_target_robot->set_abilities($abilities);
+                                }
 
                             }
 
@@ -1364,8 +1393,11 @@ class rpg_disabled {
             && $target_player->player_side == 'left'
             && !empty($this_battle->battle_rewards['robots'])){
 
-            // Only continue if this robot is unlockable
-            if (!empty($this_robot->flags['robot_is_unlockable'])){
+            // Only continue if this robot is unlockable and only unlock if NOT a rescue
+            // (disabling a rescue does NOT mean you rescued it!)
+            $robot_is_unlockable = !empty($this_robot->flags['robot_is_unlockable']) ? true : false;
+            $robot_is_rescue = !empty($this_robot->flags['robot_is_rescue']) ? true : false;
+            if ($robot_is_unlockable){
 
                 // Scan the reward array to find this robot's key
                 $temp_reward_key = false;
@@ -1377,8 +1409,8 @@ class rpg_disabled {
                 }
 
                 // Calculate whether or not this robot is currently corrupted
-                $temp_is_corrupted = false;
-                if (!empty($this_robot->history['triggered_damage_types'])){
+                $temp_is_corrupted = $robot_is_rescue ? true : false;
+                if (!$temp_is_corrupted && !empty($this_robot->history['triggered_damage_types'])){
                     foreach ($this_robot->history['triggered_damage_types'] AS $types){
                         if (!empty($types)){
                             $temp_is_corrupted = true;
@@ -1401,6 +1433,27 @@ class rpg_disabled {
                     $this_robot_level = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
                     $this_robot_experience = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
                     $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
+
+                    // If the provided level was "auto", then it will be the average of whomever fought it
+                    if (empty($this_robot_level)
+                        || $this_robot_level === 'auto'){
+                        //error_log('Calculating auto level (via '.basename(__FILE__).') for robot '.$this_robot_token.' using '.count($target_player->player_robots).' opposing robots...');
+                        $this_robot_level = 0;
+                        foreach ($target_player->player_robots AS $key => $info){ $this_robot_level += $info['robot_level']; }
+                        $this_robot_level = ceil($this_robot_level / count($target_player->player_robots));
+                        if ($this_robot_level >= 100){ $this_robot_level = 100; }
+                        //error_log('$this_robot_level = '.$this_robot_level);
+                    }
+                    // If the provided experience was "auto", then it will be based on how many turns it took to fight
+                    if (empty($this_robot_experience)
+                        || $this_robot_experience === 'auto'){
+                        //error_log('Calculating auto experience (via '.basename(__FILE__).') for robot '.$this_robot_token.' using '.$this_battle->counters['battle_turn'].' turns...');
+                        $this_robot_experience = 999;
+                        //error_log('$this_robot_experience = '.$this_robot_experience);
+                    }
+                    // Fallbacks for unrecognized values
+                    if (!is_numeric($this_robot_level)){ $this_robot_level = 1; }
+                    if (!is_numeric($this_robot_experience)){ $this_robot_experience = 0; }
 
                     // Create the temp new robot for the player
                     $temp_unlock_robot_data = array();

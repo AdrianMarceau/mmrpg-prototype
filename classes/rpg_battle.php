@@ -105,6 +105,48 @@ class rpg_battle extends rpg_object {
 
     }
 
+    // Define a public function for deleting a given battle's index entry
+    public static function unset_index_info($battle_token){
+
+        global $db;
+
+        // If the internal index has not been created yet, load it into memory
+        if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+
+        // If the requested index is not empty, unset the entry
+        if (!empty($db->INDEX['BATTLES'][$battle_token])){
+            unset($db->INDEX['BATTLES'][$battle_token]);
+            unset($_SESSION['GAME']['values']['battle_index'][$battle_token]);
+            return true;
+        }
+        // Otherwise if the battle index doesn't exist at all
+        else {
+            // Return false on failure
+            return false;
+        }
+
+    }
+
+    // Define a public function for checking if a battle index entry exists
+    public static function has_index_info($battle_token){
+
+        global $db;
+
+        // If the internal index has not been created yet, load it into memory
+        if (!isset($db->INDEX['BATTLES'])){ rpg_battle::load_battle_index(); }
+
+        // If the requested index is not empty, return true
+        if (!empty($db->INDEX['BATTLES'][$battle_token])){
+            return true;
+        }
+        // Otherwise if the battle index doesn't exist at all
+        else {
+            // Return false on failure
+            return false;
+        }
+
+    }
+
     // Define a function for loading the battle index cache file
     public static function load_battle_index(){
 
@@ -873,9 +915,15 @@ class rpg_battle extends rpg_object {
                 $this_player->player_frame = 'victory';
                 $this_robot->update_session();
                 $this_player->update_session();
-                $event_header = $this_player->player_name.' Victorious';
-                $event_body = $this_player->print_name().' was victorious! ';
-                $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                if (!empty($target_player->counters['robots_disabled'])){
+                    $event_header = $this_player->player_name.' Victorious';
+                    $event_body = $this_player->print_name().' was victorious! ';
+                    $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                } else {
+                    $event_header = 'Mission Complete';
+                    $event_body = $this_player->print_name().' completed '.$this_player->get_pronoun('possessive2').' mission! ';
+                    if (!empty($target_player->counters['robots_to_rescue'])){ $event_body .= 'The '.($target_player->counters['robots_to_rescue'] > 1 ? 'targets were' : 'target was').' rescued!'; }
+                }
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_player'] = true;
@@ -901,9 +949,15 @@ class rpg_battle extends rpg_object {
                 // Display the win message for this player with battle zenny
                 $this_robot->robot_frame = 'victory';
                 $this_robot->update_session();
-                $event_header = $this_robot->robot_name.' Victorious';
-                $event_body = $this_robot->print_name().' was victorious! ';
-                $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                if (!empty($target_player->counters['robots_disabled'])){
+                    $event_header = $this_robot->robot_name.' Victorious';
+                    $event_body = $this_robot->print_name().' was victorious! ';
+                    $event_body .= 'The '.($target_player->counters['robots_disabled'] > 1 ? 'targets were' : 'target was').' defeated!';
+                } else {
+                    $event_header = 'Mission Complete';
+                    $event_body = $this_robot->print_name().' completed '.$this_robot->get_pronoun('possessive2').' mission! ';
+                    if (!empty($target_player->counters['robots_to_rescue'])){ $event_body .= 'The '.($target_player->counters['robots_to_rescue'] > 1 ? 'targets were' : 'target was').' rescued!'; }
+                }
                 $event_body .= '<br />';
                 $event_options = array();
                 $event_options['console_show_this_robot'] = true;
@@ -1126,16 +1180,17 @@ class rpg_battle extends rpg_object {
 
             // ROBOT REWARDS
 
+            // Check to see if this player has at least one limit heart, else no unlocking
+            $this_player_limit_hearts = mmrpg_prototype_limit_hearts_earned($this_player->player_token);
+            //error_log($this_player->player_token.' has earned '.$this_player_limit_hearts.' limit hearts');
+
             // Loop through any robot rewards for this battle
             $this_robot_rewards = !empty($this->battle_rewards['robots']) ? $this->battle_rewards['robots'] : array();
-            if (!empty($this_robot_rewards)){
+            if (!empty($this_robot_rewards) && !empty($this_player_limit_hearts)){
                 foreach ($this_robot_rewards AS $robot_reward_key => $robot_reward_info){
 
                     // If this is the copy shot ability and we're in DEMO mode, continue
                     if (!empty($_SESSION['GAME']['DEMO'])){ continue; }
-
-                    // If this robot has already been unlocked, continue
-                    //if (mmrpg_prototype_robot_unlocked($this_player_token, $robot_reward_info['token'])){ continue; }
 
                     // If this robot has already been unlocked by anyone, continue
                     if (mmrpg_prototype_robot_unlocked(false, $robot_reward_info['token'])){ continue; }
@@ -1159,7 +1214,29 @@ class rpg_battle extends rpg_object {
                     $this_robot_experience = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
                     $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
 
+                    // If the provided level was "auto", then it will be the average of whomever fought it
+                    if ($this_robot_level === 'auto'){
+                        //error_log('Calculating auto level (via '.basename(__FILE__).') for robot '.$this_robot_token.' using '.count($this_player->player_robots).' opposing robots...');
+                        $this_robot_level = 0;
+                        foreach ($this_player->player_robots AS $key => $info){ $this_robot_level += $info['robot_level']; }
+                        $this_robot_level = ceil($this_robot_level / count($this_player->player_robots));
+                        if ($this_robot_level >= 100){ $this_robot_level = 100; }
+                        //error_log('$this_robot_level = '.$this_robot_level);
+                    }
+                    // If the provided experience was "auto", then it will be based on how many turns it took to fight
+                    if ($this_robot_experience === 'auto'){
+                        //error_log('Calculating auto experience (via '.basename(__FILE__).') for robot '.$this_robot_token.' using '.$this->counters['battle_turn'].' turns...');
+                        $this_robot_experience = ceil($this->counters['battle_turn'] * 100) - 1;
+                        if ($this_robot_experience >= 999){ $this_robot_experience = 999; }
+                        elseif ($this_robot_experience < 0){ $this_robot_experience = 0; }
+                        //error_log('$this_robot_experience = '.$this_robot_experience);
+                    }
+                    // Fallbacks for unrecognized values
+                    if (!is_numeric($this_robot_level)){ $this_robot_level = 1; }
+                    if (!is_numeric($this_robot_experience)){ $this_robot_experience = 0; }
+
                     // Automatically unlock this robot for use in battle
+                    //error_log($this_player->player_token.' is unlocking '.$robot_info['robot_token'].' with '.$this_player_limit_hearts.' limit hearts');
                     $this_reward = $robot_info;
                     $this_reward['robot_level'] = $this_robot_level;
                     $this_reward['robot_experience'] = $this_robot_experience;
@@ -1178,6 +1255,9 @@ class rpg_battle extends rpg_object {
 
                     // Collect the ability info from the index
                     $ability_info = $temp_abilities_index[$ability_reward_info['token']];
+                    if (empty($ability_info['ability_flag_published'])){ continue; }
+                    elseif (empty($ability_info['ability_flag_complete'])){ continue; }
+                    elseif (empty($ability_info['ability_flag_unlockable'])){ continue; }
                     // Create the temporary robot object for event creation
                     $temp_ability = rpg_game::get_ability($this, $this_player, $this_robot, $ability_info);
 
@@ -1189,12 +1269,21 @@ class rpg_battle extends rpg_object {
                         // DEBUG
                         //$this->events_create(false, false, 'DEBUG', 'Checking '.$temp_info['robot_name'].' for compatibility with the '.$ability_info['ability_name']);
                         //$debug_fragment = '';
-                        // If this robot is a mecha, skip it!
-                        if (!empty($temp_info['robot_class']) && $temp_info['robot_class'] == 'mecha'){ continue; }
-                        // Equip this ability to the robot is there was a match found
+                        // Equip this ability to the robot is there was a match found (differently for non-masters)
                         if (rpg_robot::has_ability_compatibility($temp_info['robot_token'], $ability_info['ability_token'])){
-                            if (!isset( $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'] )){ $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'] = array(); }
-                            if (count($_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities']) < 8){ $_SESSION['GAME']['values']['battle_settings'][$this_player_info['player_token']]['player_robots'][$temp_info['robot_token']]['robot_abilities'][$ability_info['ability_token']] = array('ability_token' => $ability_info['ability_token']); }
+                            $ptoken = $this_player_info['player_token'];
+                            $rclass = $temp_info['robot_class'];
+                            $rid = $temp_info['robot_base_id'];
+                            $rtoken = $temp_info['robot_token'];
+                            $rstring = $rid.'_'.$rtoken;
+                            $atoken = $ability_info['ability_token'];
+                            if (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'])
+                                && count($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities']) < 8){
+                                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'][$atoken] = array('ability_token' => $atoken);
+                            } elseif (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'])
+                                && count($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities']) < 8){
+                                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'][$atoken] = array('ability_token' => $atoken);
+                            }
                         }
                     }
 
@@ -1544,11 +1633,13 @@ class rpg_battle extends rpg_object {
             }
 
             // Print out the current vs allowed turns for this mission and the penalty or bonus, if any
+            $current_turn = !empty($this->counters['battle_turn']) ? $this->counters['battle_turn'] : 1;
+            $turn_goal = !empty($this->battle_turns) ? $this->battle_turns : 1;
             $reward_mod_strings = array();
-            $reward_mod_strings[] = ' Turns vs Goal: '.$this->counters['battle_turn'].' / '.$this->battle_turns;
-            if ($this->counters['battle_turn'] != $this->battle_turns){
-                $temp_bonus_multiplier = number_format(round(($this->battle_turns / $this->counters['battle_turn']), 2), 1, '.', ',');
-                if ($this->counters['battle_turn'] < $this->battle_turns){  $this_star_rating += 1; $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.''; }
+            $reward_mod_strings[] = ' Turns vs Goal: '.$current_turn.' / '.$turn_goal;
+            if ($current_turn != $turn_goal){
+                $temp_bonus_multiplier = number_format(round(($turn_goal / $current_turn), 2), 1, '.', ',');
+                if ($current_turn < $turn_goal){  $this_star_rating += 1; $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.''; }
                 else { $this_star_rating -= 1; $reward_mod_strings[] = 'Turn Penalty: x'.$temp_bonus_multiplier.''; }
                 $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
             } else {
@@ -1587,8 +1678,8 @@ class rpg_battle extends rpg_object {
             // Define the victory results for calculating
             if (!empty($this->flags['challenge_battle'])){
                 $victory_results = array(
-                    'challenge_turns_used' => $this->counters['battle_turn'],
-                    'challenge_turn_limit' => $this->battle_turns,
+                    'challenge_turns_used' => $current_turn,
+                    'challenge_turn_limit' => $turn_goal,
                     'challenge_robots_used' => $this_player->counters['robots_start_total'],
                     'challenge_robot_limit' => $temp_target_robot_limit
                     );
@@ -1891,13 +1982,14 @@ class rpg_battle extends rpg_object {
                 // Change all this player's robot sprite to their taunt
                 foreach ($this_player->values['robots_active'] AS $key => $info){
                     if (!preg_match('/display:\s?none;/i', $info['robot_frame_styles'])){ continue; }
+                    $is_rescue = !empty($info['flags']['robot_is_rescue']) ? true : false;
                     if ($this_robot->robot_id == $info['robot_id']){
-                        $this_robot->set_frame('defend');
+                        $this_robot->set_frame($is_rescue ? 'damage' : 'defend');
                         $this_robot->set_frame_styles('');
                         $this_robot->set_detail_styles('');
                     } else {
                         $temp_robot = rpg_game::get_robot($this, $this_player, $info);
-                        $temp_robot->set_frame('taunt');
+                        $temp_robot->set_frame($is_rescue ? 'defend' : 'taunt');
                         $temp_robot->set_frame_styles('');
                         $temp_robot->set_detail_styles('');
                     }
@@ -2251,11 +2343,16 @@ class rpg_battle extends rpg_object {
                     if ($active_robot_count == 1){
                         $new_robotinfo = $this_player->values['robots_active'][0];
                     } elseif ($active_robot_count > 1){
+                        $non_rescue_targets = array_values(array_filter($this_player->values['robots_active'], function($robot){
+                            $is_rescue = !empty($robot['flags']['robot_is_rescue']) ? true : false;
+                            return !$is_rescue;
+                            }));
+                        $non_rescue_targets_count = count($non_rescue_targets);
                         $this_last_switch = !empty($this_recent_switches) ? array_slice($this_recent_switches, -1, 1, false) : array('');
                         $this_last_switch = $this_last_switch[0];
                         $this_current_token = $this_robot->robot_id.'_'.$this_robot->robot_token;
                         do {
-                            $new_robotinfo = $this_player->values['robots_active'][mt_rand(0, ($active_robot_count - 1))];
+                            $new_robotinfo = $non_rescue_targets[mt_rand(0, ($non_rescue_targets_count - 1))];
                             if ($new_robotinfo['robot_id'] == $this_robot->robot_id){ continue; }
                             elseif ($new_robotinfo['robot_token'] == 'robot'){ continue; }
                             $this_temp_token = $new_robotinfo['robot_id'].'_'.$new_robotinfo['robot_token'];
@@ -2297,6 +2394,7 @@ class rpg_battle extends rpg_object {
                     // Collect a temp version of the new robot for key reading
                     $temp_new_robot = rpg_game::get_robot($this_battle, $this_player, $new_robotinfo);
                     $temp_new_robot_key = $temp_new_robot->robot_key;
+                    $temp_new_robot_is_rescue = !empty($temp_new_robot->flags['robot_is_rescue']) ? true : false;
 
                     // If the new robot is not valid for some reason, return false
                     if ($temp_new_robot->robot_token == 'robot'){ return false; }
@@ -2410,14 +2508,16 @@ class rpg_battle extends rpg_object {
                         $this_player->set_value('current_robot', $temp_new_robot->robot_string);
                         $this_player->set_value('current_robot_enter', $this_battle->counters['battle_turn']);
                         $event_header = ($this_player->player_visible ? $this_player->player_name.'&#39;s ' : '').$temp_new_robot->robot_name;
-                        $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />";
+                        if ($temp_new_robot_is_rescue){ $event_body = "{$temp_new_robot->print_name()} survived the battle!<br />"; }
+                        else { $event_body = "{$temp_new_robot->print_name()} ".($this_player->player_side === 'left' ? 'joins' : 'enters')." the battle!<br />"; }
                         $event_options = array();
                         rpg_canvas::apply_camera_action_flags($event_options, $temp_new_robot);
                         if (isset($temp_new_robot->robot_quotes['battle_start'])){
                             $temp_new_robot->set_frame('taunt');
                             $this_find = array('{target_player}', '{target_robot}', '{this_player}', '{this_robot}');
                             $this_replace = array($target_player->player_name, $target_robot->robot_name, $this_player->player_name, $temp_new_robot->robot_name);
-                            $event_body .= $temp_new_robot->print_quote('battle_start', $this_find, $this_replace);
+                            $quote_kind = $temp_new_robot_is_rescue ? 'battle_victory' : 'battle_start';
+                            $event_body .= $temp_new_robot->print_quote($quote_kind, $this_find, $this_replace);
                         }
 
                         // Only show the enter event if the switch reason was removed or if there is more then one robot
@@ -3306,11 +3406,12 @@ class rpg_battle extends rpg_object {
 
         // Calculate the number of turn zenny for this player using the base amounts
         $this_base_zenny = $base_zenny;
-        if ($this->counters['battle_turn'] < $base_turns
-            || $this->counters['battle_turn'] > $base_turns){
+        $this_battle_turn = !empty($this->counters['battle_turn']) ? $this->counters['battle_turn'] : 1;
+        if ($this_battle_turn < $base_turns
+            || $this_battle_turn > $base_turns){
             //$this_half_zenny = $base_zenny * 0.10;
             //$this_turn_zenny = ceil($this_half_zenny * ($base_turns / $this->counters['battle_turn']));
-            $this_base_zenny = ceil($this_base_zenny * ($base_turns / $this->counters['battle_turn']));
+            $this_base_zenny = ceil($this_base_zenny * ($base_turns / $this_battle_turn));
         }
 
         //$this_battle_zenny = $this_base_zenny + $this_turn_zenny + $this_stat_zenny;
@@ -3540,7 +3641,8 @@ class rpg_battle extends rpg_object {
         $temp_star_kind = $options['star_kind'];
         $temp_field_type_1 = !empty($options['star_type']) ? $options['star_type'] : 'none';
         $temp_field_type_2 = !empty($options['star_type2']) ? $options['star_type2'] : $temp_field_type_1;
-        if ($temp_star_kind == 'field'){
+        if ($temp_star_kind == 'boss'
+            || $temp_star_kind == 'field'){
             $temp_star_front = array('path' => 'images/items/field-star_'.$temp_field_type_1.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '02', 'size' => 40);
             $temp_star_back = array('path' => 'images/items/field-star_'.$temp_field_type_2.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE, 'frame' => '01', 'size' => 40);
         } elseif ($temp_star_kind == 'fusion'){

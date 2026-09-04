@@ -1,0 +1,68 @@
+#---------------------------#
+# DEBUG AREA 1N (TUNDRA)
+@token    = debug-area-1n
+@name     = DEBUG Area 1N
+@type     = freeze
+@level    = 40
+@size     = 15 x 15
+@sheet    = mmrpg-overworld-2k25-v2
+#---------------------------#
+@field       = wintry-forefront
+#---------------------------#
+@portals[]  = spawn(8-12, hidden)
+#---------------------------#
+@portals[]  = subspace-portal(8-9, debug-area-0__winter-portal)
+@locks[]    = freeze-portal-flower(8-9, portal-flower, freeze, items:freeze-core, x10, locked)
+#---------------------------#
+@portals[]  = north-exit(8-1, debug-area-1n2__south-exit, up-only)
+@portals[]  = south-exit(8-15, debug-area-1__north-exit, down-only)
+@groups[]   = no-encounters_north-exit(7-1...9-2)
+@groups[]   = no-encounters_south-exit(7-14...9-15)
+#---------------------------#
+@pickups      = freeze-core(10),speed-pellet(6),energy-pellet(4),speed-capsule(2),small-screw(1)
+#---------------------------#
+@encounters   = curlinger,frosty-throwman,tel-tel
+#---------------------------#
+@actors[]     = purple-reset-dude(14-14, robot, anti-eddie, -, default)
+#---------------------------#
+@bosses[]     = roaming-boss-1(8-13, ice-man)
+@bosses[]     = roaming-boss-2(4-4, blizzard-man)
+@bosses[]     = roaming-boss-3(12-4, frost-man)
+#---------------------------#
+@items[]     = boss-star-1(8-13, freeze-star, ice-man)
+@items[]     = boss-star-2(4-4, freeze-star, blizzard-man)
+@items[]     = boss-star-3(12-4, freeze-star, frost-man)
+#---------------------------#
+@events[]    = cossack-platform-left(7-3, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
+@events[]    = cossack-platform-middle(8-3, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)
+@events[]    = cossack-platform-right(9-3, cossackpad-right, any, drop-zone, item:copy-core, activate-player-platform)
+#---------------------------#
+@items[]     = cossack-init-heart(4-3, cossack-heart__1, anchored)
+@items[]     = cossack-init-program(12-3, cossack-program, anchored)
+@items[]     = cossack-init-core(3-9, copy-core, anchored)
+#---------------------------#
+@hazards[]    = frozen-hazard-1(6-9, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-2(10-9, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+#---------------------------#
+@hazards[]    = frozen-hazard-3(2-11, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-4(3-11, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-5(4-11, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-6(4-10, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+@hazards[]    = frozen-hazard-7(5-10, frozen-foothold, freeze, any, trigger-effects, lower-team-speed)
+#---------------------------#
+[__],[__],[__],[__],[__],[__],[__],[60],[__],[__],[__],[__],[__],[__],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[__],[__],[__],[__],[__],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[__],[__],[__],[__],[__],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[__],[60],[60],[60],[__],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[__],[60],[60],[60],[__],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[__],[__],[__],[__],[__],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[60],[__]
+[__],[__],[__],[__],[__],[__],[__],[60],[__],[__],[__],[__],[__],[__],[__]
+#---------------------------#

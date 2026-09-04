@@ -23,17 +23,15 @@ $session_token = mmrpg_game_token();
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/leaderboard.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
-// Update game settings for this page
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = <?= $this_start_key == 0 ? 'true' : 'false' ?>;
 // Generate the document ready events for this page
 var thisBody = false;
@@ -142,24 +140,47 @@ function windowResizeLeaderboard(){
                     // Define the start key for the next batch of players
                     $start_key = $last_key + 1;
 
-                    // Print out the opening tag for the container dig
-                    echo '<div class="container">';
+                    // Calculate pagination variables
+                    $total_pages = ceil($this_leaderboard_count / $this_display_limit_default);
+                    $current_page = floor($this_start_key / $this_display_limit_default) + 1;
+                    $window = 2; // Adjust this to show more/fewer pages around the current page
 
-                    // If not displaying all players, create a link to show more
-                    if ($this_display_limit > $this_display_limit_default){
-                        $new_display_limit = $this_display_limit - $this_display_limit_default;
-                        $new_start_key = $start_key - $this_display_limit_default - $this_display_limit_default;
-                        if ($new_display_limit < $this_display_limit_default){ $new_display_limit = 0; }
-                        if ($new_start_key < 0){ $new_start_key = 0; }
-                        echo '<a class="more" name="more_link" href="frames/leaderboard.php?'.(!empty($new_start_key) ? 'start='.$new_start_key.'&amp;' : '').(!empty($new_start_key) ? 'limit='.$new_display_limit : '').'" >&laquo; Previous Page</a>';
+                    // Print out the opening tag for the container div
+                    echo '<div class="container" style="text-align: center; margin: 10px 0;">';
+
+                    // Previous Page Link
+                    if ($current_page > 1){
+                        $prev_start = ($current_page - 2) * $this_display_limit_default;
+                        $prev_limit = ($current_page - 1) * $this_display_limit_default;
+                        echo '<a class="more prev" href="frames/leaderboard.php?start='.$prev_start.'&amp;limit='.$prev_limit.'">&laquo; Prev</a> ';
                     }
-                    if ($this_display_limit < $this_leaderboard_count){
-                        $new_display_limit = $this_display_limit + $this_display_limit_default;
-                        if ($new_display_limit > $this_leaderboard_count){ $new_display_limit = $this_leaderboard_count; }
-                        echo '<a class="more" name="more_link" href="frames/leaderboard.php?start='.$start_key.'&amp;limit='.$new_display_limit.'" >Next Page &raquo;</a>';
+
+                    // Numbered Page Links
+                    for ($i = 1; $i <= $total_pages; $i++){
+                        // Show first, last, and window around the current page
+                        if ($i == 1 || $i == $total_pages
+                            || ($i >= $current_page - $window && $i <= $current_page + $window)){
+                            $page_start = ($i - 1) * $this_display_limit_default;
+                            $page_limit = $i * $this_display_limit_default;
+                            if ($i == $current_page){
+                                // Current page styling
+                                echo '<span class="more current" style="opacity: 0.5; cursor: default;">'.$i.'</span> ';
+                            } else {
+                                // Link to other pages
+                                echo '<a class="more page" href="frames/leaderboard.php?start='.$page_start.'&amp;limit='.$page_limit.'">'.$i.'</a> ';
+                            }
+                        } elseif ($i == $current_page - $window - 1
+                            || $i == $current_page + $window + 1){
+                            // Ellipsis for skipped pages
+                            echo '<span class="more ellipsis" style="opacity: 0.5; cursor: default; border: none; background: transparent;">...</span> ';
+                        }
                     }
-                    if ($this_display_limit >= $this_leaderboard_count){
-                        echo '<a class="more" name="more_link" href="frames/leaderboard.php?start=0&amp;limit='.$this_display_limit_default.'">&laquo; First Page</a>';
+
+                    // Next Page Link
+                    if ($current_page < $total_pages){
+                        $next_start = $current_page * $this_display_limit_default;
+                        $next_limit = ($current_page + 1) * $this_display_limit_default;
+                        echo '<a class="more next" href="frames/leaderboard.php?start='.$next_start.'&amp;limit='.$next_limit.'">Next &raquo;</a>';
                     }
 
                     // Print out the scroll padding

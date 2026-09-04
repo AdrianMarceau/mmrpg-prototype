@@ -2,33 +2,61 @@
 
 // Include mandatory config files
 define('MMRPG_BUILD', 'mmrpg2k23');
-define('MMRPG_VERSION', '3.8.25');
+//define('MMRPG_VERSION', '3.8.25');
+define('MMRPG_VERSION', '4.0.0-beta.2');
 require('includes/config.php');
 
 // Update the timezone before starting the session
 @date_default_timezone_set('Canada/Eastern');
-@session_set_cookie_params(24*60*60);
-@ini_set('session.gc_maxlifetime', 24*60*60);
-@ini_set('session.gc_probability', 1);
-@ini_set('session.gc_divisor', 1);
-session_start();
 
-// Turn off magic quotes before it causes and problems
-if (get_magic_quotes_gpc()){
-    $process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
-    while (list($key, $val) = each($process)) {
-        foreach ($val as $k => $v) {
-            unset($process[$key][$k]);
-            if (is_array($v)) {
-                $process[$key][stripslashes($k)] = $v;
-                $process[] = &$process[$key][stripslashes($k)];
-            } else {
-                $process[$key][stripslashes($k)] = stripslashes($v);
-            }
+// Set a custom session save path to isolate MMRPG sessions from other apps
+$session_allowed = !defined('MMRPG_EXCLUDE_SESSION') || MMRPG_EXCLUDE_SESSION !== true;
+$session_dir = MMRPG_CONFIG_ROOTDIR . '.cache/sessions/tmp/';
+if (!is_dir($session_dir)) { mkdir($session_dir, 0777, true); }
+session_save_path($session_dir);
+
+// Configure session lifetime
+@session_set_cookie_params([
+    'lifetime' => 24*60*60,
+    'path' => '/',
+    'domain' => $_SERVER['HTTP_HOST'],
+    'secure' => true,       // Only transmit over HTTPS
+    'httponly' => true,     // Block JavaScript from reading the cookie (prevents XSS)
+    'samesite' => 'Lax'     // Use 'Strict' if you never use cross-subdomain requests
+    ]);
+@ini_set('session.gc_maxlifetime', 24*60*60);
+
+// Fix garbage collection to run 1% of the time instead of 100%
+@ini_set('session.gc_probability', 1);
+@ini_set('session.gc_divisor', 100);
+
+// Only start a session if it hasn't been explicitly excluded
+if ($session_allowed){
+    // Start the session in read-only mode if requested, else normally
+    if (defined('READ_ONLY_SESSION') && READ_ONLY_SESSION === true){
+        session_start(['read_and_close' => true]);
+    } else {
+        session_start();
+    }
+    // THE GHOST HUNTER (tracking session logout bug)
+    if ($session_allowed && empty($_SESSION['GAME'])){
+        $req_uri = $_SERVER['REQUEST_URI'] ?? 'unknown';
+        $req_method = $_SERVER['REQUEST_METHOD'] ?? 'unknown';
+        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+        // Only log if it's not a legitimate first-time visit to the login/home page
+        if (strpos($req_uri, '/file') === false && $req_uri !== '/') {
+            $log_entry = date('Y-m-d H:i:s') . " | Method: {$req_method} | URI: {$req_uri} | Agent: {$user_agent}\n";
+            file_put_contents($session_dir . 'ghost_requests.log', $log_entry, FILE_APPEND);
         }
     }
-    unset($process);
 }
+
+// NOTE: The get_magic_quotes_gpc() block has been completely
+// removed to prevent PHP 8+ Fatal Errors and other issues
+
+// Include the anti-bot and anti-spam protection scripts
+require('includes/antibot.php');
+//require('includes/autocache.php');
 
 // Include cms classs first and foremost
 require('classes/cms_database.php');
@@ -132,18 +160,15 @@ if (MMRPG_CONFIG_ADMIN_MODE){
 
 
 // Turn OFF error reporting if live
+$error_log_file = 'error.log'; $error_log_path = rtrim(dirname(MMRPG_CONFIG_ROOTDIR), '/').'/_logs/';
+$error_log_file_path = $error_log_path.$error_log_file;
 ini_set('log_errors', 1);
 ini_set('ignore_repeated_errors', 1);
+ini_set('error_log', $error_log_file_path);
+//error_log('mmrpg-logcheck @ '.time().' on '.__LINE__.' in '.basename(__FILE__));
 if (!MMRPG_CONFIG_ADMIN_MODE && MMRPG_CONFIG_IS_LIVE){
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
-    /*
-    error_reporting(E_ERROR | E_WARNING | E_PARSE);
-    ini_set('log_errors', 1);
-    ini_set('ignore_repeated_errors', 1);
-    ini_set('ignore_repeated_source', 1);
-    ini_set('error_log', rtrim(dirname(MMRPG_CONFIG_ROOTDIR), '/').'/_logs/php_error.log');
-    */
 }
 
 // Stop BANNED users from accessing the website
@@ -164,6 +189,7 @@ require('classes/rpg_user_role.php');
 require('classes/rpg_functions.php');
 require('classes/rpg_game.php');
 require('classes/rpg_prototype.php');
+require('classes/rpg_world.php');
 require('classes/rpg_mission.php');
 require('classes/rpg_mission_starter.php');
 require('classes/rpg_mission_single.php');

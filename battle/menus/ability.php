@@ -12,6 +12,7 @@ ob_start();
     if ($num_robots_active < MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX
         && empty($this_battle->flags['challenge_battle'])
         && empty($this_battle->flags['player_battle'])
+        && empty($this_battle->flags['world_battle'])
         && empty($this_player->flags['star_support_summoned'])
         && rpg_prototype::star_support_unlocked()){
         $star_support_force = rpg_prototype::get_star_support_force();
@@ -94,12 +95,16 @@ ob_start();
         // If this robot has more than eight abilities, slice to only eight
         if (count($current_robot_abilities) > 8){
             $current_robot_abilities = array_slice($current_robot_abilities, 0, 8);
-            $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_abilities'] = $current_robot_abilities;
+            $ptoken = $this_player->player_token;
+            $rid = $this_robot->robot_base_id;
+            $rtoken = $this_robot->robot_token;
+            $rstring = $rid.'_'.$rtoken;
+            if (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'])){
+                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_abilities'] = $current_robot_abilities;
+            } elseif (isset($_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'])){
+                $_SESSION['GAME']['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_abilities'] = $current_robot_abilities;
+            }
         }
-
-        // Collect the robot's held item if any
-        //if (!empty($_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item'])){ $current_robot_item = $_SESSION['GAME']['values']['battle_settings'][$this_player->player_token]['player_robots'][$this_robot->robot_token]['robot_item']; }
-        //else { $current_robot_item = ''; }
 
     } elseif ($this_robot->robot_class !== 'master'){
 
@@ -155,6 +160,22 @@ ob_start();
                 $temp_abilityinfo['ability_id'] = $this_robot->robot_id.str_pad($temp_abilityinfo['ability_id'], 3, '0', STR_PAD_LEFT);
                 $temp_ability = rpg_game::get_ability($this_battle, $this_player, $this_robot, $temp_abilityinfo);
                 $temp_ability->trigger_onload(true);
+
+                // If this robot's abilities are being distilled, strip them of their types
+                $temp_overcast_type = $this_robot->get_value('overcast_type');
+                if (!empty($temp_overcast_type)){
+                    if ($temp_overcast_type === 'none'){
+                        $temp_ability->set_type('');
+                        $temp_ability->set_type2('');
+                    } else {
+                        $temp_ability->set_type($temp_overcast_type);
+                        $temp_ability->set_type2('');
+                    }
+                } else {
+                    $temp_ability->set_type($temp_abilityinfo['ability_type']);
+                    $temp_ability->set_type2($temp_abilityinfo['ability_type2']);
+                }
+
                 $temp_type = $temp_ability->ability_type;
                 $temp_type2 = $temp_ability->ability_type2;
                 $temp_type_or_none = !empty($temp_type) ? $temp_type : 'none';

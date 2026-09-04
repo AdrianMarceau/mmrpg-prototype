@@ -17,9 +17,11 @@ if (strstr($api_request_path, '{token}')){
 // Collect any common (but optional) flags for the scripts
 $api_include_hidden = !empty($_GET['include_hidden']) && $_GET['include_hidden'] === 'true' ? true : false;
 $api_include_incomplete = !empty($_GET['include_incomplete']) && $_GET['include_incomplete'] === 'true' ? true : false;
+$api_include_templates = !empty($_GET['include_templates']) && $_GET['include_templates'] === 'true' ? true : false;
 if (!empty($_GET['include_all']) && $_GET['include_all'] === 'true'){
     $api_include_hidden = true;
     $api_include_incomplete = true;
+    $api_include_templates = true;
     $api_request_path .= '/all';
 }
 
@@ -37,7 +39,7 @@ else { $cache_file_exists = false; $cache_file_date = '00000000-0000'; }
 // LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
 if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
     $cache_file_markup = file_get_contents($cache_file_path);
-    header('Content-type: text/json; charset=UTF-8');
+    header('Content-type: application/json; charset=UTF-8');
     echo($cache_file_markup);
     exit();
 }

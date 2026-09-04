@@ -161,8 +161,8 @@ class rpg_robot extends rpg_object {
                 $this_robotinfo['robot_energy'], $this_robotinfo['robot_weapons'], $this_robotinfo['robot_attack'], $this_robotinfo['robot_defense'], $this_robotinfo['robot_speed'],
                 ($this_robotinfo['robot_energy'] + $this_robotinfo['robot_weapons'] + $this_robotinfo['robot_attack'] + $this_robotinfo['robot_defense'] + $this_robotinfo['robot_speed'])
                 );
-            error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
             */
+            //error_log($this_robotinfo['robot_token'].' stat spread = '.print_r(implode('/', $debug_stat_spread), true));
         }
 
         // -- LOAD ROBOT INFO FROM INDEX OR SESSION -- //
@@ -228,8 +228,9 @@ class rpg_robot extends rpg_object {
         $this->robot_pseudo_token = !empty($this->robot_persona) ? $this->robot_persona : $this->robot_token;
 
         // Define the internal robot base values using the robots index array
-        $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
+        $this->robot_base_id = isset($this_robotinfo['robot_base_id']) ? $this_robotinfo['robot_base_id'] : 0;
         $this->robot_base_token = isset($this_robotinfo['robot_base_token']) ? $this_robotinfo['robot_base_token'] : $this->robot_token;
+        $this->robot_base_name = isset($this_robotinfo['robot_base_name']) ? $this_robotinfo['robot_base_name'] : $this->robot_name;
 
         $this->robot_base_image = isset($this_robotinfo['robot_base_image']) ? $this_robotinfo['robot_base_image'] : $this->robot_image;
         $this->robot_base_image_size = isset($this_robotinfo['robot_base_image_size']) ? $this_robotinfo['robot_base_image_size'] : $this->robot_image_size;
@@ -322,7 +323,7 @@ class rpg_robot extends rpg_object {
         if ($this->player->player_side == 'left' && empty($this->flags['apply_session_settings'])){
 
             // Collect the abilities for this robot from the session
-            $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
+            $temp_robot_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token, $this->robot_base_id);
             //error_log('$temp_robot_settings('.$this->player_token.'/'.$this->robot_token.') = '.print_r($temp_robot_settings, true));
 
             // If this is a player-controlled robot, load abilities from session
@@ -399,7 +400,8 @@ class rpg_robot extends rpg_object {
         }
 
         // If this robot is already disabled, make sure their status reflects it
-        if (!empty($this->flags['hidden'])){
+        if (!empty($this->flags['hidden'])|| $this->robot_energy <= 0){
+            //error_log('applying disabled state to '.$this->robot_token);
             $this->flags['apply_disabled_state'] = true;
             $this->robot_status = 'disabled';
             $this->robot_energy = 0;
@@ -421,6 +423,7 @@ class rpg_robot extends rpg_object {
         unset($this->robot_function);
         $this->robot_load(array(
             'robot_id' => $this->robot_id,
+            'robot_base_id' => $this->robot_base_id,
             'robot_token' => $this->robot_token,
             'robot_pseudo_token' => !empty($this->robot_persona) ? $this->robot_persona : $this->robot_token
             ));
@@ -1238,11 +1241,11 @@ class rpg_robot extends rpg_object {
         if ($this->player->player_autopilot != true && $this->robot_class == 'master'){
 
             // Collect this robot's rewards and settings
-            $this_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token);
-            $this_rewards = mmrpg_prototype_robot_rewards($this->player_token, $this->robot_token);
+            $this_settings = mmrpg_prototype_robot_settings($this->player_token, $this->robot_token, $this->robot_base_id);
+            $this_rewards = mmrpg_prototype_robot_rewards($this->player_token, $this->robot_token, $this->robot_base_id);
 
             // Update this robot's original player with any session settings
-            $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token);
+            $this->robot_original_player = mmrpg_prototype_robot_original_player($this->player_token, $this->robot_token, $this->robot_base_id);
 
             // If we're in a player battle, cast all robots as level 100
             if (!empty($this->battle->flags['player_battle'])
@@ -1252,8 +1255,8 @@ class rpg_robot extends rpg_object {
             }
             // Otherwise collect this robot's level and experience from session
             else {
-                $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token);
-                $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token);
+                $this->robot_base_experience = $this->robot_experience = mmrpg_prototype_robot_experience($this->player_token, $this->robot_token, $this->robot_base_id);
+                $this->robot_base_level = $this->robot_level = mmrpg_prototype_robot_level($this->player_token, $this->robot_token, $this->robot_base_id);
             }
 
 
@@ -1278,6 +1281,7 @@ class rpg_robot extends rpg_object {
 
         // Fix the level if it's over 100
         if (!empty($this->values['robot_level_max'])){ $robot_level_max = $this->values['robot_level_max']; }
+        elseif (mmrpg_prototype_allow_limit_break()){ $robot_level_max = 999; }
         else { $robot_level_max = 100; }
         if ($this->robot_level > $robot_level_max){ $this->robot_level = $robot_level_max;  }
         if ($this->robot_base_level > $robot_level_max){ $this->robot_base_level = $robot_level_max;  }
@@ -1618,6 +1622,42 @@ class rpg_robot extends rpg_object {
         return $quote_text;
     }
 
+    // Define a function for getting a list of level-up abilities for a given robot
+    static public function get_level_up_abilities($robot_token){
+        //error_log('get_level_up_abilities('.$robot_token.')');
+        $this_robot_info = rpg_robot::get_index_info($robot_token);
+        //error_log('$this_robot_info = '.print_r($this_robot_info, true));
+        $level_up_abilities = array();
+        if (!empty($this_robot_info['robot_rewards']['abilities'])){
+            foreach ($this_robot_info['robot_rewards']['abilities'] AS $key => $info){
+                $level_up_abilities[] = $info['token'];
+            }
+        }
+        //error_log('$level_up_abilities = '.print_r($level_up_abilities, true));
+        return $level_up_abilities;
+    }
+
+    // Define a function for getting all abilities compatible with a given robot
+    static public function get_ability_compatibility($robot_token, $item_token = ''){
+        //error_log('get_ability_compatibility('.$robot_token.', '.$item_token.')');
+        if (empty($robot_token)){ error_log('rpg_robot::get_ability_compatibility() error: no robot token given'); return false; }
+        $mmrpg_abilities_index = rpg_ability::get_index(true);
+        $compatible_abilities = array();
+        foreach ($mmrpg_abilities_index AS $ability_token => $ability_info){
+            if ($ability_token === 'ability'){ continue; }
+            elseif ($ability_info['ability_class'] === 'system'){ continue; }
+            elseif (empty($ability_info['ability_flag_published'])){ continue; }
+            elseif (empty($ability_info['ability_flag_complete'])){ continue; }
+            elseif ($ability_info['ability_master'] !== $robot_token && empty($ability_info['ability_flag_unlockable'])){ continue; }
+            //error_log('-> now checking '.$robot_token.' has '.$ability_token.' compatibility');
+            if (self::has_ability_compatibility($robot_token, $ability_info, $item_token)){
+                $compatible_abilities[] = $ability_token;
+                //error_log('--> yes it is');
+            }
+        }
+        return $compatible_abilities;
+    }
+
     // Define a function for checking if this robot is compatible with a specific ability
     static public function has_ability_compatibility($robot_token, $ability_token, $item_token = ''){
         if (empty($robot_token) || empty($ability_token)){ return false; }
@@ -1707,7 +1747,7 @@ class rpg_robot extends rpg_object {
             //$debug_fragment .= 'is-mecha '; // DEBUG
             if (in_array($ability_info['ability_token'], array(
                 'friend-share',
-                //'mecha-support', 'mecha-assault', 'mecha-party',
+                'mecha-support', 'mecha-assault', 'mecha-party',
                 'copy-shot', 'copy-soul', 'copy-style',
                 ))){
                 //$debug_fragment .= 'is-mecha-incompatible '; // DEBUG
@@ -2730,6 +2770,23 @@ class rpg_robot extends rpg_object {
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
 
+            // If the attacking robot's abilities are being overcast, overwrite their types
+            if (!empty($target_robot)){
+                $temp_overcast_type = $target_robot->get_value('overcast_type');
+                if (!empty($temp_overcast_type)){
+                    if ($temp_overcast_type === 'none'){
+                        $this_object->set_type('');
+                        $this_object->set_type2('');
+                    } else {
+                        $this_object->set_type($temp_overcast_type);
+                        $this_object->set_type2('');
+                    }
+                } else {
+                    $this_object->reset_type();
+                    $this_object->reset_type2();
+                }
+            }
+
             // Pre-collect the bulwark robots from the players to see if the bench is protected
             if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
                 $temp_thisplayer_bulwark_robots = $this->player->get_value('bulwark_robots');
@@ -2758,8 +2815,9 @@ class rpg_robot extends rpg_object {
             $trigger_return = rpg_skill_damage::trigger_robot_damage($this, $target_robot, $this_object, $damage_amount, $trigger_disabled, $trigger_options);
         }
 
-        // Check if this unlockable robot's data has been corrupted
-        if (!empty($this->flags['robot_is_unlockable'])){
+        // Check if this unlockable robot's data has been corrupted (not applicable to rescue bots)
+        if (!empty($this->flags['robot_is_unlockable'])
+            && empty($this->flags['robot_is_rescue'])){
 
             // Calculate whether or not this robot is currently corrupted
             $is_corrupted = false;
@@ -2791,6 +2849,23 @@ class rpg_robot extends rpg_object {
 
         // Check to see which object type has been provided
         if (isset($this_object->ability_token)){
+
+            // If the attacking robot's abilities are being overcast, overwrite their types
+            if (!empty($target_robot)){
+                $temp_overcast_type = $target_robot->get_value('overcast_type');
+                if (!empty($temp_overcast_type)){
+                    if ($temp_overcast_type === 'none'){
+                        $this_object->set_type('');
+                        $this_object->set_type2('');
+                    } else {
+                        $this_object->set_type($temp_overcast_type);
+                        $this_object->set_type2('');
+                    }
+                } else {
+                    $this_object->reset_type();
+                    $this_object->reset_type2();
+                }
+            }
 
             // Pre-collect the bulwark robots from the players to see if the bench is protected
             if (!empty($target_robot) && $target_robot->robot_id !== $this->robot_id){
@@ -3389,6 +3464,18 @@ class rpg_robot extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $robot_index_byid = false;
+        if ($robot_index_byid === false){
+            $robot_index_byid = array();
+            $robot_index = self::get_index(true, true);
+            if (empty($robot_index)){ $robot_index = array(); }
+            foreach ($robot_index AS $token => $robot){ $robot_index_byid[$robot['robot_id']] = $token; }
+        }
+        return $robot_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($robot_token){
 
@@ -3753,8 +3840,9 @@ class rpg_robot extends rpg_object {
             'robot_attachments' => $this->robot_attachments,
             'robot_quotes' => $this->robot_quotes,
             'robot_rewards' => $this->robot_rewards,
-            'robot_base_name' => $this->robot_base_name,
+            'robot_base_id' => $this->robot_base_id,
             'robot_base_token' => $this->robot_base_token,
+            'robot_base_name' => $this->robot_base_name,
             'robot_base_item' => $this->robot_base_item,
             'robot_base_image' => $this->robot_base_image,
             'robot_base_image_size' => $this->robot_base_image_size,
@@ -3984,8 +4072,9 @@ class rpg_robot extends rpg_object {
                             <? if($print_options['show_key'] !== false): ?>
                                 <div class="number robot_type <?= $robot_header_types ?>"><?= 'No.'.$robot_info['robot_key'] ?></div>
                             <? endif; ?>
+                            &nbsp;
                             <? if (!in_array($robot_image_token, $default_robot_class_tokens)){ ?>
-                                <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: url(images/robots/<?= $robot_image_token ?>/mug_right_<?= $robot_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active"><?= $robot_info['robot_name']?>'s Mugshot</div></div>
+                                <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: url(images/robots/<?= $robot_image_token ?>/mug_right_<?= $robot_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active"></div></div>
                             <? } else { ?>
                                 <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: none; background-color: #000000; background-color: rgba(0, 0, 0, 0.6); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active">No Image</div></div>
                             <? } ?>
@@ -4069,7 +4158,7 @@ class rpg_robot extends rpg_object {
                                 <? if($print_options['layout_style'] != 'event'): ?>
                                     <tr>
                                         <td  class="right">
-                                            <label>Name :</label>
+                                            <label>Name :&nbsp;</label>
                                             <span class="robot_type" style="width: auto;"><?= $robot_info['robot_name']?></span>
                                             <? if (!empty($robot_info['robot_generation'])){ ?><span class="robot_type" style="width: auto;"><?= $robot_info['robot_generation']?> Gen</span><? } ?>
                                         </td>
@@ -4077,13 +4166,13 @@ class rpg_robot extends rpg_object {
                                 <? endif; ?>
                                 <tr>
                                     <td  class="right">
-                                        <label>Model :</label>
+                                        <label>Model :&nbsp;</label>
                                         <span class="robot_type"><?= $robot_info['robot_number']?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label>Type :</label>
+                                        <label>Type :&nbsp;</label>
                                         <? if($print_options['layout_style'] != 'event'): ?>
                                             <? if(!empty($robot_info['robot_core2'])): ?>
                                                 <span class="robot_type type_<?= $robot_info['robot_core'].'_'.$robot_info['robot_core2'] ?>">
@@ -4110,20 +4199,20 @@ class rpg_robot extends rpg_object {
                                             // Define the source game string
                                             $temp_source_string = rpg_game::get_source_name($robot_info['robot_game'], true);
                                             ?>
-                                            <label>Source :</label>
+                                            <label>Source :&nbsp;</label>
                                             <span class="source_game robot_type"><?= $temp_source_string ?></span>
                                         </td>
                                     </tr>
                                 <? endif; ?>
                                 <tr>
                                     <td  class="right">
-                                        <label>Class :</label>
+                                        <label>Class :&nbsp;</label>
                                         <span class="robot_type"><?= !empty($robot_info['robot_description']) ? $robot_info['robot_description'] : '&hellip;' ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right fields" data-count="<?= count($field_info_array) ?>">
-                                        <label><?= empty($field_info_array) || count($field_info_array) == 1 ? 'Field' : 'Fields' ?> :</label>
+                                        <label><?= empty($field_info_array) || count($field_info_array) == 1 ? 'Field' : 'Fields' ?> :&nbsp;</label>
                                         <?
                                         // Loop through the robots fields if available
                                         if ($show_field_info && !empty($field_info_array)){
@@ -4157,7 +4246,7 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right weaknesses" data-count="<?= count($robot_info['robot_weaknesses']) ?>">
-                                        <label>Weaknesses :</label>
+                                        <label>Weaknesses :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_weaknesses'])){
                                             $temp_string = array();
@@ -4177,7 +4266,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right resistances" data-count="<?= count($robot_info['robot_resistances']) ?>">
-                                        <label>Resistances :</label>
+                                        <label>Resistances :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_resistances'])){
                                             $temp_string = array();
@@ -4197,7 +4286,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right affinities" data-count="<?= count($robot_info['robot_affinities']) ?>">
-                                        <label>Affinities :</label>
+                                        <label>Affinities :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_affinities'])){
                                             $temp_string = array();
@@ -4217,7 +4306,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right immunities" data-count="<?= count($robot_info['robot_immunities']) ?>">
-                                        <label>Immunities :</label>
+                                        <label>Immunities :&nbsp;</label>
                                         <?
                                         if (!empty($robot_info['robot_immunities'])){
                                             $temp_string = array();
@@ -4242,7 +4331,7 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label>Energy :</label>
+                                        <label>Energy :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_energy" style="padding-left: <?= round( ( ($robot_info['robot_energy'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_energy'] ?></span></span>
@@ -4254,7 +4343,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label>Attack :</label>
+                                        <label>Attack :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_attack" style="padding-left: <?= round( ( ($robot_info['robot_attack'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_attack'] ?></span></span>
@@ -4266,7 +4355,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label>Defense :</label>
+                                        <label>Defense :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_defense" style="padding-left: <?= round( ( ($robot_info['robot_defense'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_defense'] ?></span></span>
@@ -4278,7 +4367,7 @@ class rpg_robot extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Speed :</label>
+                                        <label>Speed :&nbsp;</label>
                                         <span class="stat" style="width: <?= $stat_container_percent ?>%;">
                                             <? if(false && $print_options['layout_style'] == 'website_compact'): ?>
                                                 <span class="robot_stat type_speed" style="padding-left: <?= round( ( ($robot_info['robot_speed'] / $robot_info['robot_total']) * $stat_padding_area ), 4) ?>%;"><span style="display: inline-block; width: 35px;"><?= $robot_info['robot_speed'] ?></span></span>
@@ -4317,7 +4406,7 @@ class rpg_robot extends rpg_object {
                                 <tbody>
                                     <tr>
                                         <td  class="center">
-                                            <label>Passive Skill :</label>
+                                            <label>Passive Skill :&nbsp;</label>
                                             <strong><?= $skill_info['skill_name'] ?></strong>
                                             <p><?= $skill_info['skill_description2'] ?></p>
                                         </td>
@@ -4576,25 +4665,25 @@ class rpg_robot extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label>Start Quote : </label>
+                                        <label>Start Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_start']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_start']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Taunt Quote : </label>
+                                        <label>Taunt Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_taunt']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_taunt']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Victory Quote : </label>
+                                        <label>Victory Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_victory']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_victory']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label>Defeat Quote : </label>
+                                        <label>Defeat Quote :&nbsp;</label>
                                         <span class="robot_quote">&quot;<?= !empty($robot_info['robot_quotes']['battle_defeat']) ? str_replace($temp_find, $temp_replace, $robot_info['robot_quotes']['battle_defeat']) : '&hellip;' ?>&quot;</span>
                                     </td>
                                 </tr>
@@ -4939,7 +5028,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_encountered'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Encountered : </label>
+                                            <label>Encountered :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_encountered']) ? '1 Time' : $global_robot_records['robot_encountered'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -4947,7 +5036,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_scanned'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Scanned : </label>
+                                            <label>Scanned :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_scanned']) ? '1 Time' : $global_robot_records['robot_scanned'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -4955,7 +5044,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_defeated'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Defeated : </label>
+                                            <label>Defeated :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_defeated']) ? '1 Time' : $global_robot_records['robot_defeated'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -4963,7 +5052,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_summoned'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Summoned : </label>
+                                            <label>Summoned :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_summoned']) ? '1 Time' : $global_robot_records['robot_summoned'].' Times' ?></span>
                                         </td>
                                     </tr>
@@ -4971,7 +5060,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_unlocked'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Unlocked By : </label>
+                                            <label>Unlocked By :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_unlocked']) ? '1 Player' : $global_robot_records['robot_unlocked'].' Players' ?></span>
                                         </td>
                                     </tr>
@@ -4979,7 +5068,7 @@ class rpg_robot extends rpg_object {
                                 <? if (isset($global_robot_records['robot_avatars'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Avatar Of : </label>
+                                            <label>Avatar Of :&nbsp;</label>
                                             <span class="robot_record"><?= !number_is_plural($global_robot_records['robot_avatars']) ? '1 Player' : $global_robot_records['robot_avatars'].' Players' ?></span>
                                         </td>
                                     </tr>
@@ -5400,7 +5489,8 @@ class rpg_robot extends rpg_object {
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
-                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active facing_right"><?= $robot_info['robot_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_left_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active facing_left"><?= $robot_info['robot_name']?></div>
                             </span>
                         </a>
                     <? else: ?>
@@ -5408,7 +5498,8 @@ class rpg_robot extends rpg_object {
                             <? $temp_offset = $robot_info['robot_image_size'] == 80 ? '-20px' : '0'; ?>
                             <span class="sprite_wrapper" style="">
                                 <?= $robot_image_unlock_tokens ?>
-                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active"><?= $robot_info['robot_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_right_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active facing_right"><?= $robot_info['robot_name']?></div>
+                                <div style="left: <?= $temp_offset ?>; bottom: 0; background-image: url(images/robots/<?= !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'] ?>/sprite_left_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); animation-duration: <?= $temp_robot_animation_duration ?>s; " class="sprite sprite_robot sprite_robot_sprite sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?> sprite_<?= $robot_info['robot_image_size'].'x'.$robot_info['robot_image_size'] ?>_base robot_status_active robot_position_active facing_left"><?= $robot_info['robot_name']?></div>
                             </span>
                         </span>
                     <? endif; ?>
@@ -5446,7 +5537,7 @@ class rpg_robot extends rpg_object {
                 $right_column_markup = array();
 
                 // Check to see if the player has unlocked the ability to swap players
-                $temp_player_swap_unlocked = mmrpg_prototype_item_unlocked('wily-program'); // && rpg_prototype::event_unlocked('dr-wily', 'chapter_one_complete');
+                $temp_player_swap_unlocked = true;
                 // If this player has unlocked the ability to let robots swap players
                 if ($temp_player_swap_unlocked){
                     ob_start();
@@ -5953,15 +6044,44 @@ class rpg_robot extends rpg_object {
                                         }
                                     }
 
+                                    // Make sure we remove any abilities that are not actually available yet or were removed/unpublished
+                                    $sanitize_ability_list = function($ability_rewards) use ($mmrpg_database_abilities){
+                                        if (empty($ability_rewards)){ return array(); }
+                                        foreach ($ability_rewards AS $key => $ability){
+                                            if (is_array($ability)){ $ability_token = $ability['ability_token']; }
+                                            elseif (is_string($ability)){ $ability_token = $ability; }
+                                            else { unset($ability_rewards[$key]); continue; }
+                                            if (!isset($mmrpg_database_abilities[$ability_token])){
+                                                //error_log('$mmrpg_database_abilities['.$ability_token.'] does not exist!');
+                                                unset($ability_rewards[$key]);
+                                                continue;
+                                                }
+                                            $ability_info = $mmrpg_database_abilities[$ability_token];
+                                            if (empty($ability_info['ability_flag_published'])
+                                                || empty($ability_info['ability_flag_complete'])
+                                                || empty($ability_info['ability_flag_unlockable'])){
+                                                //error_log('$mmrpg_database_abilities['.$ability_token.'] is not published, complete, or unlockable!');
+                                                unset($ability_rewards[$key]);
+                                                continue;
+                                            }
+                                        }
+                                        $ability_rewards = array_values($ability_rewards);
+                                        return $ability_rewards;
+                                    };
+                                    $player_ability_rewards = $sanitize_ability_list($player_ability_rewards);
+                                    $robot_ability_rewards = $sanitize_ability_list($robot_ability_rewards);
+
                                     ?>
                                     <div class="ability_container" data-compatible="<?= implode(',', $allowed_ability_ids) ?>">
                                         <?
 
                                         // Sort the player ability index based on ability number
                                         uasort($player_ability_rewards, array('rpg_functions', 'abilities_sort_for_editor'));
+                                        //error_log('$player_ability_rewards: '.print_r($player_ability_rewards, true));
 
                                         // Sort the robot ability index based on ability number
                                         sort($robot_ability_rewards);
+                                        //error_log('robot_ability_rewards: '.print_r($robot_ability_rewards, true));
 
                                         // Collect the ability reward options to be used on all selects
                                         $ability_rewards_options = $global_allow_editing ? rpg_ability::print_editor_options_list_markup($player_ability_rewards, $robot_ability_rewards, $player_info, $robot_info) : '';
@@ -6985,8 +7105,12 @@ class rpg_robot extends rpg_object {
             && empty($this->battle->flags['player_battle'])
             && empty($this->battle->flags['challenge_battle'])){
             $ptoken = $this->player->player_token;
+            $rid = $this->robot_base_id;
             $rtoken = $this->robot_token;
-            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+            $rstring = $rid.'_'.$rtoken;
+            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'] = '';
+            } elseif (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
                 $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
             }
         }
@@ -7005,8 +7129,12 @@ class rpg_robot extends rpg_object {
             && empty($this->battle->flags['player_battle'])
             && empty($this->battle->flags['challenge_battle'])){
             $ptoken = $this->player->player_token;
+            $rid = $this->robot_base_id;
             $rtoken = $this->robot_token;
-            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
+            $rstring = $rid.'_'.$rtoken;
+            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring])){
+                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'] = $new_item_token;
+            } elseif (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken])){
                 $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = $new_item_token;
             }
         }

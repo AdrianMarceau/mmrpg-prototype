@@ -9,7 +9,7 @@ $hidden_database_fields_count = !empty($hidden_database_fields) ? count($hidden_
 // Collect the field database files from the cache or manually
 $cache_token = md5('database/fields/website');
 $cached_index = rpg_object::load_cached_index('database.fields', $cache_token);
-if (!empty($cached_index)){
+if (!empty($cached_index) && empty($_GET['refresh'])){
 
     // Collect the cached data for fields, field count, and field numbers
     $mmrpg_database_fields = $cached_index['mmrpg_database_fields'];
@@ -20,6 +20,8 @@ if (!empty($cached_index)){
 } else {
 
     // Collect the database fields
+    $field_where = "fields.field_token <> 'field' AND fields.field_class <> 'system' AND fields.field_flag_published = 1 ";
+    if (defined('FORCE_INCLUDE_TEMPLATE_FIELD')){ $field_where = "({$field_where}) OR fields.field_token = 'field' "; }
     $field_fields = rpg_field::get_index_fields(true, 'fields');
     $mmrpg_database_fields = $db->get_array_list("SELECT
         {$field_fields},
@@ -28,9 +30,7 @@ if (!empty($cached_index)){
         FROM mmrpg_index_fields AS fields
         LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
         LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
-        WHERE fields.field_token <> 'field'
-        AND fields.field_class <> 'system'
-        AND fields.field_flag_published = 1
+        WHERE {$field_where}
         ORDER BY
         groups.group_order ASC,
         tokens.token_order ASC
@@ -73,7 +73,8 @@ if (!empty($cached_index)){
             $temp_info = rpg_field::parse_index_info($temp_info);
 
             // Collect this field's key in the index
-            $temp_info['field_key'] = $mmrpg_database_fields_numbers[$temp_token]['field_key'];
+            if (!isset($mmrpg_database_fields_numbers[$temp_token])){ $temp_info['field_key'] = -1; }
+            else { $temp_info['field_key'] = $mmrpg_database_fields_numbers[$temp_token]['field_key']; }
 
             if (in_array($temp_token, $hidden_database_fields)){
                 unset($mmrpg_database_fields[$temp_token]);
@@ -113,7 +114,8 @@ if (isset($update_mmrpg_database_fields)
 if (!empty($mmrpg_database_fields)){
     foreach ($mmrpg_database_fields AS $temp_token => $temp_info){
         if (!empty($temp_info['field_flag_hidden'])
-            && $temp_info['field_token'] !== $this_current_token){
+            && $temp_info['field_token'] !== $this_current_token
+            && !defined('FORCE_INCLUDE_HIDDEN_FIELDS')){
             unset($mmrpg_database_fields[$temp_token]);
         }
     }

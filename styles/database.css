@@ -5,12 +5,6 @@
     background-color: transparent;
     width: 762px;
 }
-#mmrpg.windowFlag_landscapeMode,
-#mmrpg.mobileFlag_landscapeMode,
-#mmrpg.windowFlag_landscapeMode #prototype,
-#mmrpg.mobileFlag_landscapeMode #prototype {
-    width: 1024px;
-}
 #database .header {
     width: 100%;
 }
@@ -844,4 +838,57 @@
 }
 #console .event.has_sprite_showcase .sprite_showcase_buttons .frame:hover .wrap {
     background-color: rgba(0, 0, 0, 0.0);
+}
+
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
+    #mmrpg,
+    #prototype {
+        width: 1120px;
+    }
+    #console .event.has_sprite_showcase .body.body_left > table,
+    #console .event.has_sprite_showcase .body.body_left > table:first-child {
+        width: calc(100% - 170px);
+    }
+    #console .event.has_sprite_showcase .sprite_showcase {
+        width: 160px;
+        height: 160px;
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .wrapper:before {
+        height: 100px;
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .wrapper:after {
+        height: 55px;
+    }
+    #console .event.has_sprite_showcase .sprite_showcase_buttons {
+        top: 216px;
+        width: 160px;
+        height: 46px;
+    }
+    #console .event.has_sprite_showcase .sprite_showcase_buttons .frame {
+        margin: 0 4px 4px 0;
+        font-size: 13px;
+        line-height: 13px;
+        width: calc((100% / 5) - 4px);
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .sprite_robot {
+
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite,
+    #console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite {
+        transform-origin: bottom left;
+        transform: scale(3);
+        image-rendering: pixelated;
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite {
+        transform: skew(-45deg, 0deg) scale(3, 1.5) translate(-4px, -4px);
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .sprite_robot .sprite_80x80 {
+        left: -60px;
+    }
+    #console .event.has_sprite_showcase .sprite_showcase .sprite_robot.is_shadow .sprite_80x80 {
+        left: -54px;
+    }
 }

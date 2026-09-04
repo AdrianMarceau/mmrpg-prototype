@@ -128,27 +128,42 @@ function mmrpg_prototype_apply_patches(){
 
 }
 
-// Define a function for calculating required experience points to the next level
-function mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level = 100, $min_experience = 1000){
-
-    $last_level = $this_level - 1;
-    $level_mod = $this_level / $max_level;
-    $this_experience = round($min_experience + ($last_level * $level_mod * $min_experience));
-
-    return $this_experience;
+// Define a function for calculating the MARGINAL experience required for a specific level
+function mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level = 100, $base_cost = 1000){
+    if ($this_level <= 1) { return 0; }
+    // We use a standard quadratic growth formula for smooth scaling
+    $total_for_current = $base_cost * pow(($this_level - 1), 2);
+    $total_for_previous = $base_cost * pow(($this_level - 2), 2);
+    // Return just the difference needed for this specific level-up
+    return $total_for_current - $total_for_previous;
 }
 
-// Define a function for calculating required experience points to the next level
-function mmrpg_prototype_calculate_shop_level_by_experience($this_experience, $max_level = 100, $min_experience = 1000){
-    $temp_total_experience = 0;
-    for ($this_level = 1; $this_level < $max_level; $this_level++){
-        $temp_experience = mmrpg_prototype_calculate_shop_experience_required($this_level, $max_level, $min_experience);
-        $temp_total_experience += $temp_experience;
-        if ($temp_total_experience > $this_experience){
-            return $this_level - 1;
-        }
+// Define a function for calculating the CURRENT level based on total experience (zenny spent)
+function mmrpg_prototype_calculate_shop_level_by_experience($total_experience, $max_level = 100, $base_cost = 1000){
+    // We calculate the exact level instantly using a square root
+    // Level = 1 + sqrt(Total_Experience / Base_Cost)
+    $calculated_level = 1 + floor(sqrt($total_experience / $base_cost));
+    // Clamp the level between 1 and the maximum allowed for this shop
+    if ($calculated_level > $max_level) {
+        return $max_level;
+    } elseif ($calculated_level < 1) {
+        return 1;
     }
-    return $max_level;
+    return $calculated_level;
+}
+
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_new_game_plus($player_token = ''){
+    $session_token = mmrpg_game_token();
+    $flag_token = 'new_game_plus' . (!empty($player_token) ? '_'.$player_token : '');
+    return !empty($_SESSION[$session_token]['flags']['prototype_events'][$flag_token]);
+}
+
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_allow_limit_break(){
+    $force_limit_break = false;
+    $has_new_game_plus = mmrpg_prototype_new_game_plus();
+    return $force_limit_break || $has_new_game_plus ? true : false;
 }
 
 // Define a function for checking a player has completed the prototype
@@ -173,6 +188,37 @@ function mmrpg_prototype_complete($player_token = ''){
         foreach ($mmrpg_index_players AS $player_token => $player_info){
             if (mmrpg_prototype_player_unlocked($player_token)){
                 if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete'])){
+                    $complete_count += 1;
+                }
+            }
+        }
+        // Otherwise return false by default
+        return $complete_count;
+    }
+}
+
+// Define a function for checking a player has completed the prototype
+function mmrpg_prototype_complete_plus($player_token = ''){
+
+    // Pull in global variables
+    global $mmrpg_index_players;
+    if (empty($mmrpg_index_players)){ $mmrpg_index_players = rpg_player::get_index(true); }
+
+    $session_token = mmrpg_game_token();
+
+    // If the player token was provided, do a quick check
+    if (!empty($player_token)){
+        // Return the prototype complete flag for this player
+        if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete_plus'])){ return 1; }
+        else { return 0; }
+    }
+    // Otherwise loop through all players and check each
+    else {
+        // Loop through unlocked robots and return true if any are found to be completed
+        $complete_count = 0;
+        foreach ($mmrpg_index_players AS $player_token => $player_info){
+            if (mmrpg_prototype_player_unlocked($player_token)){
+                if (!empty($_SESSION[$session_token]['flags']['prototype_events'][$player_token]['prototype_complete_plus'])){
                     $complete_count += 1;
                 }
             }
@@ -751,23 +797,27 @@ function mmrpg_prototype_player_stars_available($player_token){
         $temp_field_stars[] = $info['field'];
     }
     // Loop thourgh and collect the fusion stars
-    for ($i = 0; $i < 8; $i += 2){
-        list($t1a, $t1b) = explode('-', $temp_field_stars[$i]);
-        list($t2a, $t2b) = explode('-', $temp_field_stars[$i + 1]);
-        $temp_fusion_token = $t1a.'-'.$t2b;
-        $temp_fusion_stars[] = $temp_fusion_token;
-    }
-    // Loop through field stars and remove unlocked
-    foreach ($temp_field_stars AS $key => $token){
-        if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
-            unset($temp_field_stars[$key]);
+    if (!empty($temp_field_stars)){
+
+        for ($i = 0; $i < 8; $i += 2){
+            list($t1a, $t1b) = explode('-', $temp_field_stars[$i]);
+            list($t2a, $t2b) = explode('-', $temp_field_stars[$i + 1]);
+            $temp_fusion_token = $t1a.'-'.$t2b;
+            $temp_fusion_stars[] = $temp_fusion_token;
         }
-    }
-    // Loop through fusion stars and remove unlocked
-    foreach ($temp_fusion_stars AS $key => $token){
-        if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
-            unset($temp_fusion_stars[$key]);
+        // Loop through field stars and remove unlocked
+        foreach ($temp_field_stars AS $key => $token){
+            if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
+                unset($temp_field_stars[$key]);
+            }
         }
+        // Loop through fusion stars and remove unlocked
+        foreach ($temp_fusion_stars AS $key => $token){
+            if (!empty($_SESSION[$session_token]['values']['battle_stars'][$token])){
+                unset($temp_fusion_stars[$key]);
+            }
+        }
+
     }
     // Count the field stars
     $temp_field_stars = array_values($temp_field_stars);
@@ -789,27 +839,33 @@ function mmrpg_prototype_player_stars_available($player_token){
 }
 
 // Define a function for checking a robot's prototype experience total
-function mmrpg_prototype_robot_experience($player_token, $robot_token){
+function mmrpg_prototype_robot_experience($player_token, $robot_token, $robot_id = 0){
     // Return the current point total for this robot
     $session_token = mmrpg_game_token();
-    if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
+    $robot_string = $robot_id.'_'.$robot_token;
+    if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_experience']; }
+    elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
     elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_points'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_points']; }
     else { return 0; }
 }
 
 // Define a function for checking a robot's prototype current level
-function mmrpg_prototype_robot_level($player_token, $robot_token){
+function mmrpg_prototype_robot_level($player_token, $robot_token, $robot_id = 0){
     // Return the current level total for this robot
     $session_token = mmrpg_game_token();
-    if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
+    $robot_string = $robot_id.'_'.$robot_token;
+    if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_level']; }
+    elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
     else { return 1; }
 }
 
 // Define a function for checking a robot's prototype current level
-function mmrpg_prototype_robot_original_player($player_token, $robot_token){
+function mmrpg_prototype_robot_original_player($player_token, $robot_token, $robot_id = 0){
     // Return the current level total for this robot
     $session_token = mmrpg_game_token();
-    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
+    $robot_string = $robot_id.'_'.$robot_token;
+    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string]['original_player']; }
+    elseif (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
     else { return $player_token; }
 }
 
@@ -823,14 +879,14 @@ function mmrpg_prototype_robots_rewards(){
     if (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
         foreach ($_SESSION[$session_token]['values']['battle_rewards'] as $player_token => $player_info){
             if (!empty($player_info['player_robots'])){
-                foreach ($player_info['player_robots'] as $robot_token => $robot_info){
+                foreach ($player_info['player_robots'] as $robot_key => $robot_info){
                     // Add the current player token to the robot info
                     $robot_info['current_player'] = $player_token;
                     // If the robot already exists, merge the rewards
-                    if (isset($all_robot_rewards[$robot_token])){
-                        $all_robot_rewards[$robot_token] = array_merge($all_robot_rewards[$robot_token], $robot_info);
+                    if (isset($all_robot_rewards[$robot_key])){
+                        $all_robot_rewards[$robot_key] = array_merge($all_robot_rewards[$robot_key], $robot_info);
                     } else {
-                        $all_robot_rewards[$robot_token] = $robot_info;
+                        $all_robot_rewards[$robot_key] = $robot_info;
                     }
                 }
             }
@@ -849,14 +905,14 @@ function mmrpg_prototype_robots_settings(){
     if (!empty($_SESSION[$session_token]['values']['battle_settings'])){
         foreach ($_SESSION[$session_token]['values']['battle_settings'] as $player_token => $player_info){
             if (!empty($player_info['player_robots'])){
-                foreach ($player_info['player_robots'] as $robot_token => $robot_info){
+                foreach ($player_info['player_robots'] as $robot_key => $robot_info){
                     // Add the current player token to the robot info
                     $robot_info['current_player'] = $player_token;
                     // If the robot already exists, merge the settings
-                    if (isset($all_robot_settings[$robot_token])){
-                        $all_robot_settings[$robot_token] = array_merge($all_robot_settings[$robot_token], $robot_info);
+                    if (isset($all_robot_settings[$robot_key])){
+                        $all_robot_settings[$robot_key] = array_merge($all_robot_settings[$robot_key], $robot_info);
                     } else {
-                        $all_robot_settings[$robot_token] = $robot_info;
+                        $all_robot_settings[$robot_key] = $robot_info;
                     }
                 }
             }
@@ -868,17 +924,22 @@ function mmrpg_prototype_robots_settings(){
 
 
 // Define a function for checking a robot's prototype reward array
-function mmrpg_prototype_robot_rewards($player_token = '', $robot_token){
+function mmrpg_prototype_robot_rewards($player_token = '', $robot_token, $robot_id = 0){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
+    $robot_string = $robot_id.'_'.$robot_token;
     // Return the current reward array for this robot
     if (!empty($player_token)){
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
+        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])){
+            return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string];
+        } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
             return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
         }
     } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
         foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-            if (!empty($player_info['player_robots'][$robot_token])){
+            if (!empty($player_info['player_robots'][$robot_string])){
+                return $player_info['player_robots'][$robot_string];
+            } elseif (!empty($player_info['player_robots'][$robot_token])){
                 return $player_info['player_robots'][$robot_token];
             }
         }
@@ -887,17 +948,22 @@ function mmrpg_prototype_robot_rewards($player_token = '', $robot_token){
 }
 
 // Define a function for checking a robot's prototype settings array
-function mmrpg_prototype_robot_settings($player_token = '', $robot_token){
+function mmrpg_prototype_robot_settings($player_token = '', $robot_token, $robot_id = 0){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
+    $robot_string = $robot_id.'_'.$robot_token;
     // Return the current setting array for this robot
     if (!empty($player_token)){
-        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+            return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string];
+        } elseif (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
             return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token];
         }
     } elseif (!empty($_SESSION[$session_token]['values']['battle_settings'])){
         foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
-            if (!empty($player_info['player_robots'][$robot_token])){
+            if (!empty($player_info['player_robots'][$robot_string])){
+                return $player_info['player_robots'][$robot_string];
+            } elseif (!empty($player_info['player_robots'][$robot_token])){
                 return $player_info['player_robots'][$robot_token];
             }
         }
@@ -943,22 +1009,68 @@ function mmrpg_prototype_battle_failure($player_token, $battle_token){
     return isset($_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_failure'][$player_token][$battle_token] : false;
 }
 
+// Define a function for collecting battle tokens of complete prototype battles, either by player or all
+function mmrpg_prototype_battle_tokens_complete($player_token = ''){
+    // Check if this battle has been completed and return true is it was
+    $session_token = mmrpg_game_token();
+    $battles_complete = !empty($_SESSION[$session_token]['values']['battle_complete']) ? $_SESSION[$session_token]['values']['battle_complete'] : array();
+    if (!empty($player_token)){
+        $player_battles_complete = !empty($battles_complete[$player_token]) ? array_keys($battles_complete[$player_token]) : array();
+        return $player_battles_complete;
+    } else {
+        $players_battles_complete = array();
+        foreach ($battles_complete AS $player_token => $player_battles_complete){
+            if (empty($player_battles_complete)){ continue; }
+            $players_battles_complete[$player_token] = array_keys($player_battles_complete);
+        }
+        return $players_battles_complete;
+    }
+    //return isset($_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token][$battle_token] : false;
+}
+
+// Define a function for collecting battle tokens of failed prototype battles, either by player or all
+function mmrpg_prototype_battle_tokens_failed($player_token = ''){
+    // Check if this battle has been completed and return true is it was
+    $session_token = mmrpg_game_token();
+    $battles_failed = !empty($_SESSION[$session_token]['values']['battle_failure']) ? $_SESSION[$session_token]['values']['battle_failure'] : array();
+    if (!empty($player_token)){
+        $player_battles_failed = !empty($battles_failed[$player_token]) ? array_keys($battles_failed[$player_token]) : array();
+        return $player_battles_failed;
+    } else {
+        $players_battles_failed = array();
+        foreach ($battles_failed AS $player_token => $player_battles_failed){
+            if (empty($player_battles_failed)){ continue; }
+            $players_battles_failed[$player_token] = array_keys($player_battles_failed);
+        }
+        return $players_battles_failed;
+    }
+}
+
+
 // Define a function for checking is a prototype player has been unlocked
 function mmrpg_prototype_player_unlocked($player_token){
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
-    return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? true : false;
+    $battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    return isset($battle_rewards[$player_token]) ? true : false;
 }
 
 // Define a function for checking is a prototype robot has been unlocked
-function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
+function mmrpg_prototype_robot_unlocked($player_token, $robot_token, $robot_id = 0){
+    //error_log('mmrpg_prototype_robot_unlocked($player_token:'.print_r($player_token, true).', $robot_token:'.print_r($robot_token, true).', $robot_id:'.print_r($robot_id, true).')');
     // Define the game session helper var
     $session_token = mmrpg_game_token();
+    $battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    $battle_settings = !empty($_SESSION[$session_token]['values']['battle_settings']) ? $_SESSION[$session_token]['values']['battle_settings'] : array();
+    $robot_string = $robot_id.'_'.$robot_token;
     // If the player token was not false, check to see if that particular player has unlocked
     if (!empty($player_token)){
         // Check if this battle has been completed and return true is it was
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
-            && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+        if (!empty($battle_rewards[$player_token]['player_robots'][$robot_string])
+            && !empty($battle_settings[$player_token]['player_robots'][$robot_string])){
+            return true;
+        } elseif (!empty($battle_rewards[$player_token]['player_robots'][$robot_token])
+            && !empty($battle_settings[$player_token]['player_robots'][$robot_token])){
             return true;
         } else {
             return false;
@@ -968,10 +1080,15 @@ function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
     else {
         // Loop through all the player tokens in the battle rewards
         $robot_unlocked = false;
-        foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-            if (isset($player_info['player_robots'][$robot_token])
-                && !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
-                && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+        foreach ($battle_rewards AS $player_token => $player_info){
+            if (isset($player_info['player_robots'][$robot_string])
+                && !empty($battle_rewards[$player_token]['player_robots'][$robot_string])
+                && !empty($battle_settings[$player_token]['player_robots'][$robot_string])){
+                $robot_unlocked = true;
+                break;
+            } elseif (isset($player_info['player_robots'][$robot_token])
+                && !empty($battle_rewards[$player_token]['player_robots'][$robot_token])
+                && !empty($battle_settings[$player_token]['player_robots'][$robot_token])){
                 $robot_unlocked = true;
                 break;
             }
@@ -981,29 +1098,32 @@ function mmrpg_prototype_robot_unlocked($player_token, $robot_token){
 }
 
 // Define a function for checking if a prototype ability has been unlocked
-function mmrpg_prototype_ability_unlocked($player_token, $robot_token = '', $ability_token = ''){
-
+function mmrpg_prototype_ability_unlocked($player_token = '', $robot_token = '', $ability_token = ''){
     // Define the game session helper var
     $session_token = mmrpg_game_token();
-
+    $battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    $battle_abilities = !empty($_SESSION[$session_token]['values']['battle_abilities']) ? $_SESSION[$session_token]['values']['battle_abilities'] : array();
+    if (!empty($player_token) && empty($battle_rewards[$player_token])){ return false; }
+    if (!empty($robot_token) && empty($battle_rewards[$player_token]['player_robots'][$robot_token])){ return false; }
     // If a specific robot token was provided
-    if (!empty($robot_token)){
+    if (!empty($player_token) && !empty($robot_token)){
         // Check if this ability has been unlocked by the specified robot and return true if it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token]) ? true : false;
+        return !empty($battle_rewards[$player_token]['player_robots'][$robot_token]['robot_abilities'][$ability_token]) ? true : false;
     } else {
         // Check if this ability has been unlocked by the player and return true if it was
-        return in_array($ability_token, $_SESSION[$session_token]['values']['battle_abilities']) ? true : false;
+        return in_array($ability_token, $battle_abilities) ? true : false;
     }
-
 }
 
 // Define a function for checking if a prototype item has been unlocked
 function mmrpg_prototype_item_unlocked($item_token){
+    //error_log('mmrpg_prototype_item_unlocked('.$item_token.') called');
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
 
     // If items are not yet loaded, return false
+    //error_log('$_SESSION[$session_token][\'values\'][\'battle_items\'] ='.print_r($_SESSION[$session_token]['values']['battle_items'], true));
     if (empty($_SESSION[$session_token]['values']['battle_items'])){ return false; }
 
     // If this specific item has not been unlocked, return false
@@ -1032,13 +1152,14 @@ function mmrpg_prototype_item_unlocked_count($item_token){
 }
 
 // Define a function for checking how many prototype items have been unlock
-function mmrpg_prototype_items_unlocked($unique = true){
+function mmrpg_prototype_items_unlocked($unique = true, &$items_unlocked = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
 
     // If items are not yet loaded, return false
     if (empty($_SESSION[$session_token]['values']['battle_items'])){ return 0; }
+    $items_unlocked = $_SESSION[$session_token]['values']['battle_items'];
 
     // If unique item count was requested, simply return the array size
     if ($unique){ return count($_SESSION[$session_token]['values']['battle_items']); }
@@ -1049,6 +1170,44 @@ function mmrpg_prototype_items_unlocked($unique = true){
     // Otherwise return 0
     return 0;
 
+}
+
+//$equipped_items_count = mmrpg_prototype_items_equipped('', $equipped_player_items);
+
+// Define a function for counting how many items are currently equipped by player robots
+function mmrpg_prototype_items_equipped($player_token = '', &$equipped_player_items = array()){
+    $session_token = mmrpg_game_token();
+    $GAME_SESSION = &$_SESSION[$session_token];
+    $battleSettings = !empty($GAME_SESSION['values']['battle_settings']) ? $GAME_SESSION['values']['battle_settings'] : array();
+    $equipped_items_count = 0;
+    if (!empty($player_token)){
+        if (empty($battleSettings[$player_token])){ return 0; }
+        $playerSettings = $battleSettings[$player_token];
+        if (empty($playerSettings['player_robots'])){ return 0; }
+        $playerRobots = $playerSettings['player_robots'];
+        foreach ($playerRobots AS $robot_key => $robot_info){
+            if (!empty($robot_info['robot_item'])){
+                $item_token = $robot_info['robot_item'];
+                if (!isset($equipped_player_items[$item_token])){ $equipped_player_items[$item_token] = 0; }
+                $equipped_player_items[$item_token]++;
+                $equipped_items_count++;
+            }
+        }
+    } else {
+        foreach ($battleSettings AS $player_token => $playerSettings){
+            if (empty($playerSettings['player_robots'])){ continue; }
+            $playerRobots = $playerSettings['player_robots'];
+            foreach ($playerRobots AS $robot_key => $robot_info){
+                if (!empty($robot_info['robot_item'])){
+                    $item_token = $robot_info['robot_item'];
+                    if (!isset($equipped_player_items[$item_token])){ $equipped_player_items[$item_token] = 0; }
+                    $equipped_player_items[$item_token]++;
+                    $equipped_items_count++;
+                }
+            }
+        }
+    }
+    return $equipped_items_count;
 }
 
 // Define quick functions for getting or setting battle item quantities
@@ -1082,30 +1241,32 @@ function mmrpg_prototype_dec_battle_item_count($item_token, $dec_amount = 1){
 }
 
 // Define quick functions for getting or setting battle setting items for robots
-function mmrpg_prototype_get_robot_battle_item($player_token, $robot_token){
+function mmrpg_prototype_get_robot_battle_item($player_token, $robot_key_or_token){
     $session_token = mmrpg_game_token();
-    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'])){
-        return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'];
+    if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_key_or_token]['robot_item'])){
+        return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_key_or_token]['robot_item'];
     }
     return '';
 }
-function mmrpg_prototype_set_robot_battle_item($player_token, $robot_token, $item_token){
+function mmrpg_prototype_set_robot_battle_item($player_token, $robot_key_or_token, $item_token){
     $session_token = mmrpg_game_token();
-    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'] = $item_token;
+    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_key_or_token]['robot_item'] = $item_token;
 }
-function mmrpg_prototype_unset_robot_battle_item($player_token, $robot_token){
+function mmrpg_prototype_unset_robot_battle_item($player_token, $robot_key_or_token){
     $session_token = mmrpg_game_token();
-    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['robot_item'] = '';
+    $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_key_or_token]['robot_item'] = '';
 }
 
 // Define a function for checking if a prototype alt image has been unlocked
-function mmrpg_prototype_altimage_unlocked($robot_token, $alt_token = ''){
+function mmrpg_prototype_altimage_unlocked($robot_key_or_token, $alt_token = ''){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
 
     // If robot token not provided return false
-    if (empty($robot_token)){ return false; }
+    if (empty($robot_key_or_token)){ return false; }
+    if (strstr($robot_key_or_token, '_')){ list($robot_id, $robot_token) = explode('_', $robot_key_or_token); }
+    else { $robot_id = 0; $robot_token = $robot_key_or_token; }
 
     // Pre-collect the robot alts array before we manually add to it
     if (!isset($_SESSION[$session_token]['values']['robot_alts'][$robot_token])){ $_SESSION[$session_token]['values']['robot_alts'][$robot_token] = array(); }
@@ -1197,7 +1358,7 @@ function mmrpg_prototype_player_altimage_unlocked($player_token, $alt_token = ''
 }
 
 // Define a function for counting the number of completed prototype battles
-function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battles_complete = array()){
+function mmrpg_prototype_battles_complete($player_token = '', $unique = true, &$battles_complete = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -1218,7 +1379,7 @@ function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battl
 
         // Collect the battle complete count from the session if set
         $battles_complete = isset($_SESSION[$session_token]['values']['battle_complete'][$player_token]) ? $_SESSION[$session_token]['values']['battle_complete'][$player_token] : array();
-        //error_log('$battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
+        //error_log($player_token.' | $battles_complete = '.count($battles_complete).' = '.print_r($battles_complete, true));
 
         // Check if only unique battles were requested or ALL battles
         if (!empty($unique)){
@@ -1245,7 +1406,7 @@ function mmrpg_prototype_battles_complete($player_token, $unique = true, &$battl
 }
 
 // Define a function for counting the number of failured prototype battles
-function mmrpg_prototype_battles_failure($player_token, $unique = true, &$battles_failure = array()){
+function mmrpg_prototype_battles_failure($player_token = '', $unique = true, &$battles_failure = array()){
 
     // Define the game session helper var
     $session_token = mmrpg_game_token();
@@ -1293,27 +1454,153 @@ function mmrpg_prototype_battles_failure($player_token, $unique = true, &$battle
 }
 
 // Define a function for checking is a prototype player has been unlocked
-function mmrpg_prototype_players_unlocked(){
+function mmrpg_prototype_players_unlocked($return_tokens = false){
     // Check if this battle has been completed and return true is it was
     $session_token = mmrpg_game_token();
-    return isset($_SESSION[$session_token]['values']['battle_rewards']) ? count($_SESSION[$session_token]['values']['battle_rewards']) : 0;
+    $battle_rewards = isset($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    $battle_settings = isset($_SESSION[$session_token]['values']['battle_settings']) ? $_SESSION[$session_token]['values']['battle_settings'] : array();
+    $unique_player_tokens = array_unique(array_merge(array_keys($battle_rewards), array_keys($battle_settings)));
+    if (in_array('player', $unique_player_tokens)){ unset($unique_player_tokens[array_search('player', $unique_player_tokens)]); } // not the kind of player we're talking about
+    if (in_array('proxy', $unique_player_tokens)){ unset($unique_player_tokens[array_search('proxy', $unique_player_tokens)]); } // more of a separate mode than a real player
+    $unique_player_tokens = array_values($unique_player_tokens); // re-key just in case any were removed
+    if ($return_tokens){ return $unique_player_tokens; }
+    else { return count($unique_player_tokens); }
 }
 
 // Define a function for checking is a prototype robot has been unlocked
-function mmrpg_prototype_robots_unlocked($player_token = ''){
+function mmrpg_prototype_robots_unlocked($player_token = '', $return_tokens = false, $include_ids = false){
+    //error_log('mmrpg_prototype_robots_unlocked('.$player_token.', '.($return_tokens ? 'true' : 'false').', '.($include_ids ? 'true' : 'false').') called');
+    $mmrpg_index_robots = rpg_robot::get_index(true);
     // Define the game session helper var
     $session_token = mmrpg_game_token();
-    if (!empty($player_token)){
-        // Check if this battle has been completed and return true is it was
-        return isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots']) ? count($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots']) : 0;
-    } else {
-        $robot_counter = 0;
-        foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-            $robot_counter += isset($player_info['player_robots']) ? count($player_info['player_robots']) : 0;
+    $battle_settings = isset($_SESSION[$session_token]['values']['battle_settings']) ? $_SESSION[$session_token]['values']['battle_settings'] : array();
+    $battle_rewards = isset($_SESSION[$session_token]['values']['battle_rewards']) ? $_SESSION[$session_token]['values']['battle_rewards'] : array();
+    //error_log('$battle_rewards = '.print_r($battle_rewards, true));
+    $get_robot_strings = function($player_robots) use ($mmrpg_index_robots){
+        $robot_strings = array();
+        foreach ($player_robots AS $key => $data){
+            if (!isset($data['robot_token'])){ continue; }
+            $token = $data['robot_token'];
+            $id = isset($data['robot_id']) && is_numeric($data['robot_id']) ? $data['robot_id'] : $mmrpg_index_robots[$token]['robot_id'];
+            if (empty($id)){ continue; }
+            $robot_strings[] = $id.'_'.$token;
         }
-        return $robot_counter;
+        return $robot_strings;
+        };
+    if (!empty($player_token)){
+        $player_robots = array();
+        if (isset($battle_settings[$player_token]['player_robots'])){ $player_robots = array_merge($player_robots, $battle_settings[$player_token]['player_robots']); }
+        if (isset($battle_rewards[$player_token]['player_robots'])){ $player_robots = array_merge($player_robots, $battle_rewards[$player_token]['player_robots']); }
+        if ($return_tokens){
+            if ($include_ids){ return $get_robot_strings($player_robots); }
+            else { return array_keys($player_robots); }
+        } else {
+            return count($player_robots);
+        }
+    } else {
+        $all_player_tokens = array_unique(array_merge(array_keys($battle_settings), array_keys($battle_rewards)));
+        $all_player_robots = array();
+        foreach ($all_player_tokens AS $player_key => $player_token){
+            $player_settings = isset($battle_settings[$player_token]) ? $battle_settings[$player_token] : array();
+            $player_rewards = isset($battle_rewards[$player_token]) ? $battle_rewards[$player_token] : array();
+            if (empty($player_settings['player_robots']) || empty($player_rewards['player_robots'])){ continue; }
+            $player_robots = array_merge($player_settings['player_robots'], $player_rewards['player_robots']);
+            $all_player_robots = array_merge($all_player_robots, $player_robots);
+        }
+        //error_log('$all_player_robots ='.print_r($all_player_robots, true));
+        if ($return_tokens){
+            if ($include_ids){ return $get_robot_strings($all_player_robots); }
+            else { return array_keys($all_player_robots); }
+        } else {
+            return count($all_player_robots);
+        }
     }
+}
+// Define a function for grabbing the number of robot masters that have been unlocked so far
+function mmrpg_prototype_robot_masters_unlocked($player_token = '', $return_tokens = false, $include_ids = false){
+    //error_log('mmrpg_prototype_robot_masters_unlocked('.$player_token.', '.($return_tokens ? 'true' : 'false').', '.($include_ids ? 'true' : 'false').') called');
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $unlocked_master_tokens = array();
+    $unlocked_master_strings = array();
+    $all_unlocked_robot_strings = mmrpg_prototype_robots_unlocked($player_token, true, true);
+    //error_log('$all_unlocked_robot_strings = '.print_r($all_unlocked_robot_strings, true));
+    if (empty($all_unlocked_robot_strings)){ return $return_tokens ? array() : 0; }
+    foreach ($all_unlocked_robot_strings AS $key => $robot_string){
+        list($robot_id, $robot_token) = explode('_', $robot_string);
+        if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_info = $mmrpg_index_robots[$robot_token];
+        if ($robot_info['robot_class'] !== 'master'){ continue; }
+        $unlocked_master_tokens[] = $robot_token;
+        $unlocked_master_strings[] = $robot_string;
+    }
+    //error_log('$unlocked_master_tokens = '.print_r($unlocked_master_tokens, true));
+    //error_log('$unlocked_master_strings = '.print_r($unlocked_master_strings, true));
+    return $return_tokens ? ($include_ids ? $unlocked_master_strings : $unlocked_master_tokens) : count($unlocked_master_tokens);
+}
+// Define a function for grabbing the number of support mechas that have been unlocked so far
+function mmrpg_prototype_robot_mechas_unlocked($player_token = '', $return_tokens = false, $include_ids = false){
+    //error_log('mmrpg_prototype_robot_mechas_unlocked('.$player_token.', '.($return_tokens ? 'true' : 'false').', '.($include_ids ? 'true' : 'false').') called');
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $unlocked_mecha_tokens = array();
+    $unlocked_mecha_strings = array();
+    $all_unlocked_robot_strings = mmrpg_prototype_robots_unlocked($player_token, true, true);
+    //error_log('$all_unlocked_robot_strings = '.print_r($all_unlocked_robot_strings, true));
+    if (empty($all_unlocked_robot_strings)){ return $return_tokens ? array() : 0; }
+    foreach ($all_unlocked_robot_strings AS $key => $robot_string){
+        list($robot_id, $robot_token) = explode('_', $robot_string);
+        if (!isset($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_info = $mmrpg_index_robots[$robot_token];
+        if ($robot_info['robot_class'] !== 'mecha'){ continue; }
+        $unlocked_mecha_tokens[] = $robot_token;
+        $unlocked_mecha_strings[] = $robot_string;
+    }
+    //error_log('$unlocked_mecha_tokens = '.print_r($unlocked_mecha_tokens, true));
+    //error_log('$unlocked_mecha_strings = '.print_r($unlocked_mecha_strings, true));
+    return $return_tokens ? ($include_ids ? $unlocked_mecha_strings : $unlocked_mecha_tokens) : count($unlocked_mecha_tokens);
+}
 
+
+// Define a function that counts the number of all unlocked robot tokens in the battle settings/rewards arrays
+function mmrpg_prototype_robots_unlocked_counters($player_token = ''){
+    //error_log('mmrpg_prototype_robots_unlocked_counters('.$player_token.') called');
+    $robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true, true);
+    if (empty($robots_unlocked)){ return array(); }
+    $robots_counters = array();
+    foreach ($robots_unlocked AS $robot_session_key){
+        if (strstr($robot_session_key, '_')){ list($robot_id, $robot_token) = explode('_', $robot_session_key);  }
+        else { $robot_id = 0; $robot_token = $robot_session_key; }
+        if (!isset($robots_counters[$robot_token])){ $robots_counters[$robot_token] = 0; }
+        $robots_counters[$robot_token]++;
+    }
+    return $robots_counters;
+}
+
+// Define a function for getting the next robot base ID given what's already in the session
+function mmrpg_prototype_robots_next_base_id($robot_token){
+    //error_log('mmrpg_prototype_robots_next_base_id('.$robot_token.') called');
+    $mmrpg_index_robots = rpg_robot::get_index(true);
+    $robots_unlocked = mmrpg_prototype_robots_unlocked('', true, true);
+    //error_log('$robots_unlocked ='.print_r($robots_unlocked, true));
+    if (empty($robots_unlocked)){ $robots_unlocked = array(); }
+    if (!empty($robot_token)){ $robots_unlocked[] = $robot_token; }
+    $highest_base_ids = array();
+    foreach ($robots_unlocked AS $robot_session_key){
+        if (strstr($robot_session_key, '_')){ list($rid, $rtoken) = explode('_', $robot_session_key); $rid = intval($rid); }
+        else { $rid = 0; $rtoken = $robot_session_key; }
+        if ($rid === $mmrpg_index_robots[$rtoken]['robot_id']){ $rid = 0; }
+        if (!isset($highest_base_ids[$rtoken]) || $rid > $highest_base_ids[$rtoken]){
+            $highest_base_ids[$rtoken] = $rid;
+        }
+    }
+    //error_log('$highest_base_ids = '.print_r($highest_base_ids, true));
+    $next_base_ids = array();
+    foreach ($highest_base_ids AS $rtoken => $rid){
+        if (!empty($rid)){ $next_base_ids[$rtoken] = $rid + 1; continue;  }
+        $rid = $mmrpg_index_robots[$rtoken]['robot_id'];
+        $next_base_ids[$rtoken] = ($rid * 100) + 1;
+    }
+    //error_log('$next_base_ids = '.print_r($next_base_ids, true));
+    return !empty($next_base_ids[$robot_token]) ? $next_base_ids[$robot_token] : 0;
 }
 
 // Define a function for getting a players unlocked index for reference
@@ -1333,6 +1620,7 @@ function mmrpg_prototype_players_unlocked_index($include_extra = array()){
     foreach ($session_battle_keys AS $session_battle_key){
         if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
             foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
+                if (empty($player_array) || !is_array($player_array)){ continue; }
                 $existing_player_array = array();
                 if (isset($this_unlocked_players_index[$player_token])){ $existing_player_array = $this_unlocked_players_index[$player_token];}
                 $this_unlocked_players_index[$player_token] = array_merge($existing_player_array, $player_array);
@@ -1417,7 +1705,8 @@ function mmrpg_prototype_robots_unlocked_index($include_extra = array()){
         if (!empty($_SESSION[$session_token]['values'][$session_battle_key])){
             foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
                 if (!empty($player_array['player_robots'])){
-                    foreach ($player_array['player_robots'] AS $robot_token => $robot_array){
+                    foreach ($player_array['player_robots'] AS $robot_key => $robot_array){
+                        $robot_token = !empty($robot_array['robot_token']) ? $robot_array['robot_token'] : $robot_key;
                         $robot_array['current_player'] = $player_token;
                         if (!isset($session_battle_values[$robot_token])){ $session_battle_values[$robot_token] = array(); }
                         $session_battle_values[$robot_token][$session_battle_key] = $robot_array;
@@ -1606,33 +1895,85 @@ function mmrpg_prototype_stars_unlocked($player_token = '', $star_kind = ''){
         return count($temp_stars_index);
     }
 }
+// Define a function that returns the hard-coded list of player tokens that can be unlocked
+function mmrpg_prototype_unlockable_players(){
+    //error_log('mmrpg_prototype_unlockable_players() called');
+    return array('dr-lalinde', 'dr-light', 'dr-wily', 'dr-cossack');
+}
+
 // Define a function for checking how many limit hearts have been unlocked by a player
-function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0){
+function mmrpg_prototype_limit_hearts_earned($player_token, &$max_hearts = 0, &$extra_hearts = 0){
+    //error_log('mmrpg_prototype_limit_hearts_earned('.$player_token.')');
+
+    // If this is "player" (the cursor), limit hearts are not relevant for one who cannot command robots
+    if ($player_token === 'player'){
+        // Instead, we'll simply return a representation of how many players have been unlocked so far
+        $human_players = mmrpg_prototype_unlockable_players();
+        //$num_hearts = 1;
+        //$real_max_hearts = count($human_players) + 1; // +1 for cursor
+        $num_hearts = 0;
+        $real_max_hearts = count($human_players);
+        $max_hearts = $real_max_hearts;
+        foreach ($human_players AS $token){ if (mmrpg_prototype_player_unlocked($token)){ $num_hearts++; } }
+        if ($max_hearts > $real_max_hearts){ $max_hearts = $real_max_hearts; }
+        if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
+        return $num_hearts;
+    }
+    // If this player is Dr. LaLinde, she cannot use robots so we must always return 0
+    elseif ($player_token === 'dr-lalinde'){
+        return 0;
+    }
 
     // Define the number of hearts at zero and we'll go up from there
+    $num_hearts = 0;
     $real_max_hearts = 8;
     $max_hearts = $real_max_hearts;
-    $num_hearts = 0;
+
+    // Check if this is an "original" player character or not (before 2k25 version)
+    $is_original_player = $player_token !== 'dr-lalinde' ? true : false;
 
     // Collect the player's progress in terms of chapters to determine hearts
+    $limit_hearts_earned = array();
+    $limit_heart_token = str_replace('dr-', '', $player_token).'-heart';
+    mmrpg_prototype_items_unlocked(true, $items_unlocked);
+    $player_items_unlocked = !empty($items_unlocked) ? array_keys($items_unlocked) : array();
     $player_chapters_unlocked = rpg_prototype::get_player_chapters_unlocked($player_token);
-    if ($player_chapters_unlocked['0']){ $num_hearts++; }
-    if ($player_chapters_unlocked['1']){ $num_hearts++; }
-    if ($player_chapters_unlocked['2']){ $num_hearts++; }
-    if ($player_chapters_unlocked['3']){ $num_hearts++; }
-    if ($player_chapters_unlocked['4a']){ $num_hearts++; }
-    if (mmrpg_prototype_complete($player_token)){ $num_hearts++; }
+    //error_log('$player_items_unlocked = '.print_r($player_items_unlocked, true));
+    //error_log('$player_chapters_unlocked = '.print_r($player_chapters_unlocked, true));
+    if (($is_original_player && $player_chapters_unlocked['0']) || in_array($limit_heart_token.'__1', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__1'; }
+    if (($is_original_player && $player_chapters_unlocked['1']) || in_array($limit_heart_token.'__2', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__2'; }
+    if (($is_original_player && $player_chapters_unlocked['2']) || in_array($limit_heart_token.'__3', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__3'; }
+    if (($is_original_player && $player_chapters_unlocked['3']) || in_array($limit_heart_token.'__4', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__4'; }
+    if (($is_original_player && $player_chapters_unlocked['4a']) || in_array($limit_heart_token.'__5', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__5'; }
+    if (($is_original_player && $player_chapters_unlocked['4z']) || in_array($limit_heart_token.'__6', $player_items_unlocked)){ $limit_hearts_earned[] = $limit_heart_token.'__6'; }
 
     // Hide the last two hearts behind superboss battles, but don't show them until collected
     $max_hearts -= 2;
     $session_token = mmrpg_game_token();
     $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
-    if (isset($session_robot_database['quint']['robot_defeated'])){ $num_hearts++; }
-    if (isset($session_robot_database['sunstar']['robot_defeated'])){ $num_hearts++; }
+    if (!empty($session_robot_database['quint']['robot_defeated'])
+        || in_array($limit_heart_token.'__7', $player_items_unlocked)){
+        $limit_hearts_earned[] = $limit_heart_token.'__7';
+        $max_hearts++; $extra_hearts++;
+        }
+    if (!empty($session_robot_database['sunstar']['robot_defeated'])
+        || in_array($limit_heart_token.'__8', $player_items_unlocked)){
+        $limit_hearts_earned[] = $limit_heart_token.'__8';
+        $max_hearts++; $extra_hearts++;
+        }
+
+    // Now count all the limit hearts the player has earner from wherever
+    $limit_hearts_earned = array_unique($limit_hearts_earned);
+    //error_log('$limit_hearts_earned = '.print_r($limit_hearts_earned, true));
+    $num_hearts = count($limit_hearts_earned);
     if ($num_hearts > $max_hearts){ $max_hearts = $num_hearts; }
 
     // Make sure we don't go over the max hearts
+    if ($max_hearts > $real_max_hearts){ $max_hearts = $real_max_hearts; }
     if ($num_hearts > $real_max_hearts){ $num_hearts = $real_max_hearts; }
+    //error_log('$num_hearts = '.$num_hearts);
+    //error_log('$max_hearts = '.$max_hearts);
+    //error_log('$extra_hearts = '.$extra_hearts);
 
     // Return the total number of hearts this player has earned
     return $num_hearts;
@@ -1750,7 +2091,7 @@ function mmrpg_prototype_remaining_stars($return_arrays = false, $possible_star_
 }
 
 // Define a function for checking how many prototype abilities has been unlocked
-function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array()){
+function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '', &$ability_tokens = array(), $include_hidden = false){
 
     // Pull in global variables
     $mmrpg_index_players = rpg_player::get_index(true);
@@ -1758,6 +2099,9 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
     $session_token = mmrpg_game_token();
 
     // If a specific robot token was provided
+    if (!is_string($player_token)){ $player_token = ''; }
+    if (!is_string($robot_token)){ $robot_token = ''; }
+    if (!is_array($ability_tokens)){ $ability_tokens = array(); }
     if (!empty($player_token) && !empty($robot_token)){
         // Check if this battle has been completed and return true is it was
         $ability_tokens = isset($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) ? ($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_abilities']) : array();
@@ -1779,8 +2123,9 @@ function mmrpg_prototype_abilities_unlocked($player_token = '', $robot_token = '
         if ($info['ability_class'] != 'master'){ unset($ability_tokens[$key]); }
         elseif (empty($info['ability_flag_published'])){ unset($ability_tokens[$key]); }
         elseif (empty($info['ability_flag_complete'])){ unset($ability_tokens[$key]); }
-        elseif (!empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
+        elseif (!$include_hidden && !empty($info['ability_flag_hidden'])){ unset($ability_tokens[$key]); }
     }
+    $ability_tokens = !empty($ability_tokens) ? array_values($ability_tokens) : array();
 
     // Return the total amount of ability tokens pulled
     return !empty($ability_tokens) ? count($ability_tokens) : 0;
@@ -1888,6 +2233,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             $is_player_battle = !empty($this_battleinfo['flags']['player_battle']) ? true : false;
             $is_challenge_battle = !empty($this_battleinfo['flags']['challenge_battle']) ? true : false;
             $is_endless_battle = !empty($this_battleinfo['flags']['endless_battle']) ? true : false;
+            $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
             $is_battle_counts = isset($this_battleinfo['battle_counts']) && $this_battleinfo['battle_counts'] == false ? false : true;
 
             // Check the GAME session to see if this battle has been completed, increment the counter if it was
@@ -2117,9 +2463,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     $temp_shadow = isset($this_battle_sprite['shadow']) ? $this_battle_sprite['shadow'] : false;
                     $temp_kind = isset($this_battle_sprite['kind']) ? $this_battle_sprite['kind'] : 'sprite';
                     $temp_kind_token = isset($this_battle_sprite['token']) ? $this_battle_sprite['token'] : '';
+                    $temp_other_classes = '';
                     $temp_other_styles = '';
                     if ($temp_shadow){
-                        $temp_other_styles .= '-webkit-filter: grayscale(100%); filter: grayscale(100%); ';
+                        $temp_other_styles .= ' -webkit-filter: grayscale(100%); filter: grayscale(100%); ';
                         $temp_opacity *= 0.5;
                         }
                     if (!$disable_hiding_robots
@@ -2149,14 +2496,16 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                     } elseif (preg_match('/^(abilities|items)/i', $temp_path)){
                         $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_'.str_pad($temp_frame, 2, '0', STR_PAD_LEFT).' " style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); top: 1px; right: -3px; z-index: '.$temp_layer.'; opacity: '.$temp_opacity.'; '.$temp_other_styles.'">&nbsp;</span>';
                     } else {
-                        if ($temp_kind === 'robot' && !empty($temp_kind_token)) {
+                        if ($temp_kind === 'robot'
+                            && !empty($temp_kind_token)) {
                             $robot_animation_duration = rpg_robot::get_css_animation_duration($temp_kind_token);
                             if ($this_option_complete){ $robot_animation_duration *= 4; }
-                            $temp_other_styles .= 'animation-duration: '.$robot_animation_duration.'s; ';
-                            if ($this_option_complete){ $temp_other_styles .= 'animation-delay: '.(-1 * (($this_key + $temp_key) * 0.1)).'s; '; }
+                            $temp_other_styles .= ' animation-duration: '.$robot_animation_duration.'s; ';
+                            if ($this_option_complete){ $temp_other_styles .= ' animation-delay: '.(-1 * (($this_key + $temp_key) * 0.1)).'s; '; }
                         }
+                        $temp_frame_class = ($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? ' sprite_'.$temp_size_text.'_defeat' : ' sprite_'.$temp_size_text.'_'.$this_option_frame);
                         $this_option_label .= '<span class="sprite sprite_'.$temp_kind.' sprite_40x40 sprite_40x40_00" style="right: '.$temp_right.'px; z-index: '.$temp_layer.';">';
-                            $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.' '.($this_option_complete && !$this_has_field_star && $this_option_frame == 'base' ? 'sprite_'.$temp_size_text.'_defeat ' : 'sprite_'.$temp_size_text.'_'.$this_option_frame.' ').'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.$temp_other_styles.'">&nbsp;</span>';
+                            $this_option_label .= '<span class="sprite sprite_'.$temp_size_text.$temp_frame_class.$temp_other_classes.'" style="background-image: url(images/'.$temp_path.'/sprite_left_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.');'.$temp_other_styles.'">&nbsp;</span>';
                         $this_option_label .= '</span>';
                     }
 
@@ -2169,8 +2518,10 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             elseif (!empty($this_fieldinfo['field_name'])){ $this_option_button_text = $this_fieldinfo['field_name']; }
             else { $this_option_button_text = 'Battle'; }
 
+
+            $option_level_limit_break = mmrpg_prototype_allow_limit_break() ? true : false;
             if ($this_option_min_level < 1){ $this_option_min_level = 1; }
-            if ($this_option_max_level > 100){ $this_option_max_level = 100; }
+            if ($this_option_max_level > 100 && !$option_level_limit_break){ $this_option_max_level = 100; }
             if ($this_option_min_level > $this_option_max_level){ $this_option_max_level = $this_option_min_level; }
             $this_option_level_range = $this_option_min_level == $this_option_max_level ? 'Level '.$this_option_min_level : 'Levels '.$this_option_min_level.'-'.$this_option_max_level;
 
@@ -2343,12 +2694,19 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
             }
             $temp_field_multipliers = !empty($temp_field_multipliers) ? implode('|', $temp_field_multipliers) : '';
 
+            // Add extra option classes based on the type of mission we're dealing with
+            /* $is_starter_battle, $is_player_battle, $is_challenge_battle, $is_endless_battle, $is_starfield_mission */
+            if ($is_starter_battle){ $this_option_class .= ' starter'; }
+            elseif ($is_player_battle){ $this_option_class .= ' versus'; }
+            elseif ($is_challenge_battle){ $this_option_class .= ' challenge'; }
+            elseif ($is_endless_battle){ $this_option_class .= ' endless'; }
+            elseif ($is_starfield_mission){ $this_option_class .= ' starfield'; }
+            $this_option_class = trim(preg_replace('/\s+/', ' ', $this_option_class));
 
             // Check if this is a starfield mission or not
             $this_image_style = '';
-            $is_starfield_mission = !empty($this_battleinfo['flags']['starfield_mission']) ? true : false;
             if ($is_starfield_mission){
-                $this_option_class .= ' starfield';
+                //$this_option_class .= ' starfield';
                 if (!empty($this_battleinfo['battle_complete_redirect_token'])){
                     $this_option_class .= ' starshake';
                     $this_option_class .= ' dx';
@@ -2750,6 +3108,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
     if (empty($target_robots)){ $target_robots[] = array('robot_token' => 'met'); }
     foreach ($target_robots AS $key => $robot_info){
         $index_info = $mmrpg_index_robots[$robot_info['robot_token']];
+        //error_log('checking '.$robot_info['robot_token'].' ...');
         $robot_info['robot_id'] = !empty($robot_info['robot_id']) ? $robot_info['robot_id'] : rpg_game::unique_robot_id($target_info['player_id'], $index_info['robot_id'], ($key + 1));
         $robot_info['robot_level'] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : $temp_battle_omega['battle_level'];
         $robot_info['robot_item'] = !empty($robot_info['robot_item']) ? $robot_info['robot_item'] : '';
@@ -2773,6 +3132,7 @@ function mmrpg_prototype_generate_mission($this_prototype_data,
         if ($robot_info['robot_level'] > 100){
             if (!isset($robot_info['values'])){ $robot_info['values'] = array(); }
             $robot_info['values']['robot_level_max'] = $robot_info['robot_level'];
+            //error_log('robot_level = '.$robot_info['robot_level'].' for $robot_info = '.print_r($robot_info, true));
         }
         $target_robots[$key] = $robot_info;
     }
@@ -4581,7 +4941,8 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     $temp_offset_x = 5;
     $temp_offset_z = 50;
     $temp_offset_y = -2;
-    $temp_offset_opacity = 0.75;
+    $temp_offset_brightness = 0.75;
+    $temp_offset_brightness_step = (0.50 / $robot_limit); //0.04;
     $text_sprites_markup = '';
     $sprites_displayed = 0;
 
@@ -4601,8 +4962,10 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
     if (empty($player_robot_favourites)){ $player_robot_favourites = array(); }
 
     // Collect the player's robot settings and rewards arrays then marge 'em for reference
-    $temp_player_robots_settings = $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'];
-    $temp_player_robots_rewards = $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'];
+    $temp_player_battle_settings = !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]) ? $_SESSION[$session_token]['values']['battle_settings'][$player_token] : array();
+    $temp_player_battle_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? $_SESSION[$session_token]['values']['battle_rewards'][$player_token] : array();
+    $temp_player_robots_settings = !empty($temp_player_battle_settings['player_robots']) ? $temp_player_battle_settings['player_robots'] : array();
+    $temp_player_robots_rewards = !empty($temp_player_battle_rewards['player_robots']) ? $temp_player_battle_rewards['player_robots'] : array();
     $temp_player_robots_tokens = array_unique(array_merge(array_keys($temp_player_robots_settings), array_keys($temp_player_robots_rewards)));
 
     //error_log('$temp_player_robots_tokens(before): '.print_r($temp_player_robots_tokens, true));
@@ -4655,13 +5018,14 @@ function mmrpg_prototype_get_player_robot_sprites($player_token, $session_token 
             $temp_offset_x += 20;
             $temp_offset_y = -2;
             $temp_offset_z -= 1;
-            $temp_offset_opacity -= 0.04;
-            if ($temp_offset_opacity <= 0){ $temp_offset_opacity = 0; }
-            if (in_array($token, $player_robots_locked)){ $temp_offset_brightness = 0; }
-            else { $temp_offset_brightness = $temp_offset_opacity; }
-            $temp_animation_direction = rpg_robot::get_css_animation_duration($index);
-            $text_sprites_markup .= '<span class="sprite sprite_robot sprite_nobanner sprite_40x40 sprite_40x40_00" style="top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_offset_brightness.');">';
-                $text_sprites_markup .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.'); animation-duration: '.$temp_animation_direction.'s;">'.$info['robot_name'].'</span>';
+            $temp_offset_brightness -= $temp_offset_brightness_step;
+            if ($temp_offset_brightness <= 0){ $temp_offset_brightness = 0; }
+            if (in_array($token, $player_robots_locked)){ $temp_brightness = 0; }
+            else { $temp_brightness = $temp_offset_brightness; }
+            $temp_animation_duration = rpg_robot::get_css_animation_duration($index);
+            $temp_animation_styles = ' animation-duration: '.$temp_animation_duration.'s;';
+            $text_sprites_markup .= '<span class="sprite sprite_robot sprite_nobanner sprite_40x40 sprite_40x40_00" style="top: '.$temp_offset_y.'px; right: '.$temp_offset_x.'px; z-index: '.$temp_offset_z.'; filter: brightness('.$temp_brightness.');">';
+                $text_sprites_markup .= '<span class="sprite sprite_'.$temp_size_text.' sprite_'.$temp_size_text.'_base'.'" style="background-image: url(images/robots/'.(!empty($info['robot_image']) ? $info['robot_image'] : $info['robot_token']).'/sprite_right_'.$temp_size_text.'.png?'.MMRPG_CONFIG_CACHE_DATE.');'.$temp_animation_styles.'">'.$info['robot_name'].'</span>';
             $text_sprites_markup .= '</span>';
             $sprites_displayed++;
             if (!empty($robot_limit)
@@ -5172,6 +5536,8 @@ function mmrpg_prototype_get_proxy_robot_options($this_userinfo, &$allowed_proxy
             foreach ($_SESSION[$session_token]['values'][$session_battle_key] AS $player_token => $player_array){
                 if (!empty($player_array['player_robots'])){
                     foreach ($player_array['player_robots'] AS $robot_token => $robot_array){
+                        if (strstr($robot_token, '_')){ list($robot_id, $robot_token) = explode('_', $robot_token); }
+                        else { $robot_id = 0; }
                         $robot_array['current_player'] = $player_token;
                         if (!isset($unlocked_player_robots[$robot_token])){ $unlocked_player_robots[$robot_token] = $robot_array; }
                         else { $unlocked_player_robots[$robot_token] = array_merge($unlocked_player_robots[$robot_token], $robot_array); }
@@ -5683,7 +6049,7 @@ function mmrpg_prototype_get_endless_sessions($player_token = '', $force_refresh
     $_SESSION['ENDLESS']['ENDLESS_MODE_SAVEDATA'] = array();
 
     // Check if we're allowed and there is an ENDLESS ATTACK MODE savestate in the waveboard to load now
-    if (mmrpg_prototype_item_unlocked('wily-program')){
+    if (mmrpg_prototype_item_unlocked('challenge-permit')){
         global $db;
         global $flag_wap;
         $challenge_mode_savestate = $db->get_value("SELECT

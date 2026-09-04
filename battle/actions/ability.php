@@ -1,5 +1,9 @@
 <?
 
+// DEPRECATED!!!  2026-08-27
+// This script is no-longer used and turn-actions have
+// been re-routed to 'battle/actions/action_playerturn.php'
+
 // -- ABILITY BATTLE ACTION -- //
 //error_log('battle/actions/ability.php');
 
@@ -103,6 +107,15 @@ if ($active_target_robot->robot_status != 'disabled'){
             if (!empty($attachment_info['attachment_switch_disabled'])){ $temp_switch_disabled = true; }
         }
     }
+}
+// Check if the opposing player has an active Magnet Module
+$temp_thisplayer_magnet_robots = $this_player->get_value('magnet_robots');
+$temp_thisplayer_active_robot = $this_player->get_active_robot();
+if (!empty($temp_thisplayer_magnet_robots)
+    && !empty($temp_thisplayer_active_robot)
+    && in_array($temp_thisplayer_active_robot->robot_id, $temp_thisplayer_magnet_robots)){
+    // If the human player has an active Magnet Module, the CPU cannot switch!
+    $temp_switch_disabled = true;
 }
 
 // Check if switch was allowed and successful, else we do ability

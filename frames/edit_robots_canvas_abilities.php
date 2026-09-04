@@ -58,6 +58,9 @@ echo '<div class="wrapper">';
 
             // Loop through collected ability reward options and display markup for 'em
             foreach ($mmrpg_database_abilities AS $ability_token => $ability_info){
+                if (empty($ability_info['ability_flag_published'])){ continue; }
+                if (empty($ability_info['ability_flag_complete'])){ continue; }
+                if (empty($ability_info['ability_flag_unlockable'])){ continue; }
                 if (!rpg_game::ability_unlocked('', '', $ability_token)){ continue; }
                 //if ($key_counter > 0 && $key_counter % 5 == 0){ echo '</tr><tr>'; }
                 //echo '<td>';

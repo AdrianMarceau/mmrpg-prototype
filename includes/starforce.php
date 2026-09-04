@@ -5,6 +5,7 @@ if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 // Collect the field stars from the session variable
 $this_battle_stars = !empty($_SESSION[$session_token]['values']['battle_stars']) ? $_SESSION[$session_token]['values']['battle_stars'] : array();
 $this_battle_stars_count = !empty($this_battle_stars) ? count($this_battle_stars) : 0;
+$this_battle_stars_boss_count = 0;
 $this_battle_stars_field_count = 0;
 $this_battle_stars_fusion_count = 0;
 $this_battle_stars_perfect_fusion_count = 0;
@@ -23,7 +24,8 @@ foreach ($this_battle_stars AS $temp_key => $temp_data){
     if ($star_kind == 'fusion' && $star_type != $star_type2){ $star_kind = 'fusion'; }
     elseif ($star_kind == 'fusion' && $star_type == $star_type2){ $star_kind = 'perfect-fusion'; }
 
-    if ($star_kind == 'field'){ $this_battle_stars_field_count++; }
+    if ($star_kind == 'boss'){ $this_battle_stars_boss_count++; }
+    else if ($star_kind == 'field'){ $this_battle_stars_field_count++; }
     elseif ($star_kind == 'fusion'){ $this_battle_stars_fusion_count++; }
     elseif ($star_kind == 'perfect-fusion'){ $this_battle_stars_perfect_fusion_count++; }
 

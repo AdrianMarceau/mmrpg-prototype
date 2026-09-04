@@ -236,11 +236,13 @@ elseif ($this_action == 'start'){
     // Break apart and filter this player's robots
     $this_playerinfo['player_robots'] = array();
     $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
+    //error_log('-> start action w/ $temp_this_player_robots = '.print_r($temp_this_player_robots, true));
     foreach ($temp_this_player_robots AS $temp_string){
         list($temp_id, $temp_token) = explode('_', $temp_string);
-        $temp_settings = mmrpg_prototype_robot_settings($this_playerinfo['player_token'], $temp_token);
+        $temp_base_id = is_numeric($temp_id) ? $temp_id : (strstr($temp_id, 'x') ? explode('x', $temp_id)[2] : 0);
+        $temp_settings = mmrpg_prototype_robot_settings($this_playerinfo['player_token'], $temp_token, $temp_base_id);
         $temp_abilities = !empty($temp_settings['robot_abilities']) ? array_keys($temp_settings['robot_abilities']) : array();
-        $this_playerinfo['player_robots'][] = array('robot_id' => $temp_id, 'robot_token' => $temp_token, 'robot_abilities' => $temp_abilities);
+        $this_playerinfo['player_robots'][] = array('robot_id' => $temp_id, 'robot_base_id' => $temp_base_id, 'robot_token' => $temp_token, 'robot_abilities' => $temp_abilities);
         unset($temp_settings, $temp_abilities);
     }
 
@@ -361,7 +363,7 @@ if ($this_action == 'start'){
         $temp_this_player_robots = strstr($this_player_robots, ',') ? explode(',', $this_player_robots) : array($this_player_robots);
         $temp_this_player_robots_ids = array();
         foreach ($this_playerinfo['player_robots'] AS $this_key => $this_data){
-            if (!mmrpg_prototype_robot_unlocked($this_player_token, $this_data['robot_token'])){ continue; }
+            if (!mmrpg_prototype_robot_unlocked($this_player_token, $this_data['robot_token'], $this_data['robot_base_id'])){ continue; }
             $this_info = rpg_robot::parse_index_info($battle_robots_index[$this_data['robot_token']]);
             if (in_array($this_data['robot_id'], $temp_this_player_robots_ids)){ continue; }
             else { $temp_this_player_robots_ids[] = $this_data['robot_id']; }
@@ -369,8 +371,8 @@ if ($this_action == 'start'){
             $this_position = array_search($this_token, $temp_this_player_robots);
             $this_preload = !empty($temp_robots_preload[$this_token]) ? $temp_robots_preload[$this_token] : array();
             $this_data['robot_key'] = $this_key_counter;
-            $this_data['robot_experience'] = mmrpg_prototype_robot_experience($this_playerinfo['player_token'], $this_data['robot_token']);
-            $this_data['robot_level'] = mmrpg_prototype_robot_level($this_playerinfo['player_token'], $this_data['robot_token']);
+            $this_data['robot_experience'] = mmrpg_prototype_robot_experience($this_playerinfo['player_token'], $this_data['robot_token'], $this_data['robot_base_id']);
+            $this_data['robot_level'] = mmrpg_prototype_robot_level($this_playerinfo['player_token'], $this_data['robot_token'], $this_data['robot_base_id']);
             if (isset($this_preload['robot_persona'])){
                 $this_data['robot_persona'] = $this_preload['robot_persona'];
                 $this_data['robot_persona_image'] = !empty($this_preload['robot_persona_image']) ? $this_preload['robot_persona_image'] : $this_preload['robot_persona'];
@@ -496,7 +498,8 @@ if (!empty($this_player->player_robots)){
     // Otherwise define the robotinfo array manually
     else {
         // Create the robotinfo array with engine data
-        $this_robotinfo = array('robot_id' => $this_robot_id, 'robot_token' => $this_robot_token);
+        $temp_base_id = is_numeric($this_robot_id) ? $this_robot_id : (strstr($this_robot_id, 'x') ? explode('x', $this_robot_id)[2] : 0);
+        $this_robotinfo = array('robot_id' => $this_robot_id, 'robot_base_id' => $temp_base_id, 'robot_token' => $this_robot_token);
     }
 }
 // Otherwise, if this player has no robots
@@ -518,7 +521,8 @@ if (!empty($target_player->player_robots)){
     // Otherwise define the robotinfo array manually
     else {
         // Create the robotinfo array with engine data
-        $target_robotinfo = array('robot_id' => $target_robot_id, 'robot_token' => $target_robot_token);
+        $temp_base_id = is_numeric($target_robot_id) ? $target_robot_id : (strstr($target_robot_id, 'x') ? explode('x', $target_robot_id)[2] : 0);
+        $target_robotinfo = array('robot_id' => $target_robot_id, 'robot_base_id' => $temp_base_id, 'robot_token' => $target_robot_token);
     }
 }
 // Otherwise, if the target player has no robots
@@ -552,6 +556,13 @@ if ($this_action == 'prototype'){
 
     // Require the prototype action file
     require_once('battle/actions/prototype.php');
+
+}
+// Else if the player is has requested the world map
+elseif ($this_action == 'world'){
+
+    // Require the prototype action file
+    require_once('battle/actions/world.php');
 
 }
 // Else if the player is has requested to withdraw from the battle (endless mode)
@@ -592,6 +603,16 @@ elseif ($this_action == 'scan'){
 
 }
 // Else if the player's robot is using an ability
+elseif ($this_action == 'ability'
+    || $this_action == 'item'
+    || $this_action == 'switch'){
+
+    // Require the ability action file
+    require_once('battle/actions/action_playerturn.php');
+
+}
+/*
+// Else if the player's robot is using an ability
 elseif ($this_action == 'ability'){
 
     // Require the ability action file
@@ -612,6 +633,7 @@ elseif ($this_action == 'switch'){
     require_once('battle/actions/ability_switch.php');
 
 }
+*/
 
 // Re-collect this robot if different from the "current" one in this player's values
 $this_player->player_reload();
@@ -683,8 +705,8 @@ if (!isset($_SESSION['GAME']['values']['battle_items'])){
 $actions_markup = array();
 
 // Define the default this and target ids and tokens to reload
-$temp_this_reload_robot = array('robot_id' => $this_robot->robot_id, 'robot_token' => $this_robot->robot_token);
-$temp_target_reload_robot = array('robot_id' => $target_robot->robot_id, 'robot_token' => $target_robot->robot_token);
+$temp_this_reload_robot = array('robot_id' => $this_robot->robot_id, 'robot_base_id' => $this_robot->robot_base_id, 'robot_token' => $this_robot->robot_token);
+$temp_target_reload_robot = array('robot_id' => $target_robot->robot_id, 'robot_base_id' => $target_robot->robot_base_id, 'robot_token' => $target_robot->robot_token);
 
 // If this robot is not active, check to see if there's one that is
 if ($this_robot->robot_position != 'active'){
@@ -975,8 +997,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 'challenge_robot_limit' => $temp_target_robot_limit
                 ), $new_percent, $new_rank);
 
-            /*
-            error_log('NEW results = '.print_r(array(
+            /* error_log('NEW results = '.print_r(array(
                 'challenge_turns_used' => $temp_player_turns_used,
                 'challenge_turn_limit' => $temp_target_turn_limit,
                 'challenge_robots_used' => $temp_player_robots_used,
@@ -985,8 +1006,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                 ' $new_points = '.$new_points.
                 ' | $new_percent = '.$new_percent.
                 ' | $new_rank = '.$new_rank
-                );
-            */
+                ); */
 
             // Check to see if an existing row exists to update before inserting
             if (!empty($existing_db_row)){
@@ -999,8 +1019,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                     'challenge_robot_limit' => $temp_target_robot_limit
                     ), $old_percent, $old_rank);
 
-                /*
-                error_log('OLD results = '.print_r(array(
+                /* error_log('OLD results = '.print_r(array(
                     'challenge_turns_used' => $existing_db_row['challenge_turns_used'],
                     'challenge_turn_limit' => $temp_target_turn_limit,
                     'challenge_robots_used' => $existing_db_row['challenge_robots_used'],
@@ -1009,8 +1028,7 @@ if (!empty($this_battle->flags['challenge_battle'])
                     ' $old_points = '.$old_points.
                     ' | $old_percent = '.$old_percent.
                     ' | $old_rank = '.$old_rank
-                    );
-                */
+                    ); */
 
                 // If new points are higher, we can update record, else just update access time
                 if ($new_points >= $old_points){ $update_fields = $db_common_fields; }

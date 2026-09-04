@@ -6,13 +6,17 @@ require('../top.php');
 // Return markup based on provided arguments
 $is_logged_in = !rpg_user::is_guest();
 if ($is_logged_in){
+    //error_log("AJAX REQUEST: get-events.php");
 
     // Collect the session token so we can find events
     $session_token = rpg_game::session_token();
+    $SESSION_EVENTS = !empty($_SESSION[$session_token]['EVENTS']) ? $_SESSION[$session_token]['EVENTS'] : array();
+    if (!is_array($SESSION_EVENTS)){ $SESSION_EVENTS = array(); }
+    $_SESSION[$session_token]['EVENTS'] = array();
+    session_write_close();
 
     // Pre-sort the events to make sure they are in player order
-    if (isset($_SESSION[$session_token]['EVENTS'])
-        && is_array($_SESSION[$session_token]['EVENTS'])){
+    if (!empty($SESSION_EVENTS)){
 
         // Manually define event priority so it's easier to sort stuff
         $event_priority_bracket = array(
@@ -35,7 +39,7 @@ if ($is_logged_in){
         $mmrpg_index_players_tokens_count = count($mmrpg_index_players_tokens);
 
         // Start sorting the events now that we have everything set up
-        usort($_SESSION[$session_token]['EVENTS'], function($event_a, $event_b) use (
+        usort($SESSION_EVENTS, function($event_a, $event_b) use (
             $event_priority_bracket, $event_priority_bracket_tiers,
             $mmrpg_index_players_tokens, $mmrpg_index_players_tokens_count
             ){
@@ -69,8 +73,8 @@ if ($is_logged_in){
     $window_canvas_messages = array();
 
     // If there were any prototype window events created, display them
-    if (!empty($_SESSION[$session_token]['EVENTS'])){
-        foreach ($_SESSION[$session_token]['EVENTS'] AS $temp_key => $temp_event){
+    if (!empty($SESSION_EVENTS)){
+        foreach ($SESSION_EVENTS AS $temp_key => $temp_event){
             $meta_data = array();
             if (isset($temp_event['event_type'])){ $meta_data[] = '<meta name="event_type" content="'.$temp_event['event_type'].'" />'; }
             if (isset($temp_event['player_token'])){ $meta_data[] = '<meta name="player_token" content="'.$temp_event['player_token'].'" />'; }
@@ -80,12 +84,8 @@ if ($is_logged_in){
         }
     }
 
-    // If there were any events in the session, automatically add remove them from the session
-    //error_log("Make sure we clear the event session when we're done!");
-    if (!empty($_SESSION[$session_token]['EVENTS'])){ $_SESSION[$session_token]['EVENTS'] = array(); }
-
     // Return the markup for the community formatting guide
-    header('Content-type: text/json; charset=UTF-8');
+    header('Content-type: application/json; charset=UTF-8');
     echo(json_encode(array(
         'status' => 'success',
         'updated' => time(),

@@ -152,6 +152,8 @@ function mmrpg_formatting_decode($string){
         $mmrpg_formatting_array += array(
             // image-inline (no hover, no link)
             '/\[image\]\((.*?).(jpg|jpeg|gif|png|bmp)\)/i' => '<span class="link_image_inline"><img src="$1.$2" /></span>',
+            // video-inline (no hover, no link)
+            '/\[video\]\((.*?).(mp4|webm|ogv)\)/i' => '<span class="link_video_inline"><video src="$1.$2#t=0.1" preload="metadata" controls></video></span>',
             );
         $mmrpg_formatting_array += array(
             // sprite 40x40
@@ -396,6 +398,12 @@ function mmrpg_formatting_decode($string){
     do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(jpg|jpeg|gif|png|bmp)\)/i', '<a class="link_image_inline" href="$2.$3" target="_blank"><img src="$2.$3" alt="$1" title="$1" /></a>', $string, -1, $count); }
     while ($count > 0);
 
+    // -- REPLACE VIDEOS -- //
+
+    // Recusively replace all the inline videos with their embed markup
+    do { $string = preg_replace('/\[([^\[\]]+)\]\(([^\s]+).(mp4|webm|ogv)\)/i', '<span class="link_video_inline"><video src="$2.$3#t=0.1" preload="metadata" controls loop>$1</video><a href="$2.$3" target="_blank">$1</a></span>', $string, -1, $count); }
+    while ($count > 0);
+
     // -- REPLACE LINKS -- //
 
     // Recusively replace all the standard text links with their markup
@@ -546,10 +554,11 @@ function mmrpg_formatting_decode($string){
         // Replace any photobucket links with HTTPS urls
         $string = preg_replace('/http:\/\/((?:[a-z0-9]+)\.photobucket\.com\/)/i', 'https://$1', $string);
         // Replace any other image links with HTTPS urls
-        if (preg_match_all('/src="http:\/\/((?:[-_a-z0-9\.\/\+]+)\.(?:jpg|jpeg|png|ico|bmp|svg)(?:\?(.*)?)?)"/i', $string, $matches)){
+        if (preg_match_all('/src="https?:\/\/((?:[-_a-z0-9\.\/\+]+)\.(?:jpg|jpeg|png|ico|bmp|svg|gif)(?:\?(.*)?)?)"/i', $string, $matches)){
             $proxy_script = MMRPG_CONFIG_ROOTURL.'scripts/imageproxy.php';
             foreach ($matches[1] AS $key => $src){
                 $find = $matches[0][$key];
+                if (strstr($src, '.mmrpg-world.net') !== false){ continue; }
                 $src_encoded = urlencode($src);
                 $src_hash = md5(MMRPG_SETTINGS_IMAGEPROXY_SALT . $src);
                 $replace = 'src="'.$proxy_script.'?url='.$src_encoded.'&hash='.$src_hash.'"';
@@ -704,7 +713,8 @@ function mmrpg_website_sessions_active($session_href = '', $session_timeout = 3,
         $min_time = strtotime('-'.$session_timeout.' minutes', $this_time);
         $saved_active_sessions = $db->get_array_list("SELECT
             DISTINCT user_id,
-            session_href
+            session_href,
+            session_access
             FROM mmrpg_sessions
             WHERE session_access >= {$min_time}
             ORDER BY session_access ASC
@@ -1914,6 +1924,54 @@ function get_milliseconds_from_timestamp($timestamp = ''){
 function get_timestamp_from_milliseconds($milliseconds = 0){
     $parts = convert_from_milliseconds($milliseconds);
     return sprintf('%02d:%02d:%02d', $parts['minutes'], $parts['seconds'], $parts['frames']);
+}
+
+
+// Define a function that inserts a new element into an associative array after a given key position
+function array_insert_after_key(&$parent_array, $parent_key, $child_array, $child_key) {
+    $new_array = [];
+    foreach ($parent_array as $key => $value) {
+        $new_array[$key] = $value;
+        if ($key === $parent_key){ $new_array[$child_key] = $child_array; }
+    }
+    $parent_array = $new_array;
+}
+
+// Define a function that inserts a new element into an associative array before a given key position
+function array_insert_before_key(&$parent_array, $parent_key, $child_array, $child_key) {
+    $new_array = [];
+    foreach ($parent_array as $key => $value) {
+        if ($key === $parent_key) { $new_array[$child_key] = $child_array; }
+        $new_array[$key] = $value;
+    }
+    $parent_array = $new_array;
+}
+
+// Define a function that takes a parent array and they rearranges the provided keys in the order provided
+function array_rearrange_keys(&$parent_array, $ordered_keys) {
+    $new_array = [];
+    $ordered_items = [];
+    // Collect items by the specified order
+    foreach ($ordered_keys as $key) {
+        if (array_key_exists($key, $parent_array)) {
+            $ordered_items[$key] = $parent_array[$key];
+            unset($parent_array[$key]);
+        }
+    }
+    // Build the new array with ordered items in specified sequence
+    $keys_added = false;
+    foreach ($parent_array as $key => $value) {
+        if (!$keys_added && empty($new_array)) {
+            $new_array = array_merge($ordered_items, $new_array);
+            $keys_added = true;
+        }
+        $new_array[$key] = $value;
+    }
+    // If $ordered_keys appear later in $parent_array, append them to the end
+    if (!$keys_added) {
+        $new_array = array_merge($new_array, $ordered_items);
+    }
+    $parent_array = $new_array;
 }
 
 ?>

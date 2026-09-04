@@ -1159,6 +1159,18 @@ class rpg_ability extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $ability_index_byid = false;
+        if ($ability_index_byid === false){
+            $ability_index_byid = array();
+            $ability_index = self::get_index(true, true);
+            if (empty($ability_index)){ $ability_index = array(); }
+            foreach ($ability_index AS $token => $ability){ $ability_index_byid[$ability['ability_id']] = $token; }
+        }
+        return $ability_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($ability_token){
 
@@ -1793,7 +1805,7 @@ class rpg_ability extends rpg_object {
                                 <div class="icon ability_type <?= $ability_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$ability_info['ability_key'] ?></div>
                             <? endif; ?>
                             <? if ($ability_info['ability_flag_complete']){ ?>
-                                <div class="icon ability_type <?= $ability_header_types ?>"><div style="background-image: url(images/abilities/<?= $ability_image_token ?>/icon_right_<?= $ability_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>);" class="sprite sprite_ability sprite_40x40 sprite_40x40_icon sprite_size_<?= $ability_image_size_text ?> sprite_size_<?= $ability_image_size_text ?>_icon"><?= $ability_info['ability_name']?>'s Icon</div></div>
+                                <div class="icon ability_type <?= $ability_header_types ?>"><div style="background-image: url(images/abilities/<?= $ability_image_token ?>/icon_right_<?= $ability_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>);" class="sprite sprite_ability sprite_40x40 sprite_40x40_icon sprite_size_<?= $ability_image_size_text ?> sprite_size_<?= $ability_image_size_text ?>_icon"></div></div>
                             <? } else { ?>
                                 <div class="icon ability_type <?= $ability_header_types ?>"><div class="sprite sprite_ability sprite_40x40 sprite_40x40_icon sprite_size_<?= $ability_image_size_text ?> sprite_size_<?= $ability_image_size_text ?>_icon">No Image</div></div>
                             <? } ?>
@@ -1811,6 +1823,7 @@ class rpg_ability extends rpg_object {
                             <?= $ability_info['ability_name'] ?>
                         <? endif; ?>
                         <? if ($print_options['layout_style'] != 'event'){ ?>
+                            &nbsp;
                             <? if (!empty($ability_info['ability_type_special'])){ ?>
                                 <div class="header_core ability_type"><?= ucfirst($ability_info['ability_type_special']) ?> Type</div>
                             <? } elseif (!empty($ability_info['ability_type']) && !empty($ability_info['ability_type2'])){ ?>
@@ -1828,13 +1841,13 @@ class rpg_ability extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Name :</label>
+                                        <label style="display: block; float: left;">Name :&nbsp;</label>
                                         <span class="ability_type ability_type_"><?= $ability_info['ability_name']?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Type :</label>
+                                        <label style="display: block; float: left;">Type :&nbsp;</label>
                                         <? if($print_options['layout_style'] != 'event'): ?>
                                             <?
                                             if (!empty($ability_info['ability_type_special'])){
@@ -1877,27 +1890,27 @@ class rpg_ability extends rpg_object {
                                 <? if($ability_info['ability_flag_complete']): ?>
                                     <tr>
                                         <td  class="right">
-                                            <label style="display: block; float: left;">Cost :</label>
+                                            <label style="display: block; float: left;">Cost :&nbsp;</label>
                                             <span class="ability_stat"><?= !empty($ability_info['ability_energy']) ? $ability_info['ability_energy'].(!empty($ability_info['ability_energy_percent']) ? '%' : '').' WE' : '-' ?></span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td  class="right">
                                             <? $temp_target_index = json_decode(MMRPG_SETTINGS_ABILITY_TARGETINDEX, true); ?>
-                                            <label style="display: block; float: left;">Target :</label>
+                                            <label style="display: block; float: left;">Target :&nbsp;</label>
                                             <span class="ability_stat"><?= !empty($ability_info['ability_target']) && isset($temp_target_index[$ability_info['ability_target']]) ? $temp_target_index[$ability_info['ability_target']] : 'Auto' ?></span>
                                         </td>
                                     </tr>
                                 <? else: ?>
                                     <tr>
                                         <td  class="right">
-                                            <label style="display: block; float: left;">Cost :</label>
+                                            <label style="display: block; float: left;">Cost :&nbsp;</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td  class="right">
-                                            <label style="display: block; float: left;">Target :</label>
+                                            <label style="display: block; float: left;">Target :&nbsp;</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
@@ -1910,7 +1923,7 @@ class rpg_ability extends rpg_object {
                                 <? if($ability_info['ability_flag_complete']): ?>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Power :</label>
+                                            <label style="display: block; float: left;">Power :&nbsp;</label>
                                             <? if(!empty($ability_info['ability_damage']) || !empty($ability_info['ability_recovery'])): ?>
                                                 <? if(!empty($ability_info['ability_damage'])){ ?><span class="ability_stat"><?= $ability_info['ability_damage'].(!empty($ability_info['ability_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
                                                 <? if(!empty($ability_info['ability_recovery'])){ ?><span class="ability_stat"><?= $ability_info['ability_recovery'].(!empty($ability_info['ability_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
@@ -1921,7 +1934,7 @@ class rpg_ability extends rpg_object {
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Speed :</label>
+                                            <label style="display: block; float: left;">Speed :&nbsp;</label>
                                             <? if (empty($ability_info['ability_speed']) || $ability_info['ability_speed'] === 1){ ?>
                                                 <span class="ability_stat">Normal</span>
                                             <? } elseif ($ability_info['ability_speed'] > 1){ ?>
@@ -1933,13 +1946,13 @@ class rpg_ability extends rpg_object {
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <label style="display: block; float: left;">Accuracy :&nbsp;</label>
                                             <span class="ability_stat"><?= $ability_info['ability_accuracy'].'%' ?></span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Value :</label>
+                                            <label style="display: block; float: left;">Value :&nbsp;</label>
                                             <?
                                             // Collect this ability's price and/or BP value where applicable
                                             $value_rows = array();
@@ -1960,25 +1973,25 @@ class rpg_ability extends rpg_object {
                                 <? else: ?>
                                     <tr>
                                         <td  class="right">
-                                            <label style="display: block; float: left;">Power :</label>
+                                            <label style="display: block; float: left;">Power :&nbsp;</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Accuracy :</label>
+                                            <label style="display: block; float: left;">Accuracy :&nbsp;</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Speed :</label>
+                                            <label style="display: block; float: left;">Speed :&nbsp;</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="right">
-                                            <label style="display: block; float: left;">Value :</label>
+                                            <label style="display: block; float: left;">Value :&nbsp;</label>
                                             <span class="ability_stat">-</span>
                                         </td>
                                     </tr>
@@ -2432,14 +2445,14 @@ class rpg_ability extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td class="right">
-                                        <label>Unlocked By : </label>
+                                        <label>Unlocked By :&nbsp;</label>
                                         <span class="ability_record"><?= $temp_ability_records['ability_unlocked'] == 1 ? '1 Player' : number_format($temp_ability_records['ability_unlocked'], 0, '.', ',').' Players' ?></span>
                                     </td>
                                 </tr>
                                 <? if (!empty($temp_ability_records['ability_equipped'])){ ?>
                                     <tr>
                                         <td class="right">
-                                            <label>Equipped To : </label>
+                                            <label>Equipped To :&nbsp;</label>
                                             <span class="ability_record"><?= $temp_ability_records['ability_equipped'] == 1 ? '1 Robot' : number_format($temp_ability_records['ability_equipped'], 0, '.', ',').' Robots' ?></span>
                                         </td>
                                     </tr>

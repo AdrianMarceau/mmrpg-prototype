@@ -73,7 +73,7 @@ class rpg_skill extends rpg_object {
         }
         // Otherwise if the ID appears to have already been set
         elseif (!empty($this_skillinfo['skill_id'])
-            && strstr($this_skillinfo['skill_id'], $this->robot_id)){
+            && strstr($this_skillinfo['skill_id'], strval($this->robot_id))){
             $skill_id = $this_skillinfo['skill_id'];
         }
         // Otherwise base the ID off of the robot
@@ -885,6 +885,18 @@ class rpg_skill extends rpg_object {
             }
         }
         return $index;
+    }
+
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $skill_index_byid = false;
+        if ($skill_index_byid === false){
+            $skill_index_byid = array();
+            $skill_index = self::get_index(true, true);
+            if (empty($skill_index)){ $skill_index = array(); }
+            foreach ($skill_index AS $token => $skill){ $skill_index_byid[$skill['skill_id']] = $token; }
+        }
+        return $skill_index_byid;
     }
 
     // Define a public function for collecting index data from the database

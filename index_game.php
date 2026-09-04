@@ -1,7 +1,7 @@
 <?php
 
 // MAINTENANCE
-if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('99.226.253.166', '127.0.0.1', '99.226.238.61', '72.137.208.122'))){
+if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '123.456.789.012'))){
     die('<div style="font-family: Arial; font-size: 16px; line-height: 21px; margin: 0; padding: 20px 25%; background-color: rgb(0, 122, 0); color: #FFFFFF; text-align: left; border-bottom: 1px solid #090909;">
         UPDATE IN PROGRESS<br /> The Mega Man RPG Prototype is currently being updated.  Please stand by until further notice.  Several parts of the website are being taken offline during this process and any progress made during will likely be lost, so please hold tight before trying to log in again.  I apologize for the inconvenience and thank you for your patience.<br /> - Adrian
         </div>');
@@ -9,6 +9,8 @@ if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('9
 
 // Include the TOP file
 require_once('top.php');
+$GAME_SESSION = $_SESSION['GAME'];
+session_write_close();
 
 // Set a time limit for game scripts to prevent overdoing it
 if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === false){ set_time_limit(5); }
@@ -40,12 +42,12 @@ $this_graph_data = array(
     );
 
 // If a reset was intentionally called
-if (!empty($_GET['reset']) || (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
+if (!empty($_GET['reset']) || (!empty($GAME_SESSION['DEMO']) && !empty($GAME_SESSION['CACHE_DATE']) && $GAME_SESSION['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE)){
     // Reset the game session
     mmrpg_reset_game_session();
 }
 // Else if this is an out-of-sync demo
-elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DATE']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
+elseif (!empty($GAME_SESSION['DEMO']) && !empty($GAME_SESSION['CACHE_DATE']) && $GAME_SESSION['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE){
 
     // Reset the game session
     mmrpg_reset_game_session();
@@ -54,8 +56,8 @@ elseif (!empty($_SESSION['GAME']['DEMO']) && !empty($_SESSION['GAME']['CACHE_DAT
 // Check if the session has not been created or the cache date has changed
 elseif (
     !empty($_GET['reload']) || // if a reload was specifically requested
-    !isset($_SESSION['GAME']['CACHE_DATE']) || // if there is no session created yet
-    (!empty($_SESSION['GAME']['DEMO']) && $_SESSION['GAME']['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
+    !isset($GAME_SESSION['CACHE_DATE']) || // if there is no session created yet
+    (!empty($GAME_SESSION['DEMO']) && $GAME_SESSION['CACHE_DATE'] != MMRPG_CONFIG_CACHE_DATE) // if we're in demo mode and the cache date is out of sync
     ){
 
     // Ensure there is a save file to load
@@ -73,7 +75,7 @@ elseif (
     }
 
     // Update the cache date to reflect the reload
-    $_SESSION['GAME']['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
+    $GAME_SESSION['CACHE_DATE'] = MMRPG_CONFIG_CACHE_DATE;
 
     // Save the updated file back to the system
     mmrpg_save_game_session();
@@ -90,7 +92,10 @@ $_SESSION['SKILLS'] = array();
 
 // If the player has unlocked more than one playable character,
 // we should clear the player selection so they see the title screen
-if (mmrpg_prototype_players_unlocked() > 1){ unset($_SESSION['GAME']['battle_settings']['this_player_token']); }
+if (mmrpg_prototype_players_unlocked() > 1){ unset($GAME_SESSION['battle_settings']['this_player_token']); }
+
+// Check to see if a window flag has been set in the session already
+$index_window_flag = !empty($GAME_SESSION['index_settings']['windowFlag']) ? $GAME_SESSION['index_settings']['windowFlag'] : false;
 
 // Define the flag that toggles the game's online/offline status
 $this_online_flag = true;
@@ -112,6 +117,9 @@ if (count($matches)>1){
             //You get the idea
     }
 }
+
+// Close the session now that we're done writing
+session_write_close();
 
 ?>
 <!DOCTYPE html>
@@ -153,6 +161,7 @@ if (count($matches)>1){
 
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 
 <link rel="apple-touch-icon" sizes="72x72" href="images/assets/ipad-icon-2k19_72x72.png" />
@@ -160,8 +169,7 @@ if (count($matches)>1){
 <meta name="viewport" content="user-scalable=yes, width=device-width, min-width=768, initial-scale=1">
 
 </head>
-<? $temp_window_flag = !empty($_SESSION['GAME']['index_settings']['windowFlag']) ? $_SESSION['GAME']['index_settings']['windowFlag'] : false; ?>
-<body id="mmrpg" class="index <?= !empty($temp_window_flag) ? 'windowFlag_'.$temp_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
+<body id="mmrpg" class="index <?= !empty($index_window_flag) ? 'windowFlag_'.$index_window_flag : '' ?> <?= $this_current_sub == 'facebook' ? 'windowFlag_facebookFrame' : '' ?>">
 
 <h1 id="header">Mega Man RPG Prototype | Last Updated <?= mmrpg_print_cache_date() ?></h1>
 <div id="window" style="position: relative; ">
@@ -228,79 +236,15 @@ require(MMRPG_CONFIG_ROOTDIR.'includes/footer.php');
         <a type="button" class="button" data-mod-name="height" data-mod-value="flex">Flex</a>
     </fieldset>
 </div>
+<? /*
 <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
 <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
 <script type="text/javascript" src=".libs/howler-js/howler.core.min.js"></script>
 <script type="text/javascript" src=".libs/howler-js/howler.min.js"></script>
 <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript">
-// Define the key client variables
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-var thisScrollbarSettings = {wheelSpeed:0.3};
-// Define the music and sound effects details for use in the script
-<?
-
-// Define the root paths for the music and sound files
-$mmrpg_music_path = 'prototype/sounds/';
-$mmrpg_music_rootdir = MMRPG_CONFIG_CDN_ROOTDIR.$mmrpg_music_path;
-$mmrpg_music_rooturl = MMRPG_CONFIG_CDN_ROOTURL.$mmrpg_music_path;
-
-// Collect the music index from the database and then output to the JS
-$this_music_track_index = rpg_music_track::get_index(true, false, 'music_token', 'music_album+/+music_token');
-$this_music_track_index = array_map(function($info){ return array(
-    'token' => $info['music_token'],
-    'album' => $info['music_album'],
-    'game' => $info['music_game'],
-    'name' => $info['music_name'],
-    'link' => $info['music_link'],
-    'loop' => $info['music_loop'],
-    'order' => $info['music_order']
-    ); }, $this_music_track_index);
-//error_log('$this_music_track_index ='.print_r($this_music_track_index, true));
-echo 'gameSettings.customIndex.musicIndex = '.json_encode($this_music_track_index).';'.PHP_EOL;
-
-// Collect the sound effects index from the file and then output to the JS
-$this_sound_effects_path = $mmrpg_music_rootdir.'misc/sound-effects-curated/';
-$this_sound_effects_index = array();
-$this_sound_effects_index_raw = file_exists($this_sound_effects_path.'audio.json') ? json_decode(file_get_contents($this_sound_effects_path.'audio.json'), true) : array();
-if (!empty($this_sound_effects_index_raw['resources'])
-    && !empty($this_sound_effects_index_raw['spritemap'])){
-    $this_sound_effects_index['src'] = array();
-    $this_sound_effects_index['sprite'] = array();
-    foreach ($this_sound_effects_index_raw['resources'] AS $key => $resource){
-        if (!preg_match('/\.(ogg|mp3)$/i', $resource)){ continue; }
-        $source = 'misc/'.$resource.'?'.MMRPG_CONFIG_CACHE_DATE;
-        $this_sound_effects_index['src'][] = $source;
-    }
-    foreach ($this_sound_effects_index_raw['spritemap'] AS $token => $spritemap){
-        $sprite = array();
-        $sprite['start'] = ceil($spritemap['start'] * 1000);
-        $sprite['end'] = ceil($spritemap['end'] * 1000);
-        $sprite['duration'] = $sprite['end'] - $sprite['start'];
-        $this_sound_effects_index['sprite'][$token] = $sprite;
-    }
-}
-//error_log('$this_sound_effects_index ='.print_r($this_sound_effects_index, true));
-echo 'gameSettings.customIndex.soundsIndex = '.json_encode($this_sound_effects_index).';'.PHP_EOL;
-
-// Collect the sound effect aliases index from teh file and then outpyt to the JS
-$raw_json = trim(file_get_contents(MMRPG_CONFIG_ROOTDIR.'includes/sounds.json'));
-$raw_json = !empty($raw_json) ? preg_replace('!//.*$!m', '', $raw_json) : '';
-$raw_json_array = !empty($raw_json) ? json_decode($raw_json, true) : array();
-//error_log('$raw_json_array ='.print_r($raw_json_array, true));
-$sound_effects_aliases_index = array();
-if (!empty($raw_json_array)){
-    foreach ($raw_json_array AS $sfx_category => $sfx_category_info){
-        if (!empty($sfx_category_info['index'])){
-            $sound_effects_aliases_index = array_merge($sound_effects_aliases_index, $sfx_category_info['index']);
-        }
-    }
-}
-//error_log('$sound_effects_aliases_index ='.print_r($sound_effects_aliases_index, true));
-echo 'gameSettings.customIndex.soundsAliasesIndex = '.json_encode($sound_effects_aliases_index).';'.PHP_EOL;
-
-?>
-</script>
+*/ ?>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.all.php'); ?>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
 
 // When the document is ready for event binding

@@ -53,3 +53,48 @@
         url('../.libs/google-fonts/Open_Sans/static/OpenSans-LightItalic.ttf') format('truetype');
 }
 
+/* Extended Font Awesome 5 */
+
+/* Custom HTML Entity (Inline) */
+.fa-entity {
+    font-family: inherit; /* Use the default font or specify one */
+    font-style: normal;
+    font-weight: normal;
+    display: inline-block;
+    text-align: center;
+    line-height: 1; /* Adjust to match FA5 icons */
+    vertical-align: middle; /* Align to FA icons */
+}
+.fa-entity > span {
+    display: block;
+    margin: 0 auto;
+    padding: 0;
+    line-height: 1; /* Adjust to match FA5 icons */
+    vertical-align: middle; /* Align to FA icons */
+    user-select: none; /* Prevent text selection */
+}
+
+
+/* Custom FontAwesome Icons (CSS) */
+.fa-delta,
+.fa-sigma,
+.fa-bullet,
+.fa-zenny {
+    font-family: "Font Awesome 5 Free"; /* Ensure compatibility with FontAwesome font family */
+    font-weight: 900; /* Match the weight used in FontAwesome icons (adjust as needed) */
+    font-style: normal; /* Prevent italic styling */
+    display: inline-block; /* Ensure icons align like regular FontAwesome icons */
+    text-decoration: none; /* Remove any inherited text decoration */
+}
+.fa-delta:before {
+    content: "\01d6ab";
+}
+.fa-sigma:before {
+    content: "\01d6ba";
+}
+.fa-bullet:before {
+    content: "\2022";
+}
+.fa-zenny:before {
+    content: "\0001b6";
+}

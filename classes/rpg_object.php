@@ -929,8 +929,8 @@ class rpg_object {
         // Collect the global cache time and break it down to an exact time
         if (empty($cache_time)){
             list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
-            $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
-            $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
+            $yyyy = (int)(substr($new_cache_date, 0, 4)); $mm = (int)(substr($new_cache_date, 4, 2)); $dd = (int)(substr($new_cache_date, 6, 2));
+            $hh = (int)(substr($new_cache_time, 0, 2)); $ii = (int)(substr($new_cache_time, 2, 2));
             $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
             //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
             $cache_time = $mmrpg_config_cache_time;
