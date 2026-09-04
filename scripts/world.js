@@ -799,8 +799,8 @@ class mmrpgWorldMap {
             let tileSpriteOffset = tileSpriteInfo[0], tileSpriteSize = tileSpriteInfo[1], tileSpriteAttrs = tileSpriteInfo[2];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
             let tileSpriteEffects = {grid: true, hover: false, outline: false, focus: false, active: false}; // default values
-            let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void') !== -1 ? true : false;
-            let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water') !== -1 ? true : false;
+            let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0 ? true : false;
+            let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water-') === 0 ? true : false;
             if (tileSpriteAttrs.isVoid){ tileSpriteEffects.grid = false; } // no grid or walk for void tiles
             //console.log('---> tileSpriteKey =', tileSpriteKey);
             //console.log('---> tileSpriteToken =', tileSpriteToken);
@@ -936,9 +936,9 @@ class mmrpgWorldMap {
         let tileIsFocused = tileEffects.focus;
         let tileIsActive = tileEffects.active;
         // check if this tile falls into any oft-used categories
-        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') !== -1 ? true : false;
-        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass-') !== -1 ? true : false;
-        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water-') !== -1 ? true : false;
+        let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0 ? true : false;
+        let tileIsGrass = tileSpriteToken === 'grass' || tileSpriteToken.indexOf('grass-') === 0 ? true : false;
+        let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water-') === 0 ? true : false;
         // clear a rect at the exact position and no larger
         ctx.clearRect(tilePosition[2], tilePosition[3], tileSpriteSize[0], tileSpriteSize[1]);
         // void tiles have no sprite, so we skip drawing them
