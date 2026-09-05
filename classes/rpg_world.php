@@ -4036,7 +4036,8 @@ class rpg_world {
                 $radius = 10 + ($multiplier * 5);
                 // Calculate exact position using sin/cos
                 $left = round($base_left - (cos($target_angle_rad) * $radius));
-                $top = round($base_top - (sin($target_angle_rad) * $radius));
+                // Offset the Y position by a bit to correct the perspective
+                $top = round($base_top - (sin($target_angle_rad) * $radius)) - 20;
                 // Robots render sequentially below the player, but stay within the tile's Z-band
                 $z_index = $base_top + 5 - $key;
             }
