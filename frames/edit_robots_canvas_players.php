@@ -29,8 +29,9 @@ echo '<div class="wrapper no_sort" data-count="'.count($unlocked_players).'">';
             // Collect unlocked players and add them to the dropdown
             foreach ($mmrpg_database_players AS $player_token => $player_info){
 
-                // Skip if this player isn't unlocked yet
+                // Skip if this player isn't unlocked yet or isn't allowed robots
                 if (!in_array($player_token, $unlocked_players)){ continue; }
+                elseif (mmrpg_prototype_limit_hearts_earned($player_token) < 1){ continue; }
 
                 // Collect this player's session rewards and settings
                 $player_rewards = !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]) ? $_SESSION[$session_token]['values']['battle_rewards'][$player_token] : array();
