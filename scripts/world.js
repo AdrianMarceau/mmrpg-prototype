@@ -802,6 +802,7 @@ class mmrpgWorldMap {
             let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0 ? true : false;
             let tileIsWater = tileSpriteToken === 'water' || tileSpriteToken.indexOf('water-') === 0 ? true : false;
             if (tileSpriteAttrs.isVoid){ tileSpriteEffects.grid = false; } // no grid or walk for void tiles
+            if (!tileSpriteAttrs.isWalkable && tileSpriteToken.indexOf('type-') === 0){ tileSpriteEffects.grid = false; } // no grid on non-walkable "type" tiles
             //console.log('---> tileSpriteKey =', tileSpriteKey);
             //console.log('---> tileSpriteToken =', tileSpriteToken);
             //console.log('---> tileSpriteInfo =', tileSpriteInfo);
