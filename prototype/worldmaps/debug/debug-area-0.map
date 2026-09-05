@@ -5,9 +5,13 @@
 @type     = shadow
 @level    = 80
 @size     = 50 x 16
-@sheet    = mmrpg-overworld-2k25-v2
+@sheet    = mmrpg-overworld-2k25-v3
 #---------------------------#
 @field      = prototype-subspace
+#---------------------------#
+@aliases[] = 70:prototype-subspace
+@aliases[] = 80:darkness
+@aliases[] = 90:water
 #---------------------------#
 @portals[]  = spawn(28-8)
 #---------------------------#
