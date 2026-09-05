@@ -54,20 +54,54 @@ $grid = [
     [
         'water:not-walkable',           // Col 0
         'magma:not-walkable',           // Col 1
-        'clouds:not-walkable',          // Col 2
+        'plain',                        // Col 2
         'beach',                        // Col 3
+        'grass',                        // Col 4
+        'ground',                       // Col 5
+        'tundra',                       // Col 6
+        'clouds:not-walkable',          // Col 7
     ],
 
     // ROW 4 (Starts at Y = 1320)
     [
-        'darkness',       // Col 0
-        'subspace',       // Col 1
-        'bonus',          // Col 2
-        'plain',          // Col 3
-        'grass',          // Col 4
-        'ground',         // Col 5
-        'tundra',         // Col 6
-    ]
+        'darkness',
+        'prototype-subspace',
+        'bonus-field',
+        'plain-field',
+        'gentle-countryside',
+        'maniacal-hideaway',
+        'wintry-forefront',
+        'light-laboratory',
+        'wily-castle',
+        'cossack-citadel',
+    ],
+
+    // ROW 5
+    [
+        'lightness',
+        'prototype-subspace-2',
+        'final-destination',
+        'final-destination-2',
+        'final-destination-3',
+        'robot-museum',
+        'hunter-compound',
+        'royal-palace',
+        'genesis-tower',
+        'stardroid-base',
+    ],
+
+    // ROW 6
+    [
+        'abandoned-warehouse',
+        'mountain-mines',
+        'arctic-jungle',
+        'orb-city',
+        'steel-mill',
+        'electrical-tower',
+        'clock-citadel',
+        'oil-wells',
+    ],
+
 ];
 
 // ==========================================
