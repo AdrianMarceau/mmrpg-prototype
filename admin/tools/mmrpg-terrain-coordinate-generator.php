@@ -79,10 +79,10 @@ $grid = [
     // ROW 5
     [
         'lightness',
-        'prototype-subspace-2',
+        'prototype-subspace-ii',
         'final-destination',
-        'final-destination-2',
-        'final-destination-3',
+        'final-destination-ii',
+        'final-destination-iii',
         'robot-museum',
         'hunter-compound',
         'royal-palace',
