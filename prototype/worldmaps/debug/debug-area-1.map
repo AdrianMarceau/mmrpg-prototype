@@ -5,9 +5,17 @@
 @name        = DEBUG Area 1
 @level       = 1
 @size        = 25 x 34
-@sheet       = mmrpg-overworld-2k25-v2
+@sheet       = mmrpg-overworld-2k25-v3
 #---------------------------#
 @field       = gentle-countryside
+#---------------------------#
+@aliases[] = 20:gentle-countryside
+@aliases[] = 30:maniacal-hideaway
+@aliases[] = 60:wintry-forefront
+@aliases[] = 40:oil-wells
+@aliases[] = 50:beach
+@aliases[] = 70:prototype-subspace
+@aliases[] = 90:water
 #---------------------------#
 @portals[]   = spawn(11-16)
 #---------------------------#
