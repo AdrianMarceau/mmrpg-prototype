@@ -1703,13 +1703,15 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 && dataBattles.length === 1
                 && eventsAtPosition[0].kind2 === 'mecha'){
                 //console.log('solo mecha event detected, generate the whistle button');
-                let playerHasTeamSlot = _worldPlayerRobotsKeys.length < _config.maxRobotsPerPlayer ? true : false;
+                //console.log('_worldPlayerTeam =', 'x' + _worldPlayerTeam.length, _worldPlayerTeam);
+                let playerHasTeamSlot = _worldPlayerTeam.length < _config.maxRobotsPerPlayer ? true : false;
                 let hasPermanentWhistle = false; //_playerToken === 'dr-lalinde';
                 let mechaBattleEvent = eventsAtPosition[0];
                 let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
                 let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
                 let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle';
                 let mechaWhistleTarget = mechaBattleEvent.token;
+                //console.log('playerHasTeamSlot =', playerHasTeamSlot);
                 //console.log('mechaBattleEvent =', mechaBattleEvent);
                 //console.log('mechaWhistleQuantity =', mechaWhistleQuantity);
                 //console.log('mechaWhistleTarget =', mechaWhistleTarget);
