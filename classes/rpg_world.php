@@ -1455,59 +1455,37 @@ class rpg_world {
                 }
             }
         }
-        // Now process our finalized list to populate $by_terrain and remove unwalkable voids
+        // Now process our finalized list to populate $by_terrain and track unwalkable tiles
         $by_terrain = array();
+        $not_walkable = array();
         foreach ($effective_tiles AS $pos => $tile_token){
             $is_void = ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0);
             if ($is_void){
-                // If it's void all the way down, it's truly unwalkable
+                // If it's void all the way down, it's truly unwalkable for everything
                 unset($available_cells[$pos]);
             } else {
-                // Otherwise, assign it to a single, definitive terrain category
+                // Check if this tile explicitly has the 'not-walkable' flag set
+                if (!empty($map_data['tiles'][$tile_token])){
+                    foreach ($map_data['tiles'][$tile_token] as $prop){
+                        if (is_string($prop) && strpos($prop, 'not-walkable') !== false){
+                            $not_walkable[] = $pos;
+                            break;
+                        }
+                    }
+                }
+                // Assign it to a single, definitive terrain category
                 list($tile_token_clean) = strstr($tile_token, '-') ? explode('-', $tile_token) : array($tile_token);
                 if (!isset($by_terrain[$tile_token_clean])){ $by_terrain[$tile_token_clean] = array(); }
                 $by_terrain[$tile_token_clean][] = $pos;
             }
         }
-        /*
-        // Then we through all the tiles and remove any that are unwalkable "void" type
-        $by_terrain = array();
-        if (!empty($map_data['layers'])){
-            $tileLayers = $map_data['layers'];
-            foreach ($tileLayers AS $layer_key => $layer_tiles){
-                foreach ($layer_tiles AS $row_key => $row_tiles){
-                    $row_tiles = explode(',', $row_tiles);
-                    foreach ($row_tiles AS $col_key => $tile_token){
-                        $pos = ($col_key + 1).'-'.($row_key + 1);
-
-                        // We only care about this position if it hasn't been blocked by an event, portal, etc.
-                        if (!isset($available_cells[$pos])){ continue; }
-
-                        $is_void = ($tile_token === '' || $tile_token === 'void' || strpos($tile_token, 'void-') === 0);
-
-                        if (!isset($effective_tiles[$pos])){
-                            $effective_tiles[$pos] = $tile_token;
-                        } else {
-                            $current_is_void = ($effective_tiles[$pos] === '' || $effective_tiles[$pos] === 'void' || strpos($effective_tiles[$pos], 'void-') === 0);
-
-                            // If the current top tile is a void hole, the layer beneath peeks through
-                            if ($current_is_void && !$is_void){
-                                $effective_tiles[$pos] = $tile_token;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        */
         // Return the available cells as an array of positions
         $available_cells = array_keys($available_cells);
         $total = count($available_cells);
-        //error_log('$available_cells('.count($available_cells).') = '.print_r($available_cells, true));
-        //error_log('$by_terrain('.count($by_terrain).') = '.print_r($by_terrain, true));
         return array(
             'all' => $available_cells,
             'by_terrain' => $by_terrain,
+            'not_walkable' => $not_walkable,
             'total' => $total
             );
     }
@@ -1632,7 +1610,12 @@ class rpg_world {
                     $available = array_merge($available, $cells);
                     }
                 }
-            if (empty($available) && empty($habitats)){ $available = $available_encounter_cells['all']; }
+            // If they have no habitat, ensure they don't spawn on explicitly not-walkable tiles
+            if (empty($available) && empty($habitats)){
+                $all_available = $available_encounter_cells['all'];
+                $not_walkable_tiles = !empty($available_encounter_cells['not_walkable']) ? $available_encounter_cells['not_walkable'] : array();
+                $available = array_diff($all_available, $not_walkable_tiles);
+            }
             //error_log('$available = '.print_r($available, true));
             //error_log('$available(count) = '.count($available).' vs. $used_encounter_cells(count) = '.count($used_encounter_cells));
             $robot_pos = self::get_rand_pos($available, $used_encounter_cells);
@@ -1931,8 +1914,8 @@ class rpg_world {
             //error_log(PHP_EOL.'-> next item = "'.$item_token.'"');
             //error_log('-> getting random position for item "'.$item_token.'"');
             $all_available = !empty($available_pickup_cells['all']) ? $available_pickup_cells['all'] : array();
-            $water_tiles = !empty($available_pickup_cells['by_terrain']['water']) ? $available_pickup_cells['by_terrain']['water'] : array();
-            $available = array_diff($all_available, $water_tiles);
+            $not_walkable_tiles = !empty($available_pickup_cells['not_walkable']) ? $available_pickup_cells['not_walkable'] : array();
+            $available = array_diff($all_available, $not_walkable_tiles);
             //error_log('$available = '.print_r($available, true));
             //error_log('$available(count) = '.count($available).' vs. $used_pickup_cells(count) = '.count($used_pickup_cells));
             $item_pos = self::get_rand_pos($available, $used_pickup_cells);
