@@ -1069,6 +1069,7 @@ class rpg_world {
             && !empty($map_data_parsed['tiles']['keys'])){
             //error_log('Let\'s actually parse the map tiles now...');
             //error_log('-> $map_data_parsed[\'layers\'](before) = '.print_r($map_data_parsed['layers'], true));
+            ksort($map_data_parsed['layers']); // Sort layers numerically so negative layers process first
             $parsed_map_layers = array();
             $raw_map_layers = $map_data_parsed['layers'];
             $raw_tile_keys = $map_data_parsed['tiles']['keys'];
@@ -1474,7 +1475,8 @@ class rpg_world {
                     }
                 }
                 // Assign it to a single, definitive terrain category
-                list($tile_token_clean) = strstr($tile_token, '-') ? explode('-', $tile_token) : array($tile_token);
+                //list($tile_token_clean) = strstr($tile_token, '-') ? explode('-', $tile_token) : array($tile_token);
+                $tile_token_clean = preg_replace('/(\-[0-9]+)$/i', '', $tile_token);
                 if (!isset($by_terrain[$tile_token_clean])){ $by_terrain[$tile_token_clean] = array(); }
                 $by_terrain[$tile_token_clean][] = $pos;
             }

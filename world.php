@@ -904,7 +904,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
                     $map_layer_styles = !empty($map_base_styles) ? ' style="'.$map_base_styles.'"' : '';
                     $map_layer_attrs = !empty($map_base_attrs) ? ' '.$map_base_attrs : '';
                     $terrain_layer_markup = rpg_world::get_terrain_layer_markup($this_prototype_data, $map_data_parsed, $map_layer_data);
-                    echo('<div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" '.$map_layer_styles.$map_layer_attrs.'>');
+                    echo('<div class="layer layer-1 tiles terrain has-canvas" data-layer="terrain" data-layer-key="'.$map_layer_key.'" '.$map_layer_styles.$map_layer_attrs.'>');
                         echo($terrain_layer_markup);
                     echo('</div>'.PHP_EOL);
                 }

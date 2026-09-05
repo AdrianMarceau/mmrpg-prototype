@@ -611,8 +611,9 @@ class mmrpgWorldMap {
             };
         let onLayersLoaded = function(){
             _self.refreshTerrainTileOverlay();
-            let $terrainLayer = $('.layer[data-unique-layer="terrain_0"]', $canvasMap);
-            if (!$terrainLayer.length){  $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap); }
+            let $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap).first();
+            //let $terrainLayer = $('.layer[data-unique-layer="terrain_0"]', $canvasMap);
+            //if (!$terrainLayer.length){  $terrainLayer = $('.layer[data-layer="terrain"]', $canvasMap); }
             if ($terrainLayer.length){
                 let dropdownRequired = !_elements.actionDropdown || !_elements.actionDropdown.length;
                 let overlayRequired = !_elements.clickOverlay || !_elements.clickOverlay.length;
@@ -629,6 +630,7 @@ class mmrpgWorldMap {
                 }
             return onWorldLoaded();
             };
+        //console.log('$mapLayers:', $mapLayers);
         // Loop through each map layer and generate graphics and/or interactivity
         let layerCount = 0, terrainCount = 0;
         let minLayerCount = $mapLayers.length + 1;
@@ -661,7 +663,10 @@ class mmrpgWorldMap {
                 }
             // If this is a terrain layer, we need to initialize the canvas and draw the tiles
             if (layerToken === 'terrain'){
-                $thisLayer.attr('data-unique-layer', 'terrain_' + terrainCount);
+                let actualLayerKey = parseInt($thisLayer.attr('data-layer-key'));
+                //console.log('terrainCount:', terrainCount);
+                //console.log('actualLayerKey:', actualLayerKey);
+                $thisLayer.attr('data-unique-layer', 'terrain_' + actualLayerKey);
                 $thisLayer.css('z-index', maxTerrainCount - terrainCount);
                 terrainCount++;
                 layerCount++;
