@@ -4305,7 +4305,7 @@ class mmrpgWorldMap {
 
                 // Collect the base terrain layer from the big canvas map to clone into the mini-map area view
                 let $baseTerrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
-                let $baseTerrainCanvas = $('canvas[data-canvas="terrain"]', $baseTerrainLayer);
+                let $baseTerrainCanvas = $('canvas', $baseTerrainLayer);
                 let baseTerrainCanvas = $baseTerrainCanvas.get(0);
 
                 // Determine the scaling necessary to resize the base terrain to the mini-map area size
@@ -4401,13 +4401,38 @@ class mmrpgWorldMap {
                 $areaGrid.css({width: miniTerrainWidth + 'px', height: miniTerrainHeight + 'px', transform: 'translate(0, 0)'});
                 $areaImage.css({width: miniTerrainWidth + 'px', height: miniTerrainHeight + 'px', transform: 'translate(0, 0)'});
 
-                // Clone the actual terrain canvas into the area mini-map and resize it accordingly
-                let $areaTerrainCanvas = $baseTerrainCanvas.clone(); // cloned to keep sizing consistent
+                // Create a single composite canvas for the area mini-map
+                let $areaTerrainCanvas = $('<canvas class="terrain" width="' + baseTerrainWidth + '" height="' + baseTerrainHeight + '"></canvas>');
                 let areaTerrainContext = $areaTerrainCanvas.get(0).getContext('2d');
-                $areaTerrainCanvas.removeAttr('data-canvas').removeAttr('style').addClass('terrain');
-                areaTerrainContext.drawImage(baseTerrainCanvas, 0, 0);
+                // The canvases are in DOM order (-1, 0, 1) but have descending z-indexes (2, 1, 0).
+                // We draw them in reverse DOM order so the lowest z-index is drawn first, building up to the top layer.
+                let canvasesToDraw = $baseTerrainCanvas.get().reverse();
+                for (let i = 0; i < canvasesToDraw.length; i++) {
+                    areaTerrainContext.drawImage(canvasesToDraw[i], 0, 0);
+                    }
+                // Use 'destination-out' to erase (make transparent) non-walkable tiles from the terrain canvas
+                let masterTiles = _world.layerTilesIndex['terrain'] || {};
+                areaTerrainContext.globalCompositeOperation = 'destination-out';
+                // 0.65 makes it 65% transparent. Change to 1.0 if we want the terrain completely invisible here.
+                areaTerrainContext.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                for (let row = 1; row <= _config.mapRows; row++){
+                    for (let col = 1; col <= _config.mapCols; col++){
+                        let tileKey = col + '-' + row;
+                        let tileData = masterTiles[tileKey];
+                        if (!tileData || !tileData.walkable){
+                            // Note: Use full tile size, since this canvas is drawn at full resolution before CSS scaling
+                            let tileWidth = _config.mapTileSize[0];
+                            let tileHeight = _config.mapTileSize[1];
+                            let x = Math.round((col - 1) * tileWidth);
+                            let y = Math.round((row - 1) * tileHeight);
+                            areaTerrainContext.fillRect(x, y, tileWidth, tileHeight);
+                            }
+                        }
+                    }
+                // Reset composite operation back to normal
+                areaTerrainContext.globalCompositeOperation = 'source-over';
                 $areaImage.append($areaTerrainCanvas);
-                $areaViewportTerrain = $('> canvas.terrain', $areaImage);
+                $areaViewportTerrain = $areaTerrainCanvas;
 
                 // Create a secondary canvas for adding dots/markers/symbols on top of the terrain
                 let $areaOverlayCanvas = $('<canvas class="overlay" width="' + miniTerrainWidth + '" height="' + miniTerrainHeight + '"></canvas>');
