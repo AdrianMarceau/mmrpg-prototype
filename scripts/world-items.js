@@ -444,6 +444,9 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
                 itemEventQuantity--;
                 let itemCountTextSpan = _self.getCustomNameSpan(oldItemQuantity + ' &raquo; <b>' + newItemQuantity + '</b>', 'empty');
                 messageMarkup.push('Added ' + itemNameTextSpan + ' to inventory! (' + itemCountTextSpan + ')');
+                } else {
+                let itemInventoryMax = _config.itemInventoryMax || 99;
+                messageMarkup.push(itemNameTextSpan + ' already at max &times;' + itemInventoryMax + '!');
                 }
             }
 
@@ -547,7 +550,7 @@ function addItemToInventory(itemToken, itemQuantity, animatePickup, playSound, c
     let $storageItemInOverview = $('.team-item[data-item="' + realItemToken + '"]', $storageItemsWrapper);
     let _worldPlayer = _world.player;
     let _worldPlayerItems = _worldPlayer.items;
-    let itemInventoryMax = _config.playerInventoryMax; // 99;
+    let itemInventoryMax = _config.itemInventoryMax || 99;
     // Create an entry in the items index if it does not already exist
     if (typeof _worldPlayerItems[itemToken] === 'undefined'){ _worldPlayerItems[itemToken] = 0; }
     // Check to see if there's room for the item in the inventory
@@ -558,7 +561,7 @@ function addItemToInventory(itemToken, itemQuantity, animatePickup, playSound, c
     //console.log('--> currentItemQuantity =', currentItemQuantity);
     //console.log('--> equippedItemQuantity =', equippedItemQuantity);
     if (currentItemQuantity >= itemInventoryMax){
-        console.warn('addItemToInventory() called for item that is already at max quantity!');
+        //console.warn('addItemToInventory() called for item that is already at max quantity!');
         return false; // no room in the inventory
         }
     // If there is room, add the item to the inventory
