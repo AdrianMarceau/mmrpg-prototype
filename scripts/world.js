@@ -1686,15 +1686,25 @@ class mmrpgWorldMap {
         //console.log('%c' + 'mmrpgWorldMap.refreshCanvasTiles(layerToken:' + layerToken + ')', 'color: magenta;');
         if (!layerToken || typeof layerToken !== 'string'){ console.error('refreshCanvasTiles() missing required layerToken!'); return false; }
         let _self = this;
+        // Ensure we track multiple tokens in case multiple layers are updated in the same frame
+        if (!_self.refreshCanvasTiles._scheduledTokens){ _self.refreshCanvasTiles._scheduledTokens = new Set(); }
+        // If this specific layer is already queued, we can return early
+        if (_self.refreshCanvasTiles._scheduledTokens.has(layerToken)){ return; }
+        _self.refreshCanvasTiles._scheduledTokens.add(layerToken);
         if (_self.refreshCanvasTiles._scheduled){ return; }
         _self.refreshCanvasTiles._scheduled = true;
         requestAnimationFrame(() => {
             _self.refreshCanvasTiles._scheduled = false;
-            _self.refreshCanvasTilesForReal(layerToken);
+            // Convert the set to an array, clear the queue, and refresh all captured layers
+            let tokensToRefresh = Array.from(_self.refreshCanvasTiles._scheduledTokens);
+            _self.refreshCanvasTiles._scheduledTokens.clear();
+            tokensToRefresh.forEach(token => {
+                _self.refreshCanvasTilesForReal(token);
+                });
             });
         return;
         }
-    refreshCanvasTilesForReal(layerToken) {
+    refreshCanvasTilesForReal(layerToken){
         //console.log('%c' + 'mmrpgWorldMap.refreshCanvasTilesForReal(layerToken:' + layerToken + ')', 'color: magenta;');
         let _self = this;
         let _config = _self.config;
