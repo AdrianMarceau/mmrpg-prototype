@@ -2038,6 +2038,7 @@ function getRobotDetailsForOverview(robotToken){
     let _mmrpgAbilitiesIndex = _indexes.abilities;
     let _mmrpgItemsIndex = _indexes.items;
     let _mmrpgFieldsIndex = _indexes.fields;
+    let _mmrpgSkillsIndex = _indexes.skills;
     let _world = _self.state;
     let _worldPlayer = _world.player;
     let _worldPlayerRobots = _worldPlayer.robots;
@@ -2382,13 +2383,66 @@ function getRobotDetailsForOverview(robotToken){
         }
     robotDetailsObject.infoLines.push(abilitiesLine);
 
-    // TEMP TEMP TEMP TEMP
-    // TODO: show weaknesses, resistances, affinities, immunities on separate 'page' of details maybe?
-    if (false){
+    // Show their "description" (it's actually their "class" in-lore) if they have one
+    // but only on a separate 'details' page so starting out with hidden class already applied
+    if (robotDescription){
+        let descriptionLine = { classes: 'class-description hidden', label: 'Class:', values: [] }; {
+            //console.log('let us generate infolines for the robot\'s description/class', robotDescription);
+            descriptionLineMarkup = '<strong>' + robotDescription + '</strong>';
+            descriptionLineClasses = '';
+            descriptionLine.values.push({
+                value: descriptionLineMarkup,
+                valueClasses: descriptionLineClasses,
+                });
+            }
+        robotDetailsObject.infoLines.push(descriptionLine);
+        }
+
+    // Show their skill (if they have one) on a separate 'details' page only starting out hidden
+    let robotSkill = robotIndexInfo.skill && robotIndexInfo.skill.length ? robotIndexInfo.skill : false;
+    if (robotSkill){
+        let skillLine = { classes: 'passive-skill types hidden', label: 'Passive Skill:', values: [] }; {
+            //console.log('let us generate infolines for the robot\'s skill', robotSkill);
+            let skillToken = robotIndexInfo.skill;
+            let skillName = robotIndexInfo.skillName;
+            let skillDescription = robotIndexInfo.skillDescription;
+            let skillDescription2 = robotIndexInfo.skillDescription2;
+            let skillParameters = robotIndexInfo.skillParameters;
+            let skillInfo = _mmrpgSkillsIndex[robotSkill];
+            //console.log('skillToken =', skillToken);
+            //console.log('skillName =', skillName);
+            //console.log('skillDescription =', skillDescription);
+            //console.log('skillDescription2 =', skillDescription2);
+            //console.log('skillParameters =', skillParameters);
+            //console.log('skillInfo =', skillInfo);
+            let skillType = '';
+            if (skillToken.match(/-subcore$/i)){ skillType = skillToken.replace(/-subcore$/i, '');  }
+            else if (typeof skillParameters.type !== 'undefined'){ skillType = skillParameters.type; }
+            else if (robotIndexInfo.core){ skillType = robotIndexInfo.core; }
+            else { skillType = 'none'; }
+            let skillTypeClasses = 'type ' + skillType;
+            //console.log('skillType =', skillType);
+            let skillNameMarkup = skillName.length ? skillName : skillInfo.name;
+            let skillDescriptionMarkup = skillDescription2.length ? skillDescription2 : skillInfo.description2;
+            if (robotIndexInfo.class === 'mecha'){
+                skillDescriptionMarkup = skillDescriptionMarkup.replace(/\srobot\s/i, ' mecha ');
+                }
+            skillNameMarkup = '<strong class="' + skillTypeClasses + '">' + skillNameMarkup + '</strong>';
+            skillDescriptionMarkup = '<p>' + skillDescriptionMarkup + '</p>';
+            skillLine.values.push({
+                value: skillNameMarkup + skillDescriptionMarkup,
+                valueClasses: '',
+                });
+            }
+        robotDetailsObject.infoLines.push(skillLine);
+        }
+
+    // Show weaknesses, resistances, affinities, immunities on separate 'details' page only by starting out hidden
+    if (true){
         // WEAKNESSES / RESISTANCES / AFFINITIES / IMMUNITIES
         for (let i = 0; i < weaknessTokens.length; i++){
             let weaknessToken = weaknessTokens[i];
-            let weaknessLine = { classes: 'extra ' + weaknessToken + ' types', label: weaknessToken.charAt(0).toUpperCase() + weaknessToken.slice(1) + ':', values: [] };
+            let weaknessLine = { classes: 'extra ' + weaknessToken + ' types hidden', label: weaknessToken.charAt(0).toUpperCase() + weaknessToken.slice(1) + ':', values: [] };
             if (robotIndexInfo[weaknessToken] && robotIndexInfo[weaknessToken].length){
                 for (let j = 0; j < robotIndexInfo[weaknessToken].length; j++){
                     let weaknessType = robotIndexInfo[weaknessToken][j];
@@ -2526,6 +2580,7 @@ function replaceRobotDetailsInOverview($detailsDiv, robotToken, robotDetails){
     if (!$detailsDiv || !$detailsDiv.length){ console.error('replaceRobotDetailsInOverview() missing required $detailsDiv!'); return false; }
     if (!robotToken || typeof robotToken !== 'string' || !robotToken.length){ console.error('replaceRobotDetailsInOverview() missing required robotToken!'); return false; }
     if (!robotDetails || typeof robotDetails !== 'object'){ console.error('replaceRobotDetailsInOverview() missing required robotDetails!'); return false; }
+    let _self = this;
     //console.log('-> robotDetails =', robotDetails);
     let $title = $detailsDiv.find('> .title'),
         $image = $detailsDiv.find('> .image'),
@@ -2578,8 +2633,81 @@ function replaceRobotDetailsInOverview($detailsDiv, robotToken, robotDetails){
         }
     $actions.find('.button:not(.keep)').remove();
     $actions.find('.button.keep').removeClass('keep');
+    _self.refreshRobotDetailsInOverview(robotToken, $detailsDiv);
     return true;
     }
+// Define a function that toggles back-and-forth between the details present in a given robot overview
+function toggleRobotDetailsInOverview(robotString, $detailsDiv) {
+    //console.log('%c' + 'mmrpgWorldMap.toggleRobotDetailsInOverview(robotString:' + robotString + ', $detailsDiv:' + typeof $detailsDiv + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string') { console.error('toggleRobotDetailsInOverview() robotString was empty or invalid!'); return false; }
+    if (!$detailsDiv || typeof $detailsDiv !== 'object') { console.error('toggleRobotDetailsInOverview() $detailsDiv was empty or invalid!'); return false; }
+    // Check current view and determine the new view
+    let currentView = $detailsDiv.is('[data-view]') ? $detailsDiv.attr('data-view') : 'default';
+    let newView = (currentView === 'default') ? 'details' : 'default';
+    // Update the attribute on the element
+    $detailsDiv.attr('data-view', newView);
+    // Call the refresh function to update the UI based on the new state
+    return refreshRobotDetailsInOverview(robotString, $detailsDiv);
+}
+
+// Define a function that refreshes the visibility of the details based on the current data-view state
+function refreshRobotDetailsInOverview(robotString, $detailsDiv) {
+    //console.log('%c' + 'mmrpgWorldMap.refreshRobotDetailsInOverview(robotString:' + robotString + ', $detailsDiv:' + typeof $detailsDiv + ')', 'color: magenta;');
+    if (!robotString || typeof robotString !== 'string') { console.error('refreshRobotDetailsInOverview() robotString was empty or invalid!'); return false; }
+    if (!$detailsDiv || typeof $detailsDiv !== 'object') { console.error('refreshRobotDetailsInOverview() $detailsDiv was empty or invalid!'); return false; }
+
+    // Read the current view state, assuming 'default' if it hasn't been set yet
+    let currentView = $detailsDiv.is('[data-view]') ? $detailsDiv.attr('data-view') : 'default';
+
+    let $infoLineEnergy = $('.infoline.life-energy', $detailsDiv);
+    let $infoLineWeapons = $('.infoline.weapon-energy', $detailsDiv);
+    let $infoLineBaseStats =  $('.infoline.base-stats', $detailsDiv);
+    let $infoLineHeldItem = $('.infoline.held-item', $detailsDiv);
+    let $infoLineSupportMecha = $('.infoline.support-mecha', $detailsDiv);
+    let $infoLineAbilities = $('.infoline.equipped-abilities', $detailsDiv);
+    let $infoLineDescription = $('.infoline.class-description', $detailsDiv);
+    let $infoLinePassiveSkill = $('.infoline.passive-skill', $detailsDiv);
+    let $infoLineWeaknesses = $('.infoline.weaknesses', $detailsDiv);
+    let $infoLineResistances = $('.infoline.resistances', $detailsDiv);
+    let $infoLineAffinities = $('.infoline.affinities', $detailsDiv);
+    let $infoLineImmunities = $('.infoline.immunities', $detailsDiv);
+
+    if (currentView === 'default') {
+        // show main infolines
+        $infoLineEnergy.removeClass('hidden');
+        $infoLineWeapons.removeClass('hidden');
+        $infoLineBaseStats.removeClass('hidden');
+        $infoLineHeldItem.removeClass('hidden');
+        $infoLineSupportMecha.removeClass('hidden');
+        $infoLineAbilities.removeClass('hidden');
+        // hide extra infolines
+        $infoLineDescription.addClass('hidden');
+        $infoLinePassiveSkill.addClass('hidden');
+        $infoLineWeaknesses.addClass('hidden');
+        $infoLineResistances.addClass('hidden');
+        $infoLineAffinities.addClass('hidden');
+        $infoLineImmunities.addClass('hidden');
+    }
+    else if (currentView === 'details') {
+        // show extra infolines
+        $infoLineDescription.removeClass('hidden');
+        $infoLinePassiveSkill.removeClass('hidden');
+        $infoLineWeaknesses.removeClass('hidden');
+        $infoLineResistances.removeClass('hidden');
+        $infoLineAffinities.removeClass('hidden');
+        $infoLineImmunities.removeClass('hidden');
+        // hide main infolines
+        $infoLineEnergy.addClass('hidden');
+        $infoLineWeapons.addClass('hidden');
+        $infoLineBaseStats.addClass('hidden');
+        $infoLineHeldItem.addClass('hidden');
+        $infoLineSupportMecha.addClass('hidden');
+        $infoLineAbilities.addClass('hidden');
+    }
+
+    // Return true on success
+    return true;
+}
 // Define a function for getting the id-token for the currently selected overview robot, if any
 // TODO: we should store and retrieve this value somewhere local instead of grabbing it from the DOM every time
 function getSelectedRobotInOverview(returnObject){
@@ -2786,6 +2914,8 @@ mmrpgWorldMap.prototype.refreshTeamRobotSprites = refreshTeamRobotSprites;
 mmrpgWorldMap.prototype.getRobotDetailsForOverview = getRobotDetailsForOverview;
 mmrpgWorldMap.prototype.getRobotDetailsMarkupForOverview = getRobotDetailsMarkupForOverview;
 mmrpgWorldMap.prototype.replaceRobotDetailsInOverview = replaceRobotDetailsInOverview;
+mmrpgWorldMap.prototype.toggleRobotDetailsInOverview = toggleRobotDetailsInOverview;
+mmrpgWorldMap.prototype.refreshRobotDetailsInOverview = refreshRobotDetailsInOverview;
 mmrpgWorldMap.prototype.getSelectedRobotInOverview = getSelectedRobotInOverview;
 
 mmrpgWorldMap.prototype.getRobotNameSpan = getRobotNameSpan;

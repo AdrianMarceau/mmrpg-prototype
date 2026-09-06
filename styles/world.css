@@ -3462,6 +3462,9 @@ html, body {
     display: block;
     clear: both;
 }
+#robots-overview .storage-details .infoline.hidden {
+    display: none !important;
+}
 #robots-overview .storage-details .infoline .guage {
     display: block;
     height: auto;
@@ -3524,6 +3527,9 @@ html, body {
 }
 #robots-overview .storage-details .infoline .value {
 
+}
+#robots-overview .storage-details .infoline .value.type {
+    margin-bottom: 2px;
 }
 #robots-overview .storage-details .infoline > i {
 
@@ -3889,6 +3895,42 @@ html, body {
 
 }
 
+#robots-overview .storage-details[data-robot] .class-description {
+    padding-top: 8px;
+    margin-bottom: 9px;
+}
+#robots-overview .storage-details[data-robot] .class-description .label {
+    display: none;
+}
+#robots-overview .storage-details[data-robot] .class-description .value {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+    text-decoration: underline;
+}
+
+#robots-overview .storage-details[data-robot] .passive-skill {
+    padding-top: 4px;
+    margin-bottom: 18px;
+}
+#robots-overview .storage-details[data-robot] .passive-skill .label {
+    display: block;
+    float: none;
+    clear: both;
+    margin: 0 auto 6px;
+    text-align: center;
+}
+#robots-overview .storage-details[data-robot] .passive-skill .value {
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+}
+#robots-overview .storage-details[data-robot] .passive-skill .value strong {
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
 #robots-overview .storage-details .description {
     color: #c0c0c0;
     font-size: 12px;
@@ -3979,6 +4021,10 @@ html, body {
 }
 #robots-overview .storage-details[data-robot] .actions {
     max-height: none;
+    position: absolute;
+    bottom: 9px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 #robots-overview .storage-details[data-robot] .actions .button[data-action="robot-info"],
 #robots-overview .storage-details[data-robot] .actions .button[data-action="use-item"],

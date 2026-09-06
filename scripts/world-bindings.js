@@ -395,9 +395,9 @@ function bindEventsToInputs($thisWorld){
             $actionButtonsInDetails = $actionButtonsInDetails.add($imageDiv);
             //console.log('--> $imageDiv =', $imageDiv.length); //, $imageDiv);
             if ($storageDetailsDiv.length && $storageDetailsDiv.is('[data-robot]')){
-                let $heldItem = $('.infoline.held-item .value:not(.hidden)', $storageDetailsDiv);
-                let $supportMecha = $('.infoline.support-mecha .value:not(.hidden)', $storageDetailsDiv);
-                let $equippedAbilities = $('.infoline.equipped-abilities .value:not(.hidden)', $storageDetailsDiv);
+                let $heldItem = $('.infoline.held-item:not(.hidden) .value:not(.hidden)', $storageDetailsDiv);
+                let $supportMecha = $('.infoline.support-mecha:not(.hidden) .value:not(.hidden)', $storageDetailsDiv);
+                let $equippedAbilities = $('.infoline.equipped-abilities:not(.hidden) .value:not(.hidden)', $storageDetailsDiv);
                 $actionButtonsInDetails = $actionButtonsInDetails.add($heldItem);
                 $actionButtonsInDetails = $actionButtonsInDetails.add($supportMecha);
                 $actionButtonsInDetails = $actionButtonsInDetails.add($equippedAbilities);
