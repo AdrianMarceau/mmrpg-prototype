@@ -858,6 +858,7 @@ class rpg_world {
         $map_data_vars['field'] = isset($map_data_vars['field']) ? $map_data_vars['field'] : '';
         $map_data_vars['music'] = isset($map_data_vars['music']) ? $map_data_vars['music'] : array();
         $map_data_vars['terrain'] = isset($map_data_vars['terrain']) ? $map_data_vars['terrain'] : array();
+        $map_data_vars['population'] = isset($map_data_vars['population']) ? $map_data_vars['population'] : '';
         $map_data_vars['encounters'] = isset($map_data_vars['encounters']) ? $map_data_vars['encounters'] : '';
         $map_data_vars['pickups'] = isset($map_data_vars['pickups']) ? $map_data_vars['pickups'] : '';
         $map_data_vars['habitats'] = isset($map_data_vars['habitats']) ? $map_data_vars['habitats'] : array();
@@ -875,6 +876,7 @@ class rpg_world {
         if (!isset($map_data_vars['size'][2])){ $map_data_vars['size'][2] = $map_tilesize; }
         if (empty($map_data_vars['field'])){ $map_data_vars['field'] = 'field'; }
         if (empty($map_data_vars['music'])){ $map_data_vars['music'] = array(); }
+        if (empty($map_data_vars['population'])){ $map_data_vars['population'] = '20%'; }
         if (!empty($map_data_vars['encounters'])){ $map_data_vars['encounters'] = explode(',', str_replace(' ', '', $map_data_vars['encounters'])); }
         if (!empty($map_data_vars['pickups'])){ $map_data_vars['pickups'] = explode(',', str_replace(' ', '', $map_data_vars['pickups'])); }
         $map_data_vars['tiles'] = $map_custval_parser('tiles', $map_data_vars['tiles'], true);
@@ -930,6 +932,7 @@ class rpg_world {
         $map_data_parsed['field'] = $map_data_vars['field']; unset($map_data_vars['field']);
         $map_data_parsed['music'] = $map_data_vars['music']; unset($map_data_vars['music']);
         $map_data_parsed['terrain'] = $map_data_vars['terrain']; unset($map_data_vars['terrain']);
+        $map_data_parsed['population'] = $map_data_vars['population']; unset($map_data_vars['population']);
         $map_data_parsed['encounters'] = $map_data_vars['encounters']; unset($map_data_vars['encounters']);
         $map_data_parsed['pickups'] = $map_data_vars['pickups']; unset($map_data_vars['pickups']);
         $map_data_parsed['habitats'] = $map_data_vars['habitats']; unset($map_data_vars['habitats']);
@@ -1508,6 +1511,7 @@ class rpg_world {
         $world_battle_token = 'world-battle_'.str_replace('__', '_', $world_map_token);
         $map_name = !empty($map_data_parsed['name']) ? $map_data_parsed['name'] : 'Undefined';
         $map_level = !empty($map_data_parsed['level']) ? $map_data_parsed['level'] : 1;
+        $map_population = !empty($map_data_parsed['population']) ? $map_data_parsed['population'] : '20%';
         $map_encounters = !empty($map_data_parsed['encounters']) ? $map_data_parsed['encounters'] : array();
         $map_habitats = !empty($map_data_parsed['habitats']) ? $map_data_parsed['habitats'] : array();
         $map_field_token = !empty($map_data_parsed['field']) ? $map_data_parsed['field'] : 'field';
@@ -1553,9 +1557,20 @@ class rpg_world {
         $available_encounter_terrain = !empty($map_data_parsed['terrain']) ? $map_data_parsed['terrain'] : array();
         $used_encounter_cells = array();
 
+        // Check to see what the population value is and if its a percent
+        $map_population_percent = strstr($map_population, '%') ? true : false;
+        $map_population_value = intval(preg_replace('/[^0-9]+/', '', $map_population));
+
+        //error_log('$map_data_parsed[\'population\'] = '.print_r($map_data_parsed['population'], true));
+        //error_log('$map_population = '.print_r($map_population, true));
+        //error_log('$map_population_percent = '.($map_population_percent ? 'true' : 'false'));
+        //error_log('$map_population_value = '.print_r($map_population_value, true));
+
         // RANDOM ENCOUNTERS (within defined limits)
         $allowed_random_encounters = $map_encounters;
-        $max_random_encounters = ceil($available_encounter_cells['total'] * 0.20); // TODO: make this configurable in the map file
+        //$max_random_encounters = ceil($available_encounter_cells['total'] * 0.20); // TODO: make this configurable in the map file
+        if ($map_population_percent){ $max_random_encounters = ceil($available_encounter_cells['total'] * ($map_population_value/100)); }
+        else { $max_random_encounters = $map_population_value; }
         $allowed_held_items = array();
         if ($map_level >= 10){ $allowed_held_items += array('energy-pellet', 'weapon-pellet'); }
         if ($map_level >= 20){ $allowed_held_items += array('attack-pellet', 'defense-pellet', 'speed-pellet'); }
