@@ -4242,7 +4242,9 @@ display: block;
     white-space: nowrap;
     min-width: 120px;
     border-bottom: 2px solid #000000;
-    transition: min-width 0.6s;
+    left: 0;
+    opacity: 1.0;
+    transition: min-width 0.6s, left 0.3s, opacity 0.3s;
 }
 #world #canvas #robots-overview .team-robot > .label .name {
     float: left;
@@ -4303,7 +4305,9 @@ display: block;
     border-right: 1px solid #000000;
     border-bottom: 1px solid #000000;
     pointer-events: auto;
-    transition: width 0.6s;
+    opacity: 1.0;
+    left: 0;
+    transition: width 0.6s, left 0.3s, opacity 0.3s;
 }
 #world #canvas #robots-overview .team-robot > .guage > i {
     display: block;
@@ -4384,6 +4388,8 @@ display: block;
     padding: 0 2px 0px 4px;
     border-radius: 0 3px 3px 3px;
     pointer-events: none;
+    opacity: 1.0;
+    transition: opacity 0.3s;
 }
 #world #canvas #robots-overview .team-robot > .statmods > .mod {
     display: inline-block;
@@ -4450,6 +4456,18 @@ display: block;
     margin-right: -1px;
     font-size: 9px;
     top: 1px;
+}
+
+#world.moving #canvas #robots-overview:before {
+    left: -570px;
+    background-color: rgba(0, 0, 0, 0.0);
+    box-shadow: 0 0 0 transparent;
+}
+#world.moving #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .label,
+#world.moving #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .guage,
+#world.moving #canvas #robots-overview:not(:hover):not(.expanded) .team-robot > .statmods {
+    left: -50px;
+    opacity: 0;
 }
 
 #world #canvas #robots-overview:after,

@@ -238,6 +238,18 @@ class mmrpgWorldMap {
         return mapIsHidden;
         }
 
+    // Define a function for updating whether or not the world is visually "moving" with a timeout-based removal
+    worldIsMoving(state){
+        let _self = this;
+        let _selfRef = _self.worldIsMoving;
+        let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+        if (_selfRef.removeTimeout){ clearTimeout(_selfRef.removeTimeout); }
+        if (state){ $thisWorld.addClass('moving'); }
+        else { _selfRef.removeTimeout = setTimeout(function(){ $thisWorld.removeClass('moving'); }, 1000); }
+        return;
+        }
+
     // Quick function to initialize default settings
     initConfig(custConfig){
         //console.log('%c' + 'mmrpgWorldMap.initConfig()', 'color: green;');
@@ -1932,6 +1944,7 @@ class mmrpgWorldMap {
             }
         let cursorHasMoved = _worldCursor.moved || thisNewPos !== _mapStartPosition ? true : false;
         _self.resetZoomLevel();
+        _self.worldIsMoving(true);
         $canvasMap.addClass('busy');
         _worldCursor.moving = true;
         $actionDropdown.removeClass('active');
@@ -1978,6 +1991,7 @@ class mmrpgWorldMap {
             let doAfterDelay = function(){
                 _worldCursor.moving = false;
                 $canvasMap.removeClass('busy');
+                _self.worldIsMoving(false);
                 if (typeof onComplete === 'function'){ onComplete(); }
                 if (cursorHasMoved){ _self.saveWorldState(null, 6); }
                 };
