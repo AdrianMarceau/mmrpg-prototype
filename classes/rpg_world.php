@@ -5314,6 +5314,7 @@ class rpg_world {
         //error_log($robot_token.' | $robot_stats (before) = '.print_r($robot_stats, true));
         if (!empty($player_index_info['player_type'])){
             $temp_player_type = $player_index_info['player_type'];
+            //error_log('Player '.$player_index_info['player_token'].' has a '.$temp_player_type.' bonus of '.$player_index_info['player_'.$temp_player_type].'% ('.ceil($robot_stats[$temp_player_type]['current'] * 0.25).') for '.$robot_token.'.');
             if ($temp_player_type === 'energy'){ $robot_stats['energy']['current'] = ceil($robot_stats['energy']['current'] * 1.25); }
             elseif ($temp_player_type === 'attack'){ $robot_stats['attack']['current'] = ceil($robot_stats['attack']['current'] * 1.25); }
             elseif ($temp_player_type === 'defense'){ $robot_stats['defense']['current'] = ceil($robot_stats['defense']['current'] * 1.25); }
@@ -5330,11 +5331,11 @@ class rpg_world {
         if (!empty($robot_info['robot_energy'])){
             $robot_energy = $robot_stats['energy']['current'];
             $robot_energy_max = $robot_stats['energy']['current'];
-            if (!empty($player_index_info['player_energy'])){
+            /*if (!empty($player_index_info['player_energy'])){
                 $player_boost = ceil($robot_info['robot_energy'] * ($player_index_info['player_energy'] / 100));
                 $robot_energy += $player_boost;
                 $robot_energy_max += $player_boost;
-            }
+            }*/
             if (!empty($robot_session['energy']) && is_numeric($robot_session['energy'])){ $robot_energy += $robot_session['energy']; }
             $robot_energy_percent = round(($robot_energy / $robot_energy_max) * 100);
             if ($robot_energy_percent === 100 && $robot_energy < $robot_energy_max){ $robot_energy_percent -= 1; }
