@@ -1940,7 +1940,7 @@ class rpg_world {
         return $world_map_pickups;
     }
 
-// Define a function for getting the terrain type for a given position on the map, but do not limit only to available tiles
+    // Define a function for getting the terrain type for a given position on the map, but do not limit only to available tiles
     public static function get_map_position_terrain($position, $map_data_parsed){
         //error_log('rpg_world::get_map_position_terrain() called for position "'.$position.'"');
         if (empty($position) || !is_string($position) || !isset($map_data_parsed['tiles']) || !isset($map_data_parsed['layers'])){ return 'unknown'; }
@@ -1971,7 +1971,8 @@ class rpg_world {
         if (empty($effective_tile) || $effective_tile === 'void' || strpos($effective_tile, 'void-') === 0){
             return 'unknown';
         }
-        return explode('-', $effective_tile)[0];
+        //return explode('-', $effective_tile)[0];
+        return preg_replace('/(\-[0-9]+)$/i', '', $effective_tile);
     }
 
     /*
@@ -4736,7 +4737,7 @@ class rpg_world {
                         $row_tiles = !empty($row_tiles) ? str_replace(array('[', ']'), '', $row_tiles) : '';
                         $row_tiles = !empty($row_tiles) ? (strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles)) : array();
                         //error_log('--> $row_tiles(parsed) = '.print_r($row_tiles, true));
-                        if (empty($row_tiles[$tx])){ error_log('-> tile key "'.$tile_key.'" not found in row tiles'); continue; }
+                        if (!isset($row_tiles[$tx])){ error_log('-> tile key "'.$tile_key.'" not found in row tiles (empty $row_tiles['.$tx.'])'); continue; }
                         $current_tile_value = $row_tiles[$tx];
                         $new_tile_value = $terrain_name;
                         //error_log('--> $current_tile_value = '.print_r($current_tile_value, true));
@@ -4831,9 +4832,10 @@ class rpg_world {
                         $row_tiles = !empty($layer_tiles[$ty]) ? $layer_tiles[$ty] : '';
                         $row_tiles = !empty($row_tiles) ? str_replace(array('[', ']'), '', $row_tiles) : '';
                         $row_tiles = !empty($row_tiles) ? (strstr($row_tiles, ',') ? explode(',', $row_tiles) : str_split($row_tiles)) : array();
-                        if (empty($row_tiles[$tx])){ continue; }
+                        if (!isset($row_tiles[$tx])){ continue; }
                         $current_terrain = $row_tiles[$tx];
-                        $current_terrain_base = explode('-', $current_terrain)[0];
+                        //$current_terrain_base = explode('-', $current_terrain)[0];
+                        $current_terrain_base = preg_replace('/(\-[0-9]+)$/i', '', $current_terrain);
                         //error_log('$current_terrain = '.print_r($current_terrain, true));
                         //error_log('$current_terrain_base = '.print_r($current_terrain_base, true));
                         if ($current_terrain === $terrain_up || $current_terrain_base === $terrain_up){ $row_tiles[$tx] = $terrain_down; }

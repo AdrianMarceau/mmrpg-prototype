@@ -1535,7 +1535,8 @@ class mmrpgWorldMap {
         // Quick function to grab the base string of a neighbor tile
         let getBase = (key) => {
             let t = terrainTilesIndex[key];
-            let b = t && t.sprite ? t.sprite[1].split('-')[0] : 'void';
+            //let b = t && t.sprite ? t.sprite[1].split('-')[0] : 'void';
+            let b = t && t.sprite ? t.sprite[1].replace(/-[0-9]+$/, '') : 'void';
             return (b === 'dotted' || b === '') ? 'void' : b;
             };
         let bitmask = 0;
@@ -1569,7 +1570,8 @@ class mmrpgWorldMap {
         allAffectedTiles.forEach(tileKey => {
             let tileData = terrainTilesIndex[tileKey];
             if (!tileData) return; // Skip if tile is out of bounds
-            let baseTerrain = tileData.sprite[1].split('-')[0];
+            //let baseTerrain = tileData.sprite[1].split('-')[0];
+            let baseTerrain = tileData.sprite[1].replace(/-[0-9]+$/, '');
             let finalTerrainToken = this.calculateTileBitmask(tileKey, baseTerrain);
             let terrainSpriteData = mapTilesIndex[finalTerrainToken] || false;
             if (!terrainSpriteData){ console.error('-> terrainSpriteData not found for terrain', finalTerrainToken); return; }

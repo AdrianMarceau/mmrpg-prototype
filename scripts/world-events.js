@@ -2394,7 +2394,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                                 continue;
                                 }
                             // Ensure we are assigning just the base terrain name (strip any bitmasks if accidentally provided in config)
-                            let targetTerrainBase = terrainName.split('-')[0];
+                            //let targetTerrainBase = terrainName.split('-')[0];
+                            let targetTerrainBase = terrainName.replace(/-[0-9]+$/, '');
                             tileData.sprite[1] = targetTerrainBase;
                             }
                         // --- PASS 2: Hand off to the helper to calculate edges and refresh the map! ---
@@ -2493,7 +2494,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             let tileData = terrainTilesIndex[tileKey];
                             if (!tileData) continue;
                             let currentTerrain = tileData.sprite[1];
-                            let currentTerrainBase = currentTerrain.split('-')[0];
+                            //let currentTerrainBase = currentTerrain.split('-')[0];
+                            let currentTerrainBase = currentTerrain.replace(/-[0-9]+$/, '');
                             let targetTerrainBase = currentTerrainBase;
                             if (currentTerrain === terrainUp || currentTerrainBase === terrainUp){ targetTerrainBase = terrainDown; }
                             else if (currentTerrain === terrainDown || currentTerrainBase === terrainDown){ targetTerrainBase = terrainUp; }
