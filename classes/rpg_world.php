@@ -1657,6 +1657,8 @@ class rpg_world {
             $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
             $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
             $robot_flags = array();
+            $robot_values = array();
+            $robot_counters = array();
             $battle_token = $world_battle_token.'_random-robot-'.($robot_key + 1);
             $battle_name = $map_name.' '.ucfirst($robot_class).' Battle';
             $battle_description = 'Defeat '.$robot_name.' in battle!';
@@ -1674,6 +1676,14 @@ class rpg_world {
                 elseif (!empty($possible_music['battle'])){ $possible_music = $possible_music['battle'][0]; }
                 elseif (!empty($possible_music['default'])){ $possible_music = $possible_music['default'][0]; }
                 if (!empty($possible_music)){ $battle_music = $possible_music; }
+                }
+            if (strstr($robot_token, '_alt')){
+                $alt_num = str_replace($real_robot_token.'_alt', '', $robot_token);
+                $alt_num = !empty($alt_num) ? intval($alt_num) : 1;
+                $max_boost = min(5, $alt_num);
+                $robot_counters['attack_mods'] = mt_rand(1, $max_boost);
+                $robot_counters['defense_mods'] = mt_rand(1, $max_boost);
+                $robot_counters['speed_mods'] = mt_rand(1, $max_boost);
                 }
             //error_log('RANDOM ENCOUNTERS ('.$robot_class.') // $battle_music = '.print_r($battle_music, true));
             $battle_turns = $rewards_matrix[$robot_class]['turns'];
@@ -1693,6 +1703,8 @@ class rpg_world {
                     'level' => $robot_level,
                     'item' => $robot_item,
                     'flags' => $robot_flags,
+                    'values' => $robot_values,
+                    'counters' => $robot_counters,
                     ))),
                 'flags' => array(
                     'world_battle' => true,
