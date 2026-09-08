@@ -24,8 +24,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '12-8',
         'level' => 5,
         'field' => 'light-laboratory',
+        'objects' => ['player-platform'],
         'encounters' => ['dr-light', 'mega-man'],
-        'items' => ['light-program', 'light-heart', 'defense-core'],
+        'items' => ['light-program', 'light-heart', 'copy-core'],
         'tags' => ['central', 'player', 'main', 'spawn']
         ];
     $index['light-area-1e'] = [
@@ -60,8 +61,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '19-14',
         'level' => 60,
         'field' => 'wily-castle',
+        'objects' => ['player-platform'],
         'encounters' => ['dr-wily', 'bass'],
-        'items' => ['wily-program', 'wily-heart', 'attack-core'],
+        'items' => ['wily-program', 'wily-heart', 'copy-core'],
         'tags' => ['central', 'player', 'main', 'spawn']
         ];
     $index['wily-area-1n'] = [
@@ -97,8 +99,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '5-14',
         'level' => 60,
         'field' => 'cossack-citadel',
+        'objects' => ['player-platform'],
         'encounters' => ['dr-cossack', 'proto-man'],
-        'items' => ['cossack-program', 'cossack-heart', 'speed-core'],
+        'items' => ['cossack-program', 'cossack-heart', 'copy-core'],
         'tags' => ['central', 'player', 'main', 'spawn']
         ];
     $index['cossack-area-1n'] = [
@@ -134,7 +137,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '12-18',
         'level' => 100,
         'field' => '',
+        'objects' => ['player-platform'],
         'encounters' => ['dr-lalinde'],
+        'items' => ['lalinde-program', 'empty-heart', 'empty-core', 'mecha-whistle'],
         'tags' => ['central', 'player', 'main', 'spawn']
         ];
     $index['lalinde-area-1n'] = [
@@ -170,6 +175,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'field' => 'robot-museum',
         'encounters' => ['doc-robot'],
+        'encounters2' => ['sniper-joe', 'skeleton-joe', 'crystal-joe'],
         'items' => ['extra-life'],
         'tags' => ['outer', 'main']
         ];
@@ -180,7 +186,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'robot-museum',
         'encounters' => ['trill'],
         'rescues' => ['treble'],
-        'items' => ['speed-booster'],
+        'items' => ['speed-booster', 'hyper-screw'],
         'tags' => ['outer', 'main2']
         ];
     //--------------------------//
@@ -190,7 +196,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'robot-museum',
         'encounters' => ['weapon-archivist'],
-        'items' => ['defense-booster'],
+        'items' => ['defense-booster', 'hyper-screw'],
         'tags' => ['outer']
         ];
     //--------------------------//
@@ -200,6 +206,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'field' => 'royal-palace',
         'encounters' => ['king'],
+        'encounters2' => ['pyre-fly', 'flea'],
         'items' => ['extra-life'],
         'tags' => ['outer', 'main']
         ];
@@ -210,7 +217,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'royal-palace',
         'encounters' => ['trill'],
         'rescues' => ['tango'],
-        'items' => ['speed-diverter'],
+        'items' => ['speed-diverter', 'hyper-screw'],
         'tags' => ['outer', 'main2']
         ];
     //--------------------------//
@@ -220,7 +227,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'royal-palace',
         'encounters' => ['weapon-archivist'],
-        'items' => ['defense-diverter'],
+        'items' => ['defense-diverter', 'hyper-screw'],
         'tags' => ['outer']
         ];
     //--------------------------//
@@ -248,7 +255,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'encounters' => ['trill'],
         'rescues' => ['reggae'],
-        'items' => ['attack-booster'],
+        'items' => ['attack-booster', 'hyper-screw'],
         'tags' => ['outer']
         ];
     //--------------------------//
@@ -276,7 +283,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'encounters' => ['trill'],
         'rescues' => ['auto'],
-        'items' => ['attack-diverter'],
+        'items' => ['attack-diverter', 'hyper-screw
+        '],
         'tags' => ['outer']
         ];
     //--------------------------//
@@ -286,6 +294,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'field' => 'hunter-compound',
         'encounters' => ['enker'],
+        'encounters2' => ['mouslider', 'picket-man'],
         'tags' => ['upper', 'main']
         ];
     $index['hunter-area-2'] = [
@@ -293,6 +302,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '17-3',
         'level' => 150,
         'field' => 'hunter-compound',
+        'encounters2' => ['mouslider', 'picket-man'],
         'encounters' => ['punk'],
         'tags' => ['upper']
         ];
@@ -302,6 +312,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'hunter-compound',
         'encounters' => ['ballade'],
+        'encounters2' => ['mouslider', 'picket-man'],
+        'items' => ['hyper-screw'],
         'tags' => ['upper']
         ];
     //--------------------------//
@@ -311,6 +323,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'field' => 'genesis-tower',
         'encounters' => ['buster-rod-g'],
+        'encounters2' => ['beak', 'pooker', 'moller'],
         'tags' => ['upper', 'main']
         ];
     $index['genesis-area-2'] = [
@@ -319,6 +332,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 150,
         'field' => 'genesis-tower',
         'encounters' => ['mega-water-s'],
+        'encounters2' => ['moller', 'colton', 'shield-attacker-gtr'],
         'tags' => ['upper']
         ];
     $index['genesis-area-3'] = [
@@ -327,6 +341,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'genesis-tower',
         'encounters' => ['hyper-storm-h'],
+        'encounters2' => ['beak', 'pooker', 'shield-attacker-gtr', 'propeller-eye'],
+        'items' => ['hyper-screw'],
         'tags' => ['upper']
         ];
     //--------------------------//
@@ -353,6 +369,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'field' => 'stardroid-base',
         'encounters' => ['mercury', 'venus', 'neptune', 'jupiter'],
+        'encounters2' => ['malmet', 'covercannon', 'biribaree'],
         'tags' => ['upper', 'special', 'main']
         ];
     $index['stellar-area-2'] = [
@@ -361,6 +378,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'field' => 'stardroid-base',
         'encounters' => ['mars', 'saturn', 'uranus', 'pluto'],
+        'encounters2' => ['malmet', 'covercannon', 'biribaree'],
         'tags' => ['upper', 'special']
         ];
     $index['stellar-area-3'] = [
@@ -369,6 +387,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'stardroid-base',
         'encounters' => ['sunstar'],
+        'encounters2' => ['novamite', 'malmet'],
         'items' => ['cosmo-circuit'],
         'tags' => ['upper', 'special']
         ];
@@ -420,24 +439,31 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'EXPLODE Area 1',
         'position' => '15-8',
         'level' => 30,
+        'element' => 'explode',
         'field' => 'pipe-station',
         'encounters' => ['crash-man'],
+        'encounters2' => ['killer-bullet', 'prop-top', 'spring-head', 'crazy-cannon'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['explode-area-1e'] = [
         'name' => 'EXPLODE Area 1E',
         'position' => '16-8',
         'level' => 40,
+        'element' => 'explode',
         'field' => '',
         'encounters' => ['blast-man'],
+        'items' => ['extra-life'],
         'tags' => ['central', 'elemental']
         ];
     $index['explode-area-1s'] = [
         'name' => 'EXPLODE Area 1S',
         'position' => '15-9',
         'level' => 40,
+        'element' => 'explode',
         'field' => 'trenchwork-depot',
         'encounters' => ['napalm-man', 'grenade-man'],
+        'encounters2' => ['bombardier', 'moller'],
         'items' => ['xtreme-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -445,8 +471,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'EXPLODE Area 1W',
         'position' => '14-8',
         'level' => 20,
+        'element' => 'explode',
         'field' => 'orb-city',
         'encounters' => ['bomb-man'],
+        'encounters2' => ['bombomb', 'met', 'sniper-joe', 'killer-bullet'],
         'items' => ['energy-tank'],
         'tags' => ['central', 'elemental']
         ];
@@ -455,16 +483,20 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'IMPACT Area 1',
         'position' => '12-11',
         'level' => 30,
+        'element' => 'impact',
         'field' => 'rocky-plateau',
         'encounters' => ['hard-man'],
+        'encounters2' => ['monking-r', 'hammer-joe', 'needle-ned'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['impact-area-1n'] = [
         'name' => 'IMPACT Area 1N',
         'position' => '12-10',
         'level' => 20,
+        'element' => 'impact',
         'field' => 'mountain-mines',
         'encounters' => ['guts-man'],
+        'encounters2' => ['picket-man', 'met', 'killer-bullet', 'bunby-heli'],
         'items' => ['guard-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -472,6 +504,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'IMPACT Area 1E',
         'position' => '13-11',
         'level' => 40,
+        'element' => 'impact',
         'field' => '',
         'encounters' => ['strike-man'],
         'items' => ['weapon-upgrade'],
@@ -481,8 +514,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'IMPACT Area 1W',
         'position' => '11-11',
         'level' => 40,
+        'element' => 'impact',
         'field' => 'waterworks-dam',
         'encounters' => ['concrete-man', 'impact-man'],
+        'encounters2' => ['bombomboy', 'picket-man'],
         'items' => ['energy-upgrade'],
         'tags' => ['central', 'elemental']
         ];
@@ -491,16 +526,21 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'CUTTER Area 1',
         'position' => '9-8',
         'level' => 30,
+        'element' => 'cutter',
         'field' => 'industrial-facility',
         'encounters' => ['metal-man'],
+        'encounters2' => ['pierrobot', 'drill-mole', 'spring-head'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['cutter-area-1e'] = [
         'name' => 'CUTTER Area 1E',
         'position' => '10-8',
         'level' => 20,
+        'element' => 'cutter',
         'field' => 'abandoned-warehouse',
-        'encounters' => ['cut-man'],
+        'encounters' => ['cut-man', 'big-eye'],
+        'encounters2' => ['flea', 'met', 'spine', 'killer-bullet', 'beak', 'adhering-suzy'],
         'items' => ['weapon-tank'],
         'tags' => ['central', 'elemental']
         ];
@@ -508,6 +548,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'CUTTER Area 1S',
         'position' => '9-9',
         'level' => 40,
+        'element' => 'cutter',
         'field' => '',
         'encounters' => ['blade-man', 'yamato-man', 'knight-man'],
         'items' => ['repair-module'],
@@ -517,8 +558,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'CUTTER Area 1W',
         'position' => '8-8',
         'level' => 40,
+        'element' => 'cutter',
         'field' => 'construction-site',
         'encounters' => ['needle-man'],
+        'encounters2' => ['needle-ned', 'hammer-joe', 'elecin'],
+        'items' => ['extra-life'],
         'tags' => ['central', 'elemental']
         ];
     //--------------------------//
@@ -526,16 +570,20 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'FLAME Area 1',
         'position' => '18-8',
         'level' => 60,
+        'element' => 'flame',
         'field' => 'atomic-furnace',
         'encounters' => ['heat-man'],
+        'encounters2' => ['telly', 'popo-heli'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['flame-area-1e'] = [
         'name' => 'FLAME Area 1E',
         'position' => '19-8',
         'level' => 70,
+        'element' => 'flame',
         'field' => 'egyptian-excavation',
         'encounters' => ['pharaoh-man', 'sword-man'],
+        'encounters2' => ['pyre-fly', 'mummira', 'shield-attacker'],
         'items' => ['forge-circuit'],
         'tags' => ['central', 'elemental']
         ];
@@ -543,16 +591,20 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'FLAME Area 1S',
         'position' => '18-9',
         'level' => 70,
+        'element' => 'flame',
         'field' => '',
         'encounters' => ['solar-man'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental']
         ];
     $index['flame-area-1w'] = [
         'name' => 'FLAME Area 1W',
         'position' => '17-8',
         'level' => 50,
+        'element' => 'flame',
         'field' => 'steel-mill',
         'encounters' => ['fire-man', 'torch-man'],
+        'encounters2' => ['tackle-fire', 'bombomb', 'telly'],
         'items' => ['uptick-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -561,33 +613,43 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SWIFT Area 1',
         'position' => '12-13',
         'level' => 50,
+        'element' => 'swift',
         'field' => 'spinning-greenhouse',
         'encounters' => ['top-man', 'spring-man'],
+        'encounters2' => ['spin-fiend', 'peterchy'],
         'items' => ['persist-module'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['swift-area-1n'] = [
         'name' => 'SWIFT Area 1N',
-        'position' => '11-13',
+        'position' => '12-12',
         'level' => 40,
+        'element' => 'swift',
         'field' => 'underground-laboratory',
         'encounters' => ['quick-man'],
+        'encounters2' => ['spring-head', 'tackle-fire'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental']
         ];
     $index['swift-area-1e'] = [
         'name' => 'SWIFT Area 1E',
         'position' => '13-13',
         'level' => 60,
+        'element' => 'swift',
         'field' => '',
         'encounters' => ['bounce-man'],
+        'items' => ['weapon-tank'],
         'tags' => ['central', 'elemental']
         ];
     $index['swift-area-1w'] = [
         'name' => 'SWIFT Area 1W',
         'position' => '11-13',
         'level' => 60,
+        'element' => 'swift',
         'field' => 'sonic-highway',
         'encounters' => ['turbo-man', 'nitro-man'],
+        'encounters2' => ['robo-transport', 'cannon-roader'],
+        'items' => ['energy-tank'],
         'tags' => ['central', 'elemental']
         ];
     //--------------------------//
@@ -595,6 +657,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'FREEZE Area 1',
         'position' => '6-8',
         'level' => 60,
+        'element' => 'freeze',
         'field' => '',
         'encounters' => ['tundra-man'],
         'items' => ['bulwark-module'],
@@ -604,8 +667,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'FREEZE Area 1E',
         'position' => '7-8',
         'level' => 50,
+        'element' => 'freeze',
         'field' => 'arctic-jungle',
-        'encounters' => ['ice-man', 'blizzard-man'],
+        'encounters' => ['ice-man', 'blizzard-man', 'big-eye'],
+        'encounters2' => ['peng', 'spine', 'adhering-suzy', 'foot-holder'],
         'items' => ['charge-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -613,16 +678,21 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'FREEZE Area 1S',
         'position' => '6-9',
         'level' => 70,
+        'element' => 'freeze',
         'field' => '',
         'encounters' => ['cold-man', 'frost-man'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental']
         ];
     $index['freeze-area-1w'] = [
         'name' => 'FREEZE Area 1W',
         'position' => '5-8',
         'level' => 70,
+        'element' => 'freeze',
         'field' => 'glacier-cradle',
         'encounters' => ['chill-man', 'freeze-man'],
+        'encounters2' => ['frosty-throwman', 'tel-tel'],
+        'items' => ['resetchi'],
         'tags' => ['central', 'elemental']
         ];
     //--------------------------//
@@ -630,6 +700,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'WIND Area 1',
         'position' => '18-6',
         'level' => 80,
+        'element' => 'wind',
         'field' => '',
         'encounters' => ['tornado-man', 'cloud-man'],
         'tags' => ['central', 'elemental', 'main']
@@ -638,6 +709,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'WIND Area 1E',
         'position' => '19-6',
         'level' => 90,
+        'element' => 'wind',
         'field' => '',
         'encounters' => ['wind-man', 'gyro-man'],
         'rescues' => ['quake-woman'],
@@ -648,16 +720,21 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'WIND Area 1S',
         'position' => '18-7',
         'level' => 70,
+        'element' => 'wind',
         'field' => 'sky-ridge',
         'encounters' => ['air-man'],
+        'encounters2' => ['fan-fiend', 'foot-holder'],
+        'items' => ['resetchi'],
         'tags' => ['central', 'elemental']
         ];
     $index['wind-area-1w'] = [
         'name' => 'WIND Area 1W',
         'position' => '17-6',
         'level' => 90,
+        'element' => 'wind',
         'field' => 'rusty-scrapheap',
         'encounters' => ['dust-man', 'junk-man'],
+        'encounters2' => ['lady-blader', 'upndown'],
         'items' => ['salvage-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -666,8 +743,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SHADOW Area 1',
         'position' => '21-8',
         'level' => 90,
+        'element' => 'shadow',
         'field' => 'robosaur-boneyard',
         'encounters' => ['skull-man'],
+        'encounters2' => ['skullmet', 'skeleton-joe'],
         'items' => ['overkill-module'],
         'tags' => ['central', 'elemental', 'main']
         ];
@@ -675,8 +754,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SHADOW Area 1N',
         'position' => '21-7',
         'level' => 100,
+        'element' => 'shadow',
         'field' => 'haunted-mansion',
         'encounters' => ['shade-man'],
+        'encounters2' => ['astro-zombieg', 'batton'],
         'items' => ['siphon-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -684,6 +765,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SHADOW Area 1S',
         'position' => '21-9',
         'level' => 100,
+        'element' => 'shadow',
         'field' => '',
         'encounters' => ['magic-man', 'clown-man'],
         'items' => ['weapon-tank'],
@@ -693,8 +775,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SHADOW Area 1W',
         'position' => '20-8',
         'level' => 80,
+        'element' => 'shadow',
         'field' => 'septic-system',
         'encounters' => ['shadow-man'],
+        'encounters2' => ['ribbitron', 'hammer-joe', 'spin-fiend', 'elecin'],
+        'items' => ['super-capsule'],
         'tags' => ['central', 'elemental']
         ];
     //--------------------------//
@@ -702,16 +787,20 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'ELECTRIC Area 1',
         'position' => '18-11',
         'level' => 90,
+        'element' => 'electric',
         'field' => 'power-plant',
-        'encounters' => ['spark-man', 'plug-man'],
+        'encounters' => ['spark-man', 'plug-man', 'giant-spring-head'],
+        'encounters2' => ['elecin', 'hammer-joe', 'nitron-y', 'peterchy'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['electric-area-1n'] = [
         'name' => 'ELECTRIC Area 1N',
         'position' => '18-10',
         'level' => 80,
+        'element' => 'electric',
         'field' => 'electrical-tower',
-        'encounters' => ['elec-man'],
+        'encounters' => ['elec-man', 'big-eye'],
+        'encounters2' => ['spine', 'flea', 'beak', 'adhering-suzy'],
         'items' => ['copycat-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -719,14 +808,17 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'ELECTRIC Area 1E',
         'position' => '19-11',
         'level' => 100,
+        'element' => 'electric',
         'field' => '',
         'encounters' => ['dynamo-man', 'fuse-man'],
+        'items' => ['resetchi'],
         'tags' => ['central', 'elemental']
         ];
     $index['electric-area-1w'] = [
         'name' => 'ELECTRIC Area 1W',
         'position' => '17-11',
         'level' => 100,
+        'element' => 'electric',
         'field' => '',
         'encounters' => ['gravity-man', 'sheep-man'],
         'items' => ['battery-circuit'],
@@ -737,17 +829,21 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'CRYSTAL Area 1',
         'position' => '15-13',
         'level' => 80,
+        'element' => 'crystal',
         'field' => '',
         'encounters' => ['trill'],
         'rescues' => ['meddy'],
+        'items' => ['super-capsule'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['crystal-area-1n'] = [
         'name' => 'CRYSTAL Area 1N',
         'position' => '15-12',
         'level' => 90,
+        'element' => 'crystal',
         'field' => 'gemstone-cavern',
         'encounters' => ['jewel-man'],
+        'encounters2' => ['diaymon', 'spike-pusher'],
         'items' => ['distill-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -755,16 +851,21 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'CRYSTAL Area 1S',
         'position' => '15-14',
         'level' => 90,
+        'element' => 'crystal',
         'field' => 'reflection-chamber',
         'encounters' => ['gemini-man'],
+        'encounters2' => ['nitron-r', 'nitron-b', 'nitron-y', 'spin-fiend', 'ribbitron'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental']
         ];
     $index['crystal-area-1w'] = [
         'name' => 'CRYSTAL Area 1W',
         'position' => '14-13',
         'level' => 70,
+        'element' => 'crystal',
         'field' => 'crystal-catacombs',
         'encounters' => ['crystal-man'],
+        'encounters2' => ['crystal-joe', 'tatepakkan'],
         'items' => ['hyperscan-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -773,8 +874,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'TIME Area 1',
         'position' => '12-15',
         'level' => 80,
+        'element' => 'time',
         'field' => 'photon-collider',
         'encounters' => ['flash-man'],
+        'encounters2' => ['crazy-cannon', 'blocky'],
         'items' => ['chrono-circuit'],
         'tags' => ['central', 'elemental', 'main']
         ];
@@ -782,14 +885,18 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'TIME Area 1N',
         'position' => '12-14',
         'level' => 70,
+        'element' => 'time',
         'field' => 'clock-citadel',
         'encounters' => ['time-man'],
+        'encounters2' => ['flutter-fly'],
+        'items' => ['extra-life'],
         'tags' => ['central', 'elemental']
         ];
     $index['time-area-1e'] = [
         'name' => 'TIME Area 1E',
         'position' => '13-15',
         'level' => 90,
+        'element' => 'time',
         'field' => '',
         'encounters' => ['centaur-man'],
         'items' => ['hourglass-module'],
@@ -799,8 +906,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'TIME Area 1W',
         'position' => '11-15',
         'level' => 90,
+        'element' => 'time',
         'field' => 'lighting-control',
         'encounters' => ['bright-man'],
+        'encounters2' => ['bulb-blaster', 'electriri'],
+        'items' => ['resetchi'],
         'tags' => ['central', 'elemental']
         ];
     //--------------------------//
@@ -808,24 +918,31 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'MISSILE Area 1',
         'position' => '9-13',
         'level' => 80,
+        'element' => 'missile',
         'field' => '',
         'encounters' => ['search-man'],
+        'items' => ['super-capsule'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['missile-area-1n'] = [
         'name' => 'MISSILE Area 1N',
         'position' => '9-12',
         'level' => 90,
+        'element' => 'missile',
         'field' => 'submerged-armory',
         'encounters' => ['dive-man'],
+        'encounters2' => ['manta-missile', 'covercannon'],
+        'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental']
         ];
     $index['missile-area-1e'] = [
         'name' => 'MISSILE Area 1E',
         'position' => '10-13',
         'level' => 70,
+        'element' => 'missile',
         'field' => 'magnetic-generator',
         'encounters' => ['magnet-man'],
+        'encounters2' => ['mag-fly', 'elecin', 'peterchy'],
         'items' => ['magnet-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -833,8 +950,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'MISSILE Area 1S',
         'position' => '9-14',
         'level' => 90,
+        'element' => 'missile',
         'field' => 'minefield-dunes',
         'encounters' => ['commando-man'],
+        'encounters2' => ['antlion-g', 'bombardier'],
         'items' => ['target-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -843,14 +962,17 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'NATURE Area 1',
         'position' => '6-6',
         'level' => 80,
+        'element' => 'nature',
         'field' => 'serpent-column',
         'encounters' => ['snake-man'],
+        'encounters2' => ['petit-snakey', 'ribbitron'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['nature-area-1e'] = [
         'name' => 'NATURE Area 1E',
         'position' => '7-6',
         'level' => 90,
+        'element' => 'nature',
         'field' => '',
         'encounters' => ['slash-man', 'tengu-man'],
         'items' => ['sapling-circuit'],
@@ -860,14 +982,18 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'NATURE Area 1S',
         'position' => '6-7',
         'level' => 70,
+        'element' => 'nature',
         'field' => 'preserved-forest',
         'encounters' => ['wood-man', 'burner-man'],
+        'encounters2' => ['batton', 'kabuton', 'blocky'],
+        'items' => ['resetchi'],
         'tags' => ['central', 'elemental']
         ];
     $index['nature-area-1w'] = [
         'name' => 'NATURE Area 1W',
         'position' => '5-6',
         'level' => 90,
+        'element' => 'nature',
         'field' => '',
         'encounters' => ['plant-man', 'hornet-man'],
         'rescues' => ['vesper-woman'],
@@ -879,16 +1005,20 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'WATER Area 1',
         'position' => '6-11',
         'level' => 90,
+        'element' => 'water',
         'field' => 'rainy-sewers',
         'encounters' => ['toad-man', 'pump-man'],
+        'encounters2' => ['robo-fishtot', 'piper-n', 'lady-blader', 'up-n-down'],
         'tags' => ['central', 'elemental', 'main']
         ];
     $index['water-area-1n'] = [
         'name' => 'WATER Area 1N',
         'position' => '6-10',
         'level' => 80,
+        'element' => 'water',
         'field' => 'waterfall-institute',
         'encounters' => ['bubble-man'],
+        'encounters2' => ['snapper', 'octone'],
         'items' => ['spreader-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -896,6 +1026,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'WATER Area 1E',
         'position' => '7-11',
         'level' => 100,
+        'element' => 'water',
         'field' => '',
         'encounters' => ['burst-man', 'aqua-man', 'acid-man'],
         'items' => ['alchemy-module'],
@@ -905,6 +1036,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'WATER Area 1W',
         'position' => '5-11',
         'level' => 100,
+        'element' => 'water',
         'field' => '',
         'encounters' => ['splash-woman', 'wave-man', 'pirate-man'],
         'items' => ['sponge-circuit'],
@@ -915,6 +1047,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'EARTH Area 1',
         'position' => '3-8',
         'level' => 90,
+        'element' => 'earth',
         'field' => '',
         'encounters' => ['block-man', 'stone-man'],
         'tags' => ['central', 'elemental', 'main']
@@ -923,8 +1056,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'EARTH Area 1N',
         'position' => '3-7',
         'level' => 100,
+        'element' => 'earth',
         'field' => 'mineral-quarry',
         'encounters' => ['drill-man', 'ground-man'],
+        'encounters2' => ['drill-mole', 'moller'],
         'items' => ['fortune-module'],
         'tags' => ['central', 'elemental']
         ];
@@ -932,16 +1067,21 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'EARTH Area 1E',
         'position' => '4-8',
         'level' => 80,
+        'element' => 'earth',
         'field' => 'oil-wells',
         'encounters' => ['oil-man', 'flame-man'],
+        'encounters2' => ['beetle-borg'],
+        'items' => ['super-capsule'],
         'tags' => ['central', 'elemental']
         ];
     $index['earth-area-1s'] = [
         'name' => 'EARTH Area 1S',
         'position' => '3-9',
         'level' => 100,
+        'element' => 'earth',
         'field' => 'sunset-gulch',
         'encounters' => ['tomohawk-man', 'charge-man', 'magma-man'],
+        'encounters2' => ['colton', 'merserker'],
         'items' => ['energy-tank'],
         'tags' => ['central', 'elemental']
         ];
@@ -950,6 +1090,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 1',
         'position' => '12-5',
         'level' => 100,
+        'element' => 'space',
         'field' => '',
         'encounters' => ['trill'],
         'rescues' => ['rush'],
@@ -961,14 +1102,17 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 1E',
         'position' => '13-4',
         'level' => 110,
+        'element' => 'space',
         'field' => 'satellite-deck',
         'encounters' => ['star-man'],
+        'encounters2' => ['novamite', 'shururun', 'flipping-suzy', 'mouslider', 'pukapunter'],
         'tags' => ['upper', 'elemental']
         ];
     $index['space-area-1e2'] = [
         'name' => 'SPACE Area 1E2',
         'position' => '14-4',
         'level' => 120,
+        'element' => 'space',
         'field' => 'satellite-deck',
         'encounters' => ['galaxy-man'],
         'tags' => ['upper', 'elemental']
@@ -977,6 +1121,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 1E3',
         'position' => '15-4',
         'level' => 130,
+        'element' => 'space',
         'field' => 'satellite-deck',
         'encounters' => ['terra'],
         'tags' => ['upper', 'elemental']
@@ -986,14 +1131,17 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 1W',
         'position' => '11-4',
         'level' => 110,
+        'element' => 'space',
         'field' => 'space-simulator',
-        'encounters' => ['ring-man'],
+        'encounters' => ['ring-man', 'gachappon'],
+        'encounters2' => ['ring-ring', 'adamski'],
         'tags' => ['upper', 'elemental']
         ];
     $index['space-area-1w2'] = [
         'name' => 'SPACE Area 1W2',
         'position' => '10-4',
         'level' => 120,
+        'element' => 'space',
         'field' => 'space-simulator',
         'encounters' => ['astro-man'],
         'tags' => ['upper', 'elemental']
@@ -1002,6 +1150,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 1W3',
         'position' => '9-4',
         'level' => 130,
+        'element' => 'space',
         'field' => 'space-simulator',
         'encounters' => ['ra-thor'],
         'tags' => ['upper', 'elemental']
@@ -1011,6 +1160,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 2',
         'position' => '12-2',
         'level' => 200,
+        'element' => 'space',
         'field' => 'final-destination-3',
         'encounters' => ['slur'],
         'tags' => ['upper', 'elemental', 'main', 'final']
@@ -1019,6 +1169,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 2N',
         'position' => '12-1',
         'level' => 999,
+        'element' => 'space',
         'field' => 'final-destination-3',
         'encounters' => ['proxy'],
         'items' => ['empty-core'],
@@ -1029,6 +1180,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 2E',
         'position' => '14-2',
         'level' => 150,
+        'element' => 'space',
         'field' => 'final-destination-2',
         'encounters' => ['dark-man-4'],
         'tags' => ['upper', 'elemental']
@@ -1037,6 +1189,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 2E2',
         'position' => '15-2',
         'level' => 140,
+        'element' => 'space',
         'field' => 'final-destination',
         'encounters' => ['dark-man', 'dark-man-2', 'dark-man-3'],
         'tags' => ['upper', 'elemental']
@@ -1046,6 +1199,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 2W',
         'position' => '10-2',
         'level' => 150,
+        'element' => 'space',
         'field' => 'final-destination-2',
         'encounters' => ['quake-woman-ds'],
         'tags' => ['upper', 'elemental']
@@ -1054,6 +1208,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SPACE Area 2W2',
         'position' => '9-2',
         'level' => 140,
+        'element' => 'space',
         'field' => 'final-destination',
         'encounters' => ['mega-man-ds', 'bass-ds', 'proto-man-ds'],
         'tags' => ['upper', 'elemental']
@@ -1063,14 +1218,17 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'LASER Area 1',
         'position' => '21-16',
         'level' => 300,
+        'element' => 'laser',
         'field' => '',
         'encounters' => ['laser-man'],
+        'items' => ['hyper-screw'],
         'tags' => ['outer', 'special', 'elemental', 'main']
         ];
     $index['laser-area-1e'] = [
         'name' => 'LASER Area 1E',
         'position' => '22-16',
         'level' => 250,
+        'element' => 'laser',
         'field' => '',
         'encounters' => [],
         'tags' => ['outer', 'special', 'elemental']
@@ -1079,8 +1237,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'LASER Area 1NE',
         'position' => '22-15',
         'level' => 200,
+        'element' => 'laser',
         'field' => '',
         'encounters' => [],
+        'items' => ['extra-life'],
         'tags' => ['outer', 'special', 'elemental']
         ];
     //--------------------------//
@@ -1088,24 +1248,29 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'SHIELD Area 1',
         'position' => '3-16',
         'level' => 300,
+        'element' => 'shield',
         'field' => '',
         'encounters' => ['shield-man'],
+        'items' => ['hyper-screw'],
         'tags' => ['outer', 'special', 'elemental', 'main']
         ];
     $index['shield-area-1s'] = [
-        'name' => 'SHIELD Area 1S',
-        'position' => '3-17',
+        'name' => 'SHIELD Area 1W',
+        'position' => '2-16',
         'level' => 250,
+        'element' => 'shield',
         'field' => '',
         'encounters' => [],
         'tags' => ['outer', 'special', 'elemental']
         ];
     $index['shield-area-1se'] = [
-        'name' => 'SHIELD Area 1SE',
-        'position' => '4-17',
+        'name' => 'SHIELD Area 1NW',
+        'position' => '2-15',
         'level' => 200,
+        'element' => 'shield',
         'field' => '',
         'encounters' => [],
+        'items' => ['extra-life'],
         'tags' => ['outer', 'special', 'elemental']
         ];
     //--------------------------//
