@@ -3666,6 +3666,7 @@ class mmrpgWorldMap {
                 let itemToken1 = tokenFrags[0] || '';
                 let itemToken2 = tokenFrags[1] || '';
                 let isYashichi = itemToken === 'yashichi' ? true : false;
+                let isResetchi = itemToken === 'resetchi' ? true : false;
                 let isExtraLife = itemToken === 'extra-life' ? true : false;
                 let isPellet = itemToken2 === 'pellet' ? true : false;
                 let isCapsule = itemToken2 === 'capsule' ? true : false;
@@ -3748,6 +3749,31 @@ class mmrpgWorldMap {
                         _self.restoreRobotWeapons(targetRobotToken, realWeaponsRestoreAmount, true);
                         //console.log('--> okay we should be revived now!');
                         removeFromInventory = true;
+                        disableFurtherUsage = true;
+                        }
+                    }
+                // Else if this is a resetchi item, completely reset the robot's stat modifications
+                else if (isResetchi){
+                    //console.log('--> using resetchi item ...');
+                    let resetStats = ['attack', 'defense', 'speed'];
+                    let statsWereReset = false;
+                    // Loop through the core stats and reset any that are currently modified
+                    for (var i = 0; i < resetStats.length; i++){
+                        let statToken = resetStats[i];
+                        let currentMod = playerRobotInfo[statToken + 'Mods'] || 0;
+                        if (currentMod !== 0){
+                            // Use the native method to trigger the UI updates, sounds, and saving
+                            let statReset = _self.resetRobotStat(targetRobotToken, statToken, true, true);
+                            if (statReset){ statsWereReset = true; }
+                            }
+                        }
+                    // If at least one stat was reset, consume the item
+                    if (statsWereReset){
+                        removeFromInventory = true;
+                        disableFurtherUsage = true; // The Resetchi clears ALL stats, meaning it can't be used again immediately
+                        }
+                    // If all stats are already at 0, just disable the button (no effect/not consumed)
+                    else {
                         disableFurtherUsage = true;
                         }
                     }

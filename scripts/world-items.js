@@ -304,6 +304,41 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
                     if (!itemEventQuantity){ break; } // exit the loop early if none left
                     }
                 }
+            // Check if the item was a consumable resetchi item (fully resets all stat modifications)
+            // and apply it to the first robot that has negative stat modifications, else pocket it
+            else if (itemToken === 'resetchi'){
+                // Loop through player robots and see if any of them "need" this item
+                let playerRobotKeys = Object.keys(_worldPlayerRobots);
+                for (let i = 0; i < playerRobotKeys.length; i++){
+                    let robotString = playerRobotKeys[i];
+                    let playerRobot = _worldPlayerRobots[robotString];
+                    // Check if the robot has any negative stat modifications
+                    let hasNegativeMods = false;
+                    let statTokens = ['attack', 'defense', 'speed'];
+                    for (let s = 0; s < statTokens.length; s++){
+                        let statToken = statTokens[s];
+                        let currentMod = playerRobot[statToken + 'Mods'] || 0;
+                        if (currentMod < 0){
+                            hasNegativeMods = true;
+                            break;
+                            }
+                        }
+                    // If the robot doesn't have any breaks holding them back, skip them
+                    if (!hasNegativeMods){ continue; }
+                    // Otherwise, reset all of their modified core stats back to normal using the native method
+                    for (let s = 0; s < statTokens.length; s++){
+                        let statToken = statTokens[s];
+                        let currentMod = playerRobot[statToken + 'Mods'] || 0;
+                        if (currentMod !== 0){
+                            _self.resetRobotStat(robotString, statToken, true, true);
+                            }
+                        }
+                    itemEvent.claimed = true;
+                    itemEventQuantity--;
+                    messageMarkup.push('Used ' + itemNameTextSpan + ' on team robot ' + _self.getRobotNameSpan(playerRobot.token) + '!');
+                    if (!itemEventQuantity){ break; } // exit the loop early if none left
+                    }
+                }
             // Check if the item was an extra life item (revives fallen robot w/ life and weapon energy restored to half)
             // and apply it to the first robot that's been disabled (and/or life energy is zero), else pocket it
             else if (itemToken === 'extra-life'){
