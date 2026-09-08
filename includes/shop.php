@@ -32,7 +32,7 @@ $global_unlocked_items_tokens = !empty($global_unlocked_items) ? array_keys($glo
 // -- DEFINE SHOP INDEXES -- //
 
 // Collect an item index for reference
-$mmrpg_items = rpg_item::get_index();
+$mmrpg_items = rpg_item::get_index(true);
 
 // Collect the abilities array from the database so we can control its contents
 $deprecated_abilities = rpg_ability::get_global_deprecated_abilities();

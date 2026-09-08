@@ -18,7 +18,7 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
-//require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 $mmrpg_database_items = rpg_item::get_index(true);
 
 // Collect the editor flag if set
@@ -267,27 +267,14 @@ if (true){
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
-                                            /*
-                                            // Otherwise if this is a Field Star, use the total number as quantity
-                                            elseif ($item_token == 'field-star' && !empty($this_battle_stars_field_count)){
-
-                                                // Collect the items details and current quantity
-                                                $item_info_quantity = !empty($this_battle_stars_field_count) ? $this_battle_stars_field_count : 0;
+                                            // Else if this is an elemental star, let's use the starforce counts for quantities
+                                            else if (preg_match('/\-star$/i', $item_token)){
+                                                $star_type = preg_replace('/\-star$/i', '', $item_token);
+                                                $star_quantity = isset($this_star_force_strict[$star_type]) ? $this_star_force_strict[$star_type] : 0;
+                                                $item_info_quantity = $star_quantity;
                                                 $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-
                                             }
-                                            // Otherwise if this is a Fusion Star, use the total number as quantity
-                                            elseif ($item_token == 'fusion-star' && !empty($this_battle_stars_fusion_count)){
-
-                                                // Collect the items details and current quantity
-                                                $item_info_quantity = !empty($this_battle_stars_fusion_count) ? $this_battle_stars_fusion_count : 0;
-                                                if (!empty($this_battle_stars_perfect_fusion_count)){ $item_info_quantity += $this_battle_stars_perfect_fusion_count; }
-                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
-                                                $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-
-                                            }
-                                            */
                                             // Otherwise this item slot is mysterious
                                             else {
 

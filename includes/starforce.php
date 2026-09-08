@@ -75,9 +75,9 @@ if ($include_rogue_star_power){
 $_SESSION[$session_token]['values']['star_force'] = $this_star_force;
 $_SESSION[$session_token]['values']['star_force_strict'] = $this_star_force_strict;
 
-//echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>'."\n\n");
-//echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>'."\n\n");
-//echo('<pre>$this_star_kind_counts = '.print_r($this_star_kind_counts, true).'</pre>'."\n\n");
+//error_log('$this_star_force = '.print_r($this_star_force, true));
+//error_log('$this_star_force_strict = '.print_r($this_star_force_strict, true));
+//error_log('$this_star_kind_counts = '.print_r($this_star_kind_counts, true));
 //$player_starforce = rpg_game::starforce_unlocked();
 //echo('<pre>$player_starforce = '.print_r($player_starforce, true).'</pre>'."\n\n");
 //die();
