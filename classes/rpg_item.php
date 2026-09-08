@@ -2161,6 +2161,86 @@ class rpg_item extends rpg_object {
 
     }
 
+    // Define a static function to use as the common action for all stat resetting items
+    public static function item_function_stat_resetter($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If this player is visible, we can show them as having used the item
+        $this_battle->queue_sound_effect('use-recovery-item');
+        if ($this_player->player_visible){
+
+            // Target this robot's self and print item use text
+            $this_item->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, 40, -2, 99,
+                    $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+                    $target_robot->print_name().' is given the '.$this_item->print_name().'!'
+                    )
+                ));
+            $target_robot->trigger_target($target_robot, $this_item);
+
+        }
+        // Otherwise, we should display it as the robot using the item themselves
+        else {
+
+            // Target this robot's self and print item use text
+            $this_item->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, 40, -2, 99,
+                    $target_robot->print_name().' uses the '.$this_item->print_name().'!'
+                    )
+                ));
+            $target_robot->trigger_target($target_robot, $this_item);
+
+        }
+
+        // Define the stat(s) this item will reset
+        $stat_reset_tokens = array();
+        if (strstr($this_item->item_token, 'resetchi')){
+            $stat_reset_tokens = array('attack', 'defense', 'speed');
+        } else {
+            // Fallback for single-stat resetters if you ever add them
+            $stat_reset_tokens[] = $this_item->item_type;
+        }
+
+        // Loop through each stat reset token and apply the reset
+        $stats_reset = 0;
+        foreach ($stat_reset_tokens AS $stat_token){
+            if (!empty($target_robot->counters[$stat_token.'_mods'])){
+
+                // Call the global stat reset function with customized options
+                rpg_ability::ability_function_stat_reset($target_robot, $stat_token, $this_item, array(
+                    'is_fixed_amount' => true,
+                    'skip_canvas_header' => true
+                ));
+
+                // Clear the applied history counters so the robot's slate is entirely clean
+                if (isset($target_robot->counters[$stat_token.'_breaks_applied'])){ unset($target_robot->counters[$stat_token.'_breaks_applied']); }
+                if (isset($target_robot->counters[$stat_token.'_boosts_applied'])){ unset($target_robot->counters[$stat_token.'_boosts_applied']); }
+
+                $stats_reset++;
+            }
+        }
+
+        // If no stats were altered, display a failure/no-effect message
+        if ($stats_reset === 0){
+            $this_item->target_options_update(array(
+                'frame' => 'defend',
+                'success' => array(9, 40, -2, 99,
+                    $target_robot->print_name().'\'s stats are already normal! <br />'.
+                    'The item had no effect&hellip;'
+                    )
+                ));
+            $target_robot->trigger_target($target_robot, $this_item);
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
     // Define a static function for replacing string variables with their values
     public static function parse_string_variables($search_replace, $field_values){
 
