@@ -289,7 +289,7 @@ function mmrpg_prototype_calculate_battle_points_2k19($user_id, &$points_index =
     //debug_profiler_checkpoint('func/calc-battle-points-2k19/before-get-indexes');
     $mmrpg_robots = rpg_robot::get_index();
     $mmrpg_abilities = rpg_ability::get_index();
-    $mmrpg_items = rpg_item::get_index();
+    $mmrpg_items = rpg_item::get_index(true);
     $mmrpg_fields = rpg_field::get_index();
     //debug_profiler_checkpoint('func/calc-battle-points-2k19/after-get-indexes');
 
