@@ -1490,204 +1490,238 @@ function mmrpg_prototype_world_areas($world, &$index){
     $index['star-gate-10'] = [
         'name' => 'STAR Gate 10',
         'position' => '12-6',
+        'level' => 10,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-20n'] = [
         'name' => 'STAR Gate 20N',
         'position' => '12-4',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['east', 'south', 'west']
         ];
     $index['star-gate-20e'] = [
         'name' => 'STAR Gate 20E',
         'position' => '22-7',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-20se'] = [
         'name' => 'STAR Gate 20SE',
         'position' => '19-12',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-20sse'] = [
         'name' => 'STAR Gate 20SSE',
         'position' => '16-14',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-20w'] = [
         'name' => 'STAR Gate 20W',
         'position' => '2-7',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-20sw'] = [
         'name' => 'STAR Gate 20SW',
         'position' => '5-12',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-20ssw'] = [
         'name' => 'STAR Gate 20SSW',
         'position' => '8-14',
+        'level' => 20,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-30ne'] = [
         'name' => 'STAR Gate 30NE',
         'position' => '15-3',
+        'level' => 30,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-30e'] = [
         'name' => 'STAR Gate 30E',
         'position' => '22-9',
+        'level' => 30,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-30se'] = [
         'name' => 'STAR Gate 30SE',
         'position' => '13-16',
+        'level' => 30,
         'tags' => ['stargate'],
         'exits' => ['east', 'north']
         ];
     $index['star-gate-30nw'] = [
         'name' => 'STAR Gate 30NW',
         'position' => '9-3',
+        'level' => 30,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-30w'] = [
         'name' => 'STAR Gate 30W',
         'position' => '2-9',
+        'level' => 30,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-30sw'] = [
         'name' => 'STAR Gate 30SW',
         'position' => '11-16',
+        'level' => 30,
         'tags' => ['stargate'],
         'exits' => ['north', 'west']
         ];
     $index['star-gate-40ne'] = [
         'name' => 'STAR Gate 40NE',
         'position' => '13-2',
+        'level' => 40,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-40e'] = [
         'name' => 'STAR Gate 40E',
         'position' => '19-5',
+        'level' => 40,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-40se'] = [
         'name' => 'STAR Gate 40SE',
         'position' => '13-17',
+        'level' => 40,
         'tags' => ['stargate'],
         'exits' => ['north', 'west']
         ];
     $index['star-gate-40nw'] = [
         'name' => 'STAR Gate 40NW',
         'position' => '11-2',
+        'level' => 40,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-40w'] = [
         'name' => 'STAR Gate 40W',
         'position' => '5-5',
+        'level' => 40,
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
     $index['star-gate-40sw'] = [
         'name' => 'STAR Gate 40SW',
         'position' => '11-17',
+        'level' => 40,
         'tags' => ['stargate'],
         'exits' => ['north', 'east']
         ];
     $index['star-gate-50e'] = [
         'name' => 'STAR Gate 50E',
         'position' => '19-4',
+        'level' => 50,
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
     $index['star-gate-50w'] = [
         'name' => 'STAR Gate 50W',
         'position' => '5-4',
+        'level' => 50,
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
     $index['star-gate-60e'] = [
         'name' => 'STAR Gate 60E',
         'position' => '20-2',
+        'level' => 60,
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
     $index['star-gate-60w'] = [
         'name' => 'STAR Gate 60W',
         'position' => '4-2',
+        'level' => 60,
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
     $index['star-gate-70ne'] = [
         'name' => 'STAR Gate 70NE',
         'position' => '21-2',
+        'level' => 70,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-70se'] = [
         'name' => 'STAR Gate 70SE',
         'position' => '20-14',
+        'level' => 70,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-70nw'] = [
         'name' => 'STAR Gate 70NW',
         'position' => '3-2',
+        'level' => 70,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-70sw'] = [
         'name' => 'STAR Gate 70SW',
         'position' => '4-14',
+        'level' => 70,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-80ne'] = [
         'name' => 'STAR Gate 80NE',
         'position' => '16-4',
+        'level' => 80,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-80se'] = [
         'name' => 'STAR Gate 80SE',
         'position' => '21-14',
+        'level' => 80,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-80nw'] = [
         'name' => 'STAR Gate 80NW',
         'position' => '8-4',
+        'level' => 80,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-80sw'] = [
         'name' => 'STAR Gate 80SW',
         'position' => '3-14',
+        'level' => 80,
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
     $index['star-gate-90e'] = [
         'name' => 'STAR Gate 90E',
         'position' => '22-14',
+        'level' => 90,
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
     $index['star-gate-90w'] = [
         'name' => 'STAR Gate 90W',
         'position' => '2-14',
+        'level' => 90,
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
