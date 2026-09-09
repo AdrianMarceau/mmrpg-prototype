@@ -53,7 +53,7 @@
 #--------------------------
 @encounters  = met(2),trille-bot(1)
 @habitats[]  = met(grass)
-@habitats[]  = trille-bot(subspace)
+@habitats[]  = trille-bot(prototype-subspace)
 #---------------------------#
 # SPAWN AREA BUFFER
 # + EVENT PANELS
@@ -169,7 +169,7 @@
 # SUBSPACE BUTTON + EVENTS
 #---------------------------
 @bosses[]    = subspace-portal-boss(19-28, trill, 10, speed)
-@buttons[]   = subspace-button(19-30, purple, up, set-group-terrain, subspace-path, subspace)
+@buttons[]   = subspace-button(19-30, purple, up, set-group-terrain, subspace-path, prototype-subspace)
 @groups[]    = subspace-path(14-24...14-28, 15-28)
 #---------------------------#
 # NO ENCOUNTERS
