@@ -840,6 +840,7 @@ class mmrpgWorldMap {
             for (let i = 0; i < tileDataKeys.length; i++){
                 let tileKey = tileDataKeys[i];
                 let thisTile = thisLayerTiles[tileKey];
+                if (!thisTile) { continue; }  // GUARD CLAUSE: Skip merging if the tile failed to generate earlier (e.g. invalid tile name)
                 let tileIsVoid = thisTile.sprite[1] === 'void' || thisTile.sprite[1].indexOf('void') !== -1;
                 if (typeof masterTiles[tileKey] === 'undefined'){
                     // Initialize the slot if empty
