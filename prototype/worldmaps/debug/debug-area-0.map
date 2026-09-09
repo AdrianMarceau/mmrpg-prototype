@@ -44,7 +44,7 @@
 @portals[]  = tower-portal(25-11, debug-area-1sw__subspace-portal, yellow-alt)
 @locks[]    = electric-portal-flower(25-11, portal-flower, electric, items:electric-core, x10, locked)
 #---------------------------#
-@pickups    = space-shard(40),shadow-shard(30),empty-shard(20),super-pellet(10),super-capsule(5),attack-booster(3),defense-booster(3),speed-booster(3),extra-life(1),yashichi(1)
+@pickups    = space-shard(9),shadow-shard(6),empty-shard(3),energy-upgrade(1),weapon-upgrade(1),attack-booster(3),defense-booster(3),speed-booster(3),field-booster(1),attack-diverter(1),defense-diverter(1),speed-diverter(1),charge-module(1),target-module(1),hyperscan-module(1),guard-module(1),uptick-module(1),copycat-module(1),reverse-module(1),xtreme-module(1),overkill-module(1),siphon-module(1),gambit-module(1),persist-module(1),repair-module(1),alchemy-module(1),distill-module(1),magnet-module(1),transport-module(1),bulwark-module(1),spreader-module(1),hourglass-module(1),growth-module(1),salvage-module(1),fortune-module(1),battery-circuit(1),sponge-circuit(1),forge-circuit(1),sapling-circuit(1),chrono-circuit(1),cosmo-circuit(1)
 #---------------------------#
 @encounters = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
 @groups[]   = no-encounters_da1-exit-buffer(9-5...11-7)
