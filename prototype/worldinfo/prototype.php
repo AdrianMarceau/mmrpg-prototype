@@ -14,6 +14,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 1,
         'field' => 'field',
         'encounters' => ['trill'],
+        'encounters2' => ['dark-frag'],
         'mechas' => ['met'],
         'items' => ['mecha-whistle'],
         'tags' => ['start'],
@@ -1161,7 +1162,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'nature',
         'field' => '',
         'encounters' => ['plant-man', 'hornet-man'],
-        'encounters2' => ['kabuton', 'propeller-eye', 'petal-anne'],
+        'encounters2' => ['petal-anne', 'kabuton', 'propeller-eye'],
         'rescues' => ['vesper-woman'],
         'items' => ['growth-module'],
         'tags' => ['central', 'elemental'],
@@ -1491,6 +1492,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 10',
         'position' => '12-6',
         'level' => 10,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1498,6 +1500,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20N',
         'position' => '12-4',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'south', 'west']
         ];
@@ -1505,6 +1508,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20E',
         'position' => '22-7',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1512,6 +1516,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20SE',
         'position' => '19-12',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1519,6 +1524,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20SSE',
         'position' => '16-14',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1526,6 +1532,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20W',
         'position' => '2-7',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1533,6 +1540,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20SW',
         'position' => '5-12',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1540,6 +1548,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 20SSW',
         'position' => '8-14',
         'level' => 20,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1547,6 +1556,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 30NE',
         'position' => '15-3',
         'level' => 30,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1554,6 +1564,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 30E',
         'position' => '22-9',
         'level' => 30,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1561,6 +1572,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 30SE',
         'position' => '13-16',
         'level' => 30,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'north']
         ];
@@ -1568,6 +1580,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 30NW',
         'position' => '9-3',
         'level' => 30,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1575,6 +1588,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 30W',
         'position' => '2-9',
         'level' => 30,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1582,6 +1596,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 30SW',
         'position' => '11-16',
         'level' => 30,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'west']
         ];
@@ -1589,6 +1604,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 40NE',
         'position' => '13-2',
         'level' => 40,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1596,6 +1612,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 40E',
         'position' => '19-5',
         'level' => 40,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1603,6 +1620,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 40SE',
         'position' => '13-17',
         'level' => 40,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'west']
         ];
@@ -1610,6 +1628,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 40NW',
         'position' => '11-2',
         'level' => 40,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1617,6 +1636,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 40W',
         'position' => '5-5',
         'level' => 40,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1624,6 +1644,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 40SW',
         'position' => '11-17',
         'level' => 40,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['north', 'east']
         ];
@@ -1631,6 +1652,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 50E',
         'position' => '19-4',
         'level' => 50,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
@@ -1638,6 +1660,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 50W',
         'position' => '5-4',
         'level' => 50,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
@@ -1645,6 +1668,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 60E',
         'position' => '20-2',
         'level' => 60,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
@@ -1652,6 +1676,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 60W',
         'position' => '4-2',
         'level' => 60,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
@@ -1659,6 +1684,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 70NE',
         'position' => '21-2',
         'level' => 70,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1666,6 +1692,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 70SE',
         'position' => '20-14',
         'level' => 70,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1673,6 +1700,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 70NW',
         'position' => '3-2',
         'level' => 70,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1680,6 +1708,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 70SW',
         'position' => '4-14',
         'level' => 70,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1687,6 +1716,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 80NE',
         'position' => '16-4',
         'level' => 80,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1694,6 +1724,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 80SE',
         'position' => '21-14',
         'level' => 80,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1701,6 +1732,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 80NW',
         'position' => '8-4',
         'level' => 80,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1708,6 +1740,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 80SW',
         'position' => '3-14',
         'level' => 80,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1715,6 +1748,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 90E',
         'position' => '22-14',
         'level' => 90,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
@@ -1722,6 +1756,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'STAR Gate 90W',
         'position' => '2-14',
         'level' => 90,
+        'element' => 'space',
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
@@ -1734,5 +1769,62 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
 }
 mmrpg_prototype_world_areas($this_world, $mmrpg_worlds[$this_world]['areas']);
+
+// Ensure we have data to work with before continuing with the parsing logic
+if (!empty($mmrpg_worlds[$this_world]['areas'])){
+
+    // Predefine some helpers for auto-completing certain fields more easily
+    $elemental_area_stat_prefs = array();
+    $elemental_area_stat_prefs['attack'] = array('impact', 'freeze', 'wind', 'shadow', 'electric', 'laser');
+    $elemental_area_stat_prefs['defense'] = array('explode', 'swift', 'nature', 'earth', 'water', 'shield');
+    $elemental_area_stat_prefs['speed'] = array('cutter', 'flame', 'crystal', 'time', 'missile');
+    // Apply logic to discern which checklist items are needed for each area
+    foreach ($mmrpg_worlds[$this_world]['areas'] AS $token => $info){
+        // collect info we need before starting
+        $tags = !empty($info['tags']) ? $info['tags'] : array();
+        $level = !empty($info['level']) ? $info['level'] : 1;
+        $element = !empty($info['element']) ? $info['element'] : '';
+        $stat = !empty($info['stat']) ? $info['stat'] : '';
+        $objects = !empty($info['objects']) ? $info['objects'] : array();
+        $pickups = !empty($info['pickups']) ? $info['pickups'] : array();
+        $checklist = !empty($info['checklist']) ? $info['checklist'] : array();
+        // dynamically add to arrays based on this area's tags and properties
+        if (in_array('elemental', $tags) && !in_array('final', $tags)){
+            if (empty($stat)){
+                list($type) = explode('-', $token);
+                if (in_array($type, $elemental_area_stat_prefs['attack'])){ $stat = 'attack'; }
+                if (in_array($type, $elemental_area_stat_prefs['defense'])){ $stat = 'defense'; }
+                if (in_array($type, $elemental_area_stat_prefs['speed'])){ $stat = 'speed'; }
+                }
+            if (in_array('main', $tags)){ $objects[] = 'quanta-flower'; }
+            if (!empty($stat)){ $pickups[] = $stat.'-pellet'; }
+            if (!empty($stat) && in_array('main', $tags)){ $pickups[] = $stat.'-capsules'; }
+            if ($level >= 10){ $pickups[] = 'small-screw'; }
+            if ($level >= 20 && in_array('main', $tags)){ $pickups[] = 'large-screw'; }
+            if (!empty($element)){
+                if (in_array('main', $tags)){ $pickups[] = $element.'-core'; }
+                else { $pickups[] = $element.'-shard'; }
+            }
+        }
+        // update all the info variables and write back to the main index
+        $info['stat'] = $stat;
+        $info['objects'] = $objects;
+        $info['pickups'] = $pickups;
+        $info['tags'] = $tags;
+        // update the checklist variable with everything we've learned
+        $checklist[] = $info['name'].' ('.$info['position'].')';
+        $checklist[] = 'field:   '.(!empty($info['field']) ? $info['field'] : '[unknown]').' @ Lv.'.$level;
+        $checklist[] = 'objects: '.(!empty($info['objects']) ? implode(', ', $info['objects']) : '-');
+        $checklist[] = 'robots:  '.(!empty($info['encounters']) ? implode(', ', $info['encounters']) : '-');
+        $checklist[] = 'mechas:  '.(!empty($info['encounters2']) ? implode(', ', $info['encounters2']) : '-');
+        $checklist[] = 'items:   '.(!empty($info['items']) ? implode(', ', $info['items']) : '-');
+        $checklist[] = 'pickups: '.(!empty($info['pickups']) ? implode(', ', $info['pickups']) : '-');
+        $checklist[] = 'exits: '.(!empty($info['exits']) ? implode(', ', $info['exits']) : '-');
+        $info['checklist'] = $checklist;
+        // write back to main index
+        $mmrpg_worlds[$this_world]['areas'][$token] = $info;
+    }
+
+}
 
 ?>
