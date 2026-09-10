@@ -56,15 +56,15 @@
 @actors[]     = match-lost-alone(30-15, player, proxy, alt20, first-encounter)
 #---------------------------#
 @terrain[]   = darkness(genesis-tower)
-@terrain[]   = subspace(prototype-subspace)
+@terrain[]   = prototype-subspace(prototype-subspace)
 @terrain[]   = water(reflection-chamber)
 #---------------------------#
 @habitats[] = dark-frag(darkness)
-@habitats[] = trille-bot(subspace)
+@habitats[] = trille-bot(prototype-subspace)
 @habitats[] = novamite(water)
-@habitats[] = mega-man-ds(subspace)
-@habitats[] = bass-ds(subspace)
-@habitats[] = proto-man-ds(subspace)
+@habitats[] = mega-man-ds(prototype-subspace)
+@habitats[] = bass-ds(prototype-subspace)
+@habitats[] = proto-man-ds(prototype-subspace)
 #---------------------------#
 @items[]     = void-mecha-whistle(21-15, mecha-whistle)
 @items[]     = lalinde-random-bypass(49-4, random-bypass)
