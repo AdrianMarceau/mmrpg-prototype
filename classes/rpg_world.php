@@ -1569,7 +1569,8 @@ class rpg_world {
         // RANDOM ENCOUNTERS (within defined limits)
         $allowed_random_encounters = $map_encounters;
         //$max_random_encounters = ceil($available_encounter_cells['total'] * 0.20); // TODO: make this configurable in the map file
-        if ($map_population_percent){ $max_random_encounters = ceil($available_encounter_cells['total'] * ($map_population_value/100)); }
+        if (empty($allowed_random_encounters)){ $max_random_encounters = 0; }
+        elseif ($map_population_percent){ $max_random_encounters = ceil($available_encounter_cells['total'] * ($map_population_value/100)); }
         else { $max_random_encounters = $map_population_value; }
         $allowed_held_items = array();
         if ($map_level >= 10){ $allowed_held_items += array('energy-pellet', 'weapon-pellet'); }
