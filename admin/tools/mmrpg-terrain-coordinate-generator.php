@@ -66,8 +66,8 @@ $grid = [
     [
         'darkness',
         'prototype-subspace',
-        'bonus-field',
         'plain-field',
+        'bonus-field',
         'gentle-countryside',
         'maniacal-hideaway',
         'wintry-forefront',
