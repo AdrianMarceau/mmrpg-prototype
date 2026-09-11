@@ -99,9 +99,13 @@ $allowed_robot_tokens = mmrpg_prototype_robots_unlocked('', true);
 //error_log('$allowed_robot_tokens (B) = '.print_r($allowed_robot_tokens, true));
 
 // Define defaults for the prototype world data
-//$default_world_token = 'debug__debug-area-1';
-$default_world_token = 'debug';
-$default_map_token = 'debug-area-1';
+if (false){
+    $default_world_token = 'prototype';
+    $default_map_token = 'light-area-1';
+} else {
+    $default_world_token = 'debug';
+    $default_map_token = 'debug-area-1';
+}
 $default_player_token = 'player';
 $default_world_position = '';
 $default_world_direction = '';
