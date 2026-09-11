@@ -4351,6 +4351,11 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-upgrade')){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-booster')){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-diverter')){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-module')){ $class .= ' always-zoom'; }
+                elseif (strstr($token, '-circuit')){ $class .= ' always-zoom'; }
                 //elseif ($token === 'mecha-whistle'){ $class .= ' always-zoom'; }
                 elseif (strstr($token, '-star')){ $class .= ' always-zoom'; $z_index -= 2; }
                 elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
