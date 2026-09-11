@@ -1902,10 +1902,14 @@ class mmrpgWorldMap {
         let thisOldCol = thisOldPos[0]; //_worldCursor.col;
         let thisOldRow = thisOldPos[1]; //_worldCursor.row;
         if (typeof _mapPortalsIndex[newPosition] !== 'undefined'){ newPosition = _mapPortalsIndex[newPosition].pos; }
-        if (!newPosition || typeof newPosition !== 'string' || !newPosition.match(/^[0-9]+\-[0-9]+$/)){ console.error('newPosition was invalid!', newPosition); return false; }
+        if (!newPosition || typeof newPosition !== 'string' || !newPosition.match(/^\-?[0-9]+\-\-?[0-9]+$/)){ console.error('newPosition was invalid!', newPosition); return false; }
         newPosition = newPosition.split('-');
         let thisNewCol = parseInt(newPosition[0]);
         let thisNewRow = parseInt(newPosition[1]);
+        if (thisNewCol < 1) { thisNewCol = 1; }
+        else if (thisNewCol > _config.mapCols) { thisNewCol = _config.mapCols; }
+        if (thisNewRow < 1) { thisNewRow = 1; }
+        else if (thisNewRow > _config.mapRows) { thisNewRow = _config.mapRows; }
         let colHasChanged = thisNewCol !== thisOldCol ? true : false;
         let rowHasChanged = thisNewRow !== thisOldRow ? true : false;
         let posHasChanged = colHasChanged || rowHasChanged ? true : false;
