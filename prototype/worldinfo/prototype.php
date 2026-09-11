@@ -638,7 +638,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'cutter',
         'field' => 'industrial-facility',
         'encounters' => ['metal-man'],
-        'encounters2' => ['pierrobot', 'drill-mole', 'spring-head', 'arc-weldy'],
+        'encounters2' => ['pierrobot', 'arc-weldy', 'spring-head', 'drill-mole'],
         'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['east', 'south', 'west']
@@ -650,7 +650,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'cutter',
         'field' => 'abandoned-warehouse',
         'encounters' => ['cut-man', 'big-eye'],
-        'encounters2' => ['flea', 'met', 'spine', 'killer-bullet', 'beak', 'adhering-suzy'],
+        'encounters2' => ['flea', 'adhering-suzy', 'beak', 'met', 'spine', 'killer-bullet'],
         'items' => ['weapon-tank'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -759,7 +759,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'swift',
         'field' => '',
         'encounters' => ['bounce-man'],
-        'encounters2' => ['tosanaizer-v', 'ballonboo', 'pukapunter', 'coil-n'],
+        'encounters2' => ['tosanaizer-v', 'ballonboo', 'pukapunter', 'coiln'],
         'items' => ['weapon-tank'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -784,7 +784,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'freeze',
         'field' => '',
         'encounters' => ['tundra-man'],
-        'encounters2' => ['peng', 'nitron-b', 'curlinger'],
+        'encounters2' => ['curlinger', 'peng', 'nitron-b'],
         'items' => ['bulwark-module'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'south', 'west']
@@ -796,7 +796,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'freeze',
         'field' => 'arctic-jungle',
         'encounters' => ['ice-man', 'blizzard-man', 'big-eye'],
-        'encounters2' => ['peng', 'adhering-suzy', 'foot-holder', 'bomb-sleigh'],
+        'encounters2' => ['peng', 'bomb-sleigh', 'foot-holder', 'adhering-suzy'],
         'items' => ['charge-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -808,7 +808,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'freeze',
         'field' => '',
         'encounters' => ['cold-man', 'frost-man'],
-        'encounters2' => ['penpen-ev', 'nitron-b', 'frosty-throwman'],
+        'encounters2' => ['penpen-ev', 'frosty-throwman', 'nitron-b', 'peng'],
         'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -820,7 +820,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'freeze',
         'field' => 'glacier-cradle',
         'encounters' => ['chill-man', 'freeze-man'],
-        'encounters2' => ['frosty-throwman', 'tel-tel'],
+        'encounters2' => ['frosty-throwman', 'tel-tel', 'bomb-sleigh', 'skullmet'],
         'items' => ['resetchi'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -869,7 +869,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'wind',
         'field' => 'rusty-scrapheap',
         'encounters' => ['dust-man', 'junk-man'],
-        'encounters2' => ['lady-blader', 'up-n-down', 'gockroach-s'],
+        'encounters2' => ['lady-blader', 'upndown', 'gockroach-s'],
         'items' => ['salvage-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east']
@@ -885,7 +885,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['skullmet', 'skeleton-joe'],
         'items' => ['overkill-module'],
         'tags' => ['central', 'elemental', 'main'],
-        'exits' => ['north', 'south']
+        'exits' => ['west', 'north', 'south']
         ];
     $index['shadow-area-1n'] = [
         'name' => 'SHADOW Area 1N',
@@ -979,7 +979,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'crystal',
         'field' => '',
         'encounters' => ['trill'],
-        'encounters2' => ['diaymon'],
+        'encounters2' => [
+            'diaymon', 'diaymon_alt', 'diaymon_alt2',
+            'diaymon_alt3', 'diaymon_alt4', 'diaymon_alt5',
+            'diaymon_alt6', 'diaymon_alt7', 'diaymon_alt8'
+            ],
         'rescues' => ['meddy'],
         'items' => ['super-capsule'],
         'tags' => ['central', 'elemental', 'main'],
@@ -1078,7 +1082,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'missile',
         'field' => '',
         'encounters' => ['search-man'],
-        'encounters2' => ['goriblue', 'sniper-joe', 'eggalodon'],
+        'encounters2' => ['sniper-joe', 'eggalodon', 'goriblue', 'covercannon'],
         'items' => ['super-capsule'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'south']
@@ -1090,7 +1094,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'missile',
         'field' => 'submerged-armory',
         'encounters' => ['dive-man'],
-        'encounters2' => ['manta-missile', 'covercannon'],
+        'encounters2' => ['manta-missile', 'covercannon', 'sniper-joe'],
         'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south']
@@ -1176,7 +1180,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'water',
         'field' => 'rainy-sewers',
         'encounters' => ['toad-man', 'pump-man'],
-        'encounters2' => ['robo-fishtot', 'piper-n', 'lady-blader', 'up-n-down'],
+        'encounters2' => ['robo-fishtot', 'piper-n', 'lady-blader', 'upndown'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -1187,7 +1191,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'water',
         'field' => 'waterfall-institute',
         'encounters' => ['bubble-man'],
-        'encounters2' => ['snapper', 'octone'],
+        'encounters2' => ['snapper', 'octone', 'robo-fishtot'],
         'items' => ['spreader-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -1211,7 +1215,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'water',
         'field' => '',
         'encounters' => ['splash-woman', 'wave-man', 'pirate-man'],
-        'encounters2' => ['ballonboo', 'octone', 'bui-boi'],
+        'encounters2' => ['octone', 'bui-boi', 'ballonboo'],
         'items' => ['sponge-circuit'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'south']
@@ -1798,7 +1802,7 @@ if (!empty($mmrpg_worlds[$this_world]['areas'])){
                 }
             if (in_array('main', $tags)){ $objects[] = 'quanta-flower'; }
             if (!empty($stat)){ $pickups[] = $stat.'-pellet'; }
-            if (!empty($stat) && in_array('main', $tags)){ $pickups[] = $stat.'-capsules'; }
+            if (!empty($stat) && in_array('main', $tags)){ $pickups[] = $stat.'-capsule'; }
             if ($level >= 10){ $pickups[] = 'small-screw'; }
             if ($level >= 20 && in_array('main', $tags)){ $pickups[] = 'large-screw'; }
             if (!empty($element)){
@@ -1806,6 +1810,7 @@ if (!empty($mmrpg_worlds[$this_world]['areas'])){
                 else { $pickups[] = $element.'-shard'; }
             }
         }
+        if (in_array('stargate', $tags)){ $objects[] = 'star-gate'; }
         // update all the info variables and write back to the main index
         $info['stat'] = $stat;
         $info['objects'] = $objects;
