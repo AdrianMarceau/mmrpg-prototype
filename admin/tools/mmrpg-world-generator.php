@@ -13,6 +13,11 @@ if (!defined('MMRPG_CONFIG_IS_LIVE')
     exit();
 }
 
+// Pull some indexes we might need for later
+$mmrpg_index_players = rpg_player::get_index(true);
+$mmrpg_index_robots = rpg_robot::get_index(true);
+$mmrpg_index_items = rpg_item::get_index(true);
+
 // Pull the list of areas from the database
 $mmrpg_prototype_world_areas = $db->get_array_list("SELECT *
     FROM `mmrpg_index_areas`
@@ -79,6 +84,29 @@ echo('<pre>'.PHP_EOL);
         //echo('$area_positions_index = '.print_r($area_positions_index, true).PHP_EOL);
         echo('$map_area_positions_markup = '.PHP_EOL.print_r($map_area_positions_markup, true).PHP_EOL);
 
+        // Define which types go with which portal colours so we don't have to later
+        $portal_colour_index = [];
+        $portal_colour_index['red'] = ['flame', 'laser', 'crystal'];
+        $portal_colour_index['blue'] = ['water', 'freeze', 'shield'];
+        $portal_colour_index['yellow'] = ['electric', 'missile', 'earth'];
+        $portal_colour_index['green'] = ['nature', 'wind'];
+        $portal_colour_index['purple'] = ['time', 'space', 'shadow'];
+        $portal_colour_index['orange'] = ['explode', 'swift', 'impact'];
+        $portal_colour_index['black'] = ['cutter'];
+
+        // TEMP TEMP TEMP
+        // Define a list of fields that actually have textures made so far
+        $map_tiles_exist_for = [
+            'prototype-subspace', 'prototype-subspace-ii',
+            'plain-field', 'bonus-field',
+            'gentle-countryside', 'maniacal-hideaway', 'wintry-forefront',
+            'light-laboratory', 'wily-castle', 'cossack-citadel',
+            'final-destination', 'final-destination-ii', 'final-destination-iii',
+            'robot-museum', 'hunter-compound', 'royal-palace', 'genesis-tower', 'stardroid-base',
+            'abandoned-warehouse', 'mountain-mines', 'arctic-jungle', 'orb-city', 'steel-mill', 'electrical-tower', 'clock-citadel', 'oil-wells'
+            ];
+        // TEMP TEMP TEMP
+
         // Loop through the world area again and this time actually generate the file markup
         foreach ($mmrpg_prototype_world_areas AS $area_token => $area_info){
             echo('Generating '.$area_info['area_name'].' ('.$area_token.') ... '.PHP_EOL);
@@ -91,6 +119,7 @@ echo('<pre>'.PHP_EOL);
             $area_type_name = ucfirst($area_type === 'none' ? 'neutral' : $area_type);
             $area_type_text = strtoupper($area_type_name);
             $area_level = !empty($area_info['area_level']) ? $area_info['area_level'] : 1;
+            $area_objects = !empty($area_info['area_objects']) ? explode(',', trim($area_info['area_objects'], ',')) : array();
             $area_tags = !empty($area_info['area_tags']) ? explode(',', trim($area_info['area_tags'], ',')) : array();
             $area_position = !empty($area_info['area_position']) ? $area_info['area_position'] : '1-1';
             $area_position_xy = explode('-', $area_position);
@@ -98,18 +127,23 @@ echo('<pre>'.PHP_EOL);
             $area_position_row = intval($area_position_xy[1]);
             $area_size = !empty($area_info['area_size']) ? $area_info['area_size'] : '21 x 21';
             if (in_array('stargate', $area_tags)){ $area_size = '11 x 11';  }
+            elseif (in_array('outer', $area_tags) && !in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
             $area_size_xy = explode(' x ', $area_size);
             $area_size_width = intval($area_size_xy[0]);
             $area_size_height = intval($area_size_xy[1]);
             $area_middle_col = ceil($area_size_width / 2);
             $area_middle_row = ceil($area_size_height / 2);
             $area_spawn = $area_middle_col.'-'.$area_middle_row;
+            $area_padding = !empty($area_info['area_padding']) ? intval($area_info['area_padding']) : 3;
             $area_field = !empty($area_info['area_field']) ? $area_info['area_field'] : 'field';
             $area_field_tile = $area_field === 'field' ? 'plain-field' : $area_field;
+            if (!in_array($area_field_tile, $map_tiles_exist_for)){ $area_field_tile = 'plain-field'; }
             $area_exits = !empty($area_info['area_exits']) ? explode(',', trim($area_info['area_exits'], ',')) : array();
-            $area_pickups = !empty($area_info['area_pickups']) ? explode(',', trim($area_info['area_pickups'], ',')) : array();
+            $area_random_pickups = !empty($area_info['area_pickups']) ? explode(',', trim($area_info['area_pickups'], ',')) : array();
+            $area_static_pickups = !empty($area_info['area_items']) ? explode(',', trim($area_info['area_items'], ',')) : array();
             $area_static_encounters = !empty($area_info['area_encounters']) ? explode(',', trim($area_info['area_encounters'], ',')) : array();
             $area_random_encounters = !empty($area_info['area_encounters2']) ? explode(',', trim($area_info['area_encounters2'], ',')) : array();
+            $area_static_rescues = !empty($area_info['area_rescues']) ? explode(',', trim($area_info['area_rescues'], ',')) : array();
 
             // Unlink the existing file if it already exists so we can start fresh
             if (file_exists($area_file_dir)){ unlink($area_file_dir); }
@@ -136,13 +170,14 @@ echo('<pre>'.PHP_EOL);
             $area_file_markup[] = '#---------------------------#';
             $area_file_markup[] = '@aliases[]  = 10:plain';
             $area_file_markup[] = '@aliases[]  = 20:type-'.$area_type;
-            $area_file_markup[] = '@aliases[]  = 30:'.'plain-field'; //$area_field_tile;
+            $area_file_markup[] = '@aliases[]  = 30:'.$area_field_tile;
             $area_file_markup[] = '@aliases[]  = 90:water';
             $area_file_markup[] = '#---------------------------#';
             $area_file_markup[] = '@portals[]  = spawn('.$area_spawn.', hidden)';
             // Generate the EXITS for this area of the map with their destinations
-            $area_file_markup[] = '#---------------------------#';
-            {
+            if (!empty($area_exits)){
+                $area_file_markup[] = '#---------------------------#';
+
                 // If there's a north exit, make sure we define it here
                 if (in_array('north', $area_exits)){
                     $exit_name = 'north-exit';
@@ -206,34 +241,150 @@ echo('<pre>'.PHP_EOL);
                 }
 
             }
-            // Generate the PICKUPS for this area along with their map positions where relevant
-            if (!empty($area_pickups) || !empty($area_items)){
+            // If this area has a QUANTA FLOWER, we should add it to the middle of the area
+            if (in_array('quanta-flower', $area_objects)){
                 $area_file_markup[] = '#---------------------------#';
+
+                $portal_colour = 'black';
+                foreach ($portal_colour_index AS $colour => $types){ if (in_array($area_type, $types)){ $portal_colour = $colour; break; } }
+                $portal_position = $area_middle_col.'-'.$area_middle_row;
+                $area_file_markup[] = '@portals[]  = subspace-portal('.$portal_position.', prototype-subspace__'.$area_type.'-portal, '.$portal_colour.'-alt)';
+                $area_file_markup[] = '@locks[]    = '.$area_type.'-portal-flower('.$portal_position.', portal-flower, '.$area_type.', items:'.$area_type.'-core, x10, locked)';
+
+            }
+            // If this area has any STAR GATES, we should add it to them to the area at exits
+            if (in_array('star-gate', $area_objects)){
+                $area_file_markup[] = '#---------------------------#';
+
+                if (!empty($area_exits)){
+                    foreach ($area_exits AS $exit_key => $exit_token){
+                        $exit_num = $exit_key + 1;
+                        $exit_num_padded = str_pad($exit_num, 2, '0', STR_PAD_LEFT);
+                        if ($exit_token === 'north' || $exit_token === 'south'){
+
+                            $gate_block_dir = $exit_token === 'north' ? 'horz-up' : 'horz-down';
+                            $gate_door_dir = 'horizontal';
+                            $gate_position_x = $area_middle_col;
+                            $gate_position_y = $exit_token === 'north' ? ($area_padding + 1) : $area_size_height - ($area_padding);
+                            $gate_position_b1 = ($gate_position_x - 1).'-'.$gate_position_y;
+                            $gate_position_g1 = ($gate_position_x).'-'.$gate_position_y;
+                            $gate_position_b2 = ($gate_position_x + 1).'-'.$gate_position_y;
+                            $area_file_markup[] = '@blocks[]    = star-gate-'.$exit_num_padded.'-b1('.$gate_position_b1.', star-block, '.$gate_block_dir.', x'.$area_level.')';
+                            $area_file_markup[] = '@gates[]     = star-gate-'.$exit_num_padded.'-g1('.$gate_position_g1.', star-gate, '.$gate_door_dir.', x'.$area_level.')';
+                            $area_file_markup[] = '@blocks[]    = star-gate-'.$exit_num_padded.'-b2('.$gate_position_b2.', star-block, '.$gate_block_dir.', x'.$area_level.')';
+
+                        }
+                        elseif ($exit_token === 'west' || $exit_token === 'east'){
+
+                            $gate_block_dir = $exit_token === 'west' ? 'vert-left' : 'vert-right';
+                            $gate_door_dir = 'vertical';
+                            $gate_position_x = $exit_token === 'west' ? ($area_padding + 1) : $area_size_width - ($area_padding);
+                            $gate_position_y = $area_middle_row;
+                            $gate_position_b1 = $gate_position_x.'-'.($gate_position_y - 1);
+                            $gate_position_g1 = $gate_position_x.'-'.($gate_position_y);
+                            $gate_position_b2 = $gate_position_x.'-'.($gate_position_y + 1);
+                            $area_file_markup[] = '@blocks[]    = star-gate-'.$exit_num_padded.'-b1('.$gate_position_b1.', star-block, '.$gate_block_dir.', x'.$area_level.')';
+                            $area_file_markup[] = '@gates[]     = star-gate-'.$exit_num_padded.'-g1('.$gate_position_g1.', star-gate, '.$gate_door_dir.', x'.$area_level.')';
+                            $area_file_markup[] = '@blocks[]    = star-gate-'.$exit_num_padded.'-b2('.$gate_position_b2.', star-block, '.$gate_block_dir.', x'.$area_level.')';
+
+                        }
+
+                    }
+                }
+
+            }
+            // Generate the PICKUPS for this area along with their map positions where relevant
+            if (!empty($area_random_pickups) || !empty($area_static_pickups)){
 
                 // Add the basic randomized pickup data if it exists
                 $random_pickups_string = array();
-                $num_random_pickups = count($area_pickups);
-                foreach ($area_pickups AS $key => $pickup){ $random_pickups_string[] = $pickup.'('.($num_random_pickups - $key).')'; }
+                $num_random_pickups = count($area_random_pickups);
+                foreach ($area_random_pickups AS $key => $pickup){ $random_pickups_string[] = $pickup.'('.($num_random_pickups - $key).')'; }
                 $random_pickups_string = implode(',', $random_pickups_string);
-                $area_file_markup[] = '@pickups  = '.$random_pickups_string;
+                if (!empty($random_pickups_string)){
+                    $area_file_markup[] = '#---------------------------#';
+                    $area_file_markup[] = '@pickups    = '.$random_pickups_string;
+                }
 
-                // Loop through the static item pickups and add them here too
-                // ...
+                // Loop through the static pickups and add them here too
+                $static_pickup_strings = array();
+                $num_static_pickups = count($area_static_pickups);
+                foreach ($area_static_pickups AS $key => $pickup){
+                    if (strstr($pickup, '__')){ list($item, $num) = explode('__', $pickup); }
+                    else { $item = $pickup; $num = ''; }
+                    if (!isset($mmrpg_index_items[$item])){ continue; }
+                    $position = $getRandomCoord();
+                    $item_num = $key + 1;
+                    $item_info = $mmrpg_index_items[$item];
+                    $item_class = !empty($item_info['item_class']) ? $item_info['item_class'] : '';
+                    $static_pickup_strings[] = '@items[]    = static-pickup-'.$item_num.'('.$position.', '.$pickup.')';
+                }
+                if (!empty($static_pickup_strings)){
+                    $area_file_markup[] = '#---------------------------#';
+                    $area_file_markup[] = implode(PHP_EOL, $static_pickup_strings);
+                }
+
+
 
             }
             // Generate the ENCOUNTERS for this area along with their map positions where relevant
             if (!empty($area_random_encounters) || !empty($area_static_encounters)){
-                $area_file_markup[] = '#---------------------------#';
 
                 // Add the basic encounters string for randomized support mecha if it exists
                 $random_encounters_string = array();
                 $num_random_encounters = count($area_random_encounters);
                 foreach ($area_random_encounters AS $key => $encounter){ $random_encounters_string[] = $encounter.'('.($num_random_encounters - $key).')'; }
-                $random_encounters_string = implode(',', $random_encounters_string);
-                if (!empty($random_encounters_string)){ $area_file_markup[] = '@encounters  = '.$random_encounters_string; }
+                $random_encounters_string = !empty($random_encounters_string) ? implode(',', $random_encounters_string) : '';
+                if (!empty($random_encounters_string)){
+                    $area_file_markup[] = '#---------------------------#';
+                    $area_file_markup[] = '@encounters = '.$random_encounters_string;
+                }
 
                 // Loop through the static encounters and add them here too
-                // ...
+                $static_encounter_strings = array();
+                $num_static_encounters = count($area_static_encounters);
+                foreach ($area_static_encounters AS $key => $encounter){
+                    if (strstr($encounter, '_')){ list($robot, $alt) = explode('_', $encounter); }
+                    else { $robot = $encounter; $alt = ''; }
+                    if (!isset($mmrpg_index_robots[$robot])){ continue; }
+                    $position = $getRandomCoord();
+                    $robot_num = $key + 1;
+                    $robot_info = $mmrpg_index_robots[$robot];
+                    $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
+                    $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+                    if ($robot_core === 'copy'){ continue; }
+                    if ($robot_class === 'master'){
+                        $static_encounter_strings[] = '@masters[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter.')';
+                        if (!empty($robot_core)){ $static_encounter_strings[] = '@items[]    = boss-star-'.$robot_num.'('.$position.', '.$robot_core.'-star, '.$encounter.')'; }
+                    } elseif ($robot_class === 'mecha'){
+                        $static_encounter_strings[] = '@mechas[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter.')';
+                    } elseif ($robot_class === 'boss'){
+                        $static_encounter_strings[] = '@bosses[]   = boss-boss-'.$robot_num.'('.$position.', '.$encounter.')';
+                    }
+                }
+                if (!empty($static_encounter_strings)){
+                    $area_file_markup[] = '#---------------------------#';
+                    $area_file_markup[] = implode(PHP_EOL, $static_encounter_strings);
+                }
+
+                // Loop through the static rescues and add them here too
+                $static_rescue_strings = array();
+                $num_static_rescues = count($area_static_rescues);
+                foreach ($area_static_rescues AS $key => $rescue){
+                    if (strstr($rescue, '_')){ list($robot, $alt) = explode('_', $rescue); }
+                    else { $robot = $rescue; $alt = ''; }
+                    if (!isset($mmrpg_index_robots[$robot])){ continue; }
+                    $position = $getRandomCoord();
+                    $robot_num = $key + 1;
+                    $robot_info = $mmrpg_index_robots[$robot];
+                    $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
+                    $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+                    $static_rescue_strings[] = '@rescues[]  = rescue-robo-'.$robot_num.'('.$position.', '.$rescue.')';
+                }
+                if (!empty($static_rescue_strings)){
+                    $area_file_markup[] = '#---------------------------#';
+                    $area_file_markup[] = implode(PHP_EOL, $static_rescue_strings);
+                }
 
             }
             // Generate layer tiles for LAYER 0 and LAYER -1
@@ -248,7 +399,7 @@ echo('<pre>'.PHP_EOL);
                 $clean_area_exits = array_map('trim', $area_exits);
 
                 // Define how many tiles of void space ([__]) exist between the border and the inner field
-                $padding = 2;
+                $padding = $area_padding - 1;
 
                 $layer_0_tiles = [];
                 $layer_minus_1_tiles = [];
