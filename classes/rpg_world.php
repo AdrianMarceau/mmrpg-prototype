@@ -1398,6 +1398,39 @@ class rpg_world {
                 }
             }
         }
+        // If there are any groups named or prefixed with "encounter-zone", ONLY allow cells defined in these groups
+        if (!empty($map_data['groups']) && is_array($map_data['groups'])){
+            $encounter_zones = array();
+            $map_groups = $map_data['groups'];
+            $map_groups_keys = array_keys($map_groups);
+            // Filter keys for exact matches or prefixes
+            $encounter_zone_keys = array_filter($map_groups_keys, function($v){
+                return (strtolower($v) === 'encounter-zone' || strtolower(substr($v, 0, 15)) === 'encounter-zone_');
+                });
+            if (!empty($encounter_zone_keys)){
+                // Merge all matched group tiles together
+                foreach ($encounter_zone_keys AS $group_key){ $encounter_zones = array_merge($encounter_zones, $map_data['groups'][$group_key]); }
+                $encounter_zones = array_unique($encounter_zones);
+                if (!empty($encounter_zones) && is_array($encounter_zones)){
+                    $encounter_zone_groups = array();
+                    // Unpack any groups nested inside these groups (matching your existing logic)
+                    foreach ($encounter_zones AS $key => $pos){
+                        if (preg_match('/^([0-9]+)\-([0-9]+)$/i', $pos)){ continue; }
+                        if (!isset($map_data['groups'][$pos])){ continue; }
+                        elseif (empty($map_data['groups'][$pos])){ continue; }
+                        $encounter_zone_groups = array_merge($encounter_zone_groups, $map_data['groups'][$pos]);
+                        unset($encounter_zones[$key]);
+                    }
+                    $encounter_zones = array_merge($encounter_zones, $encounter_zone_groups);
+                    // FILTER: Iterate through currently available cells and remove anything NOT in the encounter zone
+                    foreach ($available_cells AS $pos => $is_available){
+                        if (!in_array($pos, $encounter_zones)){
+                            unset($available_cells[$pos]);
+                        }
+                    }
+                }
+            }
+        }
         // If we're allowed to check existing, let's exclude any encounters or pickups already-spawned and using any of these
         if ($exclude_existing){
             //error_log('-> checking existing encounters and pickups to exclude from available cells...');
