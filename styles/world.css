@@ -5736,6 +5736,14 @@ display: block;
     opacity: 1.0;
     transition: left 1.9s, opacity 2.2s;
 }
+#world #canvas #title-banner .subtitle sub {
+    display: block;
+    text-align: right;
+    margin: 0 auto;
+    font-weight: normal;
+    font-style: italic;
+    font-size: 50%;
+}
 #world #canvas #title-banner:not(.active) {
     opacity: 0.0;
 }
