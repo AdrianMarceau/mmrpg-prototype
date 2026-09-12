@@ -4291,6 +4291,8 @@ class rpg_world {
             $world_map_items = !empty($world_items[$world_map_token]) ? $world_items[$world_map_token] : array();
             $world_map_item_symbols = !empty($world_symbols[$world_map_token]['items']) ? $world_symbols[$world_map_token]['items'] : array();
             $collected_battle_stars = null;
+            $always_zoom_items = array('mecha-whistle', 'super-capsule', 'yashichi', 'resetchi', 'extra-life', 'hyper-screw');
+            $always_zoom_regex = '/\-(upgrade|booster|diverter|module|circuit|star|tank)$/i';
             //error_log('$item_sprites = '.print_r($item_sprites, true));
             //error_log('$world_map_items = '.print_r($world_map_items, true));
             //error_log('$world_map_item_symbols = '.print_r($world_map_item_symbols, true));
@@ -4387,14 +4389,10 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-upgrade')){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-booster')){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-diverter')){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-module')){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-circuit')){ $class .= ' always-zoom'; }
-                //elseif ($token === 'mecha-whistle'){ $class .= ' always-zoom'; }
-                elseif (strstr($token, '-star')){ $class .= ' always-zoom'; $z_index -= 2; }
+                elseif (in_array($token, $always_zoom_items)){ $class .= ' always-zoom'; }
+                elseif (preg_match($always_zoom_regex, $token)){ $class .= ' always-zoom'; }
                 elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
+                if (strstr($token, '-star')){ $z_index -= 2; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.'; ';
                 $attrs = 'data-item="'.$item_namekey.'" data-colour="'.$colour.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"'; //data-key="'.$item_namekey.'"
