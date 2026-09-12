@@ -30,7 +30,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'objects' => ['player-platform'],
         'encounters' => ['dr-light', 'mega-man'],
         'encounters2' => ['met', 'eddie'],
-        'items' => ['light-program', 'light-heart', 'copy-core'],
+        'items' => ['light-program!!', 'light-heart!!', 'copy-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'south', 'west']
         ];
@@ -83,7 +83,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'objects' => ['player-platform'],
         'encounters' => ['dr-wily', 'bass'],
         'encounters2' => ['met', 'heel-bot'],
-        'items' => ['wily-program', 'wily-heart', 'copy-core'],
+        'items' => ['wily-program!!', 'wily-heart!!', 'copy-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -136,7 +136,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'objects' => ['player-platform'],
         'encounters' => ['dr-cossack', 'proto-man'],
         'encounters2' => ['met', 'heal-bot'],
-        'items' => ['cossack-program', 'cossack-heart', 'copy-core'],
+        'items' => ['cossack-program!!', 'cossack-heart!!', 'copy-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -188,7 +188,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'objects' => ['player-platform'],
         'encounters' => ['dr-lalinde'],
-        'items' => ['lalinde-program', 'empty-heart', 'empty-core', 'mecha-whistle'],
+        'items' => ['lalinde-program!!', 'empty-heart!!', 'empty-core!!', 'mecha-whistle'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -1154,7 +1154,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'nature',
         'field' => 'preserved-forest',
         'encounters' => ['wood-man', 'burner-man'],
-        'encounters2' => ['batton', 'kabuton', 'blocky', 'tank-oven'],
+        'encounters2' => ['batton', 'kabuton', 'tank-oven', 'blocky'],
         'items' => ['resetchi'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
