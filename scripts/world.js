@@ -18,6 +18,7 @@ gameSettings.worldConfig = {
     mapToken: 'undefined',
     worldName: 'Undefined World',
     mapName: 'Undefined Map',
+    mapSubName: '',
     mapImage: 'undefined.png',
     mapField: 'field',
     mapSize: [10, 10],
@@ -449,6 +450,7 @@ class mmrpgWorldMap {
         let worldName = mapData.map_world_name || false;
         let mapToken = mapData.map_token || false;
         let mapName = mapData.map_name || false;
+        let mapSubName = mapData.map_subname || false;
         let mapImage = mapData.map_image || false;
         let mapField = mapData.map_field || 'field';
         let mapSize = mapData.map_size || false;
@@ -472,6 +474,7 @@ class mmrpgWorldMap {
         _config.mapWorldName = worldName || defaultWorldName;
         _config.mapToken = mapToken;
         _config.mapName = mapName || defaultMapName;
+        _config.mapSubName = mapSubName || '';
         _config.mapImage = mapImage;
         _config.mapField = mapField;
         _config.mapSize = [parseInt(mapSize[0]), parseInt(mapSize[1])];

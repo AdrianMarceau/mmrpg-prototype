@@ -891,6 +891,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
                 $data['map_world_name'] = $map_data_parsed['world_name'];
                 $data['map_token'] = $map_data_parsed['token'];
                 $data['map_name'] = $map_data_parsed['name'];
+                $data['map_subname'] = $map_data_parsed['subname'];
                 $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
                 $data['map_field'] = $map_field_token;
                 $data['map_size'] = array($map_col_size, $map_row_size);
@@ -1104,17 +1105,21 @@ $(document).ready(function(){
                 let _fieldsIndex = _indexes.fields || {};
                 let worldName = _config.mapWorldName;
                 let mapName = _config.mapName;
+                let mapSubName = _config.mapSubName;
                 let mapField = _config.mapField;
                 let mapFieldInfo = _fieldsIndex[mapField] || {};
                 let mapFieldName = mapFieldInfo.name || mapField.replace('-', ' ').toUpperCase();
                 //console.log('-> worldName = '+worldName);
                 //console.log('-> mapName = '+mapName);
+                //console.log('-> mapSubName = '+mapSubName);
                 //console.log('-> mapField = '+mapField);
                 //console.log('-> mapFieldInfo = ', mapFieldInfo);
                 //console.log('-> mapFieldName = '+mapFieldName);
                 //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
                 let titleText = mapName + ' &raquo;';
-                let subtitleText = mapFieldName;
+                let subtitleText = mapFieldName + (mapSubName ? ' <sub>(' + mapSubName + ')</sub>' : '');
+                //let titleText = mapFieldName + ' &raquo;';
+                //let subtitleText = mapName;
                 setTimeout(function(){ _self.showTitleBanner(titleText, subtitleText, false, 2000); }, 300);
                 }
             }, customConfig, customIndexes);

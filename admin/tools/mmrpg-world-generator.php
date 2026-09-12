@@ -136,6 +136,7 @@ echo('<pre>'.PHP_EOL);
 
             $area_sheet = 'mmrpg-overworld-2k25-v3';
             $area_name = !empty($area_info['area_name']) ? $area_info['area_name'] : '[Undefined]';
+            $area_subname = !empty($area_info['area_subname']) ? $area_info['area_subname'] : '';
             $area_type = !empty($area_info['area_element']) ? $area_info['area_element'] : 'none';
             $area_type_name = ucfirst($area_type === 'none' ? 'neutral' : $area_type);
             $area_type_text = strtoupper($area_type_name);
@@ -190,6 +191,7 @@ echo('<pre>'.PHP_EOL);
             $area_file_markup[] = '#---------------------------#';
             $area_file_markup[] = '@token      = '.$area_token;
             $area_file_markup[] = '@name       = '.$area_name;
+            if ($area_subname){ $area_file_markup[] = '@subname    = '.$area_subname; }
             $area_file_markup[] = '@type       = '.$area_type;
             $area_file_markup[] = '@level      = '.$area_level;
             $area_file_markup[] = '@size       = '.$area_size;
