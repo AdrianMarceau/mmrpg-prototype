@@ -444,7 +444,7 @@ class rpg_world {
                         if ($item_subclass === 'event'){
                             //error_log('-> triggering unlock-item popup for '.$unlock_item_token.' ');
                             $is_heart = strstr($item_token, '-heart') ? true : false;
-                            $is_own_heart = $is_heart && explode('-', $item_token)[0] === explode('-', $lastPlayer)[1];
+                            $is_own_heart = $is_heart && $lastPlayer !== 'player' && explode('-', $item_token)[0] === explode('-', $lastPlayer)[1];
                             $is_unique = !$is_heart ? true : false;
                             $is_repeat = $realNewQuantity > 1 ? true : false;
                             $action_text = '{player} found '.($is_repeat ? 'another' : ($is_unique ? 'the' : 'a')).' {item}!';

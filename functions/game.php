@@ -951,7 +951,7 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
 
     // Check to see if this item is a limit heart w/ special considerations
     $is_heart = strstr($item_token, '-heart') ? true : false;
-    $is_own_heart = $is_heart && !empty($print_options['player_token']) && explode('-', $item_token)[0] === explode('-', $print_options['player_token'])[1] ? true : false;
+    $is_own_heart = $is_heart && !empty($print_options['player_token']) && $print_options['player_token'] !== 'player' && explode('-', $item_token)[0] === explode('-', $print_options['player_token'])[1] ? true : false;
 
     // Attempt to collect info for this item
     $item_info = rpg_item::get_index_info($item_token);
