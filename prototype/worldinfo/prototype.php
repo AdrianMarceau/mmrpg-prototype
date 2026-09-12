@@ -36,6 +36,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['light-area-1e'] = [
         'name' => 'LIGHT Area 1E',
+        'subname' => 'East',
         'position' => '13-8',
         'level' => 10,
         'element' => 'copy',
@@ -49,6 +50,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['light-area-1s'] = [
         'name' => 'LIGHT Area 1S',
+        'subname' => 'South',
         'position' => '12-9',
         'level' => 10,
         'element' => 'copy',
@@ -62,6 +64,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['light-area-1w'] = [
         'name' => 'LIGHT Area 1W',
+        'subname' => 'West',
         'position' => '11-8',
         'level' => 10,
         'element' => 'copy',
@@ -89,6 +92,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['wily-area-1n'] = [
         'name' => 'WILY Area 1N',
+        'subname' => 'North',
         'position' => '19-13',
         'level' => 80,
         'element' => 'copy',
@@ -102,6 +106,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['wily-area-1w'] = [
         'name' => 'WILY Area 1W',
+        'subname' => 'West',
         'position' => '18-14',
         'level' => 40,
         'element' => 'copy',
@@ -115,6 +120,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['wily-area-1w2'] = [
         'name' => 'WILY Area 1W2',
+        'subname' => 'Far West',
         'position' => '17-14',
         'level' => 20,
         'element' => 'copy',
@@ -142,6 +148,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['cossack-area-1n'] = [
         'name' => 'COSSACK Area 1N',
+        'subname' => 'North',
         'position' => '5-13',
         'level' => 80,
         'element' => 'copy',
@@ -155,6 +162,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['cossack-area-1e'] = [
         'name' => 'COSSACK Area 1E',
+        'subname' => 'East',
         'position' => '6-14',
         'level' => 40,
         'element' => 'copy',
@@ -168,6 +176,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['cossack-area-1e2'] = [
         'name' => 'COSSACK Area 1E2',
+        'subname' => 'Far East',
         'position' => '7-14',
         'level' => 20,
         'element' => 'copy',
@@ -194,6 +203,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['lalinde-area-1n'] = [
         'name' => 'LALINDE Area 1N',
+        'subname' => 'North',
         'position' => '12-17',
         'level' => 90,
         'element' => 'copy',
@@ -207,6 +217,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['lalinde-area-1e'] = [
         'name' => 'LALINDE Area 1E',
+        'subname' => 'East',
         'position' => '13-18',
         'level' => 120,
         'element' => 'copy',
@@ -218,6 +229,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['lalinde-area-1w'] = [
         'name' => 'LALINDE Area 1W',
+        'subname' => 'West',
         'position' => '11-18',
         'level' => 120,
         'element' => 'copy',
@@ -230,6 +242,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['storage-area-1'] = [
         'name' => 'STORAGE Area 1',
+        'subname' => 'Entrance',
         'position' => '23-7',
         'level' => 120,
         'field' => 'robot-museum',
@@ -241,6 +254,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['storage-area-2'] = [
         'name' => 'STORAGE Area 2',
+        'subname' => 'Interior',
         'position' => '23-6',
         'level' => 140,
         'field' => 'robot-museum',
@@ -253,6 +267,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['storage-area-1s'] = [
         'name' => 'STORAGE Area 1S',
+        'subname' => 'Basement',
         'position' => '23-9',
         'level' => 160,
         'field' => 'robot-museum',
@@ -264,6 +279,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['control-area-1'] = [
         'name' => 'CONTROL Area 1',
+        'subname' => 'Entrance',
         'position' => '1-7',
         'level' => 120,
         'field' => 'royal-palace',
@@ -275,6 +291,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['control-area-2'] = [
         'name' => 'CONTROL Area 2',
+        'subname' => 'Interior',
         'position' => '1-6',
         'level' => 140,
         'field' => 'royal-palace',
@@ -287,6 +304,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['control-area-1s'] = [
         'name' => 'CONTROL Area 1S',
+        'subname' => 'Basement',
         'position' => '1-9',
         'level' => 160,
         'field' => 'royal-palace',
@@ -298,6 +316,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['security-area-1'] = [
         'name' => 'SECURITY Area 1',
+        'subname' => '1st Floor',
         'position' => '14-16',
         'level' => 100,
         'field' => '',
@@ -308,6 +327,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['security-area-2'] = [
         'name' => 'SECURITY Area 2',
+        'subname' => '2nd Floor',
         'position' => '15-16',
         'level' => 120,
         'field' => '',
@@ -317,6 +337,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['security-area-3'] = [
         'name' => 'SECURITY Area 3',
+        'subname' => '3rd Floor',
         'position' => '16-16',
         'level' => 140,
         'field' => '',
@@ -329,6 +350,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['research-area-1'] = [
         'name' => 'RESEARCH Area 1',
+        'subname' => '1st Floor',
         'position' => '10-16',
         'level' => 100,
         'field' => '',
@@ -339,6 +361,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['research-area-2'] = [
         'name' => 'RESEARCH Area 2',
+        'subname' => '2nd Floor',
         'position' => '9-16',
         'level' => 120,
         'field' => '',
@@ -348,6 +371,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['research-area-3'] = [
         'name' => 'RESEARCH Area 3',
+        'subname' => '3rd Floor',
         'position' => '8-16',
         'level' => 140,
         'field' => '',
@@ -361,6 +385,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['hunter-area-1'] = [
         'name' => 'HUNTER Area 1',
+        'subname' => '1st Floor',
         'position' => '17-4',
         'level' => 140,
         'element' => 'shadow',
@@ -372,6 +397,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['hunter-area-2'] = [
         'name' => 'HUNTER Area 2',
+        'subname' => '2nd Floor',
         'position' => '17-3',
         'level' => 150,
         'element' => 'shadow',
@@ -383,6 +409,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['hunter-area-3'] = [
         'name' => 'HUNTER Area 3',
+        'subname' => '3rd Floor',
         'position' => '17-2',
         'level' => 160,
         'element' => 'shadow',
@@ -396,6 +423,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['genesis-area-1'] = [
         'name' => 'GENESIS Area 1',
+        'subname' => '1st Floor',
         'position' => '7-4',
         'level' => 140,
         'element' => 'shadow',
@@ -407,6 +435,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['genesis-area-2'] = [
         'name' => 'GENESIS Area 2',
+        'subname' => '2nd Floor',
         'position' => '7-3',
         'level' => 150,
         'element' => 'shadow',
@@ -418,6 +447,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['genesis-area-3'] = [
         'name' => 'GENESIS Area 3',
+        'subname' => '3rd Floor',
         'position' => '7-2',
         'level' => 160,
         'element' => 'shadow',
@@ -431,6 +461,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['hifi-area-1'] = [
         'name' => 'HiFi Area 1',
+        'subname' => 'A-Side',
         'position' => '20-4',
         'level' => 100,
         'field' => '',
@@ -440,6 +471,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['hifi-area-2'] = [
         'name' => 'HiFi Area 2',
+        'subname' => 'B-Side',
         'position' => '20-3',
         'level' => 100,
         'field' => '',
@@ -450,6 +482,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['stellar-area-1'] = [
         'name' => 'STELLAR Area 1',
+        'subname' => 'Orbit',
         'position' => '22-2',
         'level' => 120,
         'element' => 'space',
@@ -461,6 +494,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['stellar-area-2'] = [
         'name' => 'STELLAR Area 2',
+        'subname' => 'Rotation',
         'position' => '23-2',
         'level' => 140,
         'element' => 'space',
@@ -472,6 +506,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['stellar-area-3'] = [
         'name' => 'STELLAR Area 3',
+        'subname' => 'Revolution',
         'position' => '23-1',
         'level' => 160,
         'element' => 'space',
@@ -485,6 +520,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['lofi-area-1'] = [
         'name' => 'LoFi Area 1',
+        'subname' => 'A-Side',
         'position' => '4-4',
         'level' => 100,
         'field' => '',
@@ -494,6 +530,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['lofi-area-2'] = [
         'name' => 'LoFi Area 2',
+        'subname' => 'B-Side',
         'position' => '4-3',
         'level' => 100,
         'field' => '',
@@ -504,6 +541,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['paradox-area-1'] = [
         'name' => 'PARADOX Area 1',
+        'subname' => 'Lorem',
         'position' => '2-2',
         'level' => 120,
         'element' => 'shadow',
@@ -514,6 +552,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['paradox-area-2'] = [
         'name' => 'PARADOX Area 2',
+        'subname' => 'Ipsum',
         'position' => '1-2',
         'level' => 140,
         'element' => 'shadow',
@@ -524,6 +563,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['paradox-area-3'] = [
         'name' => 'PARADOX Area 3',
+        'subname' => 'Dolor',
         'position' => '1-1',
         'level' => 160,
         'element' => 'shadow',
@@ -1285,6 +1325,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['space-area-1e'] = [
         'name' => 'SPACE Area 1E',
+        'subname' => 'Entrance',
         'position' => '13-4',
         'level' => 110,
         'element' => 'space',
@@ -1296,6 +1337,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['space-area-1e2'] = [
         'name' => 'SPACE Area 1E2',
+        'subname' => 'Interior',
         'position' => '14-4',
         'level' => 120,
         'element' => 'space',
@@ -1307,6 +1349,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['space-area-1e3'] = [
         'name' => 'SPACE Area 1E3',
+        'subname' => 'Boss Room',
         'position' => '15-4',
         'level' => 130,
         'element' => 'space',
@@ -1319,6 +1362,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['space-area-1w'] = [
         'name' => 'SPACE Area 1W',
+        'subname' => 'Entrance',
         'position' => '11-4',
         'level' => 110,
         'element' => 'space',
@@ -1330,17 +1374,19 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['space-area-1w2'] = [
         'name' => 'SPACE Area 1W2',
+        'subname' => 'Interior',
         'position' => '10-4',
         'level' => 120,
         'element' => 'space',
         'field' => 'space-simulator',
         'encounters' => ['astro-man'],
-        'encounters2' => ['novamite', 'ring-ring', 'malmet', 'tamp',],
+        'encounters2' => ['novamite', 'ring-ring', 'malmet', 'tamp'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
     $index['space-area-1w3'] = [
         'name' => 'SPACE Area 1W3',
+        'subname' => 'Boss Room',
         'position' => '9-4',
         'level' => 130,
         'element' => 'space',
@@ -1364,13 +1410,14 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['space-area-2n'] = [
         'name' => 'SPACE Area 2N',
+        'subname' => 'Backdoor',
         'position' => '12-1',
         'level' => 999,
         'element' => 'space',
         'field' => 'final-destination-3',
         'encounters' => ['proxy'],
         'items' => ['empty-core'],
-        'tags' => ['upper', 'elemental'],
+        'tags' => ['upper', 'elemental', 'postgame'],
         'exits' => ['south']
         ];
     //--------------------------//
