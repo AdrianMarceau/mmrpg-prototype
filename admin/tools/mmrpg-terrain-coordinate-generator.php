@@ -100,6 +100,50 @@ $grid = [
         'electrical-tower',
         'clock-citadel',
         'oil-wells',
+        'industrial-facility',
+        'sky-ridge',
+    ],
+
+    // ROW 7
+    [
+        'waterfall-institute',
+        'underground-laboratory',
+        'pipe-station',
+        'photon-collider',
+        'atomic-furnace',
+        'preserved-forest',
+        'construction-site',
+        'magnetic-generator',
+        'reflection-chamber',
+        'rocky-plateau',
+    ],
+
+    // ROW 8
+    [
+        'spinning-greenhouse',
+        'serpent-column',
+        'power-plant',
+        'septic-system',
+        'lighting-control',
+        'rainy-sewers',
+        'mineral-quarry',
+        'egyptian-excavation',
+        'space-simulator',
+        'rusty-scrapheap',
+    ],
+
+    // ROW 9
+    [
+        'submerged-armory',
+        'robosaur-boneyard',
+        'satellite-deck',
+        'trenchwork-depot',
+        'haunted-mansion',
+        'sunset-gulch',
+        'waterwork-damn',
+        'minefield-dunes',
+        'glacier-cradle',
+        'sonic-highway',
     ],
 
 ];
