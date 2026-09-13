@@ -1790,7 +1790,8 @@ class rpg_world {
                         $real_robot_token = explode('_', $robot_token)[0];
                     }
                     $robot_pos_terrain = rpg_world::get_map_position_terrain($robot_pos, $map_data_parsed);
-                    $robot_info = $mmrpg_index_robots[$robot_token];
+                    $robot_info = $mmrpg_index_robots[$real_robot_token];
+                    if (empty($robot_info)){ error_log('generate_worldmap_encounters() cannot find robot_info for "'.$real_robot_token.'"'); continue; }
                     $robot_class = $robot_info['robot_class'];
                     $robot_gender = $robot_info['robot_gender'];
                     //error_log('-> $robot_info = '.print_r($robot_info, true));
