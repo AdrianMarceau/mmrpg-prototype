@@ -12,7 +12,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'PROTOTYPE Area 0',
         'position' => '12-7',
         'level' => 1,
-        'field' => 'field',
+        'field' => 'prototype-subspace',
         'encounters' => ['trill'],
         'encounters2' => ['dark-frag'],
         'mechas' => ['met'],
@@ -283,7 +283,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '1-7',
         'level' => 120,
         'field' => 'royal-palace',
-        'encounters' => ['king'],
+        'encounters' => ['king_alt'],
         'encounters2' => ['pyre-fly', 'flea'],
         'items' => ['extra-life'],
         'tags' => ['outer', 'main'],
@@ -429,7 +429,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'shadow',
         'field' => 'genesis-tower',
         'encounters' => ['buster-rod-g'],
-        'encounters2' => ['beak', 'pooker', 'moller'],
+        'encounters2' => ['beak', 'pooker', 'molier'],
         'tags' => ['upper', 'main'],
         'exits' => ['north', 'east']
         ];
@@ -441,7 +441,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'shadow',
         'field' => 'genesis-tower',
         'encounters' => ['mega-water-s'],
-        'encounters2' => ['moller', 'colton', 'shield-attacker-gtr'],
+        'encounters2' => ['molier', 'colton', 'shield-attacker-gtr'],
         'tags' => ['upper'],
         'exits' => ['north', 'south']
         ];
@@ -605,7 +605,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'explode',
         'field' => 'trenchwork-depot',
         'encounters' => ['napalm-man', 'grenade-man'],
-        'encounters2' => ['bombardier', 'moller', 'kakinba-tank'],
+        'encounters2' => ['bombardier', 'molier', 'kakinba-tank'],
         'items' => ['xtreme-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north']
@@ -702,7 +702,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'cutter',
         'field' => '',
         'encounters' => ['blade-man', 'yamato-man', 'knight-man'],
-        'encounters2' => ['merserker', 'moller', 'kabuton', 'ben-k', 'shield-attacker-gtr'],
+        'encounters2' => ['merserker', 'molier', 'kabuton', 'ben-k', 'shield-attacker-gtr'],
         'items' => ['repair-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north']
@@ -1279,7 +1279,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'earth',
         'field' => 'mineral-quarry',
         'encounters' => ['drill-man', 'ground-man'],
-        'encounters2' => ['drill-mole', 'moller'],
+        'encounters2' => ['drill-mole', 'molier'],
         'items' => ['fortune-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south', 'west']
@@ -1544,6 +1544,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '12-6',
         'level' => 10,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1552,6 +1553,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '12-4',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'south', 'west']
         ];
@@ -1560,6 +1562,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '22-7',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1568,6 +1571,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '19-12',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1576,6 +1580,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '16-14',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1584,6 +1589,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '2-7',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1592,6 +1598,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '5-12',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1600,6 +1607,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '8-14',
         'level' => 20,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1608,6 +1616,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '15-3',
         'level' => 30,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1616,6 +1625,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '22-9',
         'level' => 30,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1624,6 +1634,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '13-16',
         'level' => 30,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'north']
         ];
@@ -1632,6 +1643,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '9-3',
         'level' => 30,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1640,6 +1652,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '2-9',
         'level' => 30,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1648,6 +1661,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '11-16',
         'level' => 30,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'west']
         ];
@@ -1656,6 +1670,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '13-2',
         'level' => 40,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1664,6 +1679,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '19-5',
         'level' => 40,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1672,6 +1688,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '13-17',
         'level' => 40,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'west']
         ];
@@ -1680,6 +1697,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '11-2',
         'level' => 40,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1688,6 +1706,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '5-5',
         'level' => 40,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
@@ -1696,6 +1715,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '11-17',
         'level' => 40,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'east']
         ];
@@ -1704,6 +1724,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '19-4',
         'level' => 50,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
@@ -1712,6 +1733,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '5-4',
         'level' => 50,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
@@ -1720,6 +1742,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '20-2',
         'level' => 60,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
@@ -1728,6 +1751,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '4-2',
         'level' => 60,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
@@ -1736,6 +1760,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '21-2',
         'level' => 70,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1744,6 +1769,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '20-14',
         'level' => 70,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1752,6 +1778,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '3-2',
         'level' => 70,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1760,6 +1787,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '4-14',
         'level' => 70,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1768,6 +1796,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '16-4',
         'level' => 80,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1776,6 +1805,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '21-14',
         'level' => 80,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1784,6 +1814,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '8-4',
         'level' => 80,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1792,6 +1823,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '3-14',
         'level' => 80,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
@@ -1800,6 +1832,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '22-14',
         'level' => 90,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['south', 'west']
         ];
@@ -1808,6 +1841,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '2-14',
         'level' => 90,
         'element' => 'space',
+        'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['east', 'south']
         ];
