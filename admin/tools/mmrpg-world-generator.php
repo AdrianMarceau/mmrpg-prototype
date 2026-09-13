@@ -116,15 +116,9 @@ echo('<pre>'.PHP_EOL);
         $portal_colour_index['black'] = ['cutter'];
 
         // TEMP TEMP TEMP
-        // Define a list of fields that actually have textures made so far
-        $map_tiles_exist_for = [
-            'prototype-subspace', 'prototype-subspace-ii',
-            'plain-field', 'bonus-field',
-            'gentle-countryside', 'maniacal-hideaway', 'wintry-forefront',
-            'light-laboratory', 'wily-castle', 'cossack-citadel',
-            'final-destination', 'final-destination-ii', 'final-destination-iii',
-            'robot-museum', 'hunter-compound', 'royal-palace', 'genesis-tower', 'stardroid-base',
-            'abandoned-warehouse', 'mountain-mines', 'arctic-jungle', 'orb-city', 'steel-mill', 'electrical-tower', 'clock-citadel', 'oil-wells'
+        // Define a list of fields that don't have textures made yet (and/or map isn't done)
+        $map_tiles_missing_for = [
+            'crystal-catacombs', 'gemstone-cavern'
             ];
         // TEMP TEMP TEMP
 
@@ -161,7 +155,7 @@ echo('<pre>'.PHP_EOL);
             if (in_array('elemental', $area_tags)){ $area_padding += 1;  }
             $area_field = !empty($area_info['area_field']) ? $area_info['area_field'] : 'field';
             $area_field_tile = $area_field === 'field' ? 'plain-field' : $area_field;
-            if (!in_array($area_field_tile, $map_tiles_exist_for)){ $area_field_tile = 'plain-field'; }
+            if (in_array($area_field_tile, $map_tiles_missing_for)){ $area_field_tile = 'plain-field'; }
             $area_exits = !empty($area_info['area_exits']) ? explode(',', trim($area_info['area_exits'], ',')) : array();
             $area_random_pickups = !empty($area_info['area_pickups']) ? explode(',', trim($area_info['area_pickups'], ',')) : array();
             $area_static_pickups = !empty($area_info['area_items']) ? explode(',', trim($area_info['area_items'], ',')) : array();
@@ -465,12 +459,12 @@ echo('<pre>'.PHP_EOL);
                     $robot_info = $mmrpg_index_robots[$robot];
                     $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
                     $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
-                    if ($robot_core === 'copy'){ continue; }
+                    if ($robot_core === 'copy' && $robot_class === 'master'){ continue; }
                     if ($robot_class === 'master'){
-                        $static_encounter_strings[] = '@masters[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter.')';
+                        $static_encounter_strings[] = '@bosses[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter.')';
                         if (!empty($robot_core)){ $static_encounter_strings[] = '@items[]    = boss-star-'.$robot_num.'('.$position.', '.$robot_core.'-star, '.$encounter.')'; }
                     } elseif ($robot_class === 'mecha'){
-                        $static_encounter_strings[] = '@mechas[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter.')';
+                        $static_encounter_strings[] = '@bosses[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter.')';
                     } elseif ($robot_class === 'boss'){
                         $static_encounter_strings[] = '@bosses[]   = boss-boss-'.$robot_num.'('.$position.', '.$encounter.')';
                     }
