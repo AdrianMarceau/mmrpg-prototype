@@ -1,0 +1,2 @@
+# Temporarily ignore a map files while they're still being dynamically generated
+*.map
