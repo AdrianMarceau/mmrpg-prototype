@@ -151,6 +151,7 @@ echo('<pre>'.PHP_EOL);
             $area_middle_col = ceil($area_size_width / 2);
             $area_middle_row = ceil($area_size_height / 2);
             $area_spawn = $area_middle_col.'-'.$area_middle_row;
+            $area_spawn_visible = in_array('start', $area_tags) ? true : false;
             $area_padding = !empty($area_info['area_padding']) ? intval($area_info['area_padding']) : 3;
             if (in_array('elemental', $area_tags)){ $area_padding += 1;  }
             $area_field = !empty($area_info['area_field']) ? $area_info['area_field'] : 'field';
@@ -198,7 +199,7 @@ echo('<pre>'.PHP_EOL);
             $area_file_markup[] = '@aliases[]  = 30:'.$area_field_tile;
             $area_file_markup[] = '@aliases[]  = 90:water';
             $area_file_markup[] = '#---------------------------#';
-            $area_file_markup[] = '@portals[]  = spawn('.$area_spawn.', hidden)';
+            $area_file_markup[] = '@portals[]  = spawn('.$area_spawn.(!$area_spawn_visible ? ', hidden' : '').')';
             $protected_zones['spawn-buffer'] = $area_spawn;
             // Generate the EXITS for this area of the map with their destinations
             if (!empty($area_exits)){
