@@ -144,14 +144,14 @@ echo('<pre>'.PHP_EOL);
             $area_size = !empty($area_info['area_size']) ? $area_info['area_size'] : '21 x 21';
             if (in_array('stargate', $area_tags)){ $area_size = '11 x 11';  }
             elseif (in_array('path', $area_tags)){ $area_size = '13 x 13';  }
-            elseif (in_array('outer', $area_tags) && !in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
+            elseif (!in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
             $area_size_xy = explode(' x ', $area_size);
             $area_size_width = intval($area_size_xy[0]);
             $area_size_height = intval($area_size_xy[1]);
             $area_middle_col = ceil($area_size_width / 2);
             $area_middle_row = ceil($area_size_height / 2);
             $area_spawn = $area_middle_col.'-'.$area_middle_row;
-            $area_spawn_visible = in_array('start', $area_tags) ? true : false;
+            $area_spawn_visible = in_array('start', $area_tags) || in_array('player-platform', $area_objects) ? true : false;
             $area_padding = !empty($area_info['area_padding']) ? intval($area_info['area_padding']) : 3;
             if (in_array('elemental', $area_tags)){ $area_padding += 1;  }
             $area_field = !empty($area_info['area_field']) ? $area_info['area_field'] : 'field';
@@ -330,6 +330,29 @@ echo('<pre>'.PHP_EOL);
                 }
 
             }
+            // If this area has a PLAYER PLATFORM, we should add its parts and accompanying panels
+            if (in_array('player-platform', $area_objects)
+                && count($area_static_pickups) >= 3
+                && strstr($area_static_pickups[0], '-program')
+                && strstr($area_static_pickups[1], '-heart')
+                && strstr($area_static_pickups[2], '-core')){
+                $area_file_markup[] = '#---------------------------#';
+                $ptoken = explode('-', $area_token)[0];
+                $itoken1 = trim($area_static_pickups[0], '! ');
+                $itoken2 = trim($area_static_pickups[1], '! ');
+                $itoken3 = trim($area_static_pickups[2], '! ');
+                $positionx = $area_middle_col;
+                $positiony = $area_middle_row - 2;
+                $position1 = ($positionx - 1).'-'.($positiony);
+                $position2 = ($positionx + 0).'-'.($positiony);
+                $position3 = ($positionx + 1).'-'.($positiony);
+                $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-left('.$position1.', '.$ptoken.'pad-left, any, drop-zone, item:'.$itoken1.', activate-player-platform)';
+                $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-middle('.$position2.', '.$ptoken.'pad-middle, any, drop-zone, item:'.$itoken2.', activate-player-platform)';
+                $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-right('.$position3.', '.$ptoken.'pad-right, any, drop-zone, item:'.$itoken3.', activate-player-platform)';
+                $protected_zones['player-platform-left-buffer'] = $position1;
+                $protected_zones['player-platform-middle-buffer'] = $position2;
+                $protected_zones['player-platform-right-buffer'] = $position3;
+            }
 
             // Extract anchored pickups vs regular pickups
             $anchored_pickups = [];
@@ -364,7 +387,13 @@ echo('<pre>'.PHP_EOL);
                     $item_num = $key + 1;
                     $protected_zones['anchored-item-'.$item_num] = $position;
                     // Save the markup string for later
-                    $static_pickup_strings[] = '@items[]    = static-pickup-'.$item_num.'('.$position.', '.$pickup_clean.', anchored)';
+                    $static_pickup_key = 'static-pickup-'.$item_num;
+                    if (in_array('player', $area_tags)
+                        && preg_match('/\-(program|heart|core)(__[0-9]+)?$/i', $pickup_clean, $matches)){
+                        $ptoken = explode('-', $area_token)[0]; $itoken = $matches[1];
+                        $static_pickup_key = $ptoken.'-init-'.$itoken;
+                        }
+                    $static_pickup_strings[] = '@items[]    = '.$static_pickup_key.'('.$position.', '.$pickup_clean.', anchored)';
                 }
             }
 
