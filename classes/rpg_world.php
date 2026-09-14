@@ -3817,6 +3817,8 @@ class rpg_world {
             //if (empty($info) || empty($info['battle_target_player']['player_robots'])){ continue; }
             //$robot = $info['battle_target_player']['player_robots'][0];
             //error_log('-> w/ $robot = '.print_r($robot, true));
+            $rinfo = rpg_robot::get_index_info($token);
+            if (empty($rinfo)){ continue; }
             if ($subkind === 'rescue' && mmrpg_prototype_robot_unlocked('', $token)){ continue; }
             if (!empty($world_map_encounter_symbols[$encounter_namekey])){ $pos = $world_map_encounter_symbols[$encounter_namekey]; }
             list($col, $row) = explode('-', $pos);
@@ -3828,9 +3830,9 @@ class rpg_world {
             $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
             if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
             $class = 'battle vs-'.$subkind.' bounce';
-            if ($subkind === 'master'){ $class .= ' always-zoom'; }
-            elseif ($subkind === 'boss'){ $class .= ' always-zoom'; }
-            elseif ($subkind === 'rescue'){ $class .= ' always-zoom frame-lock'; }
+            if ($rinfo['robot_class'] === 'master'){ $class .= ' always-zoom'; }
+            elseif ($rinfo['robot_class'] === 'boss'){ $class .= ' always-zoom'; }
+            if ($subkind === 'rescue'){ $class .= ' frame-lock'; }
             $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
             $attrs = 'data-battle="'.$battle.'" data-label="'.$name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
             $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
