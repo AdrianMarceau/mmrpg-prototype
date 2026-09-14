@@ -29,7 +29,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'light-laboratory',
         'objects' => ['player-platform'],
         'encounters' => ['dr-light', 'mega-man'],
-        'encounters2' => ['met', 'eddie'],
+        'encounters2' => ['met'],
+        'rescues' => ['eddie'],
         'items' => ['light-program!!', 'light-heart!!', 'copy-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'south', 'west']
@@ -85,7 +86,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'wily-castle',
         'objects' => ['player-platform'],
         'encounters' => ['dr-wily', 'bass'],
-        'encounters2' => ['met', 'heel-bot'],
+        'encounters2' => ['met'],
+        'rescues' => ['heel-bot'],
         'items' => ['wily-program!!', 'wily-heart!!', 'copy-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
@@ -141,7 +143,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'cossack-citadel',
         'objects' => ['player-platform'],
         'encounters' => ['dr-cossack', 'proto-man'],
-        'encounters2' => ['met', 'heal-bot'],
+        'encounters2' => ['met'],
+        'rescues' => ['heal-bot'],
         'items' => ['cossack-program!!', 'cossack-heart!!', 'copy-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
@@ -213,7 +216,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'items' => ['field-booster'],
         'pickups' => ['small-screw', 'energy-pellet', 'weapon-pellet'],
         'tags' => ['central', 'player'],
-        'exits' => ['east', 'west']
+        'exits' => ['east', 'south', 'west']
         ];
     $index['lalinde-area-1e'] = [
         'name' => 'LALINDE Area 1E',
