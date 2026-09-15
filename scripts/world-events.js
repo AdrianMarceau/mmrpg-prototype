@@ -717,6 +717,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     let _mapEventsIndex = _config.mapEventsIndex;
     let _mapItemSymbols = _config.mapItemSymbols;
     let _mapItemsIndex = _config.mapItemsIndex;
+    let _mapBattlesIndex = _config.mapBattlesIndex;
     let _mapAbilitySymbols = _config.mapAbilitySymbols;
     let _mapAbilitiesIndex = _config.mapAbilitiesIndex;
     let _mapActorSymbols = _config.mapActorSymbols;
@@ -1596,6 +1597,14 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         }
     else if (firstEventType === 'battle'){
 
+        // Collect a reference to the first battle specifically for later
+        let firstBattleEvent = eventsAtPosition[0];
+        let firstBattleInfo = _mapBattlesIndex[firstBattleEvent.token] || null;
+        let firstBattleRobot = _mmrpgRobotsIndex[firstBattleInfo.token] || null;
+        //console.log('firstBattleEvent =', firstBattleEvent);
+        //console.log('firstBattleInfo =', firstBattleInfo);
+        //console.log('firstBattleRobot =', firstBattleRobot);
+
         // Otherwise we can/should check all the posiitons for any battles to round-up and trigger
         let dataLabels = [], dataBattles = [];
         for (var i = 0; i < eventsAtPosition.length; i++){
@@ -1701,12 +1710,12 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 }
             if (!playerIsCursor
                 && dataBattles.length === 1
-                && eventsAtPosition[0].kind2 === 'mecha'){
+                && firstBattleRobot.class === 'mecha'){
                 //console.log('solo mecha event detected, generate the whistle button');
                 //console.log('_worldPlayerTeam =', 'x' + _worldPlayerTeam.length, _worldPlayerTeam);
                 let playerHasTeamSlot = _worldPlayerTeam.length < _config.maxRobotsPerPlayer ? true : false;
                 let hasPermanentWhistle = false; //_playerToken === 'dr-lalinde';
-                let mechaBattleEvent = eventsAtPosition[0];
+                let mechaBattleEvent = firstBattleEvent;
                 let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
                 let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
                 let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle';
