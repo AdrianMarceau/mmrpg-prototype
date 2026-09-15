@@ -2522,6 +2522,50 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 //console.log('-> baseGateInfo =', baseGateInfo);
                 if (!baseGateName || !baseGateInfo){ console.error('-> gate name or info not found, cannot remove gate!'); return false; }
                 let gatesToRemove = [];
+                let visitedPositions = new Set();
+                let positionsToProcess = [baseGateInfo.pos]; // Start the queue with our clicked gate
+                // Track where we've been so we don't loop infinitely
+                visitedPositions.add(baseGateInfo.pos);
+                // We only want to chain through this exact visual type of gate
+                let targetGateSprite = baseGateInfo.sprite;
+                while (positionsToProcess.length > 0){
+                    let currentPos = positionsToProcess.shift();
+                    let currentGateName = gateSymbols[currentPos] || false;
+                    if (currentGateName){
+                        let currentGateInfo = gatesIndex[currentGateName] || false;
+                        // Ensure the adjacent tile is actually a gate AND matches our target type
+                        if (currentGateInfo && currentGateInfo.sprite === targetGateSprite) {
+                            let $currentSprite = (currentGateName === baseGateName)
+                                ? $(firstEvent.sprite)
+                                : $('.sprite[data-gate="' + currentGateName + '"]', $canvasMap);
+                            gatesToRemove.push({
+                                name: currentGateName,
+                                info: currentGateInfo,
+                                $sprite: $currentSprite.length ? $currentSprite : null,
+                                position: currentPos
+                                });
+                            // Break down the coordinates to check neighbors
+                            let coords = currentPos.split('-');
+                            let col = parseInt(coords[0]);
+                            let row = parseInt(coords[1]);
+                            // Check all 4 adjacent directions (up, down, left, right)
+                            let neighbors = [
+                                col + '-' + (row - 1),
+                                col + '-' + (row + 1),
+                                (col - 1) + '-' + row,
+                                (col + 1) + '-' + row
+                                ];
+                            // Add unvisited neighbors to our queue to process next
+                            for (let i = 0; i < neighbors.length; i++){
+                                if (!visitedPositions.has(neighbors[i])){
+                                    visitedPositions.add(neighbors[i]);
+                                    positionsToProcess.push(neighbors[i]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                /*
                 gatesToRemove.push({
                     name: baseGateName,
                     info: baseGateInfo,
@@ -2546,6 +2590,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             });
                         }
                     }
+                    */
                 //console.log('-> gatesToRemove =', gatesToRemove.length, gatesToRemove);
                 dismissDropdown(false);
                 let $allSprites = $();
