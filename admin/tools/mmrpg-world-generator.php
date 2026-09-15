@@ -18,12 +18,22 @@ $mmrpg_index_players = rpg_player::get_index(true);
 $mmrpg_index_robots = rpg_robot::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
 
+/*
 // Pull the list of areas from the database
 $mmrpg_prototype_world_areas = $db->get_array_list("SELECT *
     FROM `mmrpg_index_areas`
     WHERE `area_world` = 'prototype'
     ORDER BY `area_id` ASC
     ;", 'area_token');
+*/
+
+// Pull the list of areas from the worldinfo file so it's always fresh
+$this_world = 'prototype';
+include(MMRPG_CONFIG_ROOTDIR.'prototype/worldinfo/prototype.php');
+$mmrpg_prototype_world_areas = isset($this_world)
+    && !empty($mmrpg_worlds[$this_world]['areas'])
+    ? $mmrpg_worlds[$this_world]['areas']
+    : false;
 
 // Define the base directory for this world's files
 $world_map_filepath = 'prototype/worldmaps/prototype/';
@@ -90,8 +100,8 @@ echo('<pre>'.PHP_EOL);
         $map_area_positions_markup = array();
         $map_area_positions_markup[] = '#---------------------------#';
         foreach ($mmrpg_prototype_world_areas AS $area_token => $area_info){
-            if (empty($area_info['area_position'])){ continue; }
-            $position = $area_info['area_position'];
+            if (empty($area_info['position'])){ continue; }
+            $position = $area_info['position'];
             list($prefix) = explode('-', $area_token);
             $area_positions_index[$position] = $area_token;
             if (!isset($last_prefix) || $last_prefix !== $prefix){
@@ -124,27 +134,28 @@ echo('<pre>'.PHP_EOL);
 
         // Loop through the world area again and this time actually generate the file markup
         foreach ($mmrpg_prototype_world_areas AS $area_token => $area_info){
-            echo('Generating '.$area_info['area_name'].' ('.$area_token.') ... '.PHP_EOL);
+            echo('Generating '.$area_info['name'].' ('.$area_token.') ... '.PHP_EOL);
             $area_file_name = $area_token.'.map';
             $area_file_dir = $world_map_filedir.$area_file_name;
 
             $area_sheet = 'mmrpg-overworld-2k25-v3';
-            $area_name = !empty($area_info['area_name']) ? $area_info['area_name'] : '[Undefined]';
-            $area_subname = !empty($area_info['area_subname']) ? $area_info['area_subname'] : '';
-            $area_type = !empty($area_info['area_element']) ? $area_info['area_element'] : 'none';
+            $area_name = !empty($area_info['name']) ? $area_info['name'] : '[Undefined]';
+            $area_subname = !empty($area_info['subname']) ? $area_info['subname'] : '';
+            $area_type = !empty($area_info['element']) ? $area_info['element'] : 'none';
             $area_type_name = ucfirst($area_type === 'none' ? 'neutral' : $area_type);
             $area_type_text = strtoupper($area_type_name);
-            $area_level = !empty($area_info['area_level']) ? $area_info['area_level'] : 1;
-            $area_objects = !empty($area_info['area_objects']) ? explode(',', trim($area_info['area_objects'], ',')) : array();
-            $area_tags = !empty($area_info['area_tags']) ? explode(',', trim($area_info['area_tags'], ',')) : array();
-            $area_position = !empty($area_info['area_position']) ? $area_info['area_position'] : '1-1';
+            $area_level = !empty($area_info['level']) ? $area_info['level'] : 1;
+            $area_objects = !empty($area_info['objects']) ? $area_info['objects'] : array();
+            $area_tags = !empty($area_info['tags']) ? $area_info['tags'] : array();
+            $area_position = !empty($area_info['position']) ? $area_info['position'] : '1-1';
             $area_position_xy = explode('-', $area_position);
             $area_position_col = intval($area_position_xy[0]);
             $area_position_row = intval($area_position_xy[1]);
-            $area_size = !empty($area_info['area_size']) ? $area_info['area_size'] : '21 x 21';
+            $area_size = !empty($area_info['size']) ? $area_info['size'] : '21 x 21';
             if (in_array('stargate', $area_tags)){ $area_size = '11 x 11';  }
             elseif (in_array('path', $area_tags)){ $area_size = '13 x 13';  }
             elseif (!in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
+            elseif (in_array('main', $area_tags)){ $area_size = '31 x 31'; }
             $area_size_xy = explode(' x ', $area_size);
             $area_size_width = intval($area_size_xy[0]);
             $area_size_height = intval($area_size_xy[1]);
@@ -152,20 +163,20 @@ echo('<pre>'.PHP_EOL);
             $area_middle_row = ceil($area_size_height / 2);
             $area_spawn = $area_middle_col.'-'.$area_middle_row;
             $area_spawn_visible = in_array('start', $area_tags) || in_array('player-platform', $area_objects) ? true : false;
-            $area_padding = !empty($area_info['area_padding']) ? intval($area_info['area_padding']) : 3;
+            $area_padding = !empty($area_info['padding']) ? intval($area_info['padding']) : 3;
             if (in_array('elemental', $area_tags)){ $area_padding += 1;  }
-            $area_field = !empty($area_info['area_field']) ? $area_info['area_field'] : 'field';
+            $area_field = !empty($area_info['field']) ? $area_info['field'] : 'field';
             $area_field_tile = $area_field === 'field' ? 'plain-field' : $area_field;
             if (in_array($area_field_tile, $map_tiles_missing_for)){ $area_field_tile = 'plain-field'; }
-            $area_exits = !empty($area_info['area_exits']) ? explode(',', trim($area_info['area_exits'], ',')) : array();
-            $area_random_pickups = !empty($area_info['area_pickups']) ? explode(',', trim($area_info['area_pickups'], ',')) : array();
-            $area_static_pickups = !empty($area_info['area_items']) ? explode(',', trim($area_info['area_items'], ',')) : array();
-            $area_static_encounters = !empty($area_info['area_encounters']) ? explode(',', trim($area_info['area_encounters'], ',')) : array();
-            $area_random_encounters = !empty($area_info['area_encounters2']) ? explode(',', trim($area_info['area_encounters2'], ',')) : array();
-            $area_static_rescues = !empty($area_info['area_rescues']) ? explode(',', trim($area_info['area_rescues'], ',')) : array();
+            $area_exits = !empty($area_info['exits']) ? $area_info['exits'] : array();
+            $area_random_pickups = !empty($area_info['pickups']) ? $area_info['pickups'] : array();
+            $area_static_pickups = !empty($area_info['items']) ? $area_info['items'] : array();
+            $area_static_encounters = !empty($area_info['encounters']) ? $area_info['encounters'] : array();
+            $area_random_encounters = !empty($area_info['encounters2']) ? $area_info['encounters2'] : array();
+            $area_static_rescues = !empty($area_info['rescues']) ? $area_info['rescues'] : array();
 
             // Collect or define the inset (area border + padding + extra tile[s])
-            $encounter_inset = isset($area_info['area_encounter_inset']) ? intval($area_info['area_encounter_inset']) : $area_padding + 1;
+            $encounter_inset = isset($area_info['encounter_inset']) ? intval($area_info['encounter_inset']) : $area_padding + 1;
             // Safety Check: Ensure the map isn't too small for this inset (prevents inverted zones)
             $min_dimension = min($area_size_width, $area_size_height);
             if ($min_dimension - ($encounter_inset * 2) < 1){ $encounter_inset = floor($min_dimension / 2) - 1; }
@@ -385,7 +396,7 @@ echo('<pre>'.PHP_EOL);
                     if (!$position){ continue; } // Skip if no space left
                     // Register this item as a protected zone!
                     $item_num = $key + 1;
-                    $protected_zones['anchored-item-'.$item_num] = $position;
+                    //$protected_zones['anchored-item-'.$item_num] = $position;
                     // Save the markup string for later
                     $static_pickup_key = 'static-pickup-'.$item_num;
                     if (in_array('player', $area_tags)
