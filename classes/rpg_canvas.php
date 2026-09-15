@@ -622,7 +622,7 @@ class rpg_canvas {
                 $is_rescue_saved = $is_rescue && $this_robot->battle->battle_status == 'complete' && $this_robot->robot_status != 'disabled' ? true : false;
 
                 // If this robot is unlockable, display the icon above its head
-                if ($is_unlockable && $this_robot->robot_status != 'disabled'){
+                if ($this_robot->robot_status != 'disabled' && ($is_unlockable || $is_rescue)){
 
                     // Calculate the zoom properties for the icon sprite
                     $icon_size = 80;
@@ -663,7 +663,7 @@ class rpg_canvas {
 
                     }
                     // Otherwise, we can display the normal HEART CORE icon sprite above their head
-                    else {
+                    elseif ($is_unlockable){
 
                         // Define the animation frames based on corrupted or not
                         $icon_image_path = 'images/objects/heart-cores/'.$icon_type.'/sprite_left_'.$icon_size.'x'.$icon_size.'.png';
