@@ -1077,6 +1077,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     autoRedirect = true;
                     showActionArea = false;
                     autoRedirectURL = 'prototype.php';
+                    _world.isBusyWith.redirectToLocation = true;
                     }
                 else {
                     // GOTO PORTAL - use the world, map, and position info collected earlier to redirect
@@ -1084,6 +1085,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         //console.log('-> preparing auto-effect of moving to NEW POSITION on SAME MAP via portal...');
                         triggerEffect = true;
                         showActionArea = false;
+                        _world.isBusyWith.teleporting = true;
                         triggerEffectFunction = function(){
                             if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
                             //console.log('-> running triggerEffectFunction for portal to moveWorldCursorToPosition(' + goToPosition + ')');
@@ -1107,6 +1109,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         autoRedirectURL = 'world.php?world=' + goToWorld;
                         if (goToMap){ autoRedirectURL += '&map='+goToMap; }
                         if (goToPosition){ autoRedirectURL += '&position='+goToPosition; }
+                        _world.isBusyWith.redirectToLocation = true;
                         //console.log('-> autoRedirectURL =', autoRedirectURL);
                         //if (!confirm('teleport to ' + autoRedirectURL + '?')){ autoRedirectURL = false; } // TEMP TEMP TEMP
                         readyTeamSprites = true;
@@ -2153,8 +2156,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     // Define an inline function to redirect to the portal if needed
     let redirectToLocation = function(){
         //console.log('%c' + 'redirectToLocation()', 'color: cyan;');
-        if (_self.worldIsBusy()){ return; }
-        if (!stillAtPosition() || otherMenusActiveNow()){ return; }
+        if (_self.worldIsBusy() && !_world.isBusyWith.redirectToLocation){ return; }
+        if (!stillAtPosition() || otherMenusActiveNow()){ delete _world.isBusyWith.redirectToLocation; return; }
         if (autoRedirectSound){ _self.playSoundEffect(autoRedirectSound); }
         //if (autoRedirectEffect){ applyTeamEffect(autoRedirectEffect); }
         //if (autoRedirectAnimation){ applyTeamAnimation(autoRedirectAnimation); }
