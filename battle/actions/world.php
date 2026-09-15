@@ -141,7 +141,10 @@ if ($this_battle->battle_status === 'complete'
         rpg_battle::unset_index_info($this_battle->battle_token);
         if (!empty($this_battle->values['multi_battle_tokens'])){
             foreach ($this_battle->values['multi_battle_tokens'] AS $remove_battle_token){
-                rpg_battle::unset_index_info($remove_battle_token);
+                $remove_battle_info = rpg_battle::get_index_info($remove_battle_token);
+                if (!empty($remove_battle_info['flags']['remove_on_complete'])){
+                    rpg_battle::unset_index_info($remove_battle_token);
+                }
             }
         }
     }
