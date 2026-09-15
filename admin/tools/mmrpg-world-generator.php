@@ -357,12 +357,18 @@ echo('<pre>'.PHP_EOL);
                 $position1 = ($positionx - 1).'-'.($positiony);
                 $position2 = ($positionx + 0).'-'.($positiony);
                 $position3 = ($positionx + 1).'-'.($positiony);
+                $healpad_pos = ($positionx - 3).'-'.($positiony - 1);
+                $resetpad_pos = ($positionx + 3).'-'.($positiony - 1);
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-left('.$position1.', '.$ptoken.'pad-left, any, drop-zone, item:'.$itoken1.', activate-player-platform)';
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-middle('.$position2.', '.$ptoken.'pad-middle, any, drop-zone, item:'.$itoken2.', activate-player-platform)';
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-right('.$position3.', '.$ptoken.'pad-right, any, drop-zone, item:'.$itoken3.', activate-player-platform)';
+                $area_file_markup[] = '@events[]   = auto-heal('.$healpad_pos.', healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)';
+                $area_file_markup[] = '@events[]   = auto-reset('.$resetpad_pos.', resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)';
                 $protected_zones['player-platform-left-buffer'] = $position1;
                 $protected_zones['player-platform-middle-buffer'] = $position2;
                 $protected_zones['player-platform-right-buffer'] = $position3;
+                $protected_zones['player-healpad-buffer'] = $healpad_pos;
+                $protected_zones['player-resetpad-buffer'] = $resetpad_pos;
             }
 
             // Extract anchored pickups vs regular pickups
