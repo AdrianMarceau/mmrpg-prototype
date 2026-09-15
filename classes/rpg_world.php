@@ -1877,12 +1877,18 @@ class rpg_world {
                         $robot_flags['robot_is_rescue'] = true;
                         $robot_flags['is_friendly'] = true;
                         $robot_label = $robot_name.' (Help!)';
-                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)){
-                            //error_log('-> '.$robot_token.' is a rescue that is not unlocked yet!');
+                        if (!mmrpg_prototype_robot_unlocked('', $robot_token)
+                            && $robot_class === 'master'){
+                            //error_log('-> '.$robot_token.' is a rescue robot that is not unlocked yet!');
                             if (!isset($battle_rewards['robots'])){ $battle_rewards['robots'] = array(); }
-                            //$battle_rewards['robots'][] = array('token' => $robot_token, 'level' => 'auto', 'experience' => 'auto');
                             $battle_rewards['robots'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
-                            //error_log('-> ... adding '.$robot_token.' to the battle rewards!');
+                            //error_log('-> ... adding robot '.$robot_token.' to the battle rewards!');
+                        } elseif ($robot_class === 'mecha'){
+                            //error_log('-> '.$robot_token.' is a rescue mecha that is available to recruit!');
+                            if (!isset($battle_rewards['mechas'])){ $battle_rewards['mechas'] = array(); }
+                            $battle_rewards['mechas'][] = array('token' => $robot_token, 'level' => $robot_level, 'experience' => 999);
+                            //error_log('-> ... adding mecha '.$robot_token.' to the battle rewards!');
+                            $battle_flags['remove_on_complete'] = false;
                         }
                     }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
