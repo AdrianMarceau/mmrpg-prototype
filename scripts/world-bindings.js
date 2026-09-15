@@ -1322,9 +1322,38 @@ function bindEventsToInputs($thisWorld){
     return true;
     }
 
+// Quick function for handling window resizing and updating container dimensions
+function bindEventsToWindow(){
+    let _self = this;
+    let _config = _self.config;
+    let _elements = _self.elements;
+    let resizeTimeout;
+    $(window).bind('resize', function(){
+        // Debounce the resize event to prevent performance lag
+        if (resizeTimeout){ clearTimeout(resizeTimeout); }
+        resizeTimeout = setTimeout(function(){
+            // Update config dimensions to match the newly resized containers
+            _config.windowWidth = $(window).width();
+            _config.windowHeight = $(window).height();
+            _config.mmrpgWidth = _elements.mmrpg.outerWidth();
+            _config.mmrpgHeight = _elements.mmrpg.outerHeight();
+            _config.worldWidth = _elements.world.outerWidth();
+            _config.worldHeight = _elements.world.outerHeight();
+            _config.canvasWidth = _elements.canvas.outerWidth();
+            _config.canvasHeight = _elements.canvas.outerHeight();
+            // If the world is loaded, force the map to re-center using the new bounds
+            if (_self.state.hasLoaded){
+                _self.scrollMap(null, null, true);
+                }
+            }, 150);
+        });
+    return true;
+}
+
 // Assign the sub-functions to the main class's prototype
 
 mmrpgWorldMap.prototype.bindEventsToCanvas = bindEventsToCanvas;
 mmrpgWorldMap.prototype.bindEventsToWorld = bindEventsToWorld;
 mmrpgWorldMap.prototype.bindEventsToInputs = bindEventsToInputs;
+mmrpgWorldMap.prototype.bindEventsToWindow = bindEventsToWindow;
 

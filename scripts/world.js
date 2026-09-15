@@ -584,6 +584,7 @@ class mmrpgWorldMap {
             _self.bindEventsToCanvas($canvasMap);
             _self.bindEventsToWorld($thisWorld);
             _self.bindEventsToInputs($thisWorld);
+            _self.bindEventsToWindow();
             _self.calculateWalkableMapTiles();
             _self.initMiniMap();
             let startPosition = '1-1';
@@ -611,6 +612,7 @@ class mmrpgWorldMap {
                     _self.startIdleAnimation();
                     _world.isBusy = false;
                     gameSettings.gameHasStarted = true;
+                    $(window).trigger('resize');
                     //_self.showWorldMessage('<span style="color: cyan;">triggerOnWorldReady()</span>');
                     }, 900);
                 }, true, false, fakeOldPosition);
@@ -2135,16 +2137,24 @@ class mmrpgWorldMap {
         let mapScrollY = scrollY;
         let targetX = (mapScrollX + (mapTileSizeX / 2) - (mapTileSizeOffsetX / 2)) * worldZoom;
         let targetY = (mapScrollY + (mapTileSizeY / 2) - (mapTileSizeOffsetY / 2)) * worldZoom;
+        // Define UI offsets to push the camera away from overlapping interface elements
+        // A positive cameraOffsetX pushes the camera's focus right (giving UI room on the left)
+        let cameraOffsetX = -40; // Tweak this value based on your exact UI width
+        let cameraOffsetY = 0;
+        let visualCenterX = (worldWidth / 2) - cameraOffsetX;
+        let visualCenterY = (worldHeight / 2) - cameraOffsetY;
         // Now calculate the new translate values for the map container
         let translateX = 0, translateY = 0;
-        if (mapWidth < worldWidth){ translateX = (worldWidth - mapWidth) / 2; }
-        else if (targetX < (worldWidth / 2)){ translateX = 0; }
-        else if (targetX > (mapWidth - (worldWidth / 2))){ translateX = -(mapWidth - worldWidth); }
-        else { translateX = -(targetX - (worldWidth / 2)); }
-        if (mapHeight < worldHeight){ translateY = (worldHeight - mapHeight) / 2; }
-        else if (targetY < (worldHeight / 2)){ translateY = 0; }
-        else if (targetY > (mapHeight - (worldHeight / 2))){ translateY = -(mapHeight - worldHeight); }
-        else { translateY = -(targetY - (worldHeight / 2)); }
+        // X-Axis Boundary Logic
+        if (mapWidth <= worldWidth){ translateX = (worldWidth - mapWidth) / 2; } // Center horizontally if map is smaller than window
+        else if (targetX < visualCenterX){ translateX = 0;  } // Lock to left edge without overscrolling
+        else if (targetX > (mapWidth - (worldWidth - visualCenterX))){ translateX = -(mapWidth - worldWidth); } // Lock to right edge without overscrolling
+        else { translateX = -(targetX - visualCenterX); } // Follow player with the new visual offset
+        // Y-Axis Boundary Logic
+        if (mapHeight <= worldHeight){ translateY = (worldHeight - mapHeight) / 2; } // Center vertically if map is smaller than window
+        else if (targetY < visualCenterY){ translateY = 0; } // Lock to top edge without overscrolling
+        else if (targetY > (mapHeight - (worldHeight - visualCenterY))){ translateY = -(mapHeight - worldHeight); } // Lock to bottom edge without overscrolling
+        else { translateY = -(targetY - visualCenterY); } // Follow player with the new visual offset
         let mapTranslateX = translateX;
         let mapTranslateY = translateY;
         let subTranslateX = Math.round(-1 * (translateX * 0.1));
