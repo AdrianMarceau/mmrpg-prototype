@@ -98,17 +98,37 @@ $allowed_robot_tokens = mmrpg_prototype_robots_unlocked('', true);
 //$allowed_robot_tokens += mmrpg_prototype_robots_unlocked('', true, true);
 //error_log('$allowed_robot_tokens (B) = '.print_r($allowed_robot_tokens, true));
 
+// Define a global constant for what mode we're in
+define('MMRPG_WORLD_IS_DEBUG', true);
+
 // Define defaults for the prototype world data
-if (false){
-    $default_world_token = 'prototype';
-    $default_map_token = 'light-area-1';
-} else {
+if (defined('MMRPG_WORLD_IS_DEBUG')
+    && MMRPG_WORLD_IS_DEBUG === true){
     $default_world_token = 'debug';
     $default_map_token = 'debug-area-1';
+    $default_player_maps = array(
+        'dr-lalinde' => 'debug-area-1',
+        'dr-light' => 'debug-area-1e',
+        'dr-wily' => 'debug-area-1w',
+        'dr-cossack' => 'debug-area-1n'
+        );
+} else {
+    $default_world_token = 'prototype';
+    $default_map_token = 'prototype-area-0';
+    $default_player_maps = array(
+        'dr-lalinde' => 'lalinde-area-1',
+        'dr-light' => 'light-area-1',
+        'dr-wily' => 'wily-area-1',
+        'dr-cossack' => 'cossack-area-1'
+        );
 }
 $default_player_token = 'player';
 $default_world_position = '';
 $default_world_direction = '';
+
+// Define the variables to hold the home variables later
+$home_world_token = $default_world_token;
+$home_map_token = $default_map_token;
 
 // If a save action was requested, we should do it here and then return exit
 if (!empty($_POST['action']) && $_POST['action'] === 'save'
@@ -213,6 +233,7 @@ $this_prototype_data['this_player_mobility'] = MMRPG_WORLD_DEFAULT_MOBILITY; // 
 if (!empty($this_prototype_data['this_current_player'])){
     $this_player_token = $this_prototype_data['this_current_player'];
     $this_player_info = !empty($mmrpg_index_players[$this_player_token]) ? $mmrpg_index_players[$this_player_token] : array();
+    if (isset($default_player_maps[$this_player_token])){ $home_map_token = $default_player_maps[$this_player_token]; }
 } else {
     die('MMRPG World Fatal Error - No player token defined!');
 }
@@ -549,12 +570,8 @@ $map_pixel_height = $map_row_size * $map_tile_height;
 // Generate the map spawn points (source and destination)
 $map_spawn_pos = !empty($WORLD_SESSION['world_maps'][$world_map_token]['spawn_pos']) ? $WORLD_SESSION['world_maps'][$world_map_token]['spawn_pos'] : '';
 $map_exit_pos = !empty($WORLD_SESSION['world_maps'][$world_map_token]['exit_pos']) ? $WORLD_SESSION['world_maps'][$world_map_token]['exit_pos'] : '';
-if (empty($map_spawn_pos)){
-    $map_spawn_pos = '1-1';
-    if (!empty($map_data_parsed['portals']['spawn'])){
-        $map_spawn_pos = $map_data_parsed['portals']['spawn'][0];
-    }
-}
+if (empty($map_spawn_pos)){ $map_spawn_pos = '1-1'; }
+if (!empty($map_data_parsed['portals']['spawn'])){ $map_spawn_pos = $map_data_parsed['portals']['spawn'][0]; }
 if (empty($map_exit_pos)){
     $map_exit_pos = ($map_col_size + 1).'-'.($map_row_size + 1);
     if (!empty($map_data_parsed['portals']['exit'])){
@@ -1048,7 +1065,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
     _worldConfig.playerZenny = <?= json_encode($this_prototype_data['this_player_zenny'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerHistory = <?= json_encode($world_player_session_history, JSON_NUMERIC_CHECK) ?>;
     _worldConfig.backButtonURL = 'prototype.php';
-    _worldConfig.homeButtonURL = 'world.php?world=<?= $default_world_token ?>&map=<?= $default_map_token ?>&position=spawn';
+    _worldConfig.homeButtonURL = 'world.php?world=<?= $home_world_token ?>&map=<?= $home_map_token ?>&position=spawn';
     _worldConfig.resetButtonURL = 'world.php?reset=world';
     // Load in the main content indexes for the world map if they exist
     if (typeof mmrpgIndex !== 'undefined'){
