@@ -1702,15 +1702,20 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             if (dataBattleStars.length){ joinedDataAttrs += ' data-battle-star="'+dataBattleStarsJoined+'"'; }
             actionAreaMarkup += dataLabelsJoined;
             sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> ' + (dataBattles.length > 1 ? dataBattles.length+' ' : '') + 'Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
-            if (playerActiveRobots >= 1){
-                sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
-                //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span>Start Battle!</span></a>';
-                } else {
-                sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
+            let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' ? true : false;
+            let isSoloMechaRescue = isSoloMechaBattle && firstBattleEvent.kind2 === 'rescue' ? true : false;
+            let showBattleButton = true, showRecruitButton = false;
+            if (!playerIsCursor && isSoloMechaBattle){ showRecruitButton = true; }
+            if (showRecruitButton && isSoloMechaRescue){ showBattleButton = false; }
+            if (showBattleButton){
+                if (playerActiveRobots >= 1){
+                    sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
+                    //sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span>Start Battle!</span></a>';
+                    } else {
+                    sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
+                    }
                 }
-            if (!playerIsCursor
-                && dataBattles.length === 1
-                && firstBattleRobot.class === 'mecha'){
+            if (showRecruitButton){
                 //console.log('solo mecha event detected, generate the whistle button');
                 //console.log('_worldPlayerTeam =', 'x' + _worldPlayerTeam.length, _worldPlayerTeam);
                 let playerHasTeamSlot = _worldPlayerTeam.length < _config.maxRobotsPerPlayer ? true : false;
@@ -1718,16 +1723,27 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let mechaBattleEvent = firstBattleEvent;
                 let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
                 let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
-                let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle';
+                let isRescueMecha = mechaBattleEvent.kind2 === 'rescue';
+                let mechaWhistleSpanLabel = isRescueMecha ? '<sup>Recruit</sup> Friendly Mecha' : '<sup>Use</sup> Mecha Whistle';
                 let mechaWhistleTarget = mechaBattleEvent.token;
                 //console.log('playerHasTeamSlot =', playerHasTeamSlot);
                 //console.log('mechaBattleEvent =', mechaBattleEvent);
                 //console.log('mechaWhistleQuantity =', mechaWhistleQuantity);
                 //console.log('mechaWhistleTarget =', mechaWhistleTarget);
-                if (!hasPermanentWhistle){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
-                let playerCanUseWhistle = (mechaWhistleQuantity > 0 || hasPermanentWhistle) && playerHasTeamSlot ? true : false;
-                if (playerCanUseWhistle){ sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaWhistleTarget + '"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
-                else { sideButtonsMarkup += '<a class="button big-button disabled"><span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span></a>'; }
+                if (!hasPermanentWhistle && !isRescueMecha){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
+                let playerCanUseWhistle = (isRescueMecha || mechaWhistleQuantity > 0 || hasPermanentWhistle) && playerHasTeamSlot ? true : false;
+                if (playerCanUseWhistle){
+                    sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaWhistleTarget + '" data-is-rescue="' + (isRescueMecha ? 'true' : 'false') + '">';
+                        if (!isRescueMecha){ sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
+                        else {sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
+                    sideButtonsMarkup += '</a>';
+                    }
+                else {
+                    sideButtonsMarkup += '<a class="button big-button disabled">';
+                        if (!isRescueMecha){ sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
+                        else { sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
+                    sideButtonsMarkup += '</a>';
+                    }
                 }
             sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
             //console.log('sideButtonsMarkup =', sideButtonsMarkup);
@@ -3221,6 +3237,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let battlesIndex = _config.mapBattlesIndex;
                 let battleTarget = $button.attr('data-target') || false;
                 let battleInfo = battleTarget && (battlesIndex && battlesIndex[battleTarget]) ? battlesIndex[battleTarget] : false;
+                let isRescueMecha = $button.attr('data-is-rescue') === 'true';
                 //console.log('-> playerToken =', playerToken);
                 //console.log('-> itemToken =', itemToken);
                 //console.log('-> battleSymbols =', battleSymbols);
@@ -3228,11 +3245,12 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 //console.log('-> battleTarget =', battleTarget);
                 //console.log('-> battleInfo =', battleInfo);
                 _self.playSoundEffect('get-weird-item');
-                _self.showWorldMessage(playerNameSpan + ' uses a ' + itemNameSpan + '!', delayMessageFor);
+                if (isRescueMecha){ _self.showWorldMessage(playerNameSpan + ' calls out to the friendly mecha!', delayMessageFor); }
+                else { _self.showWorldMessage(playerNameSpan + ' uses a ' + itemNameSpan + '!', delayMessageFor); }
                 // Right now this always works, but wrap it in a function in case we wanna add conditions later
                 if (true){
                     _self.showWorldMessage('...the mecha responded!', delayDismissFor);
-                    _self.decrementItemQuantity('mecha-whistle');
+                    if (!isRescueMecha){ _self.decrementItemQuantity('mecha-whistle'); }
                     setTimeout(function(){ dismissDropdown(false); }, delayDismissFor);
                     setTimeout(function(){
                         //console.log('-> redirect to auto-recruitment URL now');
