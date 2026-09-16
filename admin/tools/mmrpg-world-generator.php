@@ -167,7 +167,11 @@ echo('<pre>'.PHP_EOL);
             if (in_array('elemental', $area_tags)){ $area_padding += 1;  }
             $area_field = !empty($area_info['field']) ? $area_info['field'] : 'field';
             $area_field_tile = $area_field === 'field' ? 'plain-field' : $area_field;
+            $area_field_tile = str_replace('-1', '-i', $area_field_tile);
+            $area_field_tile = str_replace('-2', '-ii', $area_field_tile);
+            $area_field_tile = str_replace('-3', '-iii', $area_field_tile);
             if (in_array($area_field_tile, $map_tiles_missing_for)){ $area_field_tile = 'plain-field'; }
+
             $area_exits = !empty($area_info['exits']) ? $area_info['exits'] : array();
             $area_random_pickups = !empty($area_info['pickups']) ? $area_info['pickups'] : array();
             $area_static_pickups = !empty($area_info['items']) ? $area_info['items'] : array();
@@ -359,16 +363,21 @@ echo('<pre>'.PHP_EOL);
                 $position3 = ($positionx + 1).'-'.($positiony);
                 $healpad_pos = ($positionx - 3).'-'.($positiony - 1);
                 $resetpad_pos = ($positionx + 3).'-'.($positiony - 1);
+                $portal_x = $area_middle_col;
+                $portal_y = $positiony + 5;
+                $portal_pos = $portal_x.'-'.$portal_y;
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-left('.$position1.', '.$ptoken.'pad-left, any, drop-zone, item:'.$itoken1.', activate-player-platform)';
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-middle('.$position2.', '.$ptoken.'pad-middle, any, drop-zone, item:'.$itoken2.', activate-player-platform)';
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-right('.$position3.', '.$ptoken.'pad-right, any, drop-zone, item:'.$itoken3.', activate-player-platform)';
                 $area_file_markup[] = '@events[]   = auto-heal('.$healpad_pos.', healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)';
                 $area_file_markup[] = '@events[]   = auto-reset('.$resetpad_pos.', resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)';
+                $area_file_markup[] = '@portals[]  = exit-portal('.$portal_pos.', prototype-area-0__spawn, void-alt, confirm)';
                 $protected_zones['player-platform-left-buffer'] = $position1;
                 $protected_zones['player-platform-middle-buffer'] = $position2;
                 $protected_zones['player-platform-right-buffer'] = $position3;
                 $protected_zones['player-healpad-buffer'] = $healpad_pos;
                 $protected_zones['player-resetpad-buffer'] = $resetpad_pos;
+                $protected_zones['player-return-portal-buffer'] = $portal_pos;
             }
 
             // Extract anchored pickups vs regular pickups

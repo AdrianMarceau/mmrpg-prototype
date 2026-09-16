@@ -12,6 +12,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'name' => 'PROTOTYPE Area 0',
         'position' => '12-7',
         'level' => 1,
+        'element' => 'space',
         'field' => 'prototype-subspace',
         'encounters' => ['trill'],
         'encounters2' => ['dark-frag'],
