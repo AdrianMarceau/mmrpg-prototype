@@ -129,9 +129,23 @@ if (!empty($mmrpg_indexes)){
                         $object_styles_sprites .= (implode(', ', $selectors).' { '.$inner_styles_string.' }'.PHP_EOL);
                     }
 
+                    // Collect any explicitly defined image alts first
+                    $object_image_alts = !empty($object_info[$object_kind.'_image_alts']) ? $object_info[$object_kind.'_image_alts'] : array();
+
+                    // If this object is a robot with a copy core, automatically append elemental alts
+                    if ($object_kind === 'robot' && !empty($object_info['robot_core']) && $object_info['robot_core'] === 'copy'){
+                        static $mmrpg_database_types;
+                        if (empty($mmrpg_database_types)){ $mmrpg_database_types = rpg_type::get_index(); }
+                        $existing_alt_tokens = array_column($object_image_alts, 'token');
+                        foreach ($mmrpg_database_types AS $type_token => $type_info){
+                            if (empty($type_token) || $type_token === 'none' || $type_token === 'copy'){ continue; }
+                            if (in_array($type_token, $existing_alt_tokens)){ continue; } // Prevent duplicates
+                            $object_image_alts[] = array('token' => $type_token);
+                        }
+                    }
+
                     // If this particular object has any image alts defined, generate mapped styles for them using the current prefix
-                    if (!$use_composite && !empty($object_info[$object_kind.'_image_alts'])){
-                        $object_image_alts = $object_info[$object_kind.'_image_alts'];
+                    if (!$use_composite && !empty($object_image_alts)){
                         foreach ($object_image_alts AS $alt_info){
                             $alt_token = $alt_info['token'];
                             $alt_meta = rpg_world::get_sprite_meta($object_kind, $object_token, $alt_token, 'left', $prefix);
