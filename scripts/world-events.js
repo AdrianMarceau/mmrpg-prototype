@@ -1066,7 +1066,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             showActionAreaType = 'portal';
             zoomTimeoutDuration = 500; // if we show a portal dropdown, we want to zoom in quickly
             // Automatically redirect to this portal if cursor has moved at least once
-            if (_worldCursor.moved){
+            if (_worldCursor.moved && !portalInfo.confirm){
                 //console.log('-> entering portal with name ' + dataPortal + '!');
                 if (dataPortal === 'spawn'){
                     // TODO: SPAWN PORTAL - make the spawn actually go somewhere specific ?
@@ -1126,7 +1126,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     }
                 }
             // Otherwise we can only prepare the dropdown details and wait
-            else {
+            else if (!portalInfo.confirm){
                 //console.log('-> portal ' + dataPortal + ' disabled until cursor movement!');
                 showActionArea = false;
                 }
@@ -2338,9 +2338,14 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     alert('Portal Name: ' + portalName + '\n\nThis is where you would show portal details.');
                     }
                 else if (action === 'enter-portal'){
-                    //console.log('-> entering portal with name ' + portalName + '!');
+                    //console.log('-> entering portal ' + portalName + '!');
+                    // Fetch the portal's index info so we can check its destination
+                    let portalsIndex = _config.mapPortalsIndex;
+                    let portalInfo = portalsIndex[portalName] || false;
                     _self.playSoundEffect('bounce-sound');
                     let portalHref = false;
+                    let isSameMapTeleport = false;
+                    let goToPosition = false;
                     if (portalName === 'spawn'){
                         portalHref = 'prototype.php'; // TODO: make the spawn actually go somewhere specific
                         } else if (portalName === 'exit'){
@@ -2351,8 +2356,33 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
                         else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
                         portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
+                        } else if (portalInfo && portalInfo.dst){
+                        // ADDED: Reconstruct destination from standard .map portal dst syntax
+                        let goToWorld = _config.mapWorld;
+                        let goToMap = portalInfo.dst;
+                        if (goToMap.indexOf('__') !== -1){
+                            let gtm = goToMap.split('__');
+                            if (gtm.length >= 3){ goToWorld = gtm[0]; goToMap = gtm[1]; goToPosition = gtm[2]; }
+                            else if (gtm.length >= 2){ goToMap = gtm[0]; goToPosition = gtm[1]; }
+                            }
+                        let goToSameWorld = goToWorld === _config.mapWorld;
+                        let goToSameMap = goToSameWorld && goToMap === _config.mapToken;
+                        if (goToSameWorld && goToSameMap){
+                            isSameMapTeleport = true;
+                            } else {
+                            portalHref = 'world.php?world=' + goToWorld + '&map=' + goToMap;
+                            if (goToPosition){ portalHref += '&position=' + goToPosition; }
+                            }
                         }
-                    if (portalHref){
+                    // Route the player using either same-map movement or a full page redirect
+                    if (isSameMapTeleport && goToPosition){
+                        dismissDropdown(false);
+                        _config.allowWorldEvents = false; // prevent re-triggering events during teleport
+                        _self.moveToPosition(goToPosition, function(){
+                            _config.allowWorldEvents = true; // re-allow world events after teleport complete
+                            return true;
+                            });
+                        } else if (portalHref){
                         _self.incZoomLevel();
                         $thisWorld.addClass('busy');
                         _self.saveWorldState(function(){
@@ -2360,11 +2390,12 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             $thisWorld.addClass('loading');
                             window.location.href = portalHref;
                             _self.incZoomLevel();
-                            }, true, false);
+                                }, true, false);
                         $thisWorld.animate({opacity: 0}, 1200, function(){
                             $thisWorld.addClass('hidden');
-                            });
+                                });
                         }
+
                     }
                 }
             else if (isButton){

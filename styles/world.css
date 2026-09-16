@@ -559,9 +559,31 @@ html, body {
 #world #map .sprite.tile.portal-green { background-position: -360px -200px; }
 #world #map .sprite.tile.portal-purple { background-position: -440px -200px; }
 #world #map .sprite.tile.portal-orange { background-position: -520px -200px; }
+#world #map .sprite.tile.portal-exit { background-position: -440px -40px; }
+#world #map .sprite.tile.portal-void { background-position: -1240px -920px; }
 #world #map .sprite.tile[data-portal="spawn"] { background-position: -120px -40px; }
 #world #map .sprite.tile[data-portal="exit"] { background-position: -440px -40px; }
 #world #map .sprite.tile.portal.hidden { display: none; }
+
+@keyframes world-sprite-void-rotate {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+}
+#world #map .sprite.tile.portal-void {
+    transform-origin: center;
+    transform: rotate(360deg);
+    animation: world-sprite-void-rotate 3s linear infinite !important;
+}
+#world #map .sprite.tile.portal-void:before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    animation-delay: -1s;
+    animation: world-sprite-void-rotate 9s linear infinite !important;
+}
 
 @keyframes world-sprite-playerpad-glow {
     0%, 100% { filter: brightness(1.0) opacity(0.6); }
@@ -5429,8 +5451,8 @@ display: block;
 }
 #world #canvas #side-buttons .button[data-portal],
 #world #canvas #side-buttons .button[data-action="enter-portal"] {
-    background-color: #0e4f6b !important;
-    border-color: #12709d !important;
+    background-color: #8b1d1d !important;
+    border-color: #b23333 !important;
 }
 #world #canvas #side-buttons .button[data-button],
 #world #canvas #side-buttons .button[data-action="push-button"],
@@ -5743,6 +5765,9 @@ display: block;
     font-weight: normal;
     font-style: italic;
     font-size: 50%;
+}
+#world #canvas #title-banner .subtitle:first-child {
+    text-align: center;
 }
 #world #canvas #title-banner:not(.active) {
     opacity: 0.0;

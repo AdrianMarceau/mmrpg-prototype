@@ -3112,6 +3112,7 @@ class rpg_world {
                 //$top = $mod_top; $left = $mod_left;
                 $hidden = in_array('hidden', $portal_data) ? true : false;
                 $locked = in_array('locked', $portal_data) ? true : false;
+                $confirm = in_array('confirm', $portal_data) ? true : false;
                 $colour = false;
                 $direction = false;
                 if (in_array('black-alt', $portal_data)){ $colour = 'black'; }
@@ -3121,6 +3122,8 @@ class rpg_world {
                 else if (in_array('green-alt', $portal_data)){ $colour = 'green'; }
                 else if (in_array('purple-alt', $portal_data)){ $colour = 'purple'; }
                 else if (in_array('orange-alt', $portal_data)){ $colour = 'orange'; }
+                else if (in_array('exit-alt', $portal_data)){ $colour = 'exit'; }
+                else if (in_array('void-alt', $portal_data)){ $colour = 'void'; }
                 if (in_array('left-only', $portal_data)){ $direction = 'left'; }
                 elseif (in_array('right-only', $portal_data)){ $direction = 'right'; }
                 elseif (in_array('up-only', $portal_data)){ $direction = 'up'; }
@@ -3146,6 +3149,7 @@ class rpg_world {
                     'hidden' => $hidden,
                     'locked' => $locked,
                     'direction' => $direction,
+                    'confirm' => $confirm,
                     );
             }
         }
@@ -3836,8 +3840,8 @@ class rpg_world {
             $dir = ($col > ($map_col_size / 2)) ? 'left' : 'right';
             if (mt_rand(1, 2) === 1){ $dir = $dir !== 'left' ? 'left' : 'right'; }
             $class = 'battle vs-'.$subkind.' bounce';
-            if ($rinfo['robot_class'] === 'master'){ $class .= ' always-zoom'; }
-            elseif ($rinfo['robot_class'] === 'boss'){ $class .= ' always-zoom'; }
+            if ($subkind === 'master' || $rinfo['robot_class'] === 'master'){ $class .= ' always-zoom'; }
+            elseif ($subkind === 'boss' || $rinfo['robot_class'] === 'boss'){ $class .= ' always-zoom'; }
             if ($subkind === 'rescue'){ $class .= ' frame-lock'; }
             $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
             $attrs = 'data-battle="'.$battle.'" data-label="'.$name.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
