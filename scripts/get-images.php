@@ -316,7 +316,10 @@ if ($must_regenerate){
                 $image_size = $object_info['image_size'];
                 if ($request_zoomed){ $image_size *= 2; }
                 $size_string = $image_size.'x'.$image_size;
-                $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
+                $src_folder = 'sprites';
+                if (!empty($request_alt) && $request_alt !== 'all'){
+                    $src_folder = is_numeric($request_alt) ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites_'.$request_alt;
+                }
                 $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
                 $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $request_file_name).'.png';
                 $source_path_full = $src_base.$src_file;
@@ -534,7 +537,10 @@ if ($must_regenerate){
                 $image_size = $object_info['image_size'];
                 if ($request_zoomed){ $image_size *= 2; }
                 $size_string = $image_size.'x'.$image_size;
-                $src_folder = $request_alt > 0 ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites';
+                $src_folder = 'sprites';
+                if (!empty($request_alt) && $request_alt !== 'all'){
+                    $src_folder = is_numeric($request_alt) ? 'sprites_alt'.($request_alt > 1 ? $request_alt : '') : 'sprites_'.$request_alt;
+                }
                 $src_base = $sprite_object_dir.$object_info['image'].'/'.$src_folder.'/';
                 $src_file = preg_replace('/([0-9]{1,3})x([0-9]{1,3})/', $size_string, $object_file).'.png';
                 $source_path_full = $src_base.$src_file;
