@@ -1133,8 +1133,15 @@ $(document).ready(function(){
                 //console.log('-> mapFieldInfo = ', mapFieldInfo);
                 //console.log('-> mapFieldName = '+mapFieldName);
                 //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
-                let titleText = mapName + ' &raquo;';
-                let subtitleText = mapFieldName + (mapSubName ? ' <sub>(' + mapSubName + ')</sub>' : '');
+                let titleText, subtitleText;
+                if (mapName === 'PROTOTYPE Area 0'
+                    || mapName.match(/^STAR Gate/i)){
+                    titleText = ''; //'?????? &raquo;'; //worldName + ' &raquo;';
+                    subtitleText = mapName;
+                    } else {
+                    titleText = mapName + ' &raquo;';
+                    subtitleText = mapFieldName + (mapSubName ? ' <sub>(' + mapSubName + ')</sub>' : '');
+                    }
                 //let titleText = mapFieldName + ' &raquo;';
                 //let subtitleText = mapName;
                 setTimeout(function(){ _self.showTitleBanner(titleText, subtitleText, false, 2000); }, 300);
