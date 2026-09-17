@@ -1131,7 +1131,7 @@ $(document).ready(function(){
                 //console.log('-> mapFieldName = '+mapFieldName);
                 //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
                 let titleText, subtitleText;
-                if (mapName === 'PROTOTYPE Area 0'
+                if (false //mapName === 'PROTOTYPE Area 0'
                     || mapName.match(/^STAR Gate/i)){
                     titleText = ''; //'?????? &raquo;'; //worldName + ' &raquo;';
                     subtitleText = mapName;
