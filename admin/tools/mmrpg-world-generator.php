@@ -90,20 +90,23 @@ echo('<pre>'.PHP_EOL);
     //echo('$world_map_filepath = '.print_r($world_map_filepath, true).PHP_EOL);
     //echo('$world_map_filedir = '.print_r($world_map_filedir, true).PHP_EOL);
     //echo('$mmrpg_prototype_world_areas ='.print_r($mmrpg_prototype_world_areas, true).PHP_EOL);
-    echo('$mmrpg_prototype_world_areas:first-child = '.print_r($mmrpg_prototype_world_areas[array_keys($mmrpg_prototype_world_areas)[0]], true).PHP_EOL);
+    //echo('$mmrpg_prototype_world_areas:first-child = '.print_r($mmrpg_prototype_world_areas[array_keys($mmrpg_prototype_world_areas)[0]], true).PHP_EOL);
 
     // Loop through the list of areas and create their map files (overwrite existing)
     if (!empty($mmrpg_prototype_world_areas)){
 
         // Pre-loop through the world area and map the positions for every single area
         $area_positions_index = array();
+        $quanta_positions_index = array();
         $map_area_positions_markup = array();
         $map_area_positions_markup[] = '#---------------------------#';
         foreach ($mmrpg_prototype_world_areas AS $area_token => $area_info){
             if (empty($area_info['position'])){ continue; }
             $position = $area_info['position'];
+            $objects = $area_info['objects'];
             list($prefix) = explode('-', $area_token);
             $area_positions_index[$position] = $area_token;
+            if (in_array('quanta-flower', $objects)){ $quanta_positions_index[$position] = explode('-', $area_token)[0]; }
             if (!isset($last_prefix) || $last_prefix !== $prefix){
                 $map_area_positions_markup[] = '#---------------------------#';
                 $last_prefix = $prefix;
@@ -111,9 +114,11 @@ echo('<pre>'.PHP_EOL);
             $map_area_positions_markup[] = '@areas[]  = '.$area_token.'('.$position.')';
         }
         $map_area_positions_markup[] = '#---------------------------#';
+        $map_area_positions_markup[] = '#---------------------------#';
         $map_area_positions_markup = implode(PHP_EOL, $map_area_positions_markup).PHP_EOL;
         //echo('$area_positions_index = '.print_r($area_positions_index, true).PHP_EOL);
-        echo('$map_area_positions_markup = '.PHP_EOL.print_r($map_area_positions_markup, true).PHP_EOL);
+        echo('Generating map area positions... '.PHP_EOL.print_r($map_area_positions_markup, true).'...found '.count($mmrpg_prototype_world_areas).' areas.'.PHP_EOL.PHP_EOL);
+        echo('Generating quanta flower positions... '.PHP_EOL.print_r($quanta_positions_index, true).'...found '.count($quanta_positions_index).' quanta-flowers.'.PHP_EOL.PHP_EOL);
 
         // Define which types go with which portal colours so we don't have to later
         $portal_colour_index = [];
@@ -154,6 +159,7 @@ echo('<pre>'.PHP_EOL);
             $area_size = !empty($area_info['size']) ? $area_info['size'] : '21 x 21';
             if (in_array('stargate', $area_tags)){ $area_size = '11 x 11';  }
             elseif (in_array('path', $area_tags)){ $area_size = '13 x 13';  }
+            elseif (in_array('start', $area_tags)){ $area_size = '29 x 29';  }
             elseif (!in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
             elseif (in_array('main', $area_tags)){ $area_size = '31 x 31'; }
             $area_size_xy = explode(' x ', $area_size);
@@ -344,6 +350,32 @@ echo('<pre>'.PHP_EOL);
                     }
                 }
 
+            }
+            // If this area is the START area, generate all the parallel quanta flowers here!
+            if (in_array('start', $area_tags) && !empty($quanta_positions_index)){
+                $vertical_offset = 4;
+                $area_file_markup[] = '#---------------------------#';
+                foreach ($quanta_positions_index AS $world_pos => $flower_type){
+                    // Translate world coordinates to local coordinates (accounting for padding)
+                    list($world_x, $world_y) = explode('-', $world_pos);
+                    $local_x = intval($world_x) + $area_padding;
+                    $local_y = intval($world_y) + $area_padding + $vertical_offset;
+                    $local_pos = $local_x.'-'.$local_y;
+                    // Get the destination area token based on the world position
+                    $dest_area_token = isset($area_positions_index[$world_pos]) ? $area_positions_index[$world_pos] : '';
+                    if (!empty($dest_area_token)){
+                        // Determine the correct colour for this element
+                        $portal_colour = 'black';
+                        foreach ($portal_colour_index AS $colour => $types){ if (in_array($flower_type, $types)){ $portal_colour = $colour; break; } }
+                        // Register this position so other objects don't spawn on it
+                        $protected_zones[$flower_type.'-flower-buffer'] = $local_pos;
+                        // Add the portal and lock to the markup
+                        $portal_name = $flower_type.'-portal';
+                        $exit_destination = $dest_area_token.'__subspace-portal';
+                        $area_file_markup[] = '@portals[]  = '.$portal_name.'('.$local_pos.', '.$exit_destination.', '.$portal_colour.'-alt)';
+                        $area_file_markup[] = '@locks[]    = '.$flower_type.'-portal-flower('.$local_pos.', portal-flower, '.$flower_type.', items:'.$flower_type.'-core, x10, locked)';
+                    }
+                }
             }
             // If this area has a PLAYER PLATFORM, we should add its parts and accompanying panels
             if (in_array('player-platform', $area_objects)
