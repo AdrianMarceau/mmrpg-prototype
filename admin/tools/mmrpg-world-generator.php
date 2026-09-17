@@ -455,6 +455,20 @@ echo('<pre>'.PHP_EOL);
                 }
             }
 
+            // Pre-place the Anti-Eddie "Purple Reset Guy" if the area has random encounters
+            $actor_strings = [];
+            if (!empty($area_static_encounters)
+                || !empty($area_random_encounters)
+                || !empty($area_static_rescues)){
+                // Calculate the bottom-right corner of the walkable area
+                $npc_x = $area_size_width - $area_padding;
+                $npc_y = $area_size_height - $area_padding;
+                $npc_pos = $npc_x.'-'.$npc_y;
+                $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, default)';
+                // Add him to the protected zones so encounters/items don't spawn on him
+                $protected_zones['purple-reset-dude-buffer'] = $npc_pos;
+            }
+
             // Process ALL protected zones (structural + newly added anchored items)
             $exclude_coords = [];
             $no_encounter_strings = [];
@@ -471,6 +485,39 @@ echo('<pre>'.PHP_EOL);
 
             // Initialize the permanent inline coordinate picker for all remaining randomized entities
             $getRandomCoord = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $exclude_coords);
+
+            // Generate RANDOM SUPER-BLOCKS for elemental areas (10% of remaining tiles)
+            $block_strings = [];
+            if (in_array('elemental', $area_tags)) {
+
+                // Calculate the total number of walkable tiles inside the inset
+                $zone_w = max(0, $area_size_width - ($encounter_inset * 2));
+                $zone_h = max(0, $area_size_height - ($encounter_inset * 2));
+                $total_zone_tiles = $zone_w * $zone_h;
+
+                // Count how many of our excluded coordinates actually fall inside this random zone
+                $excluded_in_zone = 0;
+                foreach ($exclude_coords as $ex_pos) {
+                    list($ex_x, $ex_y) = explode('-', $ex_pos);
+                    if ($ex_x > $encounter_inset && $ex_x <= ($area_size_width - $encounter_inset) &&
+                        $ex_y > $encounter_inset && $ex_y <= ($area_size_height - $encounter_inset)) {
+                        $excluded_in_zone++;
+                    }
+                }
+
+                // Calculate 10% of the strictly available tiles
+                $remaining_walkable = max(0, $total_zone_tiles - $excluded_in_zone);
+                $num_super_blocks = (int)floor($remaining_walkable * 0.10);
+
+                // Pop coordinates and generate the blocks!
+                for ($i = 1; $i <= $num_super_blocks; $i++) {
+                    $position = $getRandomCoord();
+                    if (!$position) break; // Failsafe if the map is stuffed
+
+                    // Generate standard super-block markup without the specific image alt
+                    $block_strings[] = '@blocks[]   = super-block-'.$i.'('.$position.', super-block)';
+                }
+            }
 
             // Generate the PICKUPS for this area along with their map positions where relevant
             if (!empty($area_random_pickups) || !empty($regular_pickups) || !empty($static_pickup_strings)){
@@ -582,6 +629,19 @@ echo('<pre>'.PHP_EOL);
                 }
 
             }
+
+            // Generate the ACTORS for this area (like the Purple Reset Guy)
+            if (!empty($actor_strings)){
+                $area_file_markup[] = '#---------------------------#';
+                $area_file_markup[] = implode(PHP_EOL, $actor_strings);
+            }
+
+            // Generate the OVERWORLD BLOCKS for this area
+            if (!empty($block_strings)){
+                $area_file_markup[] = '#---------------------------#';
+                $area_file_markup[] = implode(PHP_EOL, $block_strings);
+            }
+
             // Generate layer tiles for LAYER 0 and LAYER -1
             if (!empty($area_size_width) && !empty($area_size_height)){
                 $area_file_markup[] = '#---------------------------#';
