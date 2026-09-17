@@ -1912,7 +1912,8 @@ class rpg_world {
                         }
                     }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
-                    $world_map_encounters[] = array('robot/'.$encounter_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
+                    $world_map_encounters[] = array('robot/'.$encounter_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label);
+                    //error_log('w/ '.print_r($world_map_encounters[count($world_map_encounters) - 1], true));
                     $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                         'token' => $battle_token,
                         'name' => $battle_name,
