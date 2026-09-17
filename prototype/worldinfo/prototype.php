@@ -276,6 +276,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'robot-museum',
         'encounters' => ['weapon-archivist'],
+        'encounters2' => ['weapon-archivist_explode', 'weapon-archivist_flame', 'weapon-archivist_wind', 'weapon-archivist_shadow', 'weapon-archivist_electric'],
         'items' => ['defense-booster', 'hyper-screw'],
         'tags' => ['outer'],
         'exits' => ['west']
@@ -313,6 +314,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'field' => 'royal-palace',
         'encounters' => ['weapon-archivist'],
+        'encounters2' => ['weapon-archivist_cutter', 'weapon-archivist_freeze', 'weapon-archivist_nature', 'weapon-archivist_earth', 'weapon-archivist_water'],
         'items' => ['defense-diverter', 'hyper-screw'],
         'tags' => ['outer'],
         'exits' => ['east']
