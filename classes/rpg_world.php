@@ -1704,6 +1704,15 @@ class rpg_world {
             if ($robot_class === 'mecha'){ $battle_description = 'Defeat the '.$robot_name.' support mecha in battle!'; }
             elseif ($robot_class === 'master'){ $battle_description = 'Defeat the robot master '.$robot_name.' in battle!'; }
             elseif ($robot_class === 'boss'){ $battle_description = 'Defeat '.$robot_name.' the fortress boss in battle!'; }
+            $stat_boost = ceil($robot_level * ($robot_class === 'boss' ? 3 : ($robot_class === 'master' ? 2 : 1)));
+            $robot_rewards = array();
+            $robot_rewards['robot_attack'] = $stat_boost;
+            $robot_rewards['robot_defense'] = $stat_boost;
+            $robot_rewards['robot_speed'] = $stat_boost;
+            $robot_values['robot_rewards'] = $robot_rewards;
+            //error_log('$robot_level = '.print_r($robot_level, true));
+            //error_log('$robot_class = '.print_r($robot_class, true));
+            //error_log('$robot_values = '.print_r($robot_values, true));
             $battle_background = $map_field_token;
             $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
             $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
@@ -1727,7 +1736,7 @@ class rpg_world {
             //error_log('RANDOM ENCOUNTERS ('.$robot_class.') // $battle_music = '.print_r($battle_music, true));
             $battle_turns = $rewards_matrix[$robot_class]['turns'];
             $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
-            $world_map_encounters[] = array('robot/'.$robot_class, $robot_token, '', $robot_pos, $battle_token, $robot_label);
+            $world_map_encounters[] = array('robot/'.$robot_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label);
             $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                 'token' => $battle_token,
                 'name' => $battle_name,
@@ -1754,7 +1763,8 @@ class rpg_world {
             $distributed_encounters[$robot_token]--;
             if (empty($distributed_encounters[$robot_token])){ $robot_token = ''; }
         }
-        //error_log'$generated_encounters = '.print_r($generated_encounters, true).PHP_EOL);
+        //error_log('$generated_encounters = '.print_r($generated_encounters, true));
+        //error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
         //echo('</pre>'.PHP_EOL);
         //exit();
 
@@ -1800,9 +1810,11 @@ class rpg_world {
                     if (!empty($level) && is_numeric($level) && intval($level) > 0){ $robot_level = $level; }
                     else { $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']); }
                     $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
+                    if (!empty($robot_alt) && !empty($mmrpg_index_types[$robot_alt])){ $robot_item = $robot_alt.'-core'; }
                     $robot_name = $robot_info['robot_name'];
                     $robot_label = $robot_name.' (Lv. '.$robot_level.')';
                     $robot_flags = array();
+                    $robot_values = array();
                     $battle_token = $world_battle_token.'_static-'.$encounter_class.'-'.($robot_key + 1);
                     if ($encounter_class === 'rescue'){
                         $battle_name = $map_name.' '.ucfirst($robot_class).' Rescue';
@@ -1814,6 +1826,12 @@ class rpg_world {
                         if ($encounter_class === 'mecha'){ $battle_description = 'Defeat the '.$robot_name.' support mecha in battle!'; }
                         elseif ($encounter_class === 'master'){ $battle_description = 'Defeat the robot master '.$robot_name.' in battle!'; }
                         elseif ($encounter_class === 'boss'){ $battle_description = 'Defeat '.$robot_name.' the fortress boss in battle!'; }
+                        $stat_boost = ceil($robot_level * ($robot_class === 'boss' ? 4 : ($robot_class === 'master' ? 3 : 2)));
+                        $robot_rewards = array();
+                        $robot_rewards['robot_attack'] = $stat_boost;
+                        $robot_rewards['robot_defense'] = $stat_boost;
+                        $robot_rewards['robot_speed'] = $stat_boost;
+                        $robot_values['robot_rewards'] = $robot_rewards;
                         }
                     $battle_background = $map_field_token;
                     $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
@@ -1909,6 +1927,7 @@ class rpg_world {
                             'level' => $robot_level,
                             'item' => $robot_item,
                             'flags' => $robot_flags,
+                            'values' => $robot_values,
                             ))),
                         'rewards' => $battle_rewards,
                         'flags' => $battle_flags,
