@@ -3617,7 +3617,8 @@ class rpg_robot extends rpg_object {
         // If this is a Copy Core robot, make sure their colour is synced to abilities and held items
         $sync_to_elemental_energy = false;
         if ($this->robot_base_core === 'copy'
-            && $this->robot_base_image === $this->robot_pseudo_token){
+            && !strstr($this->robot_base_image, '_alt')){
+            //&& $this->robot_base_image === $this->robot_pseudo_token){
             //error_log('We must $sync_to_elemental_energy for '.$this->robot_token);
             //error_log('$this->robot_image_alts = '.print_r($this->robot_image_alts, true));
             $sync_to_elemental_energy = true;
@@ -3629,12 +3630,13 @@ class rpg_robot extends rpg_object {
             //error_log('-> core types = '.implode(',', array($this->robot_core, $this->robot_core2)));
             $is_hero_robot = in_array($this->robot_token, array('mega-man', 'bass', 'proto-man')) ? true : false;
             $if_empty_token = $is_hero_robot ? 'alt9' : 'shadow';
+            $clean_base_image = strstr($this->robot_base_image, '_') ? explode('_', $this->robot_base_image)[0] : $this->robot_base_image;
             // If this robot is holding an elemental core, that takes priority
             if ($this->has_item()
                 && substr($this->robot_item, -5, 5) === '-core'){
                 list($core_type) = explode('-', $this->robot_item);
-                if ($core_type !== 'empty'){ $new_image = $this->robot_base_image.'_'.$core_type; }
-                else { $new_image = $this->robot_base_image.'_'.$if_empty_token; }
+                if ($core_type !== 'empty'){ $new_image = $clean_base_image.'_'.$core_type; }
+                else { $new_image = $clean_base_image.'_'.$if_empty_token; }
                 $this->robot_core = $core_type;
                 $this->robot_core2 = 'copy';
                 $this->robot_image = $new_image;
@@ -3648,15 +3650,15 @@ class rpg_robot extends rpg_object {
                     if (empty($types)){ continue; }
                     $ability_type = $types[0];
                     if (!empty($ability_type)){
-                        if ($ability_type !== 'empty'){ $new_image = $this->robot_base_image.'_'.$ability_type; }
-                        else { $new_image = $this->robot_base_image.'_'.$if_empty_token; }
+                        if ($ability_type !== 'empty'){ $new_image = $clean_base_image.'_'.$ability_type; }
+                        else { $new_image = $clean_base_image.'_'.$if_empty_token; }
                         $this->robot_core = $ability_type;
                         $this->robot_core2 = 'copy';
                         $this->robot_image = $new_image;
                     } else {
                         $this->robot_core = 'copy';
                         $this->robot_core2 = '';
-                        $this->robot_image = $this->robot_base_image;
+                        $this->robot_image = $clean_base_image;
                     }
                     //error_log('-> using last ability type '.$ability_type.' for new image '.$this->robot_image);
                     break;
