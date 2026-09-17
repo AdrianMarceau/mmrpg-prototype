@@ -1536,6 +1536,7 @@ class rpg_world {
         //error_log('rpg_world::generate_worldmap_encounters() called!');
 
         // Collect any indexes we're gonna need for this part
+        $mmrpg_index_types = self::get_index('types');
         $mmrpg_index_robots = self::get_index('robots');
         $mmrpg_index_abilities = self::get_index('abilities');
         $mmrpg_index_fields = self::get_index('fields');
@@ -1653,8 +1654,8 @@ class rpg_world {
                 $robot_alt = explode('_', $robot_token)[1];
                 $real_robot_token = explode('_', $robot_token)[0];
             }
-            //error_log(PHP_EOL.'-> next robot = "'.$robot_token.'"');
-            $habitats = !empty($map_habitats[$robot_token]) ? $map_habitats[$robot_token] : '';
+            //error_log('-> next robot = "'.$robot_token.'" ("'.$real_robot_token.'")');
+            $habitats = !empty($map_habitats[$robot_token]) ? $map_habitats[$robot_token] : array();
             //error_log('-> getting random position for robot "'.$robot_token.'" (habitats: '.print_r(implode(',', $habitats), true).')');
             $available = array();
             if (!empty($habitats)){
@@ -1692,6 +1693,7 @@ class rpg_world {
             $robot_class = $robot_info['robot_class'];
             $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']);
             $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
+            if (!empty($robot_alt) && !empty($mmrpg_index_types[$robot_alt])){ $robot_item = $robot_alt.'-core'; }
             $robot_label = $robot_info['robot_name'].' (Lv. '.$robot_level.')';
             $robot_flags = array();
             $robot_values = array();
