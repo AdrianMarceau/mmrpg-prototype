@@ -98,21 +98,9 @@ $allowed_robot_tokens = mmrpg_prototype_robots_unlocked('', true);
 //$allowed_robot_tokens += mmrpg_prototype_robots_unlocked('', true, true);
 //error_log('$allowed_robot_tokens (B) = '.print_r($allowed_robot_tokens, true));
 
-// Define a global constant for what mode we're in
-define('MMRPG_WORLD_IS_DEBUG', true);
-
 // Define defaults for the prototype world data
-if (defined('MMRPG_WORLD_IS_DEBUG')
-    && MMRPG_WORLD_IS_DEBUG === true){
-    $default_world_token = 'debug';
-    $default_map_token = 'debug-area-1';
-    $default_player_maps = array(
-        'dr-lalinde' => 'debug-area-1',
-        'dr-light' => 'debug-area-1e',
-        'dr-wily' => 'debug-area-1w',
-        'dr-cossack' => 'debug-area-1n'
-        );
-} else {
+if (!defined('MMRPG_WORLD_IS_DEBUG')
+    || MMRPG_WORLD_IS_DEBUG === false){
     $default_world_token = 'prototype';
     $default_map_token = 'prototype-area-0';
     $default_player_maps = array(
@@ -120,6 +108,15 @@ if (defined('MMRPG_WORLD_IS_DEBUG')
         'dr-light' => 'light-area-1',
         'dr-wily' => 'wily-area-1',
         'dr-cossack' => 'cossack-area-1'
+        );
+} else {
+    $default_world_token = 'debug';
+    $default_map_token = 'debug-area-1';
+    $default_player_maps = array(
+        'dr-lalinde' => 'debug-area-1',
+        'dr-light' => 'debug-area-1e',
+        'dr-wily' => 'debug-area-1w',
+        'dr-cossack' => 'debug-area-1n'
         );
 }
 $default_player_token = 'player';
