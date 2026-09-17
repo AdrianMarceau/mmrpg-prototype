@@ -2176,10 +2176,10 @@ class rpg_item extends rpg_object {
                 'frame' => 'summon',
                 'success' => array(0, 40, -2, 99,
                     $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
-                    $target_robot->print_name().' is given the '.$this_item->print_name().'!'
+                    $this_robot->print_name().' is given the '.$this_item->print_name().'!'
                     )
                 ));
-            $target_robot->trigger_target($target_robot, $this_item);
+            $this_robot->trigger_target($this_robot, $this_item);
 
         }
         // Otherwise, we should display it as the robot using the item themselves
@@ -2189,10 +2189,10 @@ class rpg_item extends rpg_object {
             $this_item->target_options_update(array(
                 'frame' => 'summon',
                 'success' => array(0, 40, -2, 99,
-                    $target_robot->print_name().' uses the '.$this_item->print_name().'!'
+                    $this_robot->print_name().' uses the '.$this_item->print_name().'!'
                     )
                 ));
-            $target_robot->trigger_target($target_robot, $this_item);
+            $this_robot->trigger_target($this_robot, $this_item);
 
         }
 
@@ -2208,17 +2208,17 @@ class rpg_item extends rpg_object {
         // Loop through each stat reset token and apply the reset
         $stats_reset = 0;
         foreach ($stat_reset_tokens AS $stat_token){
-            if (!empty($target_robot->counters[$stat_token.'_mods'])){
+            if (!empty($this_robot->counters[$stat_token.'_mods'])){
 
                 // Call the global stat reset function with customized options
-                rpg_ability::ability_function_stat_reset($target_robot, $stat_token, $this_item, array(
+                rpg_ability::ability_function_stat_reset($this_robot, $stat_token, $this_item, array(
                     'is_fixed_amount' => true,
                     'skip_canvas_header' => true
                 ));
 
                 // Clear the applied history counters so the robot's slate is entirely clean
-                if (isset($target_robot->counters[$stat_token.'_breaks_applied'])){ unset($target_robot->counters[$stat_token.'_breaks_applied']); }
-                if (isset($target_robot->counters[$stat_token.'_boosts_applied'])){ unset($target_robot->counters[$stat_token.'_boosts_applied']); }
+                if (isset($this_robot->counters[$stat_token.'_breaks_applied'])){ unset($this_robot->counters[$stat_token.'_breaks_applied']); }
+                if (isset($this_robot->counters[$stat_token.'_boosts_applied'])){ unset($this_robot->counters[$stat_token.'_boosts_applied']); }
 
                 $stats_reset++;
             }
@@ -2229,11 +2229,11 @@ class rpg_item extends rpg_object {
             $this_item->target_options_update(array(
                 'frame' => 'defend',
                 'success' => array(9, 40, -2, 99,
-                    $target_robot->print_name().'\'s stats are already normal! <br />'.
+                    $this_robot->print_name().'\'s stats are already normal! <br />'.
                     'The item had no effect&hellip;'
                     )
                 ));
-            $target_robot->trigger_target($target_robot, $this_item);
+            $this_robot->trigger_target($this_robot, $this_item);
         }
 
         // Return true on success
