@@ -464,7 +464,8 @@ echo('<pre>'.PHP_EOL);
                 $npc_x = $area_size_width - $area_padding;
                 $npc_y = $area_size_height - $area_padding;
                 $npc_pos = $npc_x.'-'.$npc_y;
-                $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, default)';
+                $npc_ver = in_array('player-platform', $area_objects) ? 'first-encounter' : 'default';
+                $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, '.$npc_ver.')';
                 // Add him to the protected zones so encounters/items don't spawn on him
                 $protected_zones['purple-reset-dude-buffer'] = $npc_pos;
             }
