@@ -2,6 +2,10 @@
 // Define a function for generating an ability set for a given robot
 function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1, $robot_item = ''){
     global $db;
+    //error_log('mmrpg_prototype_generate_abilities() called for "'.$robot_info['robot_token'].'" ... ');
+    //error_log('&/ $robot_info = '.print_r(json_encode($robot_info, JSON_NUMERIC_CHECK), true));
+    //error_log('w/ $robot_level = '.print_r($robot_level, true).' | $ability_num = '.print_r($ability_num, true));
+    //error_log('&/ $robot_item = '.print_r($robot_item, true));
 
     // Define the static variables for the ability lists
     static $mmrpg_prototype_core_abilities;
@@ -80,6 +84,8 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
     // Check to see if this robot has any ability generation flags
     $flags = !empty($robot_info['flags']) ? $robot_info['flags'] : array();
+    if (!empty($flags) && !isset($flags[0])){ $flags = array_keys(array_filter($flags)); }
+    //error_log('&/ $flags = '.print_r($flags, true));
     $image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
     $image_alt = ''; if (strstr($image, '_')){ $image_alt = explode('_', $image)[1]; $image = explode('_', $image)[0]; }
     //error_log('$image = '.$image.' | $image_alt = '.$image_alt);
@@ -346,6 +352,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         }
         */
 
+        /*
         // Define the last addon array which will have alternating values
         $temp_addons_final = array();
         $temp_count_weapons_added = 0;
@@ -359,6 +366,21 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 break;
             }
         }
+        */
+
+        // Merge alternating values properly
+        $temp_addons_final = array();
+        $weapons_count = count($this_robot_abilities_addons['weapons']);
+        $support_count = count($this_robot_abilities_addons['support']);
+        $max_count = max($weapons_count, $support_count);
+        for ($i = 0; $i < $max_count; $i++) {
+            if (isset($this_robot_abilities_addons['support'][$i])) {
+                $temp_addons_final[] = $this_robot_abilities_addons['support'][$i];
+            }
+            if (isset($this_robot_abilities_addons['weapons'][$i])) {
+                $temp_addons_final[] = $this_robot_abilities_addons['weapons'][$i];
+            }
+        }
 
         // Combine the two arrays into one again
         //$this_robot_abilities = array_merge($this_robot_abilities_addons['base'], $this_robot_abilities_addons['weapons'], $this_robot_abilities_addons['support']);
@@ -369,10 +391,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     }
 
     // If this robot truly has no abilities (which is bad), give them the buster shot
-    if (empty($this_robot_abilities)){ $this_robot_abilities[] = 'buster-shot'; }
+    if (empty($this_robot_abilities)){ $this_robot_abilities[] = 'buster-shot'; error_log('-> no abilities! compensating w/ buster-shot'); }
 
     // Return the ability array, whatever it was
-    //error_log('robot '.$image.($image_alt ? '_'.$image_alt : '').' abilities >> '.PHP_EOL.implode(', ', $this_robot_abilities));
+    //error_log('-> '.$image.($image_alt ? '_'.$image_alt : '').' abilities >> '.implode(', ', $this_robot_abilities));
     return $this_robot_abilities;
 }
 
