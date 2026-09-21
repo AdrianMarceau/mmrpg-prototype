@@ -133,7 +133,11 @@ echo('<pre>'.PHP_EOL);
         // TEMP TEMP TEMP
         // Define a list of fields that don't have textures made yet (and/or map isn't done)
         $map_tiles_missing_for = [
-            'crystal-catacombs', 'gemstone-cavern'
+            'crystal-catacombs', 'gemstone-cavern', 'sparkling-grotto',
+            'verdant-rainforest', 'savage-menagerie',
+            'frosty-slopes', 'frozen-boulevard',
+            'solar-inferno', 'baseball-stadium',
+            'balloon-playground',
             ];
         // TEMP TEMP TEMP
 
