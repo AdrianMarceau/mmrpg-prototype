@@ -803,7 +803,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '13-13',
         'level' => 60,
         'element' => 'swift',
-        'field' => '',
+        'field' => 'balloon-playground',
         'encounters' => ['bounce-man'],
         'encounters2' => ['tosanaizer-v', 'ballonboo', 'pukapunter', 'coiln'],
         'items' => ['weapon-tank'],
