@@ -21,6 +21,8 @@ gameSettings.worldConfig = {
     mapSubName: '',
     mapImage: 'undefined.png',
     mapFiles: 'undefined/',
+    mapBlockFiles: 'images/fields/{image}/battle-field_block.png',
+    mapTerrainFiles: 'images/fields/{image}/battle-field_terrain.png',
     mapField: 'field',
     mapSize: [10, 10],
     mapTileSize: [80, 80],
@@ -768,17 +770,24 @@ class mmrpgWorldMap {
             if (Array.isArray(tileInfo[0])){ continue; }
             let tileInfoAttrs = {isWalkable: true, isVoid: false, isWater: false};
             //console.log('typeof tileInfo for tileToken "' + tileToken + '" =', typeof tileInfo, '\n-> w/ value:', tileInfo);
-            (function(indexOfNotWalkable){
-                if (indexOfNotWalkable < 0){ return; }
+            // Manually check for and extract the 'not-walkable' flag
+            let indexOfNotWalkable = tileInfo.indexOf('not-walkable');
+            if (indexOfNotWalkable > -1){
                 tileInfoAttrs.isWalkable = false;
                 tileInfo.splice(indexOfNotWalkable, 1);
-                })(tileInfo.indexOf('not-walkable'));
-                let tileInfoImage = false;
-                let indexOfImage = tileInfo.findIndex(item => typeof item === 'string' && item.match(/\.(png|gif|jpg)$/i));
-                if (indexOfImage > -1){
-                    tileInfoImage = tileInfo[indexOfImage];
-                    tileInfo.splice(indexOfImage, 1);
-                    }
+                }
+            // Extract the image filename OR token/slug
+            let tileInfoImage = false;
+            // Since 'not-walkable' is gone, any remaining string is your image token
+            let indexOfImage = tileInfo.findIndex(item => typeof item === 'string');
+            // Fallback: Just in case a token is somehow formatted as a number,
+            // we apply your counting logic (grabbing the 5th argument at index 4)
+            if (indexOfImage === -1 && tileInfo.length > 4){ indexOfImage = 4; }
+            // If we found an image/token, extract it and cleanly remove it from the array
+            if (indexOfImage > -1){
+                tileInfoImage = tileInfo[indexOfImage];
+                tileInfo.splice(indexOfImage, 1);
+                }
             let tileInfoOffset = [tileInfo[0] || 0, tileInfo[1] || 0];
             let tileInfoSize = [tileInfo[2] || tileSize[0], tileInfo[3] || tileSize[1]];
             let newTileInfo = [tileInfoOffset, tileInfoSize, tileInfoAttrs, tileInfoImage];
@@ -950,8 +959,12 @@ class mmrpgWorldMap {
             if (!_self.imageCache){ _self.imageCache = {}; }
             if (!_self.imageCache[tileSpriteImage]){
                 let img = new Image();
+                // 1. Ensure we only have the raw token/slug (strip any accidental extensions)
+                let imageToken = tileSpriteImage.replace(/\.[^/.]+$/, "");
+                // 2. Build the URL using your new template, replacing {image} with the token
+                let imageUrl = _config.mapTerrainFiles.replace('{image}', imageToken);
                 img.onload = function(){
-                    // 2. Mark ALL tiles using this image as dirty so they all render
+                    // 3. Mark ALL tiles using this image as dirty so they all render
                     let layerTiles = _world.layerTilesIndex[layerToken];
                     if (layerTiles){
                         for (let k in layerTiles){
@@ -962,12 +975,14 @@ class mmrpgWorldMap {
                         }
                     _self.refreshCanvasTiles(layerToken);
                     };
-                img.src = _config.mapFiles + tileSpriteImage;
+                // 4. Use the newly built URL
+                img.src = imageUrl;
+                // Keep using the original token/string for the cache key
                 _self.imageCache[tileSpriteImage] = img;
                 }
             let cachedImg = _self.imageCache[tileSpriteImage];
             if (cachedImg.complete && cachedImg.naturalWidth > 0){
-                tileSpriteSheet = cachedImg; // 3. Override ONLY the tile's sprite sheet
+                tileSpriteSheet = cachedImg; // 5. Override ONLY the tile's sprite sheet
                 } else {
                 return false; // Skip drawing this tile until the onload event fires
                 }
