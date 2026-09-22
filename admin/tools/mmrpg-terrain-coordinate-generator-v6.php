@@ -208,7 +208,6 @@ echo "#---------------------------# \n";
 echo "@token    = mmrpg-overworld-2k25-v6 \n";
 echo "@name     = MMRPG Overworld (2k25) (v6) \n";
 echo "@image    = mmrpg-overworld-2k25_terrain-tiles-v6.png \n";
-echo "@files    = mmrpg-overworld-2k25_terrain-tiles-v6/ \n";
 echo "@size     = 80 x 80 \n";
 echo "#---------------------------#\n";
 echo $defaultMarkup." \n";

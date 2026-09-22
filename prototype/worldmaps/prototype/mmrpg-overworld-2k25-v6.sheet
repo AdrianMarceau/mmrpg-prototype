@@ -4,7 +4,6 @@
 @token    = mmrpg-overworld-2k25-v6
 @name     = MMRPG Overworld (2k25) (v6)
 @image    = mmrpg-overworld-2k25_terrain-tiles-v6.png
-@files    = mmrpg-overworld-2k25_terrain-tiles-v6/
 @size     = 80 x 80
 #---------------------------#
 #---------------------------#
