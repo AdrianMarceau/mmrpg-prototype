@@ -147,7 +147,8 @@ echo('<pre>'.PHP_EOL);
             $area_file_name = $area_token.'.map';
             $area_file_dir = $world_map_filedir.$area_file_name;
 
-            $area_sheet = 'mmrpg-overworld-2k25-v3';
+            //$area_sheet = 'mmrpg-overworld-2k25-v3';
+            $area_sheet = 'mmrpg-overworld-2k25-v6';
             $area_name = !empty($area_info['name']) ? $area_info['name'] : '[Undefined]';
             $area_subname = !empty($area_info['subname']) ? $area_info['subname'] : '';
             $area_type = !empty($area_info['element']) ? $area_info['element'] : 'none';
