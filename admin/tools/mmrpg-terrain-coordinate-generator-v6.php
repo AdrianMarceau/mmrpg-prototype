@@ -139,12 +139,26 @@ $grid = [
         'robosaur-boneyard',
         'satellite-deck',
         'trenchwork-depot',
-        'haunted-mansion',
+        'crystal-catacombs',
         'sunset-gulch',
-        'waterwork-damn',
+        'haunted-mansion',
+        'waterworks-dam',
         'minefield-dunes',
         'glacier-cradle',
+        'verdant-rainforest',
+    ],
+
+    // GROUP 10
+    [
+        'frost-slopes',
+        'gemstone-cavern',
         'sonic-highway',
+        'baseball-stadium',
+        'solar-inferno',
+        'savage-menagerie',
+        'frozen-boulevard',
+        'sparkling-grotto',
+        'balloon-playground',
     ],
 
 ];
@@ -220,7 +234,7 @@ foreach ($grid as $rowIndex => $row) {
         $baseY = $defaultStartY; //$defaultStartY + ($rowIndex * $blockSizeY);
 
         // 1. Output the main container tile
-        echo "@tiles[]    = {$name}({$currentId}, {$baseX}, {$baseY}, {$name}.png{$flags})\n";
+        echo "@tiles[]    = {$name}({$currentId}, {$baseX}, {$baseY}, {$name}{$flags})\n";
 
         // 2. Output the 16 sub-tiles
         foreach ($subOffsets as $i => $offset) {
@@ -228,7 +242,7 @@ foreach ($grid as $rowIndex => $row) {
             $subX = $baseX + $offset[0];
             $subY = $baseY + $offset[1];
 
-            echo "@tiles[]    = {$name}-{$i}({$currentId}{$subChar}, {$subX}, {$subY}, {$name}.png{$flags})\n";
+            echo "@tiles[]    = {$name}-{$i}({$currentId}{$subChar}, {$subX}, {$subY}, {$name}{$flags})\n";
         }
 
         echo "#---------------------------#\n";
