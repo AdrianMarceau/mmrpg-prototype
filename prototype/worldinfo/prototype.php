@@ -1249,7 +1249,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'water',
         'field' => '',
         'encounters' => ['burst-man', 'aqua-man', 'acid-man'],
-        'encounters2' => ['shell-n', 'pipetto', 'bombomb'],
+        'encounters2' => ['shelln', 'pipetto', 'bombomb'],
         'items' => ['alchemy-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['west']
