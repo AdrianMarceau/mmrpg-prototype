@@ -1291,6 +1291,22 @@
                                             'width' => 100,
                                             'height' => 100
                                             );
+                                        $field_files_required[] = array(
+                                            'label' => 'block image',
+                                            'help' => 'image used overworld and battle super blocks',
+                                            'path' => $field_file_path,
+                                            'name' => 'battle-field_block.png',
+                                            'width' => 80,
+                                            'height' => 80
+                                            );
+                                        $field_files_required[] = array(
+                                            'label' => 'terrain image',
+                                            'help' => 'bitmask image with all required terrain tiles',
+                                            'path' => $field_file_path,
+                                            'name' => 'battle-field_terrain.png',
+                                            'width' => 320,
+                                            'height' => 320
+                                            );
 
                                         // Loop through required files and display filebars for them
                                         foreach ($field_files_required AS $file_key => $filebar_info){
