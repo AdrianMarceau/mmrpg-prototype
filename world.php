@@ -907,6 +907,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
                 $data['map_name'] = $map_data_parsed['name'];
                 $data['map_subname'] = $map_data_parsed['subname'];
                 $data['map_image'] = 'images/maps/'.(!empty($map_data_parsed['sheet']) ? $map_data_parsed['sheet'] : 'undefined.png');
+                $data['map_files'] = 'images/maps/'.(!empty($map_data_parsed['files']) ? $map_data_parsed['files'] : 'undefined/');
                 $data['map_field'] = $map_field_token;
                 $data['map_size'] = array($map_col_size, $map_row_size);
                 $data['tile_size'] = array($map_tile_width, $map_tile_height);
@@ -1170,10 +1171,10 @@ unset($db);
 ?>
 <?
 // DEBUG DEBUG DEBUG
-echo('<!-- [[debug]] --//'.PHP_EOL);
-echo('  -> $world_data_parsed = '.trim(print_r($world_data_parsed, true)).PHP_EOL);
-echo('  -> $map_data_parsed = '.trim(print_r($map_data_parsed, true)).PHP_EOL);
-echo('//-- [[debug]] -->'.PHP_EOL);
+//echo('<!-- [[debug]] --//'.PHP_EOL);
+//echo('  -> $world_data_parsed = '.trim(print_r($world_data_parsed, true)).PHP_EOL);
+//echo('  -> $map_data_parsed = '.trim(print_r($map_data_parsed, true)).PHP_EOL);
+//echo('//-- [[debug]] -->'.PHP_EOL);
 // DEBUG DEBUG DEBUG
 ?>
 </body>

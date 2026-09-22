@@ -1010,16 +1010,19 @@ class rpg_world {
                     $map_sprites = !empty($map_data_parsed['sprites']) ? $map_data_parsed['sprites'] : array();
                     $map_sprites_keys = !empty($map_sprites['keys']) ? $map_sprites['keys'] : array();
                     $sheet_image = !empty($sheet_data_parsed['image']) ? $sheet_data_parsed['image'] : '';
+                    $sheet_files = !empty($sheet_data_parsed['files']) ? $sheet_data_parsed['files'] : '';
                     $sheet_size = !empty($sheet_data_parsed['size']) ? $sheet_data_parsed['size'] : array();
                     $sheet_tiles = !empty($sheet_data_parsed['tiles']) ? $sheet_data_parsed['tiles'] : array();
                     $sheet_tiles_keys = !empty($sheet_tiles['keys']) ? $sheet_tiles['keys'] : array();
                     $sheet_sprites = !empty($sheet_data_parsed['sprites']) ? $sheet_data_parsed['sprites'] : array();
                     $sheet_sprites_keys = !empty($sheet_sprites['keys']) ? $sheet_sprites['keys'] : array();
                     if (!empty($sheet_image)){ $map_sheet = $sheet_image; }
+                    if (!empty($sheet_files)){ $map_files = $sheet_files; }
                     if (!empty($sheet_size)){ list($x, $y) = $map_size; list($w, $h) = $sheet_size; $map_size = array($x, $y, $w, $h); }
                     if (!empty($sheet_tiles)){ $map_tiles = array_merge($map_tiles, $sheet_tiles); $map_tiles['keys'] = $map_tiles_keys + $sheet_tiles_keys; }
                     if (!empty($sheet_sprites)){ $map_sprites = array_merge($map_sprites, $sheet_sprites); $map_sprites['keys'] = $map_sprites_keys + $sheet_sprites_keys; }
                     $map_data_parsed['sheet'] = $map_sheet;
+                    $map_data_parsed['files'] = $map_files;
                     $map_data_parsed['size'] = $map_size;
                     $map_data_parsed['tiles'] = $map_tiles;
                     $map_data_parsed['sprites'] = $map_sprites;
@@ -1148,7 +1151,7 @@ class rpg_world {
         }
         //error_log('$sheet_data_vars = '.print_r($sheet_data_vars, true));
         // Review and process the sheet layer data
-        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]+),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,!]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
+        $sheet_tiles_custval_regex = '/^([.a-z0-9-_]+)\(([a-z0-9]+),(-?[.0-9]+),(-?[.0-9]+)(,\s?[-_a-z0-9,!\.]+)?\)$/i'; // syntax: name(key,x,y) ie. void(0,20,20) => name:void, key:0, x:20, y:20
         $sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)(,[-_a-z0-9,]+)?\)$/i'; // syntax: name(x,y[,flag1,flag2,etc.]) ie. spawn(4,4) or spawn(4,4,other-area-2) => name:spawn, x:4, y:4
         $sheet_listval_custval_regex = '/^([.a-z0-9-_]+)\(([,a-z0-9-_]+)\)/i'; // syntax: name(token1,token2,token3) ie. spawn(token1,token2,token3) => name:spawn, tokens:token1,token2,token3
         //$sheet_other_custval_regex = '/^([.a-z0-9-_]+)\((-?[.0-9]+),(-?[.0-9]+)\)$/i'; // syntax: name(x,y) ie. spawn(4,4) => name:spawn, x:4, y:4
@@ -1167,7 +1170,7 @@ class rpg_world {
                     $is_listval_custval = preg_match($sheet_listval_custval_regex, $line);
                     if (!$is_tile_custval && !$is_other_custval && !$is_listval_custval){ continue; }
                     if ($is_tile_custval){
-                        $exploded = explode(',', preg_replace($sheet_tiles_custval_regex, '$1,$2,$3,$4'.'$5', $line), 5);
+                        $exploded = explode(',', preg_replace($sheet_tiles_custval_regex, '$1,$2,$3,$4'.'$5', $line)); //, 5
                         list($name, $k) = $exploded;
                         $values = array_slice($exploded, 2);
                         //error_log('raw $line ='.print_r($line, true));
@@ -1206,6 +1209,7 @@ class rpg_world {
         $sheet_data_vars['name'] = isset($sheet_data_vars['name']) ? $sheet_data_vars['name'] : '';
         $sheet_data_vars['size'] = isset($sheet_data_vars['size']) ? $sheet_data_vars['size'] : '';
         $sheet_data_vars['image'] = isset($sheet_data_vars['image']) ? $sheet_data_vars['image'] : '';
+        $sheet_data_vars['files'] = isset($sheet_data_vars['files']) ? $sheet_data_vars['files'] : '';
         $sheet_data_vars['tiles'] = isset($sheet_data_vars['tiles']) ? $sheet_data_vars['tiles'] : array();
         $sheet_data_vars['sprites'] = isset($sheet_data_vars['sprites']) ? $sheet_data_vars['sprites'] : array();
         if (empty($sheet_data_vars['world'])){ $sheet_data_vars['world'] = $world_token; }
@@ -1213,6 +1217,7 @@ class rpg_world {
         if (empty($sheet_data_vars['name'])){ $sheet_data_vars['name'] = 'Undefined'; }
         if (empty($sheet_data_vars['size'])){ $sheet_data_vars['size'] = '0 x 0'; }
         if (empty($sheet_data_vars['image'])){ $sheet_data_vars['image'] = 'undefined.png'; }
+        if (empty($sheet_data_vars['files'])){ $sheet_data_vars['files'] = 'undefined/'; }
         if (!empty($sheet_data_vars['size'])){ $sheet_data_vars['size'] = explode('x', str_replace(' ', '', $sheet_data_vars['size'])); }
         if (!isset($sheet_data_vars['size'][0])){ $sheet_data_vars['size'][0] = $sheet_tilesize; }
         if (!isset($sheet_data_vars['size'][1])){ $sheet_data_vars['size'][1] = $sheet_tilesize; }
@@ -1227,6 +1232,7 @@ class rpg_world {
         $sheet_data_parsed['name'] = $sheet_data_vars['name']; unset($sheet_data_vars['name']);
         $sheet_data_parsed['size'] = $sheet_data_vars['size']; unset($sheet_data_vars['size']);
         $sheet_data_parsed['image'] = $sheet_data_vars['image']; unset($sheet_data_vars['image']);
+        $sheet_data_parsed['files'] = $sheet_data_vars['files']; unset($sheet_data_vars['files']);
         $sheet_data_parsed['tiles'] = $sheet_data_vars['tiles']; unset($sheet_data_vars['tiles']);
         $sheet_data_parsed['sprites'] = $sheet_data_vars['sprites']; unset($sheet_data_vars['sprites']);
         if (!empty($sheet_data_vars)){ $sheet_data_parsed['vars'] = $sheet_data_vars; }

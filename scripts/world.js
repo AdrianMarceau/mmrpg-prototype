@@ -20,6 +20,7 @@ gameSettings.worldConfig = {
     mapName: 'Undefined Map',
     mapSubName: '',
     mapImage: 'undefined.png',
+    mapFiles: 'undefined/',
     mapField: 'field',
     mapSize: [10, 10],
     mapTileSize: [80, 80],
@@ -452,10 +453,12 @@ class mmrpgWorldMap {
         let mapName = mapData.map_name || false;
         let mapSubName = mapData.map_subname || false;
         let mapImage = mapData.map_image || false;
+        let mapFiles = mapData.map_files || false;
         let mapField = mapData.map_field || 'field';
         let mapSize = mapData.map_size || false;
         let tileSize = mapData.tile_size || false;
         let tilesIndex = mapData.tiles_index || false;
+        //console.log('parsed tilesIndex! ', JSON.parse(JSON.stringify(tilesIndex)));
         let groupsIndex = mapData.groups_index || false;
         let spritesIndex = mapData.sprites_index || false;
         //let portalsIndex = mapData.portals_index || {};
@@ -476,6 +479,7 @@ class mmrpgWorldMap {
         _config.mapName = mapName || defaultMapName;
         _config.mapSubName = mapSubName || '';
         _config.mapImage = mapImage;
+        _config.mapFiles = mapFiles;
         _config.mapField = mapField;
         _config.mapSize = [parseInt(mapSize[0]), parseInt(mapSize[1])];
         _config.mapTileSize = [parseInt(tileSize[0]), parseInt(tileSize[1])];
@@ -769,9 +773,15 @@ class mmrpgWorldMap {
                 tileInfoAttrs.isWalkable = false;
                 tileInfo.splice(indexOfNotWalkable, 1);
                 })(tileInfo.indexOf('not-walkable'));
+                let tileInfoImage = false;
+                let indexOfImage = tileInfo.findIndex(item => typeof item === 'string' && item.match(/\.(png|gif|jpg)$/i));
+                if (indexOfImage > -1){
+                    tileInfoImage = tileInfo[indexOfImage];
+                    tileInfo.splice(indexOfImage, 1);
+                    }
             let tileInfoOffset = [tileInfo[0] || 0, tileInfo[1] || 0];
             let tileInfoSize = [tileInfo[2] || tileSize[0], tileInfo[3] || tileSize[1]];
-            let newTileInfo = [tileInfoOffset, tileInfoSize, tileInfoAttrs];
+            let newTileInfo = [tileInfoOffset, tileInfoSize, tileInfoAttrs, tileInfoImage];
             tilesIndex[tileToken] = newTileInfo;
             }
         let tileDataKeys = Object.keys(canvasTiles);
@@ -818,7 +828,7 @@ class mmrpgWorldMap {
                 }
             let tileSpriteInfo = tilesIndex[tileSpriteToken];
             if (!tileSpriteInfo){ console.error('indexCanvasTileData() missing tileSpriteInfo for tileKey:', tileKey, 'and tileValue:', tileValue, 'and bitMask:', tileSpriteBitmask); continue; }
-            let tileSpriteOffset = tileSpriteInfo[0], tileSpriteSize = tileSpriteInfo[1], tileSpriteAttrs = tileSpriteInfo[2];
+            let tileSpriteOffset = tileSpriteInfo[0], tileSpriteSize = tileSpriteInfo[1], tileSpriteAttrs = tileSpriteInfo[2], tileSpriteImage = tileSpriteInfo[3];
             let tileSpritePosition = [tilePos[0], tilePos[1], ((tilePos[0] - 1) * tileSpriteSize[0]), ((tilePos[1] - 1) * tileSpriteSize[1])];
             let tileSpriteEffects = {grid: true, hover: false, outline: false, focus: false, active: false}; // default values
             let tileIsVoid = tileSpriteToken === 'void' || tileSpriteToken.indexOf('void-') === 0 ? true : false;
@@ -831,7 +841,7 @@ class mmrpgWorldMap {
             let tilesIndexData = typeof thisLayerTiles[tileKey] !== 'undefined' ? thisLayerTiles[tileKey] : {};
             tilesIndexData.position = tileSpritePosition;
             tilesIndexData.effects = tileSpriteEffects;
-            tilesIndexData.sprite = [tileSpriteKey, tileSpriteToken, tileSpriteOffset, tileSpriteSize];
+            tilesIndexData.sprite = [tileSpriteKey, tileSpriteToken, tileSpriteOffset, tileSpriteSize, tileSpriteImage];
             tilesIndexData.walkable = tileSpriteAttrs.isWalkable;
             tilesIndexData.dirty = false; // indicates if the tile has been changed since last draw
             //console.log('---> tilesIndexData =', tilesIndexData);
@@ -925,11 +935,44 @@ class mmrpgWorldMap {
         let tileSpriteToken = tileSprite[1];
         let tileSpriteOffset = tileSprite[2];
         let tileSpriteSize = tileSprite[3];
+        let tileSpriteImage = tileSprite[4];
+        let baseSpriteSheet = spriteSheet;
+        let tileSpriteSheet = spriteSheet;
         //console.log('-> tileSprite =', tileSprite);
         //console.log('-> tileSpriteKey =', tileSpriteKey);
         //console.log('-> tileSpriteToken =', tileSpriteToken);
         //console.log('-> tileSpriteOffset =', tileSpriteOffset);
         //console.log('-> tileSpriteSize =', tileSpriteSize);
+        //console.log('-> tileSpriteImage =', tileSpriteImage);
+
+        // Intercept and lazy-load individual tile files
+        if (tileSpriteImage){
+            if (!_self.imageCache){ _self.imageCache = {}; }
+            if (!_self.imageCache[tileSpriteImage]){
+                let img = new Image();
+                img.onload = function(){
+                    // 2. Mark ALL tiles using this image as dirty so they all render
+                    let layerTiles = _world.layerTilesIndex[layerToken];
+                    if (layerTiles){
+                        for (let k in layerTiles){
+                            if (layerTiles[k].sprite && layerTiles[k].sprite[4] === tileSpriteImage){
+                                layerTiles[k].dirty = true;
+                                }
+                            }
+                        }
+                    _self.refreshCanvasTiles(layerToken);
+                    };
+                img.src = _config.mapFiles + tileSpriteImage;
+                _self.imageCache[tileSpriteImage] = img;
+                }
+            let cachedImg = _self.imageCache[tileSpriteImage];
+            if (cachedImg.complete && cachedImg.naturalWidth > 0){
+                tileSpriteSheet = cachedImg; // 3. Override ONLY the tile's sprite sheet
+                } else {
+                return false; // Skip drawing this tile until the onload event fires
+                }
+            }
+
         // define some internal methods we can use for effect-drawingoptimization
         let _saveDrawRestore = function(callback){
             ctx.save(); callback.call(this); ctx.restore();
@@ -942,7 +985,7 @@ class mmrpgWorldMap {
                 //ctx.globalCompositeOperation = typeof composite === 'string' ? composite : 'source-atop';
                 //ctx.globalCompositeOperation = 'source-atop'; // TEMP TEMP TEMP
                 //console.log('-> drawing sprite[' + layerToken + '/' + tileKey + '] w/', '\n-> globalAlpha = ', ctx.globalAlpha, '\n-> globalCompositeOperation =', ctx.globalCompositeOperation);
-                ctx.drawImage(spriteSheet,
+                ctx.drawImage(baseSpriteSheet,
                     spriteData[0], spriteData[1], // source offset
                     tileSpriteSize[0], tileSpriteSize[1], // source size
                     tilePosition[2], tilePosition[3], // destination offset
@@ -971,7 +1014,7 @@ class mmrpgWorldMap {
         //console.log('---> tile[' + layerToken + '/' + tileKey + ']::tileIsVoid =', tileIsVoid);
         // sprite: draw the main tile sprite at the correct position
         if (tileIsWater){ ctx.globalAlpha = 0.3; }
-        ctx.drawImage(spriteSheet,
+        ctx.drawImage(tileSpriteSheet,
             tileSpriteOffset[0], tileSpriteOffset[1], // source offset
             tileSpriteSize[0], tileSpriteSize[1], // source size
             tilePosition[2], tilePosition[3], // destination offset
@@ -1588,7 +1631,6 @@ class mmrpgWorldMap {
         allAffectedTiles.forEach(tileKey => {
             let tileData = terrainTilesIndex[tileKey];
             if (!tileData) return; // Skip if tile is out of bounds
-            //let baseTerrain = tileData.sprite[1].split('-')[0];
             let baseTerrain = tileData.sprite[1].replace(/-[0-9]+$/, '');
             let finalTerrainToken = this.calculateTileBitmask(tileKey, baseTerrain);
             let terrainSpriteData = mapTilesIndex[finalTerrainToken] || false;
@@ -1596,11 +1638,13 @@ class mmrpgWorldMap {
             let terrainSpriteOffset = this.getClonedObject(terrainSpriteData[0]);
             let terrainSpriteSize = this.getClonedObject(terrainSpriteData[1]);
             let terrainSpriteAttrs = this.getClonedObject(terrainSpriteData[2]);
+            let terrainSpriteImage = terrainSpriteData[3] || false; // Extract the image filename
             let terrainIsWalkable = terrainSpriteAttrs.isWalkable ? true : false;
             // Apply the final validated sprite data to terrain_0
             tileData.sprite[1] = finalTerrainToken;
             tileData.sprite[2] = [terrainSpriteOffset[0], terrainSpriteOffset[1]];
             tileData.sprite[3] = [terrainSpriteSize[0], terrainSpriteSize[1]];
+            tileData.sprite[4] = terrainSpriteImage; // Preserve the image filename in the sprite array
             tileData.walkable = terrainIsWalkable;
             tileData.effects.grid = terrainIsWalkable;
             tileData.dirty = true;
@@ -1760,6 +1804,8 @@ class mmrpgWorldMap {
             thisLayerTiles[tileKey] = tileData; // reassign the tile data
             }
         layerTilesIndex[layerToken] = thisLayerTiles; // reassign the layer tiles index
+        // Sync these updates to the minimap if a terrain layer was just redrawn
+        if (layerToken.indexOf('terrain') !== -1){ _self.refreshMiniMapTerrain(); }
         return true;
         }
 
@@ -4473,36 +4519,11 @@ class mmrpgWorldMap {
 
                 // Create a single composite canvas for the area mini-map
                 let $areaTerrainCanvas = $('<canvas class="terrain" width="' + baseTerrainWidth + '" height="' + baseTerrainHeight + '"></canvas>');
-                let areaTerrainContext = $areaTerrainCanvas.get(0).getContext('2d');
-                // The canvases are in DOM order (-1, 0, 1) but have descending z-indexes (2, 1, 0).
-                // We draw them in reverse DOM order so the lowest z-index is drawn first, building up to the top layer.
-                let canvasesToDraw = $baseTerrainCanvas.get().reverse();
-                for (let i = 0; i < canvasesToDraw.length; i++) {
-                    areaTerrainContext.drawImage(canvasesToDraw[i], 0, 0);
-                    }
-                // Use 'destination-out' to erase (make transparent) non-walkable tiles from the terrain canvas
-                let masterTiles = _world.layerTilesIndex['terrain'] || {};
-                areaTerrainContext.globalCompositeOperation = 'destination-out';
-                // 0.65 makes it 65% transparent. Change to 1.0 if we want the terrain completely invisible here.
-                areaTerrainContext.fillStyle = 'rgba(0, 0, 0, 0.65)';
-                for (let row = 1; row <= _config.mapRows; row++){
-                    for (let col = 1; col <= _config.mapCols; col++){
-                        let tileKey = col + '-' + row;
-                        let tileData = masterTiles[tileKey];
-                        if (!tileData || !tileData.walkable){
-                            // Note: Use full tile size, since this canvas is drawn at full resolution before CSS scaling
-                            let tileWidth = _config.mapTileSize[0];
-                            let tileHeight = _config.mapTileSize[1];
-                            let x = Math.round((col - 1) * tileWidth);
-                            let y = Math.round((row - 1) * tileHeight);
-                            areaTerrainContext.fillRect(x, y, tileWidth, tileHeight);
-                            }
-                        }
-                    }
-                // Reset composite operation back to normal
-                areaTerrainContext.globalCompositeOperation = 'source-over';
                 $areaImage.append($areaTerrainCanvas);
                 $areaViewportTerrain = $areaTerrainCanvas;
+
+                // Draw the initial state of the minimap terrain
+                _self.refreshMiniMapTerrain();
 
                 // Create a secondary canvas for adding dots/markers/symbols on top of the terrain
                 let $areaOverlayCanvas = $('<canvas class="overlay" width="' + miniTerrainWidth + '" height="' + miniTerrainHeight + '"></canvas>');
@@ -4572,6 +4593,52 @@ class mmrpgWorldMap {
         // Return true on success
         return true;
         }
+
+    // Quick function to redraw the minimap terrain canvas (useful when lazy-loaded tiles finish loading)
+    refreshMiniMapTerrain(){
+        let _self = this;
+        let _config = _self.config;
+        let _world = _self.state;
+        let _elements = _self.elements;
+        let $minimapOverview = _elements.minimapOverview;
+        if (!$minimapOverview || !$minimapOverview.length){ return false; }
+        let $areaViewport = $('.viewport.area', $minimapOverview);
+        let $areaImage = $('.image', $areaViewport);
+        let $areaTerrainCanvas = $('canvas.terrain', $areaImage);
+        if (!$areaTerrainCanvas.length){ return false; } // Abort if the minimap hasn't been initialized yet
+        let areaTerrainContext = $areaTerrainCanvas.get(0).getContext('2d');
+        let $canvasMap = _elements.map;
+        let $baseTerrainLayer = $('.layer[data-layer="terrain"]', $canvasMap);
+        let $baseTerrainCanvas = $('canvas', $baseTerrainLayer);
+        if (!$baseTerrainCanvas.length){ return false; }
+        // Clear the existing minimap canvas
+        areaTerrainContext.clearRect(0, 0, $areaTerrainCanvas.width(), $areaTerrainCanvas.height());
+        // Draw the primary canvases to the minimap in reverse DOM order
+        let canvasesToDraw = $baseTerrainCanvas.get().reverse();
+        for (let i = 0; i < canvasesToDraw.length; i++) {
+            areaTerrainContext.drawImage(canvasesToDraw[i], 0, 0);
+            }
+        // Use 'destination-out' to erase (make transparent) non-walkable tiles from the terrain canvas
+        let masterTiles = _world.layerTilesIndex['terrain'] || {};
+        areaTerrainContext.globalCompositeOperation = 'destination-out';
+        areaTerrainContext.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        for (let row = 1; row <= _config.mapRows; row++){
+            for (let col = 1; col <= _config.mapCols; col++){
+                let tileKey = col + '-' + row;
+                let tileData = masterTiles[tileKey];
+                if (!tileData || !tileData.walkable){
+                    let tileWidth = _config.mapTileSize[0];
+                    let tileHeight = _config.mapTileSize[1];
+                    let x = Math.round((col - 1) * tileWidth);
+                    let y = Math.round((row - 1) * tileHeight);
+                    areaTerrainContext.fillRect(x, y, tileWidth, tileHeight);
+                    }
+                }
+            }
+        // Reset composite operation back to normal
+        areaTerrainContext.globalCompositeOperation = 'source-over';
+        return true;
+    }
 
     // Define a quick event for showing the title banner w/ whatever title and subtitle text is provided w/ optional custom timeout for autohide
     showTitleBanner(titleText, subtitleText, showBreadcrumb, autoHideTimeout, bannerColour){
