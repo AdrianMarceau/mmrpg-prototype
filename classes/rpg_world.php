@@ -1716,6 +1716,7 @@ class rpg_world {
             $robot_rewards['robot_defense'] = $stat_boost;
             $robot_rewards['robot_speed'] = $stat_boost;
             $robot_values['robot_rewards'] = $robot_rewards;
+            $robot_values['robot_level_max'] = $robot_level;
             //error_log('$robot_level = '.print_r($robot_level, true));
             //error_log('$robot_class = '.print_r($robot_class, true));
             //error_log('$robot_values = '.print_r($robot_values, true));
@@ -1839,6 +1840,7 @@ class rpg_world {
                         $robot_rewards['robot_speed'] = $stat_boost;
                         $robot_values['robot_rewards'] = $robot_rewards;
                         }
+                    $robot_values['robot_level_max'] = $robot_level;
                     $battle_background = $map_field_token;
                     $battle_foreground = !empty($available_encounter_terrain[$robot_pos_terrain]) ? $available_encounter_terrain[$robot_pos_terrain][0] : $map_field_token;
                     $battle_field = $battle_background !== $battle_foreground ? $battle_background.'/'.$battle_foreground : $battle_background;
