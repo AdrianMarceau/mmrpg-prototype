@@ -4470,6 +4470,11 @@ class mmrpgWorldMap {
                             ctx.fillStyle = color;
                             ctx.fillRect(x, y, size, size);
                             }
+                        if (shape === 'square-outline'){
+                            ctx.strokeStyle = color;
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(x, y, size, size);
+                            }
                         if (shape === 'circle'){
                             ctx.fillStyle = color;
                             ctx.beginPath();
@@ -4483,8 +4488,9 @@ class mmrpgWorldMap {
                     let portalsIndex = _config.mapPortalsIndex || {};
                     let portalSymbolsKeys = Object.keys(portalSymbols);
                     if (portalSymbolsKeys.length > 0){
-                        let drawPortalMarker = function(col, row, kind){
+                        let drawPortalMarker = function(col, row, kind, isLocked){
                             let shape = 'square', size = 4, color = '#3f83c7';
+                            if (isLocked){ shape = 'square-outline'; }
                             if (kind === 'direction'){ color = '#cacaca'; }
                             return drawOverlayMarker(col, row, shape, size, color);
                             };
@@ -4496,7 +4502,8 @@ class mmrpgWorldMap {
                             //console.log('--> w/ portalInfo =', portalInfo);
                             let portalPosition = portalKey.split('-').map(function(val){ return parseInt(val); });
                             let portalKind = portalInfo.direction ? 'direction' : 'teleport';
-                            drawPortalMarker(portalPosition[0], portalPosition[1], portalKind);
+                            let portalLocked = portalInfo.locked ? true : false;
+                            drawPortalMarker(portalPosition[0], portalPosition[1], portalKind, portalLocked);
                             }
                         }
                     // Draw red squares where enemy encounters
