@@ -77,6 +77,8 @@ RewriteRule ^(images|database)/items/core-([a-z]+)/(.*)?$ /$1/items/$2-core/$3 [
 RewriteRule ^(images|database)/items/screw-([a-z]+)/(.*)?$ /$1/items/$2-screw/$3 [R,L]
 RewriteRule ^images/abilities/attachment-defeat/(.*)?$ /images/objects/defeat-explosion/$1 [R,L]
 RewriteRule ^images/abilities/attachment-([a-z]+)/(.*)?$ /images/objects/$1/$2 [R,L]
+RewriteRule ^images/abilities/super-arm_([-_a-z0-9]+)/icon_(left|right)_(40x40|80x80)\.png$ /images/abilities/super-arm/icon_$2_$3.png [L]
+RewriteRule ^images/abilities/super-arm_([-_a-z0-9]+)/sprite_(left|right)_(40x40|80x80)\.png$ /images/fields/$1/battle-field_block.png [L]
 
 ####################################
 # -- CACHE & EXPORT REWRITES -- #
