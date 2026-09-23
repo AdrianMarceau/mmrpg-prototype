@@ -717,6 +717,8 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
         $this_mecha_info['robot_image'] = !empty($battle_target_robot['robot_image']) ? $battle_target_robot['robot_image'] : '';
         $this_mecha_info['robot_abilities'] = !empty($battle_target_robot['robot_abilities']) ? $battle_target_robot['robot_abilities'] : array('buster-shot');
         $mecha_session_key = $this_mecha_info['robot_base_id'].'_'.$this_mecha_info['robot_token'];
+        if ($this_mecha_info['robot_level'] > 100){ $this_mecha_info['robot_level'] = 100; }
+        else if ($this_mecha_info['robot_level'] < 1){ $this_mecha_info['robot_level'] = 1; }
         //error_log('-> $this_player_token = '.print_r($this_player_token, true));
         //error_log('-> $this_mecha_token = '.print_r($this_mecha_token, true));
         //error_log('-> $this_mecha_info = '.print_r($this_mecha_info, true));
