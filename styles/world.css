@@ -773,7 +773,7 @@ html, body {
 #world #map .sprite.block.super-block.frosty-slopes { background-image: url("../content/fields/frosty-slopes/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.gemstone-cavern { background-image: url("../content/fields/gemstone-cavern/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.sonic-highway { background-image: url("../content/fields/sonic-highway/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.baseball-stadium { background-image: url("../content/fields/baseball-stadium/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.striker-stadium { background-image: url("../content/fields/striker-stadium/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.solar-inferno { background-image: url("../content/fields/solar-inferno/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.super-block.savage-menagerie { background-image: url("../content/fields/savage-menagerie/sprites/battle-field_block.png"); }

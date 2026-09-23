@@ -153,7 +153,7 @@ $grid = [
         'frost-slopes',
         'gemstone-cavern',
         'sonic-highway',
-        'baseball-stadium',
+        'striker-stadium',
         'solar-inferno',
         'savage-menagerie',
         'frozen-boulevard',

@@ -657,7 +657,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '13-11',
         'level' => 40,
         'element' => 'impact',
-        'field' => 'baseball-stadium',
+        'field' => 'striker-stadium',
         'encounters' => ['strike-man'],
         'encounters2' => ['pitchan', 'monking-r', 'goriblue'],
         'items' => ['weapon-upgrade'],

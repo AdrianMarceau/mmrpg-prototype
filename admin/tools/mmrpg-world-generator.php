@@ -136,7 +136,7 @@ echo('<pre>'.PHP_EOL);
             'crystal-catacombs', 'gemstone-cavern', 'sparkling-grotto',
             'verdant-rainforest', 'savage-menagerie',
             'frosty-slopes', 'frozen-boulevard',
-            'solar-inferno', 'baseball-stadium',
+            'solar-inferno', 'striker-stadium',
             'balloon-playground',
             ];
         // TEMP TEMP TEMP
