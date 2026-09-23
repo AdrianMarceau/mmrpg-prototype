@@ -1027,9 +1027,16 @@ class rpg_canvas {
         $frame_position = is_numeric($this_data['ability_frame']) ? (int)($this_data['ability_frame']) : array_search($this_data['ability_frame'], $this_data['ability_frame_index']);
         if ($frame_position === false){ $frame_position = 0; }
         $frame_background_offset = -1 * ceil(($this_data['ability_sprite_size'] * $frame_position));
-        $this_data['ability_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+        $this_data['ability_markup_style'] = '';
         $this_data['ability_markup_style'] .= 'pointer-events: none; z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['ability_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
-        $this_data['ability_markup_style'] .= 'background-image: url('.$this_data['ability_image_path'].'); width: '.($this_data['ability_sprite_size'] * $this_data['ability_frame_span']).'px; height: '.$this_data['ability_sprite_size'].'px; background-size: '.$this_data['ability_image_width'].'px '.$this_data['ability_image_height'].'px; ';
+        $this_data['ability_markup_style'] .= 'background-image: url('.$this_data['ability_image_path'].'); width: '.($this_data['ability_sprite_size'] * $this_data['ability_frame_span']).'px; height: '.$this_data['ability_sprite_size'].'px; ';
+        if (strstr($this_data['ability_image'], 'super-arm_')){
+            $this_data['ability_markup_style'] .= 'background-size: 160px 160px; ';
+            $this_data['ability_markup_style'] .= 'background-position:  -40px -20px; ';
+        } else {
+            $this_data['ability_markup_style'] .= 'background-size: '.$this_data['ability_image_width'].'px '.$this_data['ability_image_height'].'px; ';
+            $this_data['ability_markup_style'] .= 'background-position: '.$frame_background_offset.'px 0; ';
+        }
 
         // DEBUG
         //$this_data['ability_title'] .= 'DEBUG checkpoint data sticky = '.preg_replace('/\s+/i', ' ', htmlentities(print_r($options, true), ENT_QUOTES, 'UTF-8', true));
@@ -1147,9 +1154,16 @@ class rpg_canvas {
         $frame_position = is_numeric($this_data['ability_frame']) ? (int)($this_data['ability_frame']) : array_search($this_data['ability_frame'], $this_data['ability_frame_index']);
         if ($frame_position === false){ $frame_position = 0; }
         $frame_background_offset = -1 * ceil(($this_data['ability_sprite_size'] * $frame_position));
-        $this_data['ability_markup_style'] = 'background-position: '.$frame_background_offset.'px 0; ';
+        $this_data['ability_markup_style'] = '';
         $this_data['ability_markup_style'] .= 'pointer-events: none; z-index: '.$this_data['canvas_offset_z'].'; '.$this_data['ability_float'].': '.$this_data['canvas_offset_x'].'px; bottom: '.$this_data['canvas_offset_y'].'px; ';
-        $this_data['ability_markup_style'] .= 'background-image: url('.$this_data['ability_image_path'].'); width: '.($this_data['ability_sprite_size'] * $this_data['ability_frame_span']).'px; height: '.$this_data['ability_sprite_size'].'px; background-size: '.$this_data['ability_image_width'].'px '.$this_data['ability_image_height'].'px; ';
+        $this_data['ability_markup_style'] .= 'background-image: url('.$this_data['ability_image_path'].'); width: '.($this_data['ability_sprite_size'] * $this_data['ability_frame_span']).'px; height: '.$this_data['ability_sprite_size'].'px; ';
+        if (strstr($this_data['ability_image'], 'super-arm_')){
+            $this_data['ability_markup_style'] .= 'background-size: 160px 160px; ';
+            $this_data['ability_markup_style'] .= 'background-position:  -40px -20px; ';
+        } else {
+            $this_data['ability_markup_style'] .= 'background-size: '.$this_data['ability_image_width'].'px '.$this_data['ability_image_height'].'px; ';
+            $this_data['ability_markup_style'] .= 'background-position: '.$frame_background_offset.'px 0; ';
+        }
 
         // Generate the final markup for the canvas ability
         ob_start();
