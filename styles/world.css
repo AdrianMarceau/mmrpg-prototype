@@ -692,24 +692,47 @@ html, body {
 
 #world #map .sprite.block.fence-block { background-position: -120px -840px; }
 
-#world #map .sprite.block.super-block { background-position: 0 0; }
-#world #map .sprite.block.super-block.plain { background-position: -40px -840px; }
-#world #map .sprite.block.super-block.fence { background-position: -120px -840px; }
+#world #map .sprite.block.super-block {
+        background-image: url("../content/fields/plain-field/sprites/battle-field_block.png");
+        background-position: 0 0;
+    }
 
-#world #map .sprite.block.super-block.field { background-image: url("../content/fields/field/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.plain { background-image: url("../content/fields/plain-field/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.fence { background-image: url("../content/fields/gentle-countryside/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.field { background-image: url("../content/fields/plain-field/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.super-block.gentle-countryside { background-image: url("../content/fields/gentle-countryside/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.maniacal-hideaway { background-image: url("../content/fields/maniacal-hideaway/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.wintry-forefront { background-image: url("../content/fields/wintry-forefront/sprites/battle-field_block.png"); }
+
+#world #map .sprite.block.super-block.wily-castle { background-image: url("../content/fields/wily-castle/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.light-laboratory { background-image: url("../content/fields/light-laboratory/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.cossack-citadel { background-image: url("../content/fields/cossack-citadel/sprites/battle-field_block.png"); }
+
+#world #map .sprite.block.super-block.prototype-subspace { background-image: url("../content/fields/prototype-subspace/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.prototype-subspace-alt { background-image: url("../content/fields/prototype-subspace-alt/sprites/battle-field_block.png"); }
+
+#world #map .sprite.block.super-block.robot-museum { background-image: url("../content/fields/robot-museum/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.genesis-tower { background-image: url("../content/fields/genesis-tower/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.royal-palace { background-image: url("../content/fields/royal-palace/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.hunter-compound { background-image: url("../content/fields/hunter-compound/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.stardroid-base { background-image: url("../content/fields/stardroid-base/sprites/battle-field_block.png"); }
+
+#world #map .sprite.block.super-block.final-destination { background-image: url("../content/fields/final-destination/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.final-destination-2 { background-image: url("../content/fields/final-destination-2/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.final-destination-3 { background-image: url("../content/fields/final-destination-3/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.super-block.bonus-field { background-image: url("../content/fields/bonus-field/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.super-block.mountain-mines { background-image: url("../content/fields/mountain-mines/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.arctic-jungle { background-image: url("../content/fields/arctic-jungle/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.steel-mill { background-image: url("../content/fields/steel-mill/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.electrical-tower { background-image: url("../content/fields/electrical-tower/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.abandoned-warehouse { background-image: url("../content/fields/abandoned-warehouse/sprites/battle-field_block.png"); }
-
 #world #map .sprite.block.super-block.oil-wells { background-image: url("../content/fields/oil-wells/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.clock-citadel { background-image: url("../content/fields/clock-citadel/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.orb-city { background-image: url("../content/fields/orb-city/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.super-block.pipe-station { background-image: url("../content/fields/pipe-station/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.atomic-furnace { background-image: url("../content/fields/atomic-furnace/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.industrial-facility { background-image: url("../content/fields/industrial-facility/sprites/battle-field_block.png"); }
@@ -717,8 +740,8 @@ html, body {
 #world #map .sprite.block.super-block.preserved-forest { background-image: url("../content/fields/preserved-forest/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.photon-collider { background-image: url("../content/fields/photon-collider/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.waterfall-institute { background-image: url("../content/fields/waterfall-institute/sprites/battle-field_block.png"); }
-
 #world #map .sprite.block.super-block.sky-ridge { background-image: url("../content/fields/sky-ridge/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.super-block.mineral-quarry { background-image: url("../content/fields/mineral-quarry/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.lighting-control { background-image: url("../content/fields/lighting-control/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.robosaur-boneyard { background-image: url("../content/fields/robosaur-boneyard/sprites/battle-field_block.png"); }
@@ -727,8 +750,8 @@ html, body {
 #world #map .sprite.block.super-block.egyptian-excavation { background-image: url("../content/fields/egyptian-excavation/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.rusty-scrapheap { background-image: url("../content/fields/rusty-scrapheap/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.rainy-sewers { background-image: url("../content/fields/rainy-sewers/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.construction-site { background-image: url("../content/fields/construction-site/sprites/battle-field_block.png"); }
 
+#world #map .sprite.block.super-block.construction-site { background-image: url("../content/fields/construction-site/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.magnetic-generator { background-image: url("../content/fields/magnetic-generator/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.power-plant { background-image: url("../content/fields/power-plant/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.reflection-chamber { background-image: url("../content/fields/reflection-chamber/sprites/battle-field_block.png"); }
@@ -736,19 +759,27 @@ html, body {
 #world #map .sprite.block.super-block.septic-system { background-image: url("../content/fields/septic-system/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.serpent-column { background-image: url("../content/fields/serpent-column/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.spinning-greenhouse { background-image: url("../content/fields/spinning-greenhouse/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.wily-castle { background-image: url("../content/fields/wily-castle/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.light-laboratory { background-image: url("../content/fields/light-laboratory/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.cossack-citadel { background-image: url("../content/fields/cossack-citadel/sprites/battle-field_block.png"); }
 
-#world #map .sprite.block.super-block.prototype-subspace { background-image: url("../content/fields/prototype-subspace/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.robot-museum { background-image: url("../content/fields/robot-museum/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.genesis-tower { background-image: url("../content/fields/genesis-tower/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.royal-palace { background-image: url("../content/fields/royal-palace/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.hunter-compound { background-image: url("../content/fields/hunter-compound/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.prototype-subspace-alt { background-image: url("../content/fields/prototype-subspace-alt/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.final-destination { background-image: url("../content/fields/final-destination/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.final-destination-2 { background-image: url("../content/fields/final-destination-2/sprites/battle-field_block.png"); }
-#world #map .sprite.block.super-block.final-destination-3 { background-image: url("../content/fields/final-destination-3/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.satellite-deck { background-image: url("../content/fields/satellite-deck/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.trenchwork-depot { background-image: url("../content/fields/trenchwork-depot/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.crystal-catacombs { background-image: url("../content/fields/crystal-catacombs/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.sunset-gulch { background-image: url("../content/fields/sunset-gulch/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.haunted-mansion { background-image: url("../content/fields/haunted-mansion/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.waterworks-dam { background-image: url("../content/fields/waterworks-dam/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.minefield-dunes { background-image: url("../content/fields/minefield-dunes/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.glacier-cradle { background-image: url("../content/fields/glacier-cradle/sprites/battle-field_block.png"); }
+
+#world #map .sprite.block.super-block.verdant-rainforest { background-image: url("../content/fields/verdant-rainforest/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.frosty-slopes { background-image: url("../content/fields/frosty-slopes/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.gemstone-cavern { background-image: url("../content/fields/gemstone-cavern/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.sonic-highway { background-image: url("../content/fields/sonic-highway/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.baseball-stadium { background-image: url("../content/fields/baseball-stadium/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.solar-inferno { background-image: url("../content/fields/solar-inferno/sprites/battle-field_block.png"); }
+
+#world #map .sprite.block.super-block.savage-menagerie { background-image: url("../content/fields/savage-menagerie/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.frozen-boulevard { background-image: url("../content/fields/frozen-boulevard/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.sparkling-grotto { background-image: url("../content/fields/sparkling-grotto/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.balloon-playground { background-image: url("../content/fields/balloon-playground/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.barrier-block { background-position: -40px -440px; }
 
