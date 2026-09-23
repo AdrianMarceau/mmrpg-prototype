@@ -479,6 +479,25 @@ function triggerItemPickup(itemEvent, zoomDelay, playSound){
                 itemEventQuantity--;
                 let itemCountTextSpan = _self.getCustomNameSpan(oldItemQuantity + ' &raquo; <b>' + newItemQuantity + '</b>', 'empty');
                 messageMarkup.push('Added ' + itemNameTextSpan + ' to inventory! (' + itemCountTextSpan + ')');
+                // Check if the item we just picked up is a mecha shard
+                if (itemToken.match(/^[a-z]+-shard$/i)) {
+                    let elementType = itemToken.split('-')[0];
+                    let coreToken = elementType + '-core';
+                    // Loop as long as the player has 4 or more of this shard type
+                    // (This safely catches testers who have already stockpiled > 4)
+                    while (newItemQuantity >= 4){
+                        // Deduct 4 shards using the existing helper method
+                        newItemQuantity -= 4;
+                        _self.setItemQuantity(itemToken, newItemQuantity);
+                        // Add 1 core of the same element
+                        // (passing false for animate/sound so it doesn't interrupt the map UI flow)
+                        _self.addItemToInventory(coreToken, 1, false, false);
+                        // Append the fusion notifications to the map log using the stylized span
+                        let coreNameTextSpan = _self.getItemNameSpan(coreToken);
+                        messageMarkup.push('Collected shards are glowing!');
+                        messageMarkup.push('A new ' + coreNameTextSpan + ' was generated!');
+                        }
+                }
                 } else {
                 let itemInventoryMax = _config.itemInventoryMax || 99;
                 messageMarkup.push(itemNameTextSpan + ' already at max &times;' + itemInventoryMax + '!');
