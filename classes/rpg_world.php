@@ -1792,15 +1792,10 @@ class rpg_world {
                     $robot_token = !empty($robot_data[1]) ? $robot_data[1] : 'robot'; unset($robot_data[1]);
                     $level = !empty($robot_data[2]) ? $robot_data[2] : ''; unset($robot_data[2]);
                     $flags = !empty($robot_data[3]) ? $robot_data[3] : ''; unset($robot_data[3]);
-                    $effect = !empty($robot_data[4]) ? $robot_data[4] : ''; unset($robot_data[4]);
-                    $target = !empty($robot_data[5]) ? $robot_data[5] : ''; unset($robot_data[5]);
-                    $value = !empty($robot_data[6]) ? $robot_data[6] : ''; unset($robot_data[6]);
                     //error_log('-> $robot_pos = '.print_r($robot_pos, true));
                     //error_log('-> $robot_token = '.print_r($robot_token, true));
-                    //error_log('-> $form = '.print_r($form, true));
-                    //error_log('-> $effect = '.print_r($effect, true));
-                    //error_log('-> $target = '.print_r($target, true));
-                    //error_log('-> $value = '.print_r($value, true));
+                    //error_log('-> $level = '.print_r($level, true));
+                    //error_log('-> $flags = '.print_r($flags, true));
                     //error_log('-> next '.$encounter_class.' = "'.$robot_token.'" (key: '.$robot_key.')');
                     $real_robot_token = $robot_token;
                     $robot_alt = '';

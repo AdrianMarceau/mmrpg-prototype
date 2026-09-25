@@ -673,7 +673,7 @@ class rpg_prototype {
         $settings_token = 'robots_pending_entrance_animations';
         $robots_pending_entrance_animations = '';
         $_SESSION[$session_token]['battle_settings'][$settings_token] = $robots_pending_entrance_animations;
-        //error_log('$_SESSION[\''.$settings_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$robots_pending_entrance_animations);
+        //error_log('$_SESSION[\''.$session_token.'\'][\'battle_settings\'][\''.$settings_token.'\'] = '.$robots_pending_entrance_animations);
     }
 
     // Define a subfunction for above that allows us to specifically markup a given player token as pending an entrance animation
