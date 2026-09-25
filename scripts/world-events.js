@@ -3211,7 +3211,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         let itemInfo = _mmrpgItemsIndex[itemToken];
                         if (!itemInfo){ continue; }
                         //console.log('update', itemToken, 'with new quantity', itemQuantity);
-                        if (typeof _worldPlayer.items[itemToken] === 'undefined'){
+                        if (itemQuantity > 0 && typeof _worldPlayer.items[itemToken] === 'undefined'){
                             _self.addItemToInventory(itemToken, itemQuantity, false, false);
                             } else {
                             _worldPlayer.items[itemToken] = itemQuantity;
