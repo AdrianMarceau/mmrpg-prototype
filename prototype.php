@@ -110,9 +110,8 @@ require_once('prototype/include.php');
 require(MMRPG_CONFIG_ROOTDIR.'prototype/awards.php');
 //debug_profiler_checkpoint('after-awards');
 
-// Now that we're done modifying the session, grab a static reference and close it
-$GAME_SESSION = $_SESSION[$session_token];
-session_write_close();
+// Grab a reference to the game session variable so it's easier to work with
+$GAME_SESSION = &$_SESSION[$session_token];
 
 // If possible, attempt to save the game to the session
 //debug_profiler_checkpoint('before-refresh-points-and-save');

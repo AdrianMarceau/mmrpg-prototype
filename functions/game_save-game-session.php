@@ -685,9 +685,6 @@ function mmrpg_save_game_session($force_db_save = false){
     //echo('GAME has been saved!');
     //exit();
 
-    // Release the session lock so AJAX requests are less likely to hang
-    session_write_close();
-
     // Return true on success
     //error_log('func/save-game-session/after/');
     return true;

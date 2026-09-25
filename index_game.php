@@ -10,7 +10,6 @@ if (MMRPG_CONFIG_MAINTENANCE_MODE && !in_array($_SERVER['REMOTE_ADDR'], array('1
 // Include the TOP file
 require_once('top.php');
 $GAME_SESSION = $_SESSION['GAME'];
-session_write_close();
 
 // Set a time limit for game scripts to prevent overdoing it
 if (defined('MMRPG_CONFIG_IS_LIVE') && MMRPG_CONFIG_IS_LIVE === false){ set_time_limit(5); }

@@ -4,7 +4,6 @@
 define('READ_ONLY_SESSION', true);
 require_once(dirname(dirname(__FILE__)).'/top.php');
 $GAME_SESSION = $_SESSION['GAME'];
-session_write_close();
 
 // If the return value was set explicitly as javascript, update headers
 $return_type = !empty($_REQUEST['return']) && is_string($_REQUEST['return']) ? $_REQUEST['return'] : 'default';
