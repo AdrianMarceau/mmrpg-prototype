@@ -1024,16 +1024,16 @@ function bindEventsToInputs($thisWorld){
                 // Only allow this if the map is not currently animating and the player is not currently moving
                 if (_world.mapIsAnimating || _world.playerIsMoving){ return false; }
                 // Turn ON the auto-options in case there are pickups about to happen
-                _world.autoApplyConsumables = true;
-                _world.autoEquipHoldables = true;
+                //_world.autoApplyConsumables = true;
+                //_world.autoEquipHoldables = true;
                 // If there are any nearby events, re-init them now
                 //console.log('-> checking for nearby events to re-init...');
                 _self.refreshMapPositionEvents(0, true);
                 ignoreInputFor(100);
                 } else {
                 // Turn OFF the auto-options since A isn't being held anymore
-                _world.autoApplyConsumables = false;
-                _world.autoEquipHoldables = false;
+                //_world.autoApplyConsumables = false;
+                //_world.autoEquipHoldables = false;
                 }
             // If the player has pressed the B button, ?????
             if (activeInputs.B){
