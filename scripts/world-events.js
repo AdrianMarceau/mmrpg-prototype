@@ -1117,7 +1117,11 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         teamReadyDuration = 600; // we want the animation to start right away
                         let isExitPortal = portalInfo.direction ? true : false;
                         let isTelePortal = !portalInfo.direction ? true : false;
-                        let isSubTelePortal = goToMap === 'debug-area-0' ? true : false;
+                        let isSubTelePortal = goToMap.indexOf('-area-0') !== -1 ? true : false;
+                        //console.log('goToMap = ', goToMap);
+                        //console.log('isExitPortal = ', isExitPortal);
+                        //console.log('isTelePortal = ', isTelePortal);
+                        //console.log('isSubTelePortal = ', isSubTelePortal);
                         autoRedirectSound = isExitPortal ? 'lets-go-robots' : 'intense-growing-sound'; //'bounce-sound';
                         autoRedirectEffect = isExitPortal ? 'leaving' : 'glowing';
                         if (isExitPortal){ autoRedirectAnimation = 'slide-' + portalInfo.direction; }
@@ -2343,22 +2347,23 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     // Fetch the portal's index info so we can check its destination
                     let portalsIndex = _config.mapPortalsIndex;
                     let portalInfo = portalsIndex[portalName] || false;
-                    _self.playSoundEffect('bounce-sound');
                     let portalHref = false;
                     let isSameMapTeleport = false;
                     let goToPosition = false;
+                    let finalGoToMap = false; // Track this for sub-teleportal animations
                     if (portalName === 'spawn'){
                         portalHref = 'prototype.php'; // TODO: make the spawn actually go somewhere specific
                         } else if (portalName === 'exit'){
-                        portalHref = 'prototype.php'; // TOPO: make the exit actually go somewhere specific
+                        portalHref = 'prototype.php'; // TODO: make the exit actually go somewhere specific
                         } else if (portalName.indexOf('goto__') !== -1){
                         let worldToken, mapToken;
                         let goToPath = portalName.replace(/^goto__/i, '').split('__');
                         if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
                         else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
+                        finalGoToMap = mapToken;
                         portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
                         } else if (portalInfo && portalInfo.dst){
-                        // ADDED: Reconstruct destination from standard .map portal dst syntax
+                        // Reconstruct destination from standard .map portal dst syntax
                         let goToWorld = _config.mapWorld;
                         let goToMap = portalInfo.dst;
                         if (goToMap.indexOf('__') !== -1){
@@ -2366,6 +2371,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                             if (gtm.length >= 3){ goToWorld = gtm[0]; goToMap = gtm[1]; goToPosition = gtm[2]; }
                             else if (gtm.length >= 2){ goToMap = gtm[0]; goToPosition = gtm[1]; }
                             }
+                        finalGoToMap = goToMap;
+                        //console.log('finalGoToMap = ', finalGoToMap);
                         let goToSameWorld = goToWorld === _config.mapWorld;
                         let goToSameMap = goToSameWorld && goToMap === _config.mapToken;
                         if (goToSameWorld && goToSameMap){
@@ -2378,12 +2385,33 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     // Route the player using either same-map movement or a full page redirect
                     if (isSameMapTeleport && goToPosition){
                         dismissDropdown(false);
+                        _self.playSoundEffect('bounce-sound');
                         _config.allowWorldEvents = false; // prevent re-triggering events during teleport
                         _self.moveToPosition(goToPosition, function(){
                             _config.allowWorldEvents = true; // re-allow world events after teleport complete
                             return true;
                             });
                         } else if (portalHref){
+                        //console.log('full page redirect to = ', portalHref);
+                        // --- Copy animation and sound logic from auto-redirect portals ---
+                        let isExitPortal = portalInfo && portalInfo.direction ? true : false;
+                        let isTelePortal = portalInfo && !portalInfo.direction ? true : false;
+                        let isSubTelePortal = finalGoToMap && finalGoToMap.indexOf('-area-0') !== -1 ? true : false;
+                        //console.log('isExitPortal = ', isExitPortal);
+                        //console.log('isTelePortal = ', isTelePortal);
+                        //console.log('isSubTelePortal = ', isSubTelePortal);
+                        let autoRedirectSound = isExitPortal ? 'lets-go-robots' : 'intense-growing-sound';
+                        let autoRedirectEffect = isExitPortal ? 'leaving' : 'glowing';
+                        let autoRedirectAnimation = '';
+                        if (isTelePortal){ autoRedirectAnimation = isSubTelePortal ? 'descending' : 'ascending'; }
+                        _self.playSoundEffect(autoRedirectSound);
+                        //console.log('autoRedirectSound = ', autoRedirectSound);
+                        //console.log('autoRedirectEffect = ', autoRedirectEffect);
+                        //console.log('autoRedirectAnimation = ', autoRedirectAnimation);
+                        // Target the team sprites and apply the classes before fading out
+                        $teamSprites.removeClass('shake bounce idle').addClass(autoRedirectEffect);
+                        if (autoRedirectAnimation){ $teamSprites.addClass(autoRedirectAnimation); }
+                        // -----------------------------------------------------------------
                         _self.incZoomLevel();
                         $thisWorld.addClass('busy');
                         _self.saveWorldState(function(){
