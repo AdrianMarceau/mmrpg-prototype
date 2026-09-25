@@ -103,6 +103,7 @@ if (!defined('MMRPG_WORLD_IS_DEBUG')
     || MMRPG_WORLD_IS_DEBUG === false){
     $default_world_token = 'prototype';
     $default_map_token = 'prototype-area-0';
+    $default_first_map_token = 'lalinde-area-1';
     $default_player_maps = array(
         'dr-lalinde' => 'lalinde-area-1',
         'dr-light' => 'light-area-1',
@@ -112,6 +113,7 @@ if (!defined('MMRPG_WORLD_IS_DEBUG')
 } else {
     $default_world_token = 'debug';
     $default_map_token = 'debug-area-1';
+    $default_first_map_token = 'debug-area-1';
     $default_player_maps = array(
         'dr-lalinde' => 'debug-area-1',
         'dr-light' => 'debug-area-1e',
@@ -437,7 +439,7 @@ $request_map_token = isset($_REQUEST['map']) && preg_match('/^([-_a-z0-9]+)$/i',
 if (empty($request_map_token) && !empty($WORLD_PLAYER_SESSION['last_map'])){ $request_map_token = $WORLD_PLAYER_SESSION['last_map']; }
 if (!empty($request_map_token) && !empty($WORLD_PLAYER_SESSION['last_map']) && $request_map_token !== $WORLD_PLAYER_SESSION['last_map']){ unset($WORLD_PLAYER_SESSION['last_position']); }
 if (!empty($request_map_token) && in_array($request_world_token.'__'.$request_map_token, $allowed_world_map_tokens)){ $this_prototype_data['this_current_map'] = $request_map_token; }
-if (empty($this_prototype_data['this_current_map'])){ $this_prototype_data['this_current_map'] = $default_map_token; }
+if (empty($this_prototype_data['this_current_map'])){ $this_prototype_data['this_current_map'] = empty($WORLD_PLAYER_SESSION['last_map']) ? $default_first_map_token : $default_map_token; }
 $WORLD_PLAYER_SESSION['last_map'] = $this_prototype_data['this_current_map'];
 $request_map_token = $this_prototype_data['this_current_map'];
 
