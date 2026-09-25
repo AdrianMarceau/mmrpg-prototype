@@ -1710,6 +1710,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let showBattleButton = true, showRecruitButton = false;
             if (!playerIsCursor && isSoloMechaBattle){ showRecruitButton = true; }
             if (showRecruitButton && isSoloMechaRescue){ showBattleButton = false; }
+            if (typeof _worldPlayer.items['mecha-whistle'] === 'undefined'){ showRecruitButton = false; }
             if (showBattleButton){
                 if (playerActiveRobots >= 1){
                     sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
