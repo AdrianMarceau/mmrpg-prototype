@@ -133,11 +133,7 @@ echo('<pre>'.PHP_EOL);
         // TEMP TEMP TEMP
         // Define a list of fields that don't have textures made yet (and/or map isn't done)
         $map_tiles_missing_for = [
-            'crystal-catacombs', 'gemstone-cavern', 'sparkling-grotto',
-            'verdant-rainforest', 'savage-menagerie',
-            'frosty-slopes', 'frozen-boulevard',
-            'solar-inferno', 'striker-stadium',
-            'balloon-playground',
+            // none!
             ];
         // TEMP TEMP TEMP
 
@@ -646,6 +642,20 @@ echo('<pre>'.PHP_EOL);
             if (!empty($block_strings)){
                 $area_file_markup[] = '#---------------------------#';
                 $area_file_markup[] = implode(PHP_EOL, $block_strings);
+            }
+
+            // --- HARD-CODED ENCOUNTERS FOR LALINDE AREA 1 ---
+            if ($area_token === 'lalinde-area-1') {
+                $area_file_markup[] = '#---------------------------#';
+
+                // Trill bosses on the directional exits
+                $area_file_markup[] = '@bosses[]   = boss-robo-trill-n('.$area_middle_col.'-1, trill)';
+                $area_file_markup[] = '@bosses[]   = boss-robo-trill-e('.$area_size_width.'-'.$area_middle_row.', trill)';
+                $area_file_markup[] = '@bosses[]   = boss-robo-trill-w(1-'.$area_middle_row.', trill)';
+
+                // Dark-Frag mecha on the main exit portal
+                $portal_y = $area_middle_row + 3; // Calculated from ($positiony + 5)
+                $area_file_markup[] = '@mechas[]   = boss-mech-portal-g('.$area_middle_col.'-'.$portal_y.', sniper-joe, 1)';
             }
 
             // Generate layer tiles for LAYER 0 and LAYER -1
