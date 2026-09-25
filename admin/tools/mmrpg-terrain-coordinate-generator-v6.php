@@ -150,15 +150,18 @@ $grid = [
 
     // GROUP 10
     [
-        'frost-slopes',
+        'frosty-slopes',
         'gemstone-cavern',
         'sonic-highway',
         'striker-stadium',
         'solar-inferno',
+        'medieval-castle',
+        'galaxy-fantasy',
         'savage-menagerie',
         'frozen-boulevard',
         'sparkling-grotto',
         'balloon-playground',
+        'forgotten-themepark',
     ],
 
 ];
