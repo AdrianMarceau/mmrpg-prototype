@@ -250,8 +250,8 @@ foreach ($this_shop_index AS $shop_token => $shop_info){
 // Grab a list of all already-unlocked items and abilities for reference later
 mmrpg_prototype_items_unlocked(true, $items_unlocked);
 mmrpg_prototype_abilities_unlocked(false, false, $abilities_unlocked);
-$items_unlocked_keys = array_keys($items_unlocked);
-$abilities_unlocked_keys = array_keys($abilities_unlocked);
+$items_unlocked_keys = !empty($items_unlocked) ? array_keys($items_unlocked) : array();
+$abilities_unlocked_keys = !empty($abilities_unlocked) ? array_keys($abilities_unlocked) : array();
 //error_log('$items_unlocked = '.print_r($items_unlocked, true));
 //error_log('$abilities_unlocked = '.print_r($abilities_unlocked, true));
 
@@ -363,6 +363,8 @@ if (!empty($this_shop_index['auto'])){
             if (in_array($info['item_token'], $items_unlocked_keys)){ return true; }
             else { if ($free_previews){ $free_previews--; return true; } return false; }
             }) : array();
+        //error_log('$items_unlocked_keys = '.print_r($items_unlocked_keys, true));
+        //error_log('$unlocked_parts = '.print_r($unlocked_parts, true));
         $unlocked_parts_keys = array_keys($unlocked_parts);
         uksort($unlocked_parts, function($a, $b) use ($items_unlocked_keys, $unlocked_parts_keys){
             $a_owned = in_array($a, $items_unlocked_keys);
