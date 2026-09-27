@@ -31,8 +31,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'objects' => ['player-platform'],
         'encounters' => ['dr-light', 'mega-man'],
         'encounters2' => ['met'],
-        'rescues' => ['eddie'],
-        'items' => ['light-program!!', 'light-heart!!', 'copy-core!!'],
+        'rescues' => [],
+        'items' => ['light-program!!', 'light-heart!!', 'copy-core!!', 'item-codes', 'equip-codes'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'south', 'west']
         ];
@@ -45,7 +45,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
-        'items' => ['equip-codes'],
+        'items' => [],
         'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -73,7 +73,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
-        'items' => ['item-codes'],
+        'items' => [],
         'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -382,9 +382,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'field' => '',
         'encounters' => ['trill'],
-        'rescues' => ['auto'],
-        'items' => ['attack-diverter', 'hyper-screw
-        '],
+        'rescues' => ['eddie'],
+        'items' => ['attack-diverter', 'hyper-screw'],
         'tags' => ['outer'],
         'exits' => ['east']
         ];
