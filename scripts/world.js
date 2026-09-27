@@ -170,6 +170,7 @@ gameSettings.worldState = {
     currentSubScreen: '', // if a subscreen is visible (like inventory, robot management, etc)
     autoApplyConsumables: false, // automatically apply consumable items to party robots on pickup
     autoEquipHoldables: false, // automatically hold equippable items to party robots on pickup
+    refreshRequired: false, // whether the world needs to be refreshed at the next opportunity
     };
 gameSettings.worldIndexes = {
     types: {},
@@ -4518,6 +4519,7 @@ class mmrpgWorldMap {
                             if (kind === 'mecha'){ size = 2; }
                             else if (kind === 'master'){ size = 3; }
                             else if (kind === 'boss'){ size = 4; }
+                            else if (kind === 'rescue'){ size = 2; color = '#5dc73f'; }
                             return drawOverlayMarker(col, row, shape, size, color);
                             };
                         for (let i = 0; i < battleSymbolsKeys.length; i++){
