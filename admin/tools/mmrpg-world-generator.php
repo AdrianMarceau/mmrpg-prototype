@@ -413,6 +413,68 @@ echo('<pre>'.PHP_EOL);
                 $protected_zones['player-return-portal-buffer'] = $portal_pos;
             }
 
+            // Create an array to hold any actor strings we want to add
+            $actor_strings = [];
+
+            // Pre-place the "Purple Reset Guy" (Anti-Eddie) if the area has random encounters and isn't a player area
+            $has_encounters = !empty($area_static_encounters) || !empty($area_random_encounters) || !empty($area_static_rescues);
+            if ($has_encounters && !in_array('player-platform', $area_objects)){
+                // Calculate the bottom-right corner of the walkable area
+                $npc_x = $area_size_width - $area_padding;
+                $npc_y = $area_size_height - $area_padding;
+                if (in_array('player-platform', $area_objects)){
+                    $npc_x -= 1;
+                    $npc_y -= 1;
+                }
+                $npc_pos = $npc_x.'-'.$npc_y;
+                $npc_ver = in_array('player', $area_tags) ? 'first-encounter' : 'default';
+                $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, '.$npc_ver.')';
+                // Add him to the protected zones so encounters/items don't spawn on him
+                $protected_zones['purple-reset-dude-buffer'] = $npc_pos;
+            }
+
+            // Pre-place "Good Guy Auto" (the shopkeeper) in LIGHT Area 1 specifically
+            if ($area_token === 'light-area-1'){
+                // Calculate the bottom-left corner of the walkable area
+                $auto_x = $area_padding + 2;
+                $auto_y = $area_size_height - $area_padding - 1;
+                $auto_pos = $auto_x.'-'.$auto_y;
+                // Determine the correct version to display based on the area's objects
+                $auto_ver = in_array('start', $area_tags) ? 'first-encounter' : 'default';
+                // Add the actor string using syntax from the debug map
+                $actor_strings[] = '@actors[]   = good-guy-auto('.$auto_pos.', robot, auto, -, '.$auto_ver.')';
+                // Add him to the protected zones so nothing else spawns on his tile
+                $protected_zones['good-guy-auto-buffer'] = $auto_pos;
+            }
+
+            // Pre-place "Weird Bird Reggae" (the shopkeeper) in WILY Area 1 specifically
+            if ($area_token === 'wily-area-1'){
+                // Calculate the bottom-left corner of the walkable area
+                $reggae_x = $area_padding + 2;
+                $reggae_y = $area_size_height - $area_padding - 1;
+                $reggae_pos = $reggae_x.'-'.$reggae_y;
+                // Determine the correct version to display based on the area's objects
+                $reggae_ver = in_array('start', $area_tags) ? 'first-encounter' : 'default';
+                // Add the actor string using syntax from the debug map
+                $actor_strings[] = '@actors[]   = weird-bird-reggae('.$reggae_pos.', robot, reggae, -, '.$reggae_ver.')';
+                // Add him to the protected zones so nothing else spawns on his tile
+                $protected_zones['weird-bird-reggae-buffer'] = $reggae_pos;
+            }
+
+            // Pre-place "Star Gazer Kalinka" (the shopkeeper) in COSSACK Area 1 specifically
+            if ($area_token === 'cossack-area-1'){
+                // Calculate the bottom-left corner of the walkable area
+                $kalinka_x = $area_padding + 2;
+                $kalinka_y = $area_size_height - $area_padding - 1;
+                $kalinka_pos = $kalinka_x.'-'.$kalinka_y;
+                // Determine the correct version to display based on the area's objects
+                $kalinka_ver = in_array('start', $area_tags) ? 'first-encounter' : 'default';
+                // Add the actor string using syntax from the debug map
+                $actor_strings[] = '@actors[]   = star-gazer-kalinka('.$kalinka_pos.', player, kalinka, -, '.$kalinka_ver.')';
+                // Add him to the protected zones so nothing else spawns on his tile
+                $protected_zones['star-gazer-kalinka-buffer'] = $kalinka_pos;
+            }
+
             // Extract anchored pickups vs regular pickups
             $anchored_pickups = [];
             $regular_pickups = [];
@@ -425,6 +487,7 @@ echo('<pre>'.PHP_EOL);
 
             // Pre-place anchored pickups so they can generate their own protected zones
             $static_pickup_strings = [];
+            $exact_protected_coords = [];
             if (!empty($anchored_pickups)){
                 foreach ($anchored_pickups AS $key => $pickup){
                     $pickup_clean = trim($pickup, '! ');
@@ -444,6 +507,7 @@ echo('<pre>'.PHP_EOL);
                     if (!$position){ continue; } // Skip if no space left
                     // Register this item as a protected zone!
                     $item_num = $key + 1;
+                    $exact_protected_coords[] = $position;
                     //$protected_zones['anchored-item-'.$item_num] = $position;
                     // Save the markup string for later
                     $static_pickup_key = 'static-pickup-'.$item_num;
@@ -454,21 +518,6 @@ echo('<pre>'.PHP_EOL);
                         }
                     $static_pickup_strings[] = '@items[]    = '.$static_pickup_key.'('.$position.', '.$pickup_clean.', anchored)';
                 }
-            }
-
-            // Pre-place the Anti-Eddie "Purple Reset Guy" if the area has random encounters
-            $actor_strings = [];
-            if (!empty($area_static_encounters)
-                || !empty($area_random_encounters)
-                || !empty($area_static_rescues)){
-                // Calculate the bottom-right corner of the walkable area
-                $npc_x = $area_size_width - $area_padding;
-                $npc_y = $area_size_height - $area_padding;
-                $npc_pos = $npc_x.'-'.$npc_y;
-                $npc_ver = in_array('player-platform', $area_objects) ? 'first-encounter' : 'default';
-                $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, '.$npc_ver.')';
-                // Add him to the protected zones so encounters/items don't spawn on him
-                $protected_zones['purple-reset-dude-buffer'] = $npc_pos;
             }
 
             // Process ALL protected zones (structural + newly added anchored items)
@@ -482,6 +531,10 @@ echo('<pre>'.PHP_EOL);
                 $exclude_coords = array_merge($exclude_coords, $coords);
                 // Build the no-encounters markup for the dynamic system
                 $no_encounter_strings[] = '@groups[]   = no-encounters_'.$zone_name.'(' . $box['range'] . ')';
+            }
+            // Merge in the exact coordinates of anchored items without applying a buffer box
+            if (!empty($exact_protected_coords)){
+                $exclude_coords = array_merge($exclude_coords, $exact_protected_coords);
             }
             $exclude_coords = array_unique($exclude_coords);
 
