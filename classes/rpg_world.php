@@ -3924,6 +3924,50 @@ class rpg_world {
                         array('Get Some Advice', 'advice-from-auto', 'none'),
                         )
                     ),
+                'advice' => array(
+                    'Defeat robot masters with super effective attacks to increase the chance of elemental cores dropping!',
+                    'Defeat support mecha with super effective attacks to increase the odds of elemental shards dropping!',
+                    'Experience points in battle are split among your whole team, so everyone gets to level-up together!',
+                    'You can\'t bring robots into battle without Limit Hearts, so try to earn as many as you can!',
+                    'You can change direction in-place by holding down the cancel button before trying to move!',
+                    'Boss Stars contain Starforce power, and that power makes your robots stronger! Try to collect a lot!',
+                    'Heal Pads are green and restore your energy, while Reset Pads are red and blue and reset your stats!',
+                    'Hold down the confirm button while picking up items to automatically use/give them to your robots!',
+                    'Support mecha can be recruited using the Mecha Whistle, but only when they\'re totally isolated.',
+                    'Holding an elemental core allows a robots to equip virtually any ability that matches its type!',
+                    'Elemental shards don\'t do much on their own, but collect four of the same kind and they\'ll fuse!',
+                    'Benched robots regain more Weapon Energy between turns than active ones.  Make sure you swap often!',
+                    'Different battle fields have different multipliers, boosting or lowering different elemental types!',
+                    'Stat buffs in battle max-out at +5 stages, so don\'t get greedy! The same is true for stat breaks!'
+                    ),
+                ),
+            'reggae' => array(
+                'name' => 'Reggae',
+                'type' => 'none',
+                'colour' => 'explode',
+                'messages' => array(
+                    'default' => array('Welcome to shop! Squawk!', 'New abilities you want? Squaaawk!', 'Give me your zenny! Squawk!!'),
+                    'first-encounter' => array('Reggae\'s Shop this is! Squawk!', 'New abilities you want! Squaaawk!', 'Zenny I accept!'),
+                    ),
+                'actions' => array(
+                    'default' => array(
+                        array('Open The Shop', 'shop-with-reggae', 'none'),
+                        array('Get Some Advice', 'advice-from-reggae', 'none'),
+                        )
+                    ),
+                'advice' => array(
+                    'Collect shards! Shards! Squawk! Four shards makes a core! Four shards makes a core! Squaaawk!',
+                    'Robot equip ability if same type! Squawk! Robot hold core! Now robot equip more ability! Squaaawk!',
+                    'Player sell cores! Sell cores! Squawk! Reggae make abilities! Make abilities! Squaaawk!',
+                    'Weakness! Weakness! Squawk! Weakness make robot take twice damage! Careful! Squaaawk!',
+                    'Resistance! Resistance! Squawk! Resistance make robot take half damage! Helpful! Squaaawk!',
+                    'Affinity! Robot can have them! Squawk! Affinity make robot heal from damage! Madness! Squaaawk!',
+                    'Immunity! Robot can have them! Squawk! Immunity make robot take no damage! Amazing! Squaaawk!',
+                    'Hit enemy weaknesses for extra experience! Squawk! Annihilate \'em! Squaaawk!',
+                    'Resisted hits earn less experience points! Squawk! Don\'t be stupid! Squaaawk!',
+                    'Use the Copy Shot! Squawk! Steals last ability opponent used! Squaawk! Permanently! Squaaawk!',
+                    'Some abilities hit benched robots! Squawk! No where is safe from Reggae\'s weapons! Squaaawk!'
+                    ),
                 ),
             'kalinka' => array(
                 'name' => 'Kalinka',
@@ -3933,13 +3977,33 @@ class rpg_world {
                     'default' => array('Greetings {player_name}, welcome back.', 'Is there something you\'d like to discuss with me?'),
                     'first-encounter' => array('Greetings {player_name}.', 'It is good to see you again.', 'Perhaps under better circumstances next time?'),
                     ),
+                'actions' => array(
+                    'default' => array(
+                        array('Open The Shop', 'shop-with-kalinka', 'none'),
+                        array('Get Some Advice', 'advice-from-kalinka', 'none'),
+                        )
+                    ),
+                'advice' => array(
+                    'Make sure you scan unknown robots you find in battle, some can only be unlocked that way!',
+                    'Collecting stars boosts the elemental damage of all doctors\' recruited robots and mechas!',
+                    'Player Battles use the ghost data of real players and are great for earning Battle Points!',
+                    'Endless Mode let\'s you challenge a gauntlet of robots with only a small team to fight with!',
+                    'Star Fields are fusions of different battlefields, each with their own unique star to collect!',
+                    'Starforce permanently boosts the AT/DF/SP stats of all robots that share its elemental type!',
+                    'Copy-type robots benefit from all Starforce types at once, but less-so than elemental robots do.',
+                    'Neutral-type robots benefit from all Starforce types at once, but it only boosts their LE and WE.',
+                    'Passive skills can be incredibly helpful. Crystal Man\'s skill lets you scan target abilities!',
+                    'Hold items have a variety of effects and are very useful. I heard one lets you survive OHKOs!',
+                    'Rhythm discovered that this entire place is made from a substance called Quanta. Fascinating, isn\'t it?',
+                    'Subspace area has me curious about what lies beyond the portals, deep in the pitch black darkness.',
+                    ),
                 ),
             'anti-eddie' => array(
                 'name' => 'Anti Eddie',
                 'type' => 'none',
                 'colour' => 'shadow',
                 'messages' => array(
-                    'default' => array('Like I said , I can "reset" parts of this area for you if you\'ve got the goods.', 'So whaddya say?'),
+                    'default' => array('Hello again!', 'I can "reset" parts of this area for you if you\'ve got the goods.', 'Whaddya say?'),
                     'first-encounter' => array('Psst, can you keep a secret?', 'I can "reset" parts of this area.', 'You gotta have the goods though!'),
                     ),
                 'actions' => array(
@@ -4037,6 +4101,7 @@ class rpg_world {
                         $colour = $alt_colour;
                         if (!empty($actor_info[$image.'_messages'])){ $actor_info['messages'] = $actor_info[$image.'_messages']; }
                         if (!empty($actor_info[$image.'_actions'])){ $actor_info['actions'] = $actor_info[$image.'_actions']; }
+                        if (!empty($actor_info[$image.'_advice'])){ $actor_info['advice'] = $actor_info[$image.'_advice']; }
                         //error_log('$alt_name = '.print_r($alt_name, true));
                         //error_log('$name = '.print_r($name, true));
                         //error_log('$colour = '.print_r($colour, true));
@@ -4048,6 +4113,7 @@ class rpg_world {
                 $actions = array();
                 if (!empty($actor_info['actions'][$context])){ $actions = $actor_info['actions'][$context]; }
                 else if (!empty($actor_info['actions']['default'])){ $actions = $actor_info['actions']['default']; }
+                $advice = !empty($actor_info['advice']) ? $actor_info['advice'] : array();
                 $base_classes = 'sprite object vs-actor bounce';
                 $kind_classes = $kind.' '.$sprite.($image ? ' '.$image : '');
                 //if (true){ $base_classes .= ' always-zoom'; }
@@ -4075,6 +4141,7 @@ class rpg_world {
                     'context' => $context,
                     'messages' => $messages,
                     'actions' => $actions,
+                    'advice' => $advice,
                     'colour' => $colour,
                     'col' => $col,
                     'row' => $row,
