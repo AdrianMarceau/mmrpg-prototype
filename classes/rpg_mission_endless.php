@@ -134,7 +134,10 @@ class rpg_mission_endless extends rpg_mission {
 
         // Combine all possible items into a single list and then shuffle it
         $possible_item_tokens = array();
-        foreach ($possible_item_kinds AS $kind){ $possible_item_tokens = array_merge($possible_item_tokens, $mmrpg_items_index_bykind[$kind]); }
+        foreach ($possible_item_kinds AS $kind){
+            if (!isset($mmrpg_items_index_bykind[$kind])){ continue; }
+            $possible_item_tokens = array_merge($possible_item_tokens, $mmrpg_items_index_bykind[$kind]);
+            }
         shuffle($possible_item_tokens);
 
         // Define which robots will appear based on typelist and phasearray_unique($mission_data['targets'])
