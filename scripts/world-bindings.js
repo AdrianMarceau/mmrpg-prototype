@@ -362,7 +362,7 @@ function bindEventsToInputs($thisWorld){
                 }
             }
         // If the robots overview is open, make sure we respond to panel-agnostic inputs
-        if (robotsOverviewIsExpanded){
+        if (robotsOverviewIsExpanded || _world.actionModalVisible){
             //console.log('-> robotsOverviewIsExpanded =', robotsOverviewIsExpanded);
             // Collect references to key elements within the robots overview
             let $teamRobotsDiv = $('.team-robots', $robotsOverview);
