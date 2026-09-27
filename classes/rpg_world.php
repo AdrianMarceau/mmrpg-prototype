@@ -15,6 +15,10 @@ define('MMRPG_WORLD_DEFAULT_BASEPATH', 'prototype/worldmaps/'); // TODO: move th
 // Define the actual RPG_WORLD class that uses the above constants and methods
 class rpg_world {
 
+    // Define some static variables we can use later
+    static $skip_worldmap_encounters = array();
+    static $skip_worldmap_actors = array();
+
     // -- PREDEFINED CONSTANTS -- //
 
     // Define the defaults for this class
@@ -3847,6 +3851,7 @@ class rpg_world {
             $name = $encounter_data[5];
             //error_log('-> processing battle w/'.PHP_EOL.'-> $token ='.' '.$token.PHP_EOL.'-> $kind = '.$kind.PHP_EOL.'-> $subkind = '.$subkind.PHP_EOL.'-> $alt = '.$alt.PHP_EOL.'-> $pos = '.$pos.PHP_EOL.'-> $battle = '.$battle);
             if (!rpg_battle::has_index_info($battle)){ continue; }
+            if (in_array($battle, self::$skip_worldmap_encounters)){ continue; }
             //$info = rpg_battle::get_index_info($battle);
             //error_log('-> w/ $info = '.print_r($info, true));
             //if (empty($info) || empty($info['battle_target_player']['player_robots'])){ continue; }
