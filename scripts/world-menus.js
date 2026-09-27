@@ -75,20 +75,29 @@ function initMenuHomeButton($thisWorld, $homeButton){
     $homeButton.bind('click', function(e){
         e.preventDefault();
         if ($(this).is('.disabled')){ return false; }
-        //console.log('%c' + 'Home button clicked!', 'color: cyan;');
-        //if (!confirm('Are you sure you want to return to the home area?')){ return; }
-        _self.playSoundEffect('bounce-sound');
-        let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
-        _self.decZoomLevel();
-        $thisWorld.addClass('busy');
-        _self.saveWorldState(function(){
-            _self.decZoomLevel();
-            $thisWorld.addClass('loading');
-            window.location.href = homeButtonURL;
-            });
-        $thisWorld.animate({opacity: 0}, 600, function(){
-            $thisWorld.addClass('hidden');
-            });
+        // Trigger the confirmation modal before leaving
+        _self.showActionModal(
+            'confirm',
+            'Return Home',
+            'Are you sure you want to return home?',
+            null, {
+                onConfirm: function() {
+                    // Execute the original redirect and animation logic
+                    _self.playSoundEffect('bounce-sound');
+                    let homeButtonURL = $homeButton.attr('data-url') || _config.homeButtonURL;
+                    _self.decZoomLevel();
+                    $thisWorld.addClass('busy');
+                    _self.saveWorldState(function(){
+                        _self.decZoomLevel();
+                        $thisWorld.addClass('loading');
+                        window.location.href = homeButtonURL;
+                        });
+                    $thisWorld.animate({opacity: 0}, 600, function(){
+                        $thisWorld.addClass('hidden');
+                        });
+                    }
+                }
+            );
         return true;
         });
     return true;
