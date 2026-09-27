@@ -303,6 +303,7 @@ $(document).ready(function(){
         var thisToken = thisCell.attr('data-token');
         var thisQuantity = thisCell.find('.item_quantity').attr('data-quantity') || 0;
         var thisPrice = thisCell.find('.item_price').attr('data-price') || 0;
+        var thisPlayer = thisCell.attr('data-player') || '';
         thisQuantity = parseInt(thisQuantity);
         thisPrice = parseInt(thisPrice);
         var sellQuantity = 1;
@@ -323,7 +324,15 @@ $(document).ready(function(){
             itemCellConfirm.find('.item_price').attr('data-price', sellPrice).html('&hellip; '+printNumberWithCommas(sellPrice)+'z');
             } else {
             itemCellConfirm.empty();
-            itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', sellQuantity).attr('data-shop', thisSeller);
+            itemCellConfirm
+                .attr('data-kind', thisKind)
+                .attr('data-action', thisAction)
+                .attr('data-token', thisToken)
+                .attr('data-price', thisPrice)
+                .attr('data-quantity', sellQuantity)
+                .attr('data-shop', thisSeller)
+                .attr('data-player', thisPlayer)
+                ;
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<label class="item_price" data-price="'+sellPrice+'">&hellip; '+printNumberWithCommas(sellPrice)+'z</label>');
@@ -356,6 +365,7 @@ $(document).ready(function(){
 
     // Functionality to the buy links for all shops
     $('.item_cell[data-token][data-action="buy"] .buy_button', gameConsole).live('click', function(e){
+        //console.log('buy button clicked!');
         e.preventDefault();
         if (!thisShopData.allowEdit){ return false; }
         var thisButton = $(this);
@@ -367,6 +377,7 @@ $(document).ready(function(){
         var thisToken = thisCell.attr('data-token');
         var thisQuantity = thisCell.find('.item_quantity').attr('data-quantity') || 0;
         var thisPrice = thisCell.find('.item_price').attr('data-price') || 0;
+        var thisPlayer = thisCell.attr('data-player') || 'all';
         thisQuantity = parseInt(thisQuantity);
         thisPrice = parseInt(thisPrice);
         var buyQuantity = 1;
@@ -374,7 +385,7 @@ $(document).ready(function(){
         var thisDisabled = thisCell.hasClass('item_cell_disabled') ? true : false;
         if (thisDisabled){ return false; }
         var thisItemName = thisCell.find('.item_name').clone();
-        //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z');
+        //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z / '+thisPlayer);
         var itemCellConfirm = $('.item_cell_confirm', thisTab);
         itemCellConfirm.removeClass('with_mods');
         if (thisKind == 'item'){ itemCellConfirm.addClass('with_mods'); }
@@ -385,7 +396,15 @@ $(document).ready(function(){
             //console.log('thisUnlocked', thisUnlocked);
             //console.log('ABILITY-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+actualQuantity+' / '+thisPrice+'z '+' / '+(thisUnlocked ? 'Unlocked' : 'Not Unlocked'));
             itemCellConfirm.empty();
-            itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer).attr('data-player', 'all');
+            itemCellConfirm
+                .attr('data-kind', thisKind)
+                .attr('data-action', thisAction)
+                .attr('data-token', thisToken)
+                .attr('data-price', thisPrice)
+                .attr('data-quantity', buyQuantity)
+                .attr('data-shop', thisBuyer)
+                .attr('data-player', thisPlayer)
+                ;
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
             var buttonCounter = 0;
@@ -435,11 +454,19 @@ $(document).ready(function(){
                 itemCellConfirm.append(thisItemName);
                 }
             } else {
-            //console.log('OTHER-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
+            //console.log('OTHER-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z / '+thisPlayer);
             itemCellConfirm.empty();
-            itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer);
-            itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
-            itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
+            itemCellConfirm
+                .attr('data-kind', thisKind)
+                .attr('data-action', thisAction)
+                .attr('data-token', thisToken)
+                .attr('data-price', thisPrice)
+                .attr('data-quantity', buyQuantity)
+                .attr('data-shop', thisBuyer)
+                .attr('data-player', thisPlayer)
+                ;
+            itemCellConfirm.append('<a class="cancel_button type type_attack" href="#">Cancel</a>');
+            itemCellConfirm.append('<a class="confirm_button type type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
             itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
             itemCellConfirm.append(thisItemName);
@@ -601,7 +628,21 @@ $(document).ready(function(){
                             $('#zenny_counter', thisBody).removeClass(thisZennyDiffClass);
                             //console.log('we just completed an action... postData = ', postData);
 
-                            // If the completed action was buying a new robot, refresh page
+                            // If the completed action was buying a new robot or ability, refresh page afterward
+                            if ((postData.kind === 'robot'
+                                || postData.kind === 'ability')
+                                && postData.action === 'buy'
+                                && postData.quantity >= 1){
+
+                                // If we're in a world view, we should update the parent to ask for a refresh
+                                if (typeof window.parent.gameSettings !== 'undefined'
+                                    && typeof window.parent.gameSettings.worldState !== 'undefined'){
+                                    window.parent.gameSettings.worldState.refreshRequired = true;
+                                    }
+
+                                }
+
+                            // If the completed action was buying a new robot, update the ready room
                             if (postData.kind === 'robot'
                                 && postData.action === 'buy'
                                 && postData.quantity >= 1){
@@ -685,16 +726,7 @@ $(document).ready(function(){
 
                     // Make sure we always poll the server for popup events after our action
                     //console.log('queuing the windowEventsPull event (via shop)');
-                    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
-                        window.top.mmrpg_queue_for_game_start(function(){
-                            //console.log('i guess the game has started');
-                            setTimeout(function(){ parent.windowEventsPull(); }, 1000);
-                            });
-                        }
-                    else if (typeof window.top.windowEventsPull !== 'undefined'){
-                        //console.log('i guess we pull events manually');
-                        setTimeout(function(){ parent.windowEventsPull(); }, 1000);
-                        }
+                    triggerWindowEventsPull();
 
                     return true;
 
@@ -890,6 +922,38 @@ function windowResizeFrame(){
     //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
 
 }
+
+// Define a quick functino for polling the server for new events (but only if we can actually show them)
+function triggerWindowEventsPull(afterDelay){
+    //console.log('%c' + 'mmrpgShop.triggerWindowEventsPull()', 'color: magenta;');
+    afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
+    //console.log('queuing the windowEventsPull event (via world)');
+    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+        //console.log('i guess we wait for the game to start via parent.mmrpg_queue_for_game_start()', parent.mmrpg_queue_for_game_start);
+        window.top.mmrpg_queue_for_game_start(function(){
+            //console.log('i guess the game has started');
+            setTimeout(function(){
+                //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                let result = window.top.windowEventsPull(true);
+                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                //else { console.log('windowEventsPull returned successfully: ' + result); }
+                }, afterDelay);
+            });
+        }
+    else if (typeof window.top.windowEventsPull !== 'undefined'){
+        //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+        setTimeout(function(){
+            let result = window.top.windowEventsPull(true);
+            if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+            //else { console.log('windowEventsPull returned successfully: ' + result); }
+            }, afterDelay);
+        }
+    else {
+        //console.warn('could not find a way to pull window events from the parent window!');
+        }
+    // Return no specific result
+    return;
+    }
 
 // Define a function for printing a number with commas as thousands separators
 function printNumberWithCommas(x) {

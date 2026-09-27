@@ -312,8 +312,14 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'buy'){
         if (!empty($unlock_robot_info)
             && !empty($unlock_robot_info['robot_flag_unlockable'])){
 
-            // Hard-code this robot's player if from specific games
-            if ($unlock_robot_info['robot_game'] == 'MM1'){
+            // If a specific player was passed, assign the robot to them directly
+            if (!empty($temp_player) && $temp_player !== 'all'){
+
+                $unlock_player_token = $temp_player;
+
+            }
+            // Otherwise, hard-code this robot's player if from specific games
+            elseif ($unlock_robot_info['robot_game'] == 'MM1'){
 
                 // All MM1 robot masters go to Dr. Light
                 $unlock_player_token = 'dr-light';
