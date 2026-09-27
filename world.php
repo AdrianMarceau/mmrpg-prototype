@@ -807,6 +807,11 @@ $map_data_parsed['battles'] = $battles_remaining;
 // Refresh the world map with any persistent changes that have occurred
 rpg_world::refresh_world_map($this_prototype_data, $map_data_parsed);
 
+// Include the world progression script so it can review and update where necessary
+$worldprog_token = $this_prototype_data['this_current_world'];
+$worldprog_filepath = 'prototype/worldprogs/'.$worldprog_token.'.php';
+if (file_exists(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath)){ require(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath); }
+
 // Now that we have encounter and other data, let's see if we should change the music at all
 if (!empty($map_data_parsed['music'])){
     $music_tracks = $map_data_parsed['music'];
