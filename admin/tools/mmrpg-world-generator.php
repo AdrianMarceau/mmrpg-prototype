@@ -302,7 +302,7 @@ echo('<pre>'.PHP_EOL);
                 foreach ($portal_colour_index AS $colour => $types){ if (in_array($area_type, $types)){ $portal_colour = $colour; break; } }
                 $portal_position = $area_middle_col.'-'.$area_middle_row;
                 $protected_zones['quanta-flower-buffer'] = $portal_position;
-                $area_file_markup[] = '@portals[]  = subspace-portal('.$portal_position.', prototype-subspace__'.$area_type.'-portal, '.$portal_colour.'-alt)';
+                $area_file_markup[] = '@portals[]  = subspace-portal('.$portal_position.', prototype-area-0__'.$area_type.'-portal, '.$portal_colour.'-alt)';
                 $area_file_markup[] = '@locks[]    = '.$area_type.'-portal-flower('.$portal_position.', portal-flower, '.$area_type.', items:'.$area_type.'-core, x10, locked)';
 
             }
