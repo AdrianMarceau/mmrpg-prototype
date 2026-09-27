@@ -1770,47 +1770,50 @@ function mmrpg_queue_for_game_start(onGameStart){
 
 // Define a function that checks the server for any event popups to display
 gameSettings.eventPullTimeout = false;
-gameSettings.eventPullInProgress = false;
-function windowEventsPull(forcePull, butForReal){
-    //console.log('windowEventsPull()');
-    if (gameSettings.eventPullInProgress){ return false; }
-    if (!butForReal){
-        if (gameSettings.eventPullTimeout){ clearTimeout(gameSettings.eventPullTimeout); }
-        gameSettings.eventPullTimeout = setTimeout(function(){
-            windowEventsPull(forcePull, true);
-            }, 300);
+function windowEventsPull(forcePull){
+    //console.warn('windowEventsPull()');
+    // Clear the previous timeout every time the function is called
+    if (gameSettings.eventPullTimeout){
+        clearTimeout(gameSettings.eventPullTimeout);
         }
-    // Do not pull events if we're currently in a sub-menu iframe
-    gameSettings.eventPullInProgress = true;
-    forcePull = typeof forcePull === 'boolean' ? forcePull : false;
-    var $mmrpg = $('#mmrpg');
-    var $prototype = $('#prototype');
-    if (!forcePull){
-        if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
-        else if ($mmrpg.is('.iframe')){ return -2; }
-        else if (!$prototype.length){ return -3; }
-        }
-    // Otherwise we can pull events from the server and display them
-    $.ajax({
-        url: 'scripts/get-events.php',
-        dataType: 'json',
-        success: function(response){
-            //console.log('scripts/get-events.php returned ', response);
-            gameSettings.eventPullInProgress = false;
-            if (typeof response.data !== 'undefined'
-                && typeof response.data.events !== 'undefined'
-                && typeof response.data.messages !== 'undefined'){
-                //console.log('creating event');
-                var eventsMarkup = response.data.events;
-                var messagesMarkup = response.data.messages;
-                if (eventsMarkup.length && messagesMarkup.length){
-                    windowEventCreate(eventsMarkup, messagesMarkup, false);
-                    windowEventDisplay();
-                    }
-                }
+    // Set a new timeout. The code inside will ONLY run if 1000ms
+    // pass without this function being called again.
+    gameSettings.eventPullTimeout = setTimeout(function(){
+        // Do not pull events if we're currently in a sub-menu iframe
+        forcePull = typeof forcePull === 'boolean' ? forcePull : false;
+        var $mmrpg = $('#mmrpg');
+        var $prototype = $('#prototype');
+        if (!forcePull){
+            // If any of these are true, we just return to safely exit the timeout callback
+            if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
+            else if ($mmrpg.is('.iframe')){ return -2; }
+            else if (!$prototype.length){ return -3; }
             }
-        });
-    // Return true to indicate that the pull was successful
+        // Otherwise we can pull events from the server and display them
+        //console.log('sending...');
+        $.ajax({
+            url: 'scripts/get-events.php',
+            dataType: 'json',
+            success: function(response){
+                //console.log('scripts/get-events.php returned ', response);
+                if (typeof response.data !== 'undefined'
+                    && typeof response.data.events !== 'undefined'
+                    && typeof response.data.messages !== 'undefined'){
+                    var eventsMarkup = response.data.events;
+                    var messagesMarkup = response.data.messages;
+                    if (eventsMarkup.length && messagesMarkup.length){
+                        windowEventCreate(eventsMarkup, messagesMarkup, false);
+                        windowEventDisplay();
+                        }
+                    }
+                },
+            error: function(response){
+                //console.log('scripts/get-events.php failed ', response);
+                // Silently fail or handle error
+                }
+            });
+        }, 1000);
+    // Return true immediately to indicate that the pull has been successfully queued
     return true;
 }
 
@@ -1844,10 +1847,13 @@ function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
     for (var i = 0; i < messagesMarkupArray.length; i++){ gameSettings.messagesMarkupArray.push(messagesMarkupArray[i]); }
     updatePendingEventsCount();
     if (autoDisplay){
+        //console.log('autoDisplay requested');
         if (!gameSettings.gameHasStarted){
-            gameSettings.onGameStart.push(function(){ setTimeout(windowEventDisplay, 1000); });
+            //console.log('game not started, adding trigger to gameSettings.onGameStart');
+            mmrpg_queue_for_game_start(function(){ setTimeout(windowEventDisplay, 1000); });
             }
         else {
+            //console.log('game has started, using windowEventDisplay directly');
             windowEventDisplay();
             }
         }
