@@ -2294,6 +2294,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             let isBlock = action.indexOf('-block') !== -1 || action.indexOf('block-') !== -1;
             let isHazard = action.indexOf('-hazard') !== -1 || action.indexOf('hazard-') !== -1;
             let isShop = action.indexOf('-shop') !== -1 || action.indexOf('shop-') !== -1;
+            let isAdvice = action.indexOf('-advice') !== -1 || action.indexOf('advice-') !== -1;
             let isDismiss = action === 'dismiss';
             if (!isDismiss){ $button.addClass('clicked'); }
             if ($sideButtons.is('.busy') && !isDismiss){ return false; }
@@ -3225,7 +3226,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     };
 
                 let frameSource = '';
-                frameSource = '/frames/shop.php?world=true&amp;shop=' + shopToken;
+                frameSource = '/frames/shop.php?world=true&shop=' + shopToken + '&player=' + _playerToken;
                 let popupMarkup = '<div id="popup-iframe" class="chrome active hidden">'
                         + '<div class="overlay"></div>'
                         + '<div class="wrapper">'
@@ -3245,9 +3246,18 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     $popupFrame.addClass('hidden');
                     $thisWorld.removeClass('has_iframe');
                     _self.playSoundEffect('back-click');
+                    _self.triggerWindowEventsPull();
                     setTimeout(function(){
                         $popupFrame.remove();
                         }, 1000);
+                    if (_world.refreshRequired){
+                        //console.log('refresh required!');
+                        _self.incZoomLevel();
+                        $thisWorld.addClass('loading');
+                        window.location.href = window.location.href;
+                        _world.refreshRequired = false;
+                        return;
+                        }
                     });
 
                 window.prototype_menu_loaded = function(){ onShopReady(); };
@@ -3261,25 +3271,36 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 $('iframe', $popupFrame).attr('src', frameSource);
 
                 }
-            else if (action === 'advice-from-auto'){
+            else if (isAdvice){
                 //console.log('-> special action "', action, '", time to give some advice');
+                // Grab a reference to this actor's index info
+                let actorToken, actorNameKey, actorInfo;
+                actorToken = action.replace(/^advice-from-/, '');
+                if (actorToken === 'auto'){ actorNameKey = 'good-guy-auto'; }
+                else if (actorToken === 'reggae'){ actorNameKey = 'weird-bird-reggae'; }
+                else if (actorToken === 'kalinka'){ actorNameKey = 'star-gazer-kalinka'; }
+                if (actorNameKey && typeof _mapActorsIndex[actorNameKey] !== 'undefined'){ actorInfo = _mapActorsIndex[actorNameKey]; }
+                //console.log('_mapActorsIndex =', _mapActorsIndex);
+                //console.log('actorInfo =', actorInfo);
+                // Collect possible advice messages from the actor info if set
                 let possibleMessages = [];
-                possibleMessages.push('Defeat robot masters with super effective attacks to increase the chance of elemental cores dropping!');
-                possibleMessages.push('Defeat support mecha with super effective attacks to increase the odds of elemental shards dropping!');
-                possibleMessages.push('Experience points in battle are split among your whole team, so everyone gets to level-up together!');
-                possibleMessages.push('You can\'t bring robots into battle without Limit Hearts, so try to earn as many as you can!');
-                possibleMessages.push('You can change direction in-place by holding down the cancel button before trying to move!');
-                possibleMessages.push('Boss Stars contain Starforce power, and that power makes your robots stronger! Try to collect a lot!');
-                possibleMessages.push('Heal Pads are green and restore your energy, while Reset Pads are red and blue and reset your stats!');
-                possibleMessages.push('Hold down the confirm button while picking up items to automatically use/give them to your robots!');
-                possibleMessages.push('Support mecha can be recruited using the Mecha Whistle, but only when they\'re totally isolated.');
-                possibleMessages.push('Holding an elemental core allows a robots to equip virtually any ability that matches its type!');
-                possibleMessages.push('Elemental shards don\'t do much on their own, but collect four of the same kind and they\'ll fuse!');
-                let currentKey = typeof _self.currentAdviceFromAutoKey !== 'undefined' ? _self.currentAdviceFromAutoKey : -1;
+                if (actorInfo
+                    && typeof actorInfo['advice'] !== 'undefined'
+                    && actorInfo['advice'].length > 0){
+                    possibleMessages = Object.values(actorInfo['advice']);
+                    } else {
+                    possibleMessages.push('I don\'t have any advice to share right now, sorry.');
+                    }
+                //console.log('possibleMessages =', possibleMessages);
+                let currentKey = typeof _self.currentAdviceKey !== 'undefined' ? _self.currentAdviceKey : -1;
                 let randomKey;
-                do { randomKey = Math.floor(Math.random() * possibleMessages.length) + 0; }
-                while (randomKey === currentKey);
-                _self.currentAdviceFromAutoKey = randomKey;
+                if (possibleMessages.length === 1){
+                    randomKey = 0;
+                    } else {
+                    do { randomKey = Math.floor(Math.random() * possibleMessages.length) + 0; }
+                    while (randomKey === currentKey);
+                    }
+                _self.currentAdviceKey = randomKey;
                 //console.log('currentKey =', currentKey);
                 //console.log('randomKey =', randomKey);
                 let selectedMessageText = possibleMessages[randomKey];
