@@ -87,10 +87,9 @@ html, body {
     height: 100%;
     background-color: transparent;
     background-image: none;
-    background-size: 100%;
-    background-size: cover;
-    background-position: center top;
-    filter: blur(6px) brightness(0.6);
+    background-size: auto 100vh;
+    background-position: center center;
+    filter: blur(3px) brightness(0.6);
     transform: translate(0, 0);
     transition: none;
 }
@@ -776,11 +775,14 @@ html, body {
 #world #map .sprite.block.super-block.sonic-highway { background-image: url("../content/fields/sonic-highway/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.striker-stadium { background-image: url("../content/fields/striker-stadium/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.solar-inferno { background-image: url("../content/fields/solar-inferno/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.medieval-castle { background-image: url("../content/fields/medieval-castle/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.galaxy-fantasy { background-image: url("../content/fields/galaxy-fantasy/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.super-block.savage-menagerie { background-image: url("../content/fields/savage-menagerie/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.frozen-boulevard { background-image: url("../content/fields/frozen-boulevard/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.sparkling-grotto { background-image: url("../content/fields/sparkling-grotto/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.balloon-playground { background-image: url("../content/fields/balloon-playground/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.forgotten-themepark { background-image: url("../content/fields/forgotten-themepark/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.barrier-block { background-position: -40px -440px; }
 
