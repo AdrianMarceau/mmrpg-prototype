@@ -101,42 +101,40 @@ $grid = [
         'electrical-tower',
         'clock-citadel',
         'oil-wells',
-        'industrial-facility',
-        'sky-ridge',
     ],
 
     // GROUP 7
     [
+        'industrial-facility',
+        'sky-ridge',
         'waterfall-institute',
         'underground-laboratory',
         'pipe-station',
         'photon-collider',
         'atomic-furnace',
         'preserved-forest',
+    ],
+    [
         'construction-site',
         'magnetic-generator',
         'reflection-chamber',
         'rocky-plateau',
-    ],
-
-    // GROUP 8
-    [
         'spinning-greenhouse',
         'serpent-column',
         'power-plant',
         'septic-system',
+    ],
+    [
         'lighting-control',
         'rainy-sewers',
         'mineral-quarry',
         'egyptian-excavation',
         'space-simulator',
         'rusty-scrapheap',
-    ],
-
-    // GROUP 9
-    [
         'submerged-armory',
         'robosaur-boneyard',
+    ],
+    [
         'satellite-deck',
         'trenchwork-depot',
         'crystal-catacombs',
@@ -145,11 +143,9 @@ $grid = [
         'waterworks-dam',
         'minefield-dunes',
         'glacier-cradle',
-        'verdant-rainforest',
     ],
-
-    // GROUP 10
     [
+        'verdant-rainforest',
         'frosty-slopes',
         'gemstone-cavern',
         'sonic-highway',
@@ -157,11 +153,15 @@ $grid = [
         'solar-inferno',
         'medieval-castle',
         'galaxy-fantasy',
+    ],
+    [
         'savage-menagerie',
         'frozen-boulevard',
         'sparkling-grotto',
         'balloon-playground',
         'forgotten-themepark',
+        'sunken-metropolis',
+        'ancient-temple',
     ],
 
 ];

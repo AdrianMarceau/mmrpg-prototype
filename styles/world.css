@@ -783,6 +783,8 @@ html, body {
 #world #map .sprite.block.super-block.sparkling-grotto { background-image: url("../content/fields/sparkling-grotto/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.balloon-playground { background-image: url("../content/fields/balloon-playground/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.forgotten-themepark { background-image: url("../content/fields/forgotten-themepark/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.sunken-metropolis { background-image: url("../content/fields/sunken-metropolis/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.ancient-temple { background-image: url("../content/fields/ancient-temple/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.barrier-block { background-position: -40px -440px; }
 
