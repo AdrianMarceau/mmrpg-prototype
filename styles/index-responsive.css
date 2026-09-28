@@ -92,7 +92,21 @@ body:before {
     }
     #window .page .subbody .float_link .sprite.mugshot.field,
     #window .page .subbody .float.link .sprite.mugshot.field {
-        width: 32px;
+        width: 50px;
+        height: 50px;
+    }
+    #window .page .subbody .link_nav .float_link .sprite.mugshot.field,
+    #window .page .subbody .link_nav .float.link .sprite.mugshot.field {
+        width: 30px;
+        height: 22px;
+    }
+    #window .page .subbody .float_link .sprite.mugshot.field img,
+    #window .page .subbody .float.link .sprite.mugshot.field img {
+        margin: 0 auto;
+    }
+    #window .page .body .subbody[data-class="fields"] .float_link_group[data-game="MMRPG/Events"],
+    #window .page .body .subbody[data-class="fields"] .float.link.group[data-game="MMRPG/Events"] {
+        clear: left;
     }
     #window .page .subbody .float_link .sprite_size_40x40 span,
     #window .page .subbody .float_link .sprite_size_40x40 img,
@@ -234,7 +248,8 @@ body:before {
     }
     #window .page .subbody .float_link .sprite.mugshot.field,
     #window .page .subbody .float.link .sprite.mugshot.field {
-        width: 30px;
+        width: 40px;
+        height: 40px;
     }
 
 
@@ -281,6 +296,12 @@ body:before {
     }
     #window .page .leaderboard .subbody .bodytext .player_stats {
         width: calc(50% - 4px);
+    }
+
+    #window .page .subbody .float_link .sprite.mugshot.field,
+    #window .page .subbody .float.link .sprite.mugshot.field {
+        width: calc((100vw - 130px) / 8);
+        height: calc((100vw - 130px) / 8);
     }
 
 
