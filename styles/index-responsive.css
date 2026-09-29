@@ -104,8 +104,8 @@ body:before {
     #window .page .subbody .float.link .sprite.mugshot.field img {
         margin: 0 auto;
     }
-    #window .page .body .subbody[data-class="fields"] .float_link_group[data-game="MMRPG/Events"],
-    #window .page .body .subbody[data-class="fields"] .float.link.group[data-game="MMRPG/Events"] {
+    #window .page .body .subbody[data-class="fields"] .float_link_group[data-game="MM99/Master"], /* MMRPG/Events */
+    #window .page .body .subbody[data-class="fields"] .float.link.group[data-game="MM99/Master"] {
         clear: left;
     }
     #window .page .subbody .float_link .sprite_size_40x40 span,
