@@ -1,5 +1,15 @@
 <?php
 
+// Require the global top file
+define('MMRPG_EXTERNAL_TOP_INCLUDE', true);
+define('MMRPG_EXCLUDE_SESSION', true);
+require_once('../../top.php');
+
+// Collect the list of master fields
+$mmrpg_index_fields = rpg_field::get_index();
+//echo('<pre>$mmrpg_index_fields = '.print_r($mmrpg_index_fields, true).'</pre>'.PHP_EOL);
+//exit();
+
 // ==========================================
 // CONFIGURATION
 // ==========================================
@@ -25,146 +35,63 @@ $blockSizeY   = 320;
 $grid = [
     // GROUP 1 (Starts at Y = 360)
     [
-        'type-none:not-walkable',      // Col 0
-        'type-cutter:not-walkable',    // Col 1
-        'type-impact:not-walkable',    // Col 2
-        'type-freeze:not-walkable',    // Col 3
-        'type-explode:not-walkable',   // Col 4
-        'type-flame:not-walkable',     // Col 5
-        'type-electric:not-walkable',  // Col 6
-        'type-time:not-walkable',      // Col 7
-        'type-earth:not-walkable',     // Col 8
-        'type-wind:not-walkable',      // Col 9
-    ],
-
-    // GROUP 2 (Starts at Y = 680)
-    [
-        'type-water:not-walkable',     // Col 0
-        'type-swift:not-walkable',     // Col 1
-        'type-nature:not-walkable',    // Col 2
-        'type-missile:not-walkable',   // Col 3
-        'type-crystal:not-walkable',   // Col 4
-        'type-shadow:not-walkable',    // Col 5
-        'type-space:not-walkable',     // Col 6
-        'type-shield:not-walkable',    // Col 7
-        'type-laser:not-walkable',     // Col 8
-        'type-copy:not-walkable',      // Col 9
+        'type-none:not-walkable',
+        'type-cutter:not-walkable',
+        'type-impact:not-walkable',
+        'type-freeze:not-walkable',
+        'type-explode:not-walkable',
+        'type-flame:not-walkable',
+        'type-electric:not-walkable',
+        'type-time:not-walkable',
+        'type-earth:not-walkable',
+        'type-wind:not-walkable',
+        'type-water:not-walkable',
+        'type-swift:not-walkable',
+        'type-nature:not-walkable',
+        'type-missile:not-walkable',
+        'type-crystal:not-walkable',
+        'type-shadow:not-walkable',
+        'type-space:not-walkable',
+        'type-shield:not-walkable',
+        'type-laser:not-walkable',
+        'type-copy:not-walkable',
     ],
 
     // GROUP 3 (Starts at Y = 1000)
     [
-        'water:not-walkable',           // Col 0
-        'magma:not-walkable',           // Col 1
-        'plain',                        // Col 2
-        'beach',                        // Col 3
-        'grass',                        // Col 4
-        'ground',                       // Col 5
-        'tundra',                       // Col 6
-        'clouds:not-walkable',          // Col 7
+        'water:not-walkable',
+        'magma:not-walkable',
+        'clouds:not-walkable',
+        'plain',
+        'beach',
+        'grass',
+        'ground',
+        'tundra',
+        'darkness',
+        'lightness',
     ],
 
     // GROUP 4 (Starts at Y = 1320)
     [
-        'darkness',
-        'prototype-subspace',
         'plain-field',
         'bonus-field',
-        'gentle-countryside',
-        'maniacal-hideaway',
-        'wintry-forefront',
-        'light-laboratory',
-        'wily-castle',
-        'cossack-citadel',
-    ],
-
-    // GROUP 5
-    [
-        'lightness',
-        'prototype-subspace-ii',
-        'final-destination',
-        'final-destination-ii',
-        'final-destination-iii',
-        'robot-museum',
-        'hunter-compound',
-        'royal-palace',
-        'genesis-tower',
-        'stardroid-base',
-    ],
-
-    // GROUP 6
-    [
-        'abandoned-warehouse',
-        'mountain-mines',
-        'arctic-jungle',
-        'orb-city',
-        'steel-mill',
-        'electrical-tower',
-        'clock-citadel',
-        'oil-wells',
-    ],
-
-    // GROUP 7
-    [
-        'industrial-facility',
-        'sky-ridge',
-        'waterfall-institute',
-        'underground-laboratory',
-        'pipe-station',
-        'photon-collider',
-        'atomic-furnace',
-        'preserved-forest',
-    ],
-    [
-        'construction-site',
-        'magnetic-generator',
-        'reflection-chamber',
-        'rocky-plateau',
-        'spinning-greenhouse',
-        'serpent-column',
-        'power-plant',
-        'septic-system',
-    ],
-    [
-        'lighting-control',
-        'rainy-sewers',
-        'mineral-quarry',
-        'egyptian-excavation',
-        'space-simulator',
-        'rusty-scrapheap',
-        'submerged-armory',
-        'robosaur-boneyard',
-    ],
-    [
-        'satellite-deck',
-        'trenchwork-depot',
-        'crystal-catacombs',
-        'sunset-gulch',
-        'haunted-mansion',
-        'waterworks-dam',
-        'minefield-dunes',
-        'glacier-cradle',
-    ],
-    [
-        'verdant-rainforest',
-        'frosty-slopes',
-        'gemstone-cavern',
-        'sonic-highway',
-        'striker-stadium',
-        'solar-inferno',
-        'medieval-castle',
-        'galaxy-fantasy',
-    ],
-    [
-        'savage-menagerie',
-        'frozen-boulevard',
-        'sparkling-grotto',
-        'balloon-playground',
-        'forgotten-themepark',
-        'sunken-metropolis',
-        'ancient-temple',
     ],
 
 ];
+
+// Loop through fields and manually add them to the grid list
+$grid_database_fields = array();
+foreach ($mmrpg_index_fields AS $field_token => $field_info){
+    if (empty($field_info['field_flag_published'])){ continue; }
+    elseif (empty($field_info['field_flag_complete'])){ continue; }
+    $terrain_token = $field_token;
+    $terrain_token = str_replace('-3', '-iii', $terrain_token);
+    $terrain_token = str_replace('-2', '-ii', $terrain_token);
+    $terrain_token = str_replace('-1', '-i', $terrain_token);
+    $grid_database_fields[] = $terrain_token;
+    if ($terrain_token === 'prototype-subspace'){ $grid_database_fields[] = $terrain_token.'-ii'; }
+}
+$grid[] = $grid_database_fields;
 
 // ==========================================
 // GENERATOR LOGIC (Do not edit below)
