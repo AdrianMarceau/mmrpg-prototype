@@ -1319,9 +1319,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '12-5',
         'level' => 100,
         'element' => 'space',
-        'field' => 'galaxy-fantasy',
-        'encounters' => ['trill'],
-        'encounters2' => ['novamite', 'adamski'],
+        'field' => 'space-simulator',
+        'encounters' => ['ring-man', 'trill'],
+        'encounters2' => ['ring-ring', 'pukapunter', 'adamski'],
         'rescues' => ['rush'],
         'items' => ['reverse-module'],
         'tags' => ['upper', 'elemental', 'main'],
@@ -1330,7 +1330,7 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['space-area-1e'] = [
         'name' => 'SPACE Area 1E',
-        'subname' => 'Entrance',
+        'subname' => 'Zone 1',
         'position' => '13-4',
         'level' => 110,
         'element' => 'space',
@@ -1342,19 +1342,19 @@ function mmrpg_prototype_world_areas($world, &$index){
         ];
     $index['space-area-1e2'] = [
         'name' => 'SPACE Area 1E2',
-        'subname' => 'Interior',
+        'subname' => 'Zone 2',
         'position' => '14-4',
         'level' => 120,
         'element' => 'space',
         'field' => 'satellite-deck',
-        'encounters' => ['galaxy-man'],
+        'encounters' => ['astro-man'],
         'encounters2' => ['novamite', 'shururun', 'flipping-suzy', 'pukapunter'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
     $index['space-area-1e3'] = [
         'name' => 'SPACE Area 1E3',
-        'subname' => 'Boss Room',
+        'subname' => 'Zone 3',
         'position' => '15-4',
         'level' => 130,
         'element' => 'space',
@@ -1367,35 +1367,35 @@ function mmrpg_prototype_world_areas($world, &$index){
     //--------------------------//
     $index['space-area-1w'] = [
         'name' => 'SPACE Area 1W',
-        'subname' => 'Entrance',
+        'subname' => 'Zone 1',
         'position' => '11-4',
         'level' => 110,
         'element' => 'space',
-        'field' => 'space-simulator',
-        'encounters' => ['ring-man', 'gachappon'],
+        'field' => 'galaxy-fantasy',
+        'encounters' => ['galaxy-man'],
         'encounters2' => ['novamite', 'ring-ring', 'adamski', 'tamp'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
     $index['space-area-1w2'] = [
         'name' => 'SPACE Area 1W2',
-        'subname' => 'Interior',
+        'subname' => 'Zone 2',
         'position' => '10-4',
         'level' => 120,
         'element' => 'space',
-        'field' => 'space-simulator',
-        'encounters' => ['astro-man'],
+        'field' => 'galaxy-fantasy',
+        'encounters' => ['gachappon'],
         'encounters2' => ['novamite', 'ring-ring', 'malmet', 'tamp'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
     $index['space-area-1w3'] = [
         'name' => 'SPACE Area 1W3',
-        'subname' => 'Boss Room',
+        'subname' => 'Zone 3',
         'position' => '9-4',
         'level' => 130,
         'element' => 'space',
-        'field' => 'space-simulator',
+        'field' => 'galaxy-fantasy',
         'encounters' => ['ra-thor'],
         'encounters2' => ['novamite', 'ring-ring', 'adamski', 'malmet', 'trille-bot'],
         'tags' => ['upper', 'elemental'],
