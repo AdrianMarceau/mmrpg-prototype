@@ -174,7 +174,7 @@ foreach ($grid as $rowIndex => $row) {
             //echo "@tiles[]    = {$name}-{$i}({$currentId}{$subChar}, {$subX}, {$subY}, {$name}{$flags})\n";
         }
 
-        echo "#---------------------------#\n";
+        //echo "#---------------------------#\n";
 
         // Increment ID for the next valid tile
         $currentId += $idIncrement;
