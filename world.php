@@ -1180,10 +1180,13 @@ unset($db);
 ?>
 <?
 // DEBUG DEBUG DEBUG
-//echo('<!-- [[debug]] --//'.PHP_EOL);
-//echo('  -> $world_data_parsed = '.trim(print_r($world_data_parsed, true)).PHP_EOL);
-//echo('  -> $map_data_parsed = '.trim(print_r($map_data_parsed, true)).PHP_EOL);
-//echo('//-- [[debug]] -->'.PHP_EOL);
+if (!defined('MMRPG_CONFIG_IS_LIVE')
+    || MMRPG_CONFIG_IS_LIVE === false){
+    echo('<!-- [[debug]] --//'.PHP_EOL);
+    echo('  -> $world_data_parsed = '.trim(print_r($world_data_parsed, true)).PHP_EOL);
+    echo('  -> $map_data_parsed = '.trim(print_r($map_data_parsed, true)).PHP_EOL);
+    echo('//-- [[debug]] -->'.PHP_EOL);
+}
 // DEBUG DEBUG DEBUG
 ?>
 </body>
