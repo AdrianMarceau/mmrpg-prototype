@@ -163,7 +163,7 @@ foreach ($grid as $rowIndex => $row) {
         $baseY = $defaultStartY; //$defaultStartY + ($rowIndex * $blockSizeY);
 
         // 1. Output the main container tile
-        echo "@tiles[]    = {$name}({$currentId}, {$baseX}, {$baseY}, {$name}{$flags})\n";
+        echo "@tiles[]    = {$name}({$currentId}, {$baseX}, {$baseY}, {$name}{$flags}, has-bitmask)\n";
 
         // 2. Output the 16 sub-tiles
         foreach ($subOffsets as $i => $offset) {
@@ -171,7 +171,7 @@ foreach ($grid as $rowIndex => $row) {
             $subX = $baseX + $offset[0];
             $subY = $baseY + $offset[1];
 
-            echo "@tiles[]    = {$name}-{$i}({$currentId}{$subChar}, {$subX}, {$subY}, {$name}{$flags})\n";
+            //echo "@tiles[]    = {$name}-{$i}({$currentId}{$subChar}, {$subX}, {$subY}, {$name}{$flags})\n";
         }
 
         echo "#---------------------------#\n";
