@@ -2299,6 +2299,38 @@ class mmrpgWorldMap {
                 _selfRef.refreshTerrainTimeout = setTimeout(function(){ _self.refreshTerrainTileOverlay(); }, 100);
                 }
             }
+        // Define a max scroll value for the upcoming parallax background code
+        let maxParallaxRatio = 0.4;
+        // Calculate exact horizontal progress (0.0 to 1.0)
+        let mapMaxTranslateX = worldWidth - mapWidth;
+        let progressX = 0;
+        if (mapMaxTranslateX < 0){
+            progressX = Math.max(0, Math.min(1, mapTranslateX / mapMaxTranslateX));
+            }
+        // Calculate exact vertical progress (0.0 to 1.0)
+        let mapMaxTranslateY = worldHeight - mapHeight;
+        let progressY = 0;
+        if (mapMaxTranslateY < 0){
+            progressY = Math.max(0, Math.min(1, mapTranslateY / mapMaxTranslateY));
+            }
+        // Apply parallax by translating the correctly-proportioned background element
+        let $canvasBgSprite = $('#bg .sprite.field', _elements.canvas);
+        if ($canvasBgSprite.length) {
+            // Get the dimensions of both the sprite and its oversized #bg parent
+            let bgWidth = $canvasBgSprite.outerWidth();
+            let bgHeight = $canvasBgSprite.outerHeight();
+            let bgContainerWidth = $canvasBgSprite.parent().outerWidth();
+            let bgContainerHeight = $canvasBgSprite.parent().outerHeight();
+            // Calculate natural max translation against the #bg container
+            let bgMaxTranslateX = Math.min(0, bgContainerWidth - bgWidth);
+            let bgMaxTranslateY = Math.min(0, bgContainerHeight - bgHeight);
+            // Clamp both axes so it never scrolls faster than the map
+            let clampedBgMaxTranslateX = Math.max(bgMaxTranslateX, mapMaxTranslateX * maxParallaxRatio);
+            let clampedBgMaxTranslateY = Math.max(bgMaxTranslateY, mapMaxTranslateY * maxParallaxRatio);
+            let bgTranslateX = progressX * clampedBgMaxTranslateX;
+            let bgTranslateY = progressY * clampedBgMaxTranslateY;
+            $canvasBgSprite.css('transform', 'translate3d(' + bgTranslateX + 'px, ' + bgTranslateY + 'px, 0)');
+            }
         // Return true on success
         return true;
         }
