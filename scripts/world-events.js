@@ -1937,6 +1937,16 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     let token = typeof action[1] !== 'undefined' && action[1] ? action[1] : false;
                     let colour = typeof action[2] !== 'undefined' && action[2] ? action[2] : false;
                     if (!label || !token){ continue; }
+                    if (token === 'reset-world-pickups'){
+                        let allItemSymbols = Object.values(_config.mapItemSymbols).join(',');
+                        let hasRandomItems = allItemSymbols.indexOf('random-') !== -1;
+                        if (!hasRandomItems){ continue; }
+                        }
+                    else if (token === 'reset-world-encounters'){
+                        let allBattleSymbols = Object.values(_config.mapBattleSymbols).join(',');
+                        let hasRandomBattles = allBattleSymbols.indexOf('random-') !== -1;
+                        if (!hasRandomBattles){ continue; }
+                        }
                     let enabled = true;
                     let currency = typeof action[3] !== 'undefined' && action[3] ? action[3] : false;
                     let price = typeof action[4] !== 'undefined' && action[4] ? action[4] : false;

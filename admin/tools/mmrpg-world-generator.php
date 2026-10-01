@@ -427,7 +427,7 @@ echo('<pre>'.PHP_EOL);
                     $npc_y -= 1;
                 }
                 $npc_pos = $npc_x.'-'.$npc_y;
-                $npc_ver = in_array('player', $area_tags) ? 'first-encounter' : 'default';
+                $npc_ver = $area_token === 'prototype-area-0' ? 'first-encounter' : 'default';
                 $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, '.$npc_ver.')';
                 // Add him to the protected zones so encounters/items don't spawn on him
                 $protected_zones['purple-reset-dude-buffer'] = $npc_pos;
