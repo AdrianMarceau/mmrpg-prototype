@@ -520,6 +520,51 @@ class mmrpgWorldMap {
         _worldPlayer.direction = _worldCursor.direction || 'down-right';
         _worldPlayer.mobility = _config.playerMobility || 1;
         _worldPlayer.zenny = _config.playerZenny || 0;
+        // Loop through and expand any of the tile index definitions that have bitmasks
+        let mapTilesIndex = _config.mapTilesIndex;
+        if (Object.keys(mapTilesIndex).length){
+            let tileSizeX = _config.mapTileSize[0];
+            let tileSizeY = _config.mapTileSize[0];
+            let tilesIndexKeys = Object.keys(_config.mapTilesIndex);
+            let tilesIndexLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'];
+            let tilesIndexOffsets = [
+                [0, 0],
+                [0, tileSizeY * 3],
+                [tileSizeX, 0],
+                [tileSizeX, tileSizeY * 3],
+                [0, tileSizeY],
+                [0, tileSizeY * 2],
+                [tileSizeX, tileSizeY],
+                [tileSizeX, tileSizeY * 2],
+                [tileSizeX * 3, 0],
+                [tileSizeX * 3, tileSizeY * 3],
+                [tileSizeX * 2, 0],
+                [tileSizeX * 2, tileSizeY * 3],
+                [tileSizeX * 3, tileSizeY],
+                [tileSizeX * 3, tileSizeY * 2],
+                [tileSizeX * 2, tileSizeY],
+                [tileSizeX * 2, tileSizeY * 2]
+                ];
+            for (var i = 0; i < tilesIndexKeys.length; i++){
+                let tileKey = tilesIndexKeys[i];
+                if (tileKey === 'keys'){ continue; }
+                let tileData = _config.mapTilesIndex[tileKey];
+                if (tileData.indexOf('has-bitmask') === -1){ continue; }
+                //console.log('tileKey', tileKey, 'has bitmask | tileData =', tileData);
+                delete tileData[tileData.indexOf('has-bitmask')];
+                tileData = Object.values(tileData);
+                _config.mapTilesIndex[tileKey] = tileData;
+                for (var j = 0; j < tilesIndexLetters.length; j++){
+                    let newTileKey = tileKey + '-' + j;
+                    let newTileData = Object.values(tileData);
+                    newTileData[0] = tilesIndexOffsets[j][0];
+                    newTileData[1] = tilesIndexOffsets[j][1];
+                    //console.log('-> adding _config.mapTilesIndex[' + newTileKey + '] =', newTileData);
+                    _config.mapTilesIndex[newTileKey] = newTileData;
+                    }
+                }
+            //console.log('expanded _config.mapTilesIndex! ', JSON.parse(JSON.stringify(_config.mapTilesIndex)));
+            }
         // If player robots were defined [list + index] in the predefined config, copy them over to the state
         let _playerRobots = _config.playerRobots;
         let _playerRobotsIndex = _config.playerRobotsIndex;
