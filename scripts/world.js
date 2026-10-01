@@ -2145,6 +2145,18 @@ class mmrpgWorldMap {
             teamTravelDuration += 50;
             $otherSpritesInOrder.each(function(index, element){
                 let $thisSprite = $(element);
+                // Snap disabled sprites to the leader invisibly and skip gap calculations
+                if ($thisSprite.is('.disabled')){
+                    $thisSprite.prop('worldX', tileOffsetX);
+                    $thisSprite.prop('worldY', tileOffsetY);
+                    $thisSprite.prop('worldZ', tileOffsetZ);
+                    $thisSprite.css({
+                        left: tileOffsetX + 'px',
+                        top: tileOffsetY + 'px',
+                        zIndex: tileOffsetZ
+                    });
+                    return true; // Continue to the next sprite without incrementing offsets
+                }
                 let spriteKind = $thisSprite.attr('data-sprite');
                 let $innerSprite = $('.sprite', $thisSprite);
                 let imgSize = $thisSprite.attr('data-size') || 40;
