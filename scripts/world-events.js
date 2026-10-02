@@ -900,36 +900,35 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     let readyTeamPlayerFrames = [];
     let readyTeamRobotFrames = [];
 
+    // Helper function to safely merge actionData without overwriting defaults with falsy values
+    let applyActionData = function(actionData){
+        if (!actionData) return;
+        if (typeof actionData.showActionArea !== 'undefined') showActionArea = actionData.showActionArea;
+        if (actionData.actionAreaMarkup) actionAreaMarkup += actionData.actionAreaMarkup;
+        if (actionData.sideButtonsMarkup) sideButtonsMarkup += actionData.sideButtonsMarkup;
+        if (actionData.showActionAreaType) showActionAreaType = actionData.showActionAreaType;
+        if (actionData.zoomTimeoutDuration) zoomTimeoutDuration = actionData.zoomTimeoutDuration;
+        if (typeof actionData.triggerEffect !== 'undefined') triggerEffect = actionData.triggerEffect;
+        if (typeof actionData.readyTeamSprites !== 'undefined') readyTeamSprites = actionData.readyTeamSprites;
+        if (actionData.teamReadyDuration) teamReadyDuration = actionData.teamReadyDuration;
+        if (actionData.triggerEffectFunction) triggerEffectFunction = actionData.triggerEffectFunction;
+        if (typeof actionData.readyTeamSpritesAnyway !== 'undefined') readyTeamSpritesAnyway = actionData.readyTeamSpritesAnyway;
+        if (actionData.readyTeamPlayerFrames) readyTeamPlayerFrames = actionData.readyTeamPlayerFrames;
+        if (actionData.readyTeamRobotFrames) readyTeamRobotFrames = actionData.readyTeamRobotFrames;
+        };
+
     // --- EVENT DATA PARSING SWITCHBOARD ---
     if (firstEventType === 'event'){
-        let $customEvent = $(firstEvent.sprite);
-        let dataLabel = $customEvent.attr('data-label');
-        let dataEvent = $customEvent.attr('data-event');
-        let eventInfo = _config.mapEventsIndex[dataEvent] || false;
-        if (eventInfo && _worldCursor.moved){
-            let eventFilter = eventInfo['filter'] || false;
-            let eventAction = eventInfo['action'] || false;
-            let eventData = eventInfo['data'] || false;
-            let eventAllowed = eventFilter === 'any' ? true : false;
-            if (eventAllowed){
-                if (eventAction !== false){
-                    triggerEffect = true;
-                    readyTeamSprites = true;
-                    zoomTimeoutDuration = 600;
-                    triggerEffectFunction = function(){
-                        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
-                        _self.triggerWorldEvent(eventAction, eventData, $customEvent);
-                        };
-                    } else {
-                    showActionArea = true;
-                    if (!dataLabel){ dataLabel = 'Event Options'; }
-                    actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
-                    sideButtonsMarkup += '<a class="button big-button" data-action="trigger-event" data-event="'+dataEvent+'"><span><sup>Ready To</sup> Trigger Event</span></a>';
-                    sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                    showActionAreaType = 'event';
-                    }
-                }
-            }
+        let actionData = _self.prepareCustomEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
+        }
+    else if (firstEventType === 'item'){
+        let actionData = _self.prepareItemEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
+        }
+    else if (firstEventType === 'ability'){
+        let actionData = _self.prepareAbilityEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
         }
     else if (firstEventType === 'portal'){
         let $portalEvent = $(firstEvent.sprite);
@@ -1519,34 +1518,6 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             zoomTimeoutDuration = 1000;
             }
         }
-    else if (firstEventType === 'item'){
-        let actionData = _self.prepareItemEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
-        if (actionData) {
-            showActionArea = actionData.showActionArea;
-            actionAreaMarkup += actionData.actionAreaMarkup;
-            sideButtonsMarkup += actionData.sideButtonsMarkup;
-            showActionAreaType = actionData.showActionAreaType;
-            zoomTimeoutDuration = actionData.zoomTimeoutDuration;
-            triggerEffect = actionData.triggerEffect;
-            readyTeamSprites = actionData.readyTeamSprites;
-            teamReadyDuration = actionData.teamReadyDuration;
-            triggerEffectFunction = actionData.triggerEffectFunction;
-            }
-        }
-    else if (firstEventType === 'ability'){
-        let actionData = _self.prepareAbilityEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
-        if (actionData) {
-            showActionArea = actionData.showActionArea;
-            actionAreaMarkup += actionData.actionAreaMarkup;
-            sideButtonsMarkup += actionData.sideButtonsMarkup;
-            showActionAreaType = actionData.showActionAreaType;
-            zoomTimeoutDuration = actionData.zoomTimeoutDuration;
-            triggerEffect = actionData.triggerEffect;
-            readyTeamSprites = actionData.readyTeamSprites;
-            teamReadyDuration = actionData.teamReadyDuration;
-            triggerEffectFunction = actionData.triggerEffectFunction;
-            }
-        }
     else if (firstEventType === 'actor'){
         let eventInfo = firstEvent;
         let actorInfo = _mapActorsIndex[eventInfo.token];
@@ -1716,6 +1687,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let action = $button.attr('data-action') || false;
                 if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
                 if (!action){ console.error('-> no action found on button, skipping!'); return false; }
+                let isCustomEvent = action === 'trigger-event';
                 let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1;
                 let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
                 let isButton = action.indexOf('-button') !== -1 || action.indexOf('button-') !== -1;
@@ -1735,7 +1707,10 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
 
                 _self.disableActionDropdown();
 
-                if (isBattle){
+                if (isCustomEvent){
+                    return _self.handleCustomEventActionClick(action, $button, firstEvent);
+                    }
+                else if (isBattle){
                     let battleId = $button.attr('data-battle') || false;
                     let battleStarId = $button.attr('data-battle-star') || false;
                     if (action === 'battle-info'){
@@ -2464,6 +2439,101 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
     return true;
     }
 
+// Define a quick function for parsing a custom event on the map and returning action dropdown options
+function prepareCustomEventOptions(firstEvent, options){
+    //console.log('%c' + 'mmrpgWorldMap.prepareCustomEventOptions()', 'color: magenta;');
+    let _self = this;
+    let _config = _self.config;
+    let _world = _self.state;
+    let _worldCursor = _world.cursor;
+
+    options = options || {};
+    let stillAtPosition = typeof options.stillAtPosition === 'function' ? options.stillAtPosition : function(){ return true; };
+    let otherMenusActiveNow = typeof options.otherMenusActiveNow === 'function' ? options.otherMenusActiveNow : function(){ return false; };
+
+    let $customEvent = $(firstEvent.sprite);
+    let dataLabel = $customEvent.attr('data-label');
+    let dataEvent = $customEvent.attr('data-event');
+    let eventInfo = _config.mapEventsIndex[dataEvent] || false;
+
+    let actionData = {
+        showActionArea: false,
+        actionAreaMarkup: '',
+        sideButtonsMarkup: '',
+        showActionAreaType: '',
+        triggerEffect: false,
+        readyTeamSprites: false,
+        triggerEffectFunction: function(){}
+    };
+
+    if (eventInfo && _worldCursor.moved){
+        //console.log('-> found eventInfo for ' + dataEvent + ':', eventInfo);
+        let eventFilter = eventInfo['filter'] || false;
+        let eventAction = eventInfo['action'] || false;
+        let eventData = eventInfo['data'] || false;
+        let eventAllowed = eventFilter === 'any' ? true : false; // TODO: implement player and/or robot-specific filter logic
+
+        if (eventAllowed){
+            if (eventAction !== false){
+                //console.log('-> eventAction is "', eventAction, '" so defer it to triggerEffectFunction()');
+                actionData.triggerEffect = true;
+                actionData.readyTeamSprites = true;
+                actionData.readyTeamSpritesAnyway = true; // Ensures the poses trigger even while the map is "busy" executing the effect
+                actionData.zoomTimeoutDuration = 600; // for event panels we want to zoom in quickly
+                // We purposefully leave teamReadyDuration undefined so it inherits the parent default
+
+                actionData.triggerEffectFunction = function(){
+                    if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+                    //console.log('-> running triggerEffectFunction for eventAction "' + eventAction + '" with eventData:', eventData);
+                    _self.triggerWorldEvent(eventAction, eventData, $customEvent);
+                    };
+                } else {
+                //console.log('-> eventAction is false, so prepare dropdown instead');
+                actionData.showActionArea = true;
+                if (!dataLabel){ dataLabel = 'Event Options'; }
+                actionData.actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
+                actionData.sideButtonsMarkup += '<a class="button big-button" data-action="trigger-event" data-event="'+dataEvent+'"><span><sup>Ready To</sup> Trigger Event</span></a>';
+                actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                actionData.showActionAreaType = 'event';
+                }
+            } else {
+            //console.log('-> event not allowed based on filter "' + eventFilter + '"');
+            }
+        } else if (eventInfo && !_worldCursor.moved) {
+        //console.log('-> eventInfo found for ' + dataEvent + ', but cursor not moved yet, skipping');
+        } else {
+        //console.log('-> no eventInfo found for ' + dataEvent + ', skipping');
+        }
+
+    return actionData;
+    }
+
+// Define a quick function for handling manual custom event interactions via the dropdown
+function handleCustomEventActionClick(action, $button, firstEvent){
+    //console.log('%c' + 'mmrpgWorldMap.handleCustomEventActionClick(action:' + action + ')', 'color: magenta;');
+    let _self = this;
+    let _config = _self.config;
+
+    let dataEvent = $button.attr('data-event') || false;
+    let eventInfo = dataEvent ? _config.mapEventsIndex[dataEvent] : false;
+    let $customEvent = $(firstEvent.sprite);
+
+    if (!dataEvent || !eventInfo){ console.error('-> custom event name or info not found!'); return false; }
+    _self.hideActionDropdown(false);
+
+    if (action === 'trigger-event'){
+        let eventAction = eventInfo['action'] || false;
+        let eventData = eventInfo['data'] || false;
+        if (eventAction !== false){
+            _self.triggerWorldEvent(eventAction, eventData, $customEvent);
+            } else {
+            console.warn('-> trigger-event clicked, but eventAction is false. Nothing to trigger!');
+            }
+        }
+
+    return true;
+    }
+
 
 // Assign the sub-functions to the main class's prototype
 
@@ -2477,3 +2547,6 @@ mmrpgWorldMap.prototype.getEventsAtPosition = getEventsAtPosition;
 
 mmrpgWorldMap.prototype.refreshPlayerPlatforms = refreshPlayerPlatforms;
 mmrpgWorldMap.prototype.refreshMapPositionEvents = refreshMapPositionEvents;
+
+mmrpgWorldMap.prototype.prepareCustomEventOptions = prepareCustomEventOptions;
+mmrpgWorldMap.prototype.handleCustomEventActionClick = handleCustomEventActionClick;
