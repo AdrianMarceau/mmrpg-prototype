@@ -1052,6 +1052,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
 <script type="text/javascript" src="scripts/world-robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-items.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-abilities.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/world-battles.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <!-- (4) define game settings/config/indexes -->
 <script type="text/javascript">

@@ -1390,133 +1390,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             }
         }
     else if (firstEventType === 'battle'){
-        let firstBattleEvent = eventsAtPosition[0];
-        let firstBattleInfo = _mapBattlesIndex[firstBattleEvent.token] || null;
-        let firstBattleRobot = _mmrpgRobotsIndex[firstBattleInfo.token] || null;
-
-        let dataLabels = [], dataBattles = [];
-        for (var i = 0; i < eventsAtPosition.length; i++){
-            let battleEvent = eventsAtPosition[i];
-            let dataPosition = battleEvent.position;
-            var dataBattle = battleEvent.token;
-            var dataLabel = battleEvent.label;
-            if (dataBattle){
-                dataLabels.push([dataLabel, dataPosition]);
-                dataBattles.push([dataBattle, dataPosition]);
-                }
-            }
-        let dataBattleStars = [];
-        if (starsNearPosition.length){
-            for (var i = 0; i < starsNearPosition.length; i++){
-                let starEvent = starsNearPosition[i];
-                let dataPosition = starEvent.position;
-                var dataStar = 'world-star_' + _worldToken + '_' + _mapToken + '_' + starEvent.token;
-                if (dataStar){
-                    dataBattleStars.push([dataStar, dataPosition]);
-                    }
-                }
-            }
-
-        let standingAtPosition = (cursorPosition.split('-')).map(function(num){ return parseInt(num); });
-        let lookingAtPosition = [standingAtPosition[0], standingAtPosition[1]];
-        if (cursorDirection.indexOf('right') !== -1){ lookingAtPosition[0] = lookingAtPosition[0] + 1; }
-        else if (cursorDirection.indexOf('left') !== -1){ lookingAtPosition[0] = lookingAtPosition[0] - 1; }
-        if (cursorDirection.indexOf('down') !== -1){ lookingAtPosition[1] = lookingAtPosition[1] + 1; }
-        else if (cursorDirection.indexOf('up') !== -1){ lookingAtPosition[1] = lookingAtPosition[1] - 1; }
-
-        let tilesAroundPosition = [];
-        tilesAroundPosition.push((standingAtPosition[0] + 1) + '-' + (standingAtPosition[1] - 1)); // top-right
-        tilesAroundPosition.push((standingAtPosition[0] + 1) + '-' + standingAtPosition[1]); // right
-        tilesAroundPosition.push((standingAtPosition[0] + 1) + '-' + (standingAtPosition[1] + 1)); // bottom-right
-        tilesAroundPosition.push(standingAtPosition[0] + '-' + (standingAtPosition[1] + 1)); // bottom
-        tilesAroundPosition.push((standingAtPosition[0] - 1) + '-' + (standingAtPosition[1] + 1)); // bottom-left
-        tilesAroundPosition.push((standingAtPosition[0] - 1) + '-' + standingAtPosition[1]); // left
-        tilesAroundPosition.push((standingAtPosition[0] - 1) + '-' + (standingAtPosition[1] - 1)); // top-left
-        tilesAroundPosition.push(standingAtPosition[0] + '-' + (standingAtPosition[1] - 1)); // top
-        standingAtPosition = standingAtPosition.join('-');
-        lookingAtPosition = lookingAtPosition.join('-');
-
-        do {
-            let firstTile = tilesAroundPosition.shift();
-            if (firstTile === lookingAtPosition){ tilesAroundPosition.push(firstTile); break; }
-            else { tilesAroundPosition.push(firstTile); }
-        } while (tilesAroundPosition[0] !== lookingAtPosition);
-
-        if (dataLabels.length && dataBattles.length){
-            showActionArea = true;
-            readyTeamSprites = true;
-            let dataBattlesJoined = (function(battles){
-                for (var i = 0, list = []; i < battles.length; i++){
-                    let battle = battles[i][0];
-                    list.push(battle);
-                    } return list;
-                })(dataBattles).join(',');
-            let dataBattleStarsJoined = (function(stars){
-                for (var i = 0, list = []; i < stars.length; i++){
-                    let star = stars[i][0];
-                    list.push(star);
-                    } return list;
-                })(dataBattleStars).join(',');
-            let dataLabelsJoined = (function(labels){
-                for (var i = 0, markup = []; i < labels.length; i++){
-                    let label = labels[i][0], labelPosition = labels[i][1];
-                    let positionRelative = _self.getPositionRelative(cursorPosition, labelPosition);
-                    let labelText = label;
-                    let labelClasses = 'label sublabel';
-                    labelClasses += ' ' + (positionRelative[0] === 0 ? 'center' : (positionRelative[0] < 0 ? 'left' : 'right'));
-                    labelClasses += ' ' + (positionRelative[1] === 0 ? 'middle' : (positionRelative[1] < 0 ? 'up' : 'down'));
-                    markup.push('<strong class="'+labelClasses+'" data-pos="' + labelPosition + '" data-rel="' + positionRelative + '">' + labelText + '</strong>');
-                    } return markup;
-                })(dataLabels).join('');
-
-            let joinedDataAttrs = '';
-            if (dataBattles.length){ joinedDataAttrs += ' data-battle="'+dataBattlesJoined+'"'; }
-            if (dataBattleStars.length){ joinedDataAttrs += ' data-battle-star="'+dataBattleStarsJoined+'"'; }
-            actionAreaMarkup += dataLabelsJoined;
-            sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> ' + (dataBattles.length > 1 ? dataBattles.length+' ' : '') + 'Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
-
-            let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' ? true : false;
-            let isSoloMechaRescue = isSoloMechaBattle && firstBattleEvent.kind2 === 'rescue' ? true : false;
-            let showBattleButton = true, showRecruitButton = false;
-            if (!playerIsCursor && isSoloMechaBattle){ showRecruitButton = true; }
-            if (showRecruitButton && isSoloMechaRescue){ showBattleButton = false; }
-            if (typeof _worldPlayer.items['mecha-whistle'] === 'undefined'){ showRecruitButton = false; }
-            if (showBattleButton){
-                if (playerActiveRobots >= 1){
-                    sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
-                    } else {
-                    sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
-                    }
-                }
-            if (showRecruitButton){
-                let playerHasTeamSlot = _worldPlayerTeam.length < _config.maxRobotsPerPlayer ? true : false;
-                let hasPermanentWhistle = false;
-                let mechaBattleEvent = firstBattleEvent;
-                let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
-                let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
-                let isRescueMecha = mechaBattleEvent.kind2 === 'rescue';
-                let mechaWhistleSpanLabel = isRescueMecha ? '<sup>Recruit</sup> Friendly Mecha' : '<sup>Use</sup> Mecha Whistle';
-                let mechaWhistleTarget = mechaBattleEvent.token;
-                if (!hasPermanentWhistle && !isRescueMecha){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
-                let playerCanUseWhistle = (isRescueMecha || mechaWhistleQuantity > 0 || hasPermanentWhistle) && playerHasTeamSlot ? true : false;
-                if (playerCanUseWhistle){
-                    sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaWhistleTarget + '" data-is-rescue="' + (isRescueMecha ? 'true' : 'false') + '">';
-                        if (!isRescueMecha){ sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
-                        else {sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
-                    sideButtonsMarkup += '</a>';
-                    }
-                else {
-                    sideButtonsMarkup += '<a class="button big-button disabled">';
-                        if (!isRescueMecha){ sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
-                        else { sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
-                    sideButtonsMarkup += '</a>';
-                    }
-                }
-            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-            showActionAreaType = 'battle';
-            showActionAreaSound = 'mecha-taunt-sound' + (dataBattles.length > 1 ? '*'+dataBattles.length : '');
-            zoomTimeoutDuration = 1000;
-            }
+        let actionData = _self.prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPosition, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
         }
     else if (firstEventType === 'actor'){
         let eventInfo = firstEvent;
@@ -1688,7 +1563,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
                 if (!action){ console.error('-> no action found on button, skipping!'); return false; }
                 let isCustomEvent = action === 'trigger-event';
-                let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1;
+                let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1 || action === 'use-mecha-whistle';
                 let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
                 let isButton = action.indexOf('-button') !== -1 || action.indexOf('button-') !== -1;
                 let isSwitch = action.indexOf('-switch') !== -1 || action.indexOf('switch-') !== -1;
@@ -1710,39 +1585,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if (isCustomEvent){
                     return _self.handleCustomEventActionClick(action, $button, firstEvent);
                     }
-                else if (isBattle){
-                    let battleId = $button.attr('data-battle') || false;
-                    let battleStarId = $button.attr('data-battle-star') || false;
-                    if (action === 'battle-info'){
-                        alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
-                        }
-                    else if (action === 'start-battle'){
-                        let activeRobots = Object.values(_worldPlayerTeam);
-                        _self.playSoundEffect('lets-go-robots');
-                        let battleVars = [];
-                        battleVars.push('wap=false');
-                        battleVars.push('flag_skip_fadein=true');
-                        battleVars.push('this_user_id=' + _userId);
-                        battleVars.push('this_player_id=' + _playerId);
-                        battleVars.push('this_player_token=' + _playerToken);
-                        battleVars.push('this_player_robots=' + activeRobots.join(','));
-                        battleVars.push('this_battle_token=' + battleId);
-                        if (battleStarId){ battleVars.push('this_star_token=' + battleStarId); }
-                        let battleHref = 'battle.php?' + battleVars.join('&');
-                        if (true){
-                            $thisWorld.addClass('busy');
-                            _self.incZoomLevel();
-                            _self.saveWorldState(function(){
-                                _self.incZoomLevel();
-                                $thisWorld.addClass('loading');
-                                window.location.href = battleHref;
-                                _self.incZoomLevel();
-                                }, true, false);
-                            } else {
-                            console.warn('battles disabled for testing!');
-                            console.warn('-> battleHref =', battleHref);
-                            }
-                        }
+                if (isBattle){
+                    return _self.handleBattleActionClick(action, $button, firstEvent);
                     }
                 else if (isPortal){
                     let portalName = $button.attr('data-portal') || false;
