@@ -4801,6 +4801,350 @@ class mmrpgWorldMap {
         return;
         }
 
+    // -- REUSABLE UI & ANIMATION METHODS -- //
+
+// Quick function for showing the action dropdown and sidebar buttons
+    showActionDropdown(options){
+        //console.log('%c' + 'mmrpgWorldMap.showActionDropdown()', 'color: cyan;');
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+
+        options = options || {};
+        let actionAreaMarkup = options.actionAreaMarkup || '';
+        let sideButtonsMarkup = options.sideButtonsMarkup || '';
+        let showActionAreaType = options.showActionAreaType || '';
+        let showActionAreaSound = options.showActionAreaSound || '';
+        let cursorDirection = options.cursorDirection || _self.state.cursor.direction;
+
+        let cursorPositionXY = options.cursorPosition ? options.cursorPosition.split('-') : _self.state.cursor.position.split('-');
+        let thisNewCol = parseInt(cursorPositionXY[0]);
+        let thisNewRow = parseInt(cursorPositionXY[1]);
+
+        let $actionDropdown = _elements.actionDropdown;
+        let $actionDropdownWrapper = $('> .wrapper', $actionDropdown);
+        let $sideButtons = _elements.sideButtons;
+        let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
+
+        // ALWAYS position the action dropdown and set its data attributes so alignment math works
+        // and leftover perimeters (like battles) are properly cleared out.
+        $actionDropdown.css({
+            left: ((thisNewCol - 1) * _config.mapTileSize[0] + _config.mapTileSizeOffset[0]) + 'px',
+            top: ((thisNewRow - 1) * _config.mapTileSize[1] + _config.mapTileSizeOffset[1]) + 'px',
+            }).attr('data-dir', cursorDirection).attr('data-type', showActionAreaType).attr('data-align', 'center');
+
+        // Only inject markup if we actually have it, otherwise ensure it is empty
+        if (actionAreaMarkup.length){
+            $actionDropdownWrapper.empty().html(actionAreaMarkup);
+            } else {
+            $actionDropdownWrapper.empty();
+            }
+
+        // Add the buttons to the sidebar area so that they are out-of-the-way
+        $sideButtonsWrapper.empty().html(sideButtonsMarkup);
+
+        // Add the active class so it shows and has a box model (delay slightly for visual flow)
+        setTimeout(function(){
+            $actionDropdown.addClass('active');
+            $sideButtons.addClass('active');
+
+            // Collect parent and child sizes and offsets to determine alignment
+            let dropdownParentSize = [_config.worldWidth, _config.worldHeight];
+            let dropdownOffset = $actionDropdown.offset();
+            let dropdownOffsets = [dropdownOffset.left, dropdownOffset.top];
+            let dropdownPositionDelta = [];
+            dropdownPositionDelta.push(1 - (dropdownParentSize[0] - dropdownOffsets[0]) / dropdownParentSize[0]);
+            dropdownPositionDelta.push(1 - (dropdownParentSize[1] - dropdownOffsets[1]) / dropdownParentSize[1]);
+            let dropdownAlign = dropdownPositionDelta[1] >= 0.5 ? 'above' : 'below';
+            if (dropdownPositionDelta[0] <= 0.25){ dropdownAlign += '-right'; }
+            if (dropdownPositionDelta[0] >= 0.75){ dropdownAlign += '-left'; }
+
+            // Apply the alignment to the dropdown
+            $actionDropdown.attr('data-align', dropdownAlign);
+
+            // If sound effect(s) have been defined play now
+            if (showActionAreaSound){
+                let sound = showActionAreaSound, repeat = 1, delay = 0;
+                if (sound.indexOf('*') !== -1){ var parts = sound.split('*'); sound = parts[0]; repeat = parseInt(parts[1]); }
+                for (var i = 0; i < repeat; i++){
+                    if (!delay){ _self.playSoundEffect(sound); delay += 50; }
+                    else { setTimeout(function(){ _self.playSoundEffect(sound); }, delay); delay *= 2; }
+                    }
+                }
+            }, 100);
+
+        return true;
+        }
+
+    // Quick function for dismissing the action dropdown and returning state to normal
+    hideActionDropdown(playSound){
+        //console.log('%c' + 'mmrpgWorldMap.hideActionDropdown()', 'color: cyan;');
+        let _self = this;
+        let _elements = _self.elements;
+
+        let $actionDropdown = _elements.actionDropdown;
+        let $actionDropdownWrapper = $('> .wrapper', $actionDropdown);
+        let $sideButtons = _elements.sideButtons;
+        let $sideButtonsWrapper = $('> .wrapper', $sideButtons);
+        let $worldCursor = _elements.worldCursor;
+        let $canvasMap = _elements.map;
+        let $spritesLayer = $('.layer.sprites[data-layer]', $canvasMap);
+
+        playSound = typeof playSound === 'boolean' ? playSound : true;
+        if (playSound){ _self.playSoundEffect('back-click'); }
+
+        _self.enableActionDropdown();
+
+        // Crucially, clear all positioning and custom attributes so they don't bleed into the next interaction
+        $actionDropdown.removeClass('active hover').css({left: '', top: ''}).removeAttr('data-dir').removeAttr('data-type').removeAttr('data-align');
+        $actionDropdownWrapper.empty();
+        $sideButtons.removeClass('active');
+        $sideButtonsWrapper.empty();
+
+        $worldCursor.removeClass('shake');
+        $spritesLayer.removeClass('has-zoom');
+        $('.sprite.zoom', $canvasMap).removeClass('zoom').removeClass('busy');
+        $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
+
+        return true;
+        }
+
+    // Quick functions for disabling/enabling dropdown interactions during events
+    disableActionDropdown(){
+        let $sideButtons = this.elements.sideButtons;
+        $sideButtons.addClass('busy');
+        $('.big-button', $sideButtons).attr('disabled', 'disabled');
+        return true;
+        }
+    enableActionDropdown(){
+        let $sideButtons = this.elements.sideButtons;
+        $sideButtons.removeClass('busy');
+        $('.big-button', $sideButtons).removeAttr('disabled');
+        return true;
+        }
+
+    // Quick function for triggering an automatic URL redirect for portals/escapes
+    triggerAutoRedirect(options){
+        //console.log('%c' + 'mmrpgWorldMap.triggerAutoRedirect()', 'color: cyan;');
+        let _self = this;
+        let _world = _self.state;
+        let _elements = _self.elements;
+        let $thisWorld = _elements.world;
+
+        options = options || {};
+        let autoRedirectURL = options.autoRedirectURL || false;
+        let autoRedirectSound = options.autoRedirectSound || false;
+        let stillAtPosition = typeof options.stillAtPosition === 'function' ? options.stillAtPosition : function(){ return true; };
+        let otherMenusActiveNow = typeof options.otherMenusActiveNow === 'function' ? options.otherMenusActiveNow : function(){ return false; };
+
+        if (_self.worldIsBusy() && !_world.isBusyWith.redirectToLocation){ return false; }
+        if (!stillAtPosition() || otherMenusActiveNow()){ delete _world.isBusyWith.redirectToLocation; return false; }
+
+        if (autoRedirectSound){ _self.playSoundEffect(autoRedirectSound); }
+
+        if (autoRedirectURL){
+            _self.incZoomLevel();
+            $thisWorld.addClass('busy');
+            _world.isBusyWith.redirectToLocation = true;
+            _self.saveWorldState(function(){
+                if (!stillAtPosition() || otherMenusActiveNow()){ return; }
+                else { _self.resetZoomLevel(); }
+                _self.incZoomLevel();
+                $thisWorld.addClass('loading');
+                window.location.href = autoRedirectURL;
+                _self.incZoomLevel();
+                }, true, false);
+            }
+        return true;
+        }
+
+    // Quick function to put the team into their battle-ready or interactive poses relative to a target
+    readyTeamSprites(options){
+        //console.log('%c' + 'mmrpgWorldMap.readyTeamSprites()', 'color: cyan;');
+        let _self = this;
+        let _config = _self.config;
+        let _elements = _self.elements;
+        let _world = _self.state;
+        let _worldCursor = _world.cursor;
+
+        options = options || {};
+        let firstEvent = options.firstEvent || null;
+        let readyTeamSpritesAnyway = options.readyTeamSpritesAnyway || false;
+        let autoRedirectAnimation = options.autoRedirectAnimation || '';
+        let autoRedirectEffect = options.autoRedirectEffect || '';
+        let readyTeamPlayerFrames = options.readyTeamPlayerFrames && options.readyTeamPlayerFrames.length ? options.readyTeamPlayerFrames : ['06', '01', '04'];
+        let readyTeamRobotFrames = options.readyTeamRobotFrames && options.readyTeamRobotFrames.length ? options.readyTeamRobotFrames : ['04', '08', '01', '06', '10', '00', '04', '01'];
+        let teamRushDuration = options.teamRushDuration || 300;
+        let cursorPosition = options.cursorPosition || _worldCursor.position;
+
+        let stillAtPosition = function(){ return (_worldCursor.position === cursorPosition) ? true : false; };
+        let otherMenusActiveNow = function(){ return (_elements.robotsOverview.is('.expanded')) ? true : false; };
+
+        if (_self.worldIsBusy() && !readyTeamSpritesAnyway){ return false; }
+        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+
+        let $worldCursor = _elements.worldCursor;
+        let $teamSprites = _elements.teamSprites;
+        let _mapEffects = _config.mapEffects;
+        let _mapTileSize = _config.mapTileSize;
+        let _mapTileSizeOffset = _config.mapTileSizeOffset;
+        let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
+
+        // Add the shake class to the cursor so it hides behind the player
+        $worldCursor.addClass('shake');
+
+        // Collect the position of the firstEvent and use it to decide which direction the cursor needs to face
+        let cursorPositionXY = cursorPosition.split('-').map(num => parseInt(num));
+        let firstEventDirection = [];
+        if (firstEvent && firstEvent.position){
+            let firstEventPositionXY = firstEvent.position.split('-').map(num => parseInt(num));
+            if (firstEventPositionXY[0] > cursorPositionXY[0]){ firstEventDirection.push('right'); }
+            else if (firstEventPositionXY[0] < cursorPositionXY[0]){ firstEventDirection.push('left'); }
+            if (firstEventPositionXY[1] < cursorPositionXY[1]){ firstEventDirection.push('up'); }
+            else if (firstEventPositionXY[1] > cursorPositionXY[1]){ firstEventDirection.push('down'); }
+        }
+        firstEventDirection = firstEventDirection.join('-');
+
+        let goingUp = firstEventDirection.indexOf('up') !== -1;
+        let goingDown = firstEventDirection.indexOf('down') !== -1;
+        let goingLeft = firstEventDirection.indexOf('left') !== -1;
+        let goingRight = firstEventDirection.indexOf('right') !== -1;
+        let goingHorz = goingLeft || goingRight;
+        let goingVert = goingUp || goingDown;
+
+        let spacingX = Math.ceil(_mapTileSize[0] / 4);
+        let spacingY = Math.ceil(_mapTileSize[1] / 6);
+        let $cursorSprite = $teamSprites.filter('.sprite.cursor');
+        let $otherSprites = $teamSprites.filter('.sprite:not(.cursor)');
+        let $playerSprites = $otherSprites.filter('.sprite.player');
+        let $robotSprites = $otherSprites.filter('.sprite.robot');
+
+        let willAscendUpward = autoRedirectAnimation === 'ascend-upward';
+        let willDescendDownward = autoRedirectAnimation === 'descend-downward';
+        let willSlideHorizontally = autoRedirectAnimation.indexOf('slide-') === 0;
+        let willSlideDirection = willSlideHorizontally ? autoRedirectAnimation.replace('slide-', '') : false;
+
+        let spriteClassBeforeMove = '';
+        let spriteClassAfterMove = '';
+        if (autoRedirectEffect === 'glowing'){ spriteClassBeforeMove = 'glowing'; }
+        else if (autoRedirectEffect === 'leaving'){ spriteClassBeforeMove = 'leaving'; }
+
+        if (willAscendUpward){ spriteClassAfterMove = 'ascending'; }
+        else if (willDescendDownward){ spriteClassAfterMove = 'descending'; }
+
+        let spriteBeforeMove = function(){
+            if (!spriteClassBeforeMove){ return; }
+            $(this).removeClass('shake bounce idle').addClass(spriteClassBeforeMove);
+            };
+        let spriteAfterMove = function(){
+            if (!spriteClassAfterMove){ return; }
+            $(this).addClass(spriteClassAfterMove);
+            };
+
+        $cursorSprite.attr('data-frame', '01');
+        spriteBeforeMove.call($cursorSprite);
+
+        $playerSprites.each(function(index){
+            let $sprite = $(this);
+            if ($sprite.is('.disabled')){ return; }
+            let dataDir = $sprite.attr('data-dir') || 'right';
+            if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
+            else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
+            let dataFrame = spriteClassAfterMove !== 'sliding' ? (readyTeamPlayerFrames[index % readyTeamPlayerFrames.length] || '00') : '07';
+            $sprite.attr('data-frame', dataFrame);
+            spriteBeforeMove.call($sprite);
+            });
+
+        $robotSprites.each(function(index){
+            let $sprite = $(this);
+            if ($sprite.is('.disabled')){ return; }
+            let dataDir = $sprite.attr('data-dir') || 'right';
+            if (goingLeft && dataDir !== 'left'){ $sprite.attr('data-dir', 'left'); }
+            else if (goingRight && dataDir !== 'right'){ $sprite.attr('data-dir', 'right'); }
+            let dataFrame = spriteClassAfterMove !== 'sliding' ? (readyTeamRobotFrames[index % readyTeamRobotFrames.length] || '00') : '07';
+            $sprite.attr('data-frame', dataFrame);
+            spriteBeforeMove.call($sprite);
+            });
+
+        let targetX, targetY, targetZ;
+        if (_mapEffects.usePerspective === true){
+            let targetOffset = _self.getLayerTileSpriteOffset(cursorPositionXY[0], cursorPositionXY[1]);
+            targetX = targetOffset.left;
+            targetY = targetOffset.top;
+            targetZ = targetY + 1;
+            } else {
+            targetX = (cursorPositionXY[0] - 1) * _mapTileSize[0];
+            targetY = (cursorPositionXY[1] - 1) * _mapTileSize[1];
+            targetZ = targetY + 1;
+            }
+
+        let playerPositions = [];
+        $playerSprites.each(function(index){
+            let $sprite = $(this);
+            let spriteWidth = parseInt($sprite.attr('data-size')) || 40;
+            let spriteHeight = parseInt($sprite.attr('data-size')) || 40;
+            let posX = targetX;
+            let posY = targetY;
+            if (goingRight){ posX = targetX + _mapTileSize[0] - spriteWidth - _mapTileSizeOffset[0]; }
+            else if (goingLeft){ posX = targetX + _mapTileSizeOffset[0]; }
+            else { posX = targetX + Math.ceil((_mapTileSize[0] - spriteWidth) / 2); }
+            if (goingUp){ posY = (targetY + _mapTileSizeOffset[1]) - (_mapSpriteSizeOffset[1] / 1); }
+            else if (goingDown){ posY = targetY + _mapTileSize[1] - spriteHeight - _mapTileSizeOffset[1]; }
+            else { posY = targetY + Math.ceil((_mapTileSize[1] - spriteHeight) / 2) - (_mapSpriteSizeOffset[1] / 2); }
+            playerPositions.push([posX, posY]);
+            $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration, spriteAfterMove);
+            });
+
+        let firstPlayerPosition = playerPositions[0] || [targetX, targetY];
+        let robotSpriteKey = 0;
+        $robotSprites.each(function(index){
+            let $sprite = $(this);
+            let posKey = robotSpriteKey++;
+            let posX = firstPlayerPosition[0];
+            let posY = firstPlayerPosition[1] - 4;
+            let horzSpacing = Math.ceil(spacingX * (posKey + 1));
+            let vertSpacing = Math.ceil(spacingY * (posKey + 1));
+            if (goingHorz && goingVert){ horzSpacing = Math.ceil(horzSpacing / 2); }
+            if (goingRight){ posX -= horzSpacing; }
+            else if (goingLeft){ posX += horzSpacing; }
+            if (goingUp){ posY += vertSpacing; }
+            else if (goingDown){ posY -= vertSpacing; }
+            $sprite.animate({left: posX + 'px', top: posY + 'px', zIndex: (posY + 10) }, teamRushDuration, spriteAfterMove);
+            });
+
+        let lowestOtherSpriteZ = (function($otherSprites){
+            let lowestZ = null;
+            $otherSprites.each(function(){
+                let spriteZ = parseInt($(this).css('zIndex'));
+                if (lowestZ === null || spriteZ < lowestZ){ lowestZ = spriteZ; }
+                });
+            return lowestZ !== null ? lowestZ : 1;
+            })($otherSprites);
+
+        $cursorSprite.attr('data-frame', '01').css({zIndex:(lowestOtherSpriteZ - 1)});
+        setTimeout(function(){ spriteAfterMove.call($cursorSprite); }, Math.ceil(teamRushDuration * 0.8));
+
+        if (willSlideHorizontally){
+            let rushDuration = Math.ceil(teamRushDuration * 1.6);
+            setTimeout(function(){
+                let $sprites = $cursorSprite.add($playerSprites).add($robotSprites);
+                let offsetDst = (_mapTileSize[0] * 2);
+                let offsreenCss = {};
+                if (willSlideDirection === 'left'){ offsreenCss.left = (targetX - offsetDst); }
+                else if (willSlideDirection === 'right'){ offsreenCss.left = (targetX + offsetDst); }
+                else if (willSlideDirection === 'up'){ offsreenCss.top = (targetY - offsetDst); }
+                else if (willSlideDirection === 'down'){ offsreenCss.top = (targetY + offsetDst); }
+                if (offsreenCss.top){ offsreenCss.zIndex = offsreenCss.top - 1; }
+                $playerSprites.attr('data-frame', '07'); $robotSprites.attr('data-frame', '07');
+                $sprites.each(function(){
+                    rushDuration = Math.ceil(rushDuration * 1.2);
+                    $(this).animate(offsreenCss, rushDuration);
+                    });
+                }, rushDuration);
+            }
+        return true;
+        }
+
     // -- MISC HELPER METHODS -- //
 
     // Define a quick reusable method for cloning object data via JSON serialization
