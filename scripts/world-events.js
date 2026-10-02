@@ -1520,49 +1520,17 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             }
         }
     else if (firstEventType === 'item'){
-        let eventInfo = firstEvent;
-        let itemInfo = _mapItemsIndex[eventInfo.token];
-        let $itemEvent = $(firstEvent.sprite);
-        let dataLabel = $itemEvent.attr('data-label');
-        let dataItem = $itemEvent.attr('data-item');
-        let dataItemToken = $itemEvent.attr('data-token');
-        let dataColour = $itemEvent.attr('data-colour');
-        if (!dataLabel){ dataLabel = dataItemToken; }
-        if (!dataColour){ dataColour = 'none'; }
-        if (dataItem && dataItemToken){
-            if (playerIsCursor){
-                showActionArea = true;
-                if (!_worldCursor.holding){
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="pickup-item" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
-                    } else if (_worldCursor.holding && _worldCursor.holding === 'item/'+dataItem){
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Put Down</sup> ' + dataLabel + '</span></a>';
-                    } else if (_worldCursor.holding){
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
-                    }
-                sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                showActionAreaType = 'item';
-                zoomTimeoutDuration = 750;
-                }
-            else {
-                if (!itemInfo.anchored){
-                    triggerEffect = true;
-                    readyTeamSprites = true;
-                    teamReadyDuration = 600;
-                    zoomTimeoutDuration = 600;
-                    triggerEffectFunction = function(){
-                        if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
-                        _self.triggerItemPickup(firstEvent, 600);
-                        };
-                    }
-                else {
-                    showActionArea = true;
-                    if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-                    sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
-                    sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-                    showActionAreaType = 'item';
-                    zoomTimeoutDuration = 750;
-                    }
-                }
+        let actionData = _self.prepareItemEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        if (actionData) {
+            showActionArea = actionData.showActionArea;
+            actionAreaMarkup += actionData.actionAreaMarkup;
+            sideButtonsMarkup += actionData.sideButtonsMarkup;
+            showActionAreaType = actionData.showActionAreaType;
+            zoomTimeoutDuration = actionData.zoomTimeoutDuration;
+            triggerEffect = actionData.triggerEffect;
+            readyTeamSprites = actionData.readyTeamSprites;
+            teamReadyDuration = actionData.teamReadyDuration;
+            triggerEffectFunction = actionData.triggerEffectFunction;
             }
         }
     else if (firstEventType === 'ability'){
@@ -2187,106 +2155,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     _self.saveWorldState();
                     }
                 else if (isItem){
-                    let itemSymbols = _config.mapItemSymbols;
-                    let itemsIndex = _config.mapItemsIndex;
-                    let itemClaims = _world.items;
-                    let itemName = $button.attr('data-item') || false;
-                    let itemInfo = itemName && (itemsIndex && itemsIndex[itemName]) ? itemsIndex[itemName] : false;
-                    let itemPosition = itemInfo ? itemInfo.pos : false;
-                    let $eventSprite = $(firstEvent.sprite);
-                    let $innerSprite = $eventSprite ? $('.sprite', $eventSprite) : false;
-                    if (!itemName || !itemInfo){ console.error('-> item name or info not found, cannot pick up item!'); return false; }
-                    _self.hideActionDropdown(false);
-                    let $cursorPalette = _elements.cursorPalette;
-                    let $tempItemSlots = $('.slots.temp', $cursorPalette);
-                    if (action === 'pickup-item'){
-                        let $firstOpenTempSlot = $('.slot:not(.active)', $tempItemSlots).first();
-                        if (!$firstOpenTempSlot.length){
-                            console.error('-> no open temp slots found in palette, cannot pick up item!');
-                            return false;
-                            }
-                        $cursorPalette.addClass('active');
-                        $worldCursor.addClass('pickup');
-                        let newTop = _config.worldHeight + 200;
-                        let newLeft = (parseInt($eventSprite.css('left')) || 0) - 200;
-                        let $clonedEventSprite = $eventSprite.clone();
-                        _self.playSoundEffect('upward-impact');
-                        setTimeout(function(){
-                            _self.playSoundEffect('suck-sound');
-                            $clonedEventSprite.css({top:'',left:'',zIndex:''});
-                            $clonedEventSprite.appendTo($firstOpenTempSlot).addClass('new');;
-                            $firstOpenTempSlot.addClass('active').attr('data-item', itemName);
-                            setTimeout(function(){
-                                $worldCursor.removeClass('pickup');
-                                $clonedEventSprite.removeClass('new');
-                                }, 3000);
-                            }, 600);
-                        itemInfo.beingHeld = true;
-                        _worldCursor.holding = 'item/'+itemName;
-                        $eventSprite.addClass('tracking-cursor');
-                        let targetLeft = parseInt($worldCursor.css('left') || 0) + 10;
-                        let targetTop = parseInt($worldCursor.css('top') || 0) + 5;
-                        let targetZ = parseInt($worldCursor.css('zIndex') || 0) - 1;
-                        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
-                        if ($eventSprite.is('.always-zoom')){ $eventSprite.addClass('not-always-zoom').removeClass('always-zoom'); }
-                        if (_mapEventSymbols[itemPosition]){
-                            let eventUnderPosition = _mapEventSymbols[itemPosition];
-                            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
-                            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
-                                _self.triggerDropZoneEmpty(eventUnderPosition, eventUnderInfo);
-                                }
-                            }
-                        }
-                    else if (action === 'drop-item'){
-                        let $firstActiveTempSlot = $('.slot.active', $tempItemSlots).first();
-                        if (!$firstActiveTempSlot.length){
-                            console.error('-> no active temp slots found in palette, cannot drop item!');
-                            return false;
-                            }
-                        _worldCursor.busy = true;
-                        $cursorPalette.removeClass('active');
-                        $worldCursor.addClass('drop');
-                        let $clonedEventSprite = $firstActiveTempSlot.find('.sprite');
-                        $clonedEventSprite.addClass('dropped');
-                        _self.playSoundEffect('suck-sound');
-                        _self.playSoundEffect('downward-impact', {delay:400});
-                        setTimeout(function(){
-                            $firstActiveTempSlot.removeClass('active').attr('data-item', '');
-                            setTimeout(function(){
-                                $worldCursor.removeClass('drop');
-                                $clonedEventSprite.remove();
-                                }, 3000);
-                            }, 600);
-                        _worldCursor.holding = '';
-                        $eventSprite.removeClass('tracking-cursor');
-                        let newItemPosition = _worldCursor.position;
-                        let newItemPositionXY = newItemPosition.split('-');
-                        let targetLeft = ((newItemPositionXY[0] - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
-                        let targetTop = ((newItemPositionXY[1] - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
-                        let targetZ = targetTop + 1;
-                        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
-                        if ($eventSprite.is('.not-always-zoom')){ $eventSprite.addClass('always-zoom').removeClass('not-always-zoom'); }
-                        let oldItemPosition = itemInfo.pos;
-                        itemInfo.pos = newItemPosition;
-                        itemInfo.position = newItemPositionXY;
-                        itemInfo.col = parseInt(newItemPositionXY[0]) || 1;
-                        itemInfo.row = parseInt(newItemPositionXY[1]) || 1;
-                        itemInfo.beingHeld = false;
-                        delete itemSymbols[oldItemPosition];
-                        itemSymbols[newItemPosition] = itemName;
-                        if (typeof _worldSymbols.items === 'undefined'){ _worldSymbols.items = {}; }
-                        _worldSymbols.items[itemName] = newItemPosition;
-                        if (_mapEventSymbols[newItemPosition]){
-                            let eventUnderPosition = _mapEventSymbols[newItemPosition];
-                            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
-                            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
-                                _self.triggerDropZoneEvent(eventUnderPosition, eventUnderInfo, 'item', itemName, itemInfo);
-                                }
-                            }
-                        _self.saveWorldState(function(){
-                            _worldCursor.busy = false;
-                            });
-                        }
+                    return _self.handleItemActionClick(action, $button, firstEvent);
                     }
                 else if (isAbility){
                     let abilitySymbols = _config.mapAbilitySymbols;

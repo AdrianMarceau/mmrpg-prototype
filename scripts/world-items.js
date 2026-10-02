@@ -1269,6 +1269,202 @@ function generateItemSelectPlaceholderMarkup(playerRobotInfo, buttonOptions){
     buttonMarkup += '</div>';
     return buttonMarkup;
     }
+// Define a quick function for parsing an item event on the map and returning action dropdown options
+function prepareItemEventOptions(firstEvent, options){
+    //console.log('%c' + 'mmrpgWorldMap.prepareItemEventOptions()', 'color: magenta;');
+    let _self = this;
+    let _config = _self.config;
+    let _world = _self.state;
+    let _worldCursor = _world.cursor;
+    let _worldPlayer = _world.player;
+    let _mapItemsIndex = _config.mapItemsIndex;
+
+    options = options || {};
+    let stillAtPosition = typeof options.stillAtPosition === 'function' ? options.stillAtPosition : function(){ return true; };
+    let otherMenusActiveNow = typeof options.otherMenusActiveNow === 'function' ? options.otherMenusActiveNow : function(){ return false; };
+
+    let eventInfo = firstEvent;
+    let itemInfo = _mapItemsIndex[eventInfo.token];
+    let $itemEvent = $(firstEvent.sprite);
+    let dataLabel = $itemEvent.attr('data-label') || $itemEvent.attr('data-token');
+    let dataItem = $itemEvent.attr('data-item');
+    let dataColour = $itemEvent.attr('data-colour') || 'none';
+
+    let actionData = {
+        showActionArea: false,
+        actionAreaMarkup: '',
+        sideButtonsMarkup: '',
+        showActionAreaType: '',
+        zoomTimeoutDuration: 0,
+        triggerEffect: false,
+        readyTeamSprites: false,
+        teamReadyDuration: 0,
+        triggerEffectFunction: function(){}
+    };
+
+    let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+
+    if (dataItem){
+        // If the player is the cursor player, we should show the item pickup dropdown
+        if (playerIsCursor){
+            actionData.showActionArea = true;
+            if (!_worldCursor.holding){
+                actionData.sideButtonsMarkup += '<a class="button big-button'+(dataColour !== '' ? ' type '+dataColour : '')+'" data-action="pickup-item" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                } else if (_worldCursor.holding && _worldCursor.holding === 'item/'+dataItem){
+                actionData.sideButtonsMarkup += '<a class="button big-button'+(dataColour !== '' ? ' type '+dataColour : '')+'" data-action="drop-item" data-item="'+dataItem+'"><span><sup>Put Down</sup> ' + dataLabel + '</span></a>';
+                } else if (_worldCursor.holding){
+                actionData.sideButtonsMarkup += '<a class="button big-button'+(dataColour !== '' ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                }
+            actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+            actionData.showActionAreaType = 'item';
+            actionData.zoomTimeoutDuration = 750; // if we show a pick-up dropdown, we want to zoom in faster
+            }
+        // Otherwise if this is a human player, we should trigger the auto-pickup functionality instead
+        else {
+            if (!itemInfo.anchored){
+                actionData.triggerEffect = true;
+                actionData.readyTeamSprites = true;
+                actionData.teamReadyDuration = 600;
+                actionData.zoomTimeoutDuration = 600;
+                actionData.triggerEffectFunction = function(){
+                    if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
+                    _self.triggerItemPickup(firstEvent, 600);
+                    };
+                }
+            else {
+                actionData.showActionArea = true;
+                if (dataLabel && dataLabel !== $itemEvent.attr('data-token')){ actionData.actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
+                actionData.sideButtonsMarkup += '<a class="button big-button'+(dataColour !== 'none' ? ' type '+dataColour : '')+' disabled" data-item="'+dataItem+'"><span><sup>Pick Up</sup> ' + dataLabel + '</span></a>';
+                actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
+                actionData.showActionAreaType = 'item';
+                actionData.zoomTimeoutDuration = 750;
+                }
+            }
+        }
+
+    return actionData;
+    }
+
+// Define a quick function for handling map item interactions (pickup and drop via cursor)
+function handleItemActionClick(action, $button, firstEvent){
+    //console.log('%c' + 'mmrpgWorldMap.handleItemActionClick(action:' + action + ')', 'color: magenta;');
+    let _self = this;
+    let _config = _self.config;
+    let _world = _self.state;
+    let _elements = _self.elements;
+    let _worldCursor = _world.cursor;
+    let _worldSymbols = _world.symbols;
+    let $worldCursor = _elements.worldCursor;
+
+    let itemSymbols = _config.mapItemSymbols;
+    let itemsIndex = _config.mapItemsIndex;
+    let itemName = $button.attr('data-item') || false;
+    let itemInfo = itemName && (itemsIndex && itemsIndex[itemName]) ? itemsIndex[itemName] : false;
+    let itemPosition = itemInfo ? itemInfo.pos : false;
+    let $eventSprite = $(firstEvent.sprite);
+
+    if (!itemName || !itemInfo){ console.error('-> item name or info not found, cannot pick up item!'); return false; }
+    _self.hideActionDropdown(false);
+
+    let $cursorPalette = _elements.cursorPalette;
+    let $tempItemSlots = $('.slots.temp', $cursorPalette);
+    let _mapTileSize = _config.mapTileSize;
+    let _mapSpriteSizeOffset = _config.mapSpriteSizeOffset;
+    let _mapEventSymbols = _config.mapEventSymbols;
+    let _mapEventsIndex = _config.mapEventsIndex;
+
+    if (action === 'pickup-item'){
+        let $firstOpenTempSlot = $('.slot:not(.active)', $tempItemSlots).first();
+        if (!$firstOpenTempSlot.length){
+            console.error('-> no open temp slots found in palette, cannot pick up item!');
+            return false;
+            }
+        $cursorPalette.addClass('active');
+        $worldCursor.addClass('pickup');
+        let $clonedEventSprite = $eventSprite.clone();
+        _self.playSoundEffect('upward-impact');
+        setTimeout(function(){
+            _self.playSoundEffect('suck-sound');
+            $clonedEventSprite.css({top:'',left:'',zIndex:''});
+            $clonedEventSprite.appendTo($firstOpenTempSlot).addClass('new');;
+            $firstOpenTempSlot.addClass('active').attr('data-item', itemName);
+            setTimeout(function(){
+                $worldCursor.removeClass('pickup');
+                $clonedEventSprite.removeClass('new');
+                }, 3000);
+            }, 600);
+        itemInfo.beingHeld = true;
+        _worldCursor.holding = 'item/'+itemName;
+        $eventSprite.addClass('tracking-cursor');
+        let targetLeft = parseInt(_elements.worldCursor.css('left') || 0) + 10;
+        let targetTop = parseInt(_elements.worldCursor.css('top') || 0) + 5;
+        let targetZ = parseInt(_elements.worldCursor.css('zIndex') || 0) - 1;
+        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
+        if ($eventSprite.is('.always-zoom')){ $eventSprite.addClass('not-always-zoom').removeClass('always-zoom'); }
+        if (_mapEventSymbols[itemPosition]){
+            let eventUnderPosition = _mapEventSymbols[itemPosition];
+            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
+            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
+                _self.triggerDropZoneEmpty(eventUnderPosition, eventUnderInfo);
+                }
+            }
+        }
+    else if (action === 'drop-item'){
+        let $firstActiveTempSlot = $('.slot.active', $tempItemSlots).first();
+        if (!$firstActiveTempSlot.length){
+            console.error('-> no active temp slots found in palette, cannot drop item!');
+            return false;
+            }
+        _worldCursor.busy = true;
+        $cursorPalette.removeClass('active');
+        $worldCursor.addClass('drop');
+        let $clonedEventSprite = $firstActiveTempSlot.find('.sprite');
+        $clonedEventSprite.addClass('dropped');
+        _self.playSoundEffect('suck-sound');
+        _self.playSoundEffect('downward-impact', {delay:400});
+        setTimeout(function(){
+            $firstActiveTempSlot.removeClass('active').attr('data-item', '');
+            setTimeout(function(){
+                $worldCursor.removeClass('drop');
+                $clonedEventSprite.remove();
+                }, 3000);
+            }, 600);
+        _worldCursor.holding = '';
+        $eventSprite.removeClass('tracking-cursor');
+        let newItemPosition = _worldCursor.position;
+        let newItemPositionXY = newItemPosition.split('-');
+        let targetLeft = ((newItemPositionXY[0] - 1) * _mapTileSize[0]) + _mapSpriteSizeOffset[0];
+        let targetTop = ((newItemPositionXY[1] - 1) * _mapTileSize[1]) + _mapSpriteSizeOffset[1];
+        let targetZ = targetTop + 1;
+        $eventSprite.css({left: targetLeft + 'px', top: targetTop + 'px', zIndex: targetZ});
+        if ($eventSprite.is('.not-always-zoom')){ $eventSprite.addClass('always-zoom').removeClass('not-always-zoom'); }
+        let oldItemPosition = itemInfo.pos;
+        itemInfo.pos = newItemPosition;
+        itemInfo.position = newItemPositionXY;
+        itemInfo.col = parseInt(newItemPositionXY[0]) || 1;
+        itemInfo.row = parseInt(newItemPositionXY[1]) || 1;
+        itemInfo.beingHeld = false;
+        delete itemSymbols[oldItemPosition];
+        itemSymbols[newItemPosition] = itemName;
+        if (typeof _worldSymbols.items === 'undefined'){ _worldSymbols.items = {}; }
+        _worldSymbols.items[itemName] = newItemPosition;
+        let dropZoneTriggered = false;
+        if (_mapEventSymbols[newItemPosition]){
+            let eventUnderPosition = _mapEventSymbols[newItemPosition];
+            let eventUnderInfo = _mapEventsIndex[eventUnderPosition];
+            if (eventUnderInfo && eventUnderInfo.action === 'drop-zone'){
+                _self.triggerDropZoneEvent(eventUnderPosition, eventUnderInfo, 'item', itemName, itemInfo);
+                dropZoneTriggered = true;
+                }
+            }
+        if (!dropZoneTriggered){ _worldCursor.busy = false; }
+        _self.saveWorldState(function(){
+            _worldCursor.busy = false;
+            });
+        }
+
+    return true;
+    }
 
 // Assign the sub-functions to the main class's prototype
 
@@ -1300,3 +1496,6 @@ mmrpgWorldMap.prototype.showDropItemModal = showDropItemModal;
 
 mmrpgWorldMap.prototype.generateItemSelectButtonMarkup = generateItemSelectButtonMarkup;
 mmrpgWorldMap.prototype.generateItemSelectPlaceholderMarkup = generateItemSelectPlaceholderMarkup;
+
+mmrpgWorldMap.prototype.prepareItemEventOptions = prepareItemEventOptions;
+mmrpgWorldMap.prototype.handleItemActionClick = handleItemActionClick;
