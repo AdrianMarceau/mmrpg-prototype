@@ -915,6 +915,13 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         if (typeof actionData.readyTeamSpritesAnyway !== 'undefined') readyTeamSpritesAnyway = actionData.readyTeamSpritesAnyway;
         if (actionData.readyTeamPlayerFrames) readyTeamPlayerFrames = actionData.readyTeamPlayerFrames;
         if (actionData.readyTeamRobotFrames) readyTeamRobotFrames = actionData.readyTeamRobotFrames;
+        // Portal specific keys
+        if (typeof actionData.autoRedirect !== 'undefined') autoRedirect = actionData.autoRedirect;
+        if (actionData.autoRedirectURL) autoRedirectURL = actionData.autoRedirectURL;
+        if (actionData.autoRedirectSound) autoRedirectSound = actionData.autoRedirectSound;
+        if (actionData.autoRedirectEffect) autoRedirectEffect = actionData.autoRedirectEffect;
+        if (actionData.autoRedirectAnimation) autoRedirectAnimation = actionData.autoRedirectAnimation;
+        if (actionData.triggerEffectSound) triggerEffectSound = actionData.triggerEffectSound;
         };
 
     // --- EVENT DATA PARSING SWITCHBOARD ---
@@ -931,92 +938,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         applyActionData(actionData);
         }
     else if (firstEventType === 'portal'){
-        let $portalEvent = $(firstEvent.sprite);
-        let dataLabel = $portalEvent.attr('data-label');
-        let dataPortal = $portalEvent.attr('data-portal');
-        let portalInfo = dataPortal ? (_config.mapPortalsIndex[dataPortal] || false) : false;
-        let goToDestination = false;
-        let goToWorld, goToMap, goToPosition;
-        let goToSameWorld, goToSameMap, goToSamePosition;
-
-        if (dataPortal.indexOf('goto__') !== -1){
-            goToDestination = true;
-            goToWorld = _config.mapWorld;
-            goToMap = dataPortal.replace(/^goto__/i, '');
-            if (goToMap.indexOf('__') !== -1){ let gtm = goToMap.split('__'); goToWorld = gtm[0]; goToMap = gtm[1]; }
-            if (portalInfo['dst']){ goToPosition = portalInfo['dst']; }
-            } else if (portalInfo['dst']){
-            goToDestination = true;
-            goToWorld = _config.mapWorld;
-            goToMap = portalInfo['dst'];
-            if (goToMap.indexOf('__') !== -1){
-                let gtm = goToMap.split('__');
-                if (gtm.length >= 3){ goToWorld = gtm[0]; goToMap = gtm[1]; goToPosition = gtm[2]; }
-                else if (gtm.length >= 2){ goToMap = gtm[0]; goToPosition = gtm[1]; }
-                }
-            }
-        goToSameWorld = goToWorld === _config.mapWorld ? true : false;
-        goToSameMap = goToSameWorld && goToMap === _config.mapToken ? true : false;
-        goToSamePosition = goToSameWorld && goToSameMap && goToPosition === _worldCursor.position ? true : false;
-
-        if (portalInfo && goToDestination){
-            showActionArea = true;
-            if (!dataLabel){ dataLabel = 'Portal Options'; }
-            actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>';
-            if (dataPortal === 'exit'){ sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>'; }
-            else { sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>'; }
-            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-            showActionAreaType = 'portal';
-            zoomTimeoutDuration = 500;
-            if (_worldCursor.moved && !portalInfo.confirm){
-                if (dataPortal === 'spawn'){
-                    console.warn('-> spawn portals not yet implemented yet');
-                    }
-                else if (dataPortal === 'exit'){
-                    autoRedirect = true;
-                    showActionArea = false;
-                    autoRedirectURL = 'prototype.php';
-                    _world.isBusyWith.redirectToLocation = true;
-                    }
-                else {
-                    if (goToSameWorld && goToSameMap && !goToSamePosition){
-                        triggerEffect = true;
-                        showActionArea = false;
-                        _world.isBusyWith.teleporting = true;
-                        triggerEffectFunction = function(){
-                            if (!stillAtPosition() || otherMenusActiveNow()){ return false; }
-                            _config.allowWorldEvents = false;
-                            if (triggerEffectSound){ _self.playSoundEffect(triggerEffectSound); }
-                            _self.moveToPosition(goToPosition, function(){
-                                _config.allowWorldEvents = true;
-                                return true;
-                                });
-                            };
-                        triggerEffectSound = 'bounce-sound';
-                        readyTeamSprites = true;
-                        }
-                    else {
-                        autoRedirect = true;
-                        showActionArea = false;
-                        autoRedirectURL = 'world.php?world=' + goToWorld;
-                        if (goToMap){ autoRedirectURL += '&map='+goToMap; }
-                        if (goToPosition){ autoRedirectURL += '&position='+goToPosition; }
-                        _world.isBusyWith.redirectToLocation = true;
-                        readyTeamSprites = true;
-                        readyTeamSpritesAnyway = true;
-                        teamReadyDuration = 600;
-                        let isExitPortal = portalInfo.direction ? true : false;
-                        let isTelePortal = !portalInfo.direction ? true : false;
-                        let isSubTelePortal = goToMap.indexOf('-area-0') !== -1 ? true : false;
-                        autoRedirectSound = isExitPortal ? 'lets-go-robots' : 'intense-growing-sound';
-                        autoRedirectEffect = isExitPortal ? 'leaving' : 'glowing';
-                        if (isExitPortal){ autoRedirectAnimation = 'slide-' + portalInfo.direction; }
-                        else if (isTelePortal){ autoRedirectAnimation = isSubTelePortal ? 'descend-downward' : 'ascend-upward'; }
-                        }
-                    }
-                }
-            else if (!portalInfo.confirm){ showActionArea = false; }
-            }
+        let actionData = _self.preparePortalEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
         }
     else if (firstEventType === 'button'){
         let $buttonEvent = $(firstEvent.sprite);
@@ -1585,82 +1508,11 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if (isCustomEvent){
                     return _self.handleCustomEventActionClick(action, $button, firstEvent);
                     }
-                if (isBattle){
+                else if (isBattle){
                     return _self.handleBattleActionClick(action, $button, firstEvent);
                     }
                 else if (isPortal){
-                    let portalName = $button.attr('data-portal') || false;
-                    if (action === 'portal-info'){
-                        alert('Portal Name: ' + portalName + '\n\nThis is where you would show portal details.');
-                        }
-                    else if (action === 'enter-portal'){
-                        let portalsIndex = _config.mapPortalsIndex;
-                        let portalInfo = portalsIndex[portalName] || false;
-                        let portalHref = false;
-                        let isSameMapTeleport = false;
-                        let goToPosition = false;
-                        let finalGoToMap = false;
-                        if (portalName === 'spawn'){
-                            portalHref = 'prototype.php';
-                            } else if (portalName === 'exit'){
-                            portalHref = 'prototype.php';
-                            } else if (portalName.indexOf('goto__') !== -1){
-                            let worldToken, mapToken;
-                            let goToPath = portalName.replace(/^goto__/i, '').split('__');
-                            if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
-                            else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
-                            finalGoToMap = mapToken;
-                            portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
-                            } else if (portalInfo && portalInfo.dst){
-                            let goToWorld = _config.mapWorld;
-                            let goToMap = portalInfo.dst;
-                            if (goToMap.indexOf('__') !== -1){
-                                let gtm = goToMap.split('__');
-                                if (gtm.length >= 3){ goToWorld = gtm[0]; goToMap = gtm[1]; goToPosition = gtm[2]; }
-                                else if (gtm.length >= 2){ goToMap = gtm[0]; goToPosition = gtm[1]; }
-                                }
-                            finalGoToMap = goToMap;
-                            let goToSameWorld = goToWorld === _config.mapWorld;
-                            let goToSameMap = goToSameWorld && goToMap === _config.mapToken;
-                            if (goToSameWorld && goToSameMap){
-                                isSameMapTeleport = true;
-                                } else {
-                                portalHref = 'world.php?world=' + goToWorld + '&map=' + goToMap;
-                                if (goToPosition){ portalHref += '&position=' + goToPosition; }
-                                }
-                            }
-                        if (isSameMapTeleport && goToPosition){
-                            _self.hideActionDropdown(false);
-                            _self.playSoundEffect('bounce-sound');
-                            _config.allowWorldEvents = false;
-                            _self.moveToPosition(goToPosition, function(){
-                                _config.allowWorldEvents = true;
-                                return true;
-                                });
-                            } else if (portalHref){
-                            let isExitPortal = portalInfo && portalInfo.direction ? true : false;
-                            let isTelePortal = portalInfo && !portalInfo.direction ? true : false;
-                            let isSubTelePortal = finalGoToMap && finalGoToMap.indexOf('-area-0') !== -1 ? true : false;
-                            let autoRedirectSound = isExitPortal ? 'lets-go-robots' : 'intense-growing-sound';
-                            let autoRedirectEffect = isExitPortal ? 'leaving' : 'glowing';
-                            let autoRedirectAnimation = '';
-                            if (isTelePortal){ autoRedirectAnimation = isSubTelePortal ? 'descending' : 'ascending'; }
-                            _self.playSoundEffect(autoRedirectSound);
-                            $teamSprites.removeClass('shake bounce idle').addClass(autoRedirectEffect);
-                            if (autoRedirectAnimation){ $teamSprites.addClass(autoRedirectAnimation); }
-                            _self.incZoomLevel();
-                            $thisWorld.addClass('busy');
-                            _self.saveWorldState(function(){
-                                _self.incZoomLevel();
-                                $thisWorld.addClass('loading');
-                                window.location.href = portalHref;
-                                _self.incZoomLevel();
-                                    }, true, false);
-                            $thisWorld.animate({opacity: 0}, 1200, function(){
-                                $thisWorld.addClass('hidden');
-                                    });
-                            }
-                        }
+                    return _self.handlePortalActionClick(action, $button, firstEvent);
                     }
                 else if (isButton){
                     let buttonsIndex = _config.mapButtonsIndex;
