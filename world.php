@@ -1054,6 +1054,9 @@ $_SESSION[$session_token]['EVENTS'][] = array(
 <script type="text/javascript" src="scripts/world-abilities.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-battles.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <script type="text/javascript" src="scripts/world-portals.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/world-mechanisms.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/world-obstacles.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<script type="text/javascript" src="scripts/world-actors.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
 <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <!-- (4) define game settings/config/indexes -->
 <script type="text/javascript">
@@ -1143,8 +1146,7 @@ $(document).ready(function(){
                 //console.log('-> mapFieldName = '+mapFieldName);
                 //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
                 let titleText, subtitleText;
-                if (false //mapName === 'PROTOTYPE Area 0'
-                    || mapName.match(/^STAR Gate/i)){
+                if (mapName.match(/^STAR Gate/i)){
                     titleText = ''; //'?????? &raquo;'; //worldName + ' &raquo;';
                     subtitleText = mapName;
                     } else {
