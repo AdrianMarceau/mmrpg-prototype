@@ -4890,7 +4890,7 @@ class mmrpgWorldMap {
         }
 
     // Quick function for dismissing the action dropdown and returning state to normal
-    hideActionDropdown(playSound){
+    hideActionDropdown(playSound, resetZoom, resetFrames){
         //console.log('%c' + 'mmrpgWorldMap.hideActionDropdown()', 'color: cyan;');
         let _self = this;
         let _elements = _self.elements;
@@ -4914,10 +4914,16 @@ class mmrpgWorldMap {
         $sideButtons.removeClass('active');
         $sideButtonsWrapper.empty();
 
+        resetZoom = typeof resetZoom === 'boolean' ? resetZoom : true;
+        resetFrames = typeof resetFrames === 'boolean' ? resetFrames : true;
         $worldCursor.removeClass('shake');
-        $spritesLayer.removeClass('has-zoom');
-        $('.sprite.zoom', $canvasMap).removeClass('zoom').removeClass('busy');
-        $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
+        if (resetZoom){
+            $spritesLayer.removeClass('has-zoom');
+            $('.sprite.zoom', $canvasMap).removeClass('zoom').removeClass('busy');
+            }
+        if (resetFrames){
+            $('.sprite[data-frame]:not(.disabled):not(.frame-lock)', $canvasMap).attr('data-frame', '00');
+            }
 
         return true;
         }

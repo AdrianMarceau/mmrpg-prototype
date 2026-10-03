@@ -191,7 +191,9 @@ function handleBattleActionClick(action, $button, firstEvent){
     let _playerToken = _config.playerToken;
     let $thisWorld = _elements.world;
 
-    _self.hideActionDropdown(false);
+    if (action === 'battle-info'){
+        _self.hideActionDropdown(false, false, false);
+        }
 
     if (action === 'start-battle' || action === 'battle-info'){
         let battleId = $button.attr('data-battle') || false;
@@ -213,7 +215,8 @@ function handleBattleActionClick(action, $button, firstEvent){
             battleVars.push('this_battle_token=' + battleId);
             if (battleStarId){ battleVars.push('this_star_token=' + battleStarId); }
             let battleHref = 'battle.php?' + battleVars.join('&');
-
+            let $teamSprites = _elements.teamSprites;
+            $teamSprites.addClass('frame-lock');
             $thisWorld.addClass('busy');
             _self.incZoomLevel();
             _self.saveWorldState(function(){
