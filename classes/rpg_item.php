@@ -1237,8 +1237,12 @@ class rpg_item extends rpg_object {
 
             $temp_item_title .= '  | ';
             if ($item_info['item_class'] != 'item' && !empty($item_info['item_accuracy'])){ $temp_item_title .= ' '.$item_info['item_accuracy'].'% Accuracy'; }
-            elseif ($item_info['item_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token])){ $temp_item_title .= ' '.($_SESSION[$session_token]['values']['battle_items'][$temp_item_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_item_token].' Units'); }
-            elseif ($item_info['item_class'] == 'item' ){ $temp_item_title .= ' 0 Units'; }
+            elseif ($item_info['item_class'] == 'item'){
+                $inventory_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token]) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token] : 0;
+                $equipped_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped']) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped'] : 0;
+                $available_count = max(0, $inventory_count - $equipped_count);
+                $temp_item_title .= ' '.($available_count == 1 ? '1 Unit' : $available_count.' Units');
+            }
 
         }
 
@@ -1286,12 +1290,17 @@ class rpg_item extends rpg_object {
         if (!empty($item_info['item_damage'])){ $temp_item_option .= ' | D:'.$item_info['item_damage']; }
         if (!empty($item_info['item_recovery'])){ $temp_item_option .= ' | R:'.$item_info['item_recovery']; }
         if ($item_info['item_class'] != 'item' && !empty($item_info['item_accuracy'])){ $temp_item_option .= ' | A:'.$item_info['item_accuracy']; }
-        elseif ($item_info['item_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token])){ $temp_item_option .= ' | U:'.$_SESSION[$session_token]['values']['battle_items'][$temp_item_token]; }
-        elseif ($item_info['item_class'] == 'item'){ $temp_item_option .= ' | U:0'; }
+        elseif ($item_info['item_class'] == 'item'){
+            $inventory_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token]) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token] : 0;
+            $equipped_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped']) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped'] : 0;
+            $available_count = max(0, $inventory_count - $equipped_count);
+            $temp_item_option .= ' | U:'.$available_count;
+        }
         if (!empty($temp_item_energy)){ $temp_item_option .= ' | E:'.$temp_item_energy; }
 
         // Return the generated option markup
-        $this_option_markup = '<option value="'.$temp_item_token.'" data-label="'.$temp_item_label.'" data-type="'.(!empty($temp_item_type) ? $temp_item_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_item_type2) ? $temp_item_type2['type_token'] : '').'" title="'.$temp_item_title_plain.'" data-tooltip="'.$temp_item_title_tooltip.'">'.$temp_item_option.'</option>';
+        $disabled_attr = (isset($available_count) && $available_count <= 0) ? ' disabled="disabled"' : '';
+        $this_option_markup = '<option value="'.$temp_item_token.'" data-label="'.$temp_item_label.'" data-type="'.(!empty($temp_item_type) ? $temp_item_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_item_type2) ? $temp_item_type2['type_token'] : '').'" title="'.$temp_item_title_plain.'" data-tooltip="'.$temp_item_title_tooltip.'"'.$disabled_attr.'>'.$temp_item_option.'</option>';
 
         // Return the generated option markup
         return $this_option_markup;
@@ -1370,7 +1379,9 @@ class rpg_item extends rpg_object {
 
         $item_info_id = $item_info['item_id'];
         $item_info_token = $item_info['item_token'];
-        $item_info_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token]) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token] : 0;
+        $inventory_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token]) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token] : 0;
+        $equipped_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token.'__equipped']) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token.'__equipped'] : 0;
+        $item_info_count = max(0, $inventory_count - $equipped_count);
         $item_info_name = $item_info['item_name'];
         $item_info_type = !empty($item_info['item_type']) ? $item_info['item_type'] : false;
         $item_info_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : false;
