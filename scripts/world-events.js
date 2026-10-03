@@ -941,35 +941,10 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         let actionData = _self.preparePortalEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
         applyActionData(actionData);
         }
-    else if (firstEventType === 'button'){
-        let $buttonEvent = $(firstEvent.sprite);
-        let dataLabel = $buttonEvent.attr('data-label');
-        let dataButton = $buttonEvent.attr('data-button');
-        let dataColour = $buttonEvent.attr('data-colour');
-        let dataState = $buttonEvent.attr('data-state');
-        if (dataButton && dataState === 'up'){
-            showActionArea = true;
-            if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-            sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="push-button" data-button="'+dataButton+'"><span><sup>Push The</sup> ' + (dataColour[0].toUpperCase() + dataColour.slice(1)) + ' Button</span></a>';
-            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-            showActionAreaType = 'button';
-            zoomTimeoutDuration = 500;
-            }
-        }
-    else if (firstEventType === 'switch'){
-        let $switchEvent = $(firstEvent.sprite);
-        let dataLabel = $switchEvent.attr('data-label');
-        let dataSwitch = $switchEvent.attr('data-switch');
-        let dataColour = $switchEvent.attr('data-colour');
-        let dataState = $switchEvent.attr('data-state');
-        if (dataSwitch){
-            showActionArea = true;
-            if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-            sideButtonsMarkup += '<a class="button big-button'+(dataColour ? ' '+dataColour : '')+'" data-action="toggle-switch" data-switch="'+dataSwitch+'"><span><sup>Toggle The</sup> ' + dataColour.split('-').map(function(colour){ return colour[0].toUpperCase() + colour.slice(1); }).join(' & ') + ' Switch</span></a>';
-            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-            showActionAreaType = 'switch';
-            zoomTimeoutDuration = 500;
-            }
+    else if (firstEventType === 'button'
+        || firstEventType === 'switch'){
+        let actionData = _self.prepareMechanismEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
         }
     else if (firstEventType === 'gate'){
         let eventInfo = firstEvent;
@@ -1488,8 +1463,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let isCustomEvent = action === 'trigger-event';
                 let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1 || action === 'use-mecha-whistle';
                 let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
-                let isButton = action.indexOf('-button') !== -1 || action.indexOf('button-') !== -1;
-                let isSwitch = action.indexOf('-switch') !== -1 || action.indexOf('switch-') !== -1;
+                let isMechanism = action === 'push-button' || action === 'toggle-switch';
                 let isGate = action.indexOf('-gate') !== -1 || action.indexOf('gate-') !== -1;
                 let isLock = action.indexOf('-lock') !== -1 || action.indexOf('lock-') !== -1;
                 let isItem = action.indexOf('-item') !== -1 || action.indexOf('item-') !== -1;
@@ -1514,149 +1488,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 else if (isPortal){
                     return _self.handlePortalActionClick(action, $button, firstEvent);
                     }
-                else if (isButton){
-                    let buttonsIndex = _config.mapButtonsIndex;
-                    let buttonStates = _world.buttons;
-                    let buttonName = $button.attr('data-button') || false;
-                    let buttonInfo = buttonName && (buttonsIndex && buttonsIndex[buttonName]) ? buttonsIndex[buttonName] : false;
-                    let $eventSprite = $(firstEvent.sprite);
-                    let $innerSprite = $eventSprite ? $('> .sprite', $eventSprite) : false;
-                    if (!buttonName || !buttonInfo){ console.error('-> button name or info not found, cannot push button!'); return false; }
-                    if (!$eventSprite || !$eventSprite.length){ console.error('-> event sprite not found, cannot push button!'); return false; }
-                    if (!$innerSprite || !$innerSprite.length){ console.error('-> inner sprite not found, cannot push button!'); return false; }
-                    _self.hideActionDropdown(false);
-                    buttonInfo.state = 'down';
-                    buttonsIndex[buttonName] = buttonInfo;
-                    buttonStates[buttonName] = 'down';
-                    $eventSprite.attr('data-state', 'down');
-                    $innerSprite.removeClass('up').addClass('down');
-                    $eventSprite.removeClass('glow');
-                    _self.playSoundEffect('button-click');
-                    _self.playSoundEffect('hyper-stomp-sound', {delay: 200});
-                    $canvasMap.addClass('shake-once');
-                    setTimeout(function(){ $canvasMap.removeClass('shake-once'); }, 1000);
-                    (function(buttonInfo){
-                        if (!buttonInfo.action){ return false; }
-                        let buttonAction = buttonInfo.action;
-                        let buttonData = buttonInfo.data || {};
-                        if (buttonAction === 'set-group-terrain'){
-                            let groupName = buttonData[0] || false;
-                            let terrainName = buttonData[1] || false;
-                            if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
-                            if (!terrainName){ console.error('-> terrainName not provided, cannot set group terrain!'); return false; }
-                            let terrainTilesIndex = _world.layerTilesIndex['terrain_0'] || false;
-                            if (!terrainTilesIndex){ console.error('-> terrain_0 not found in _world.layerTilesIndex, cannot set terrain!'); return false; }
-                            let groupsIndex = _config.mapGroupsIndex;
-                            let groupTiles = groupsIndex[groupName] || false;
-                            if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found, cannot set terrain!'); return false; }
-                            for (let i = 0; i < groupTiles.length; i++){
-                                let tileKey = groupTiles[i];
-                                let tileData = terrainTilesIndex[tileKey];
-                                if (!tileData){
-                                    console.error('-> tile data not found for tile', tileKey, ', cannot set terrain!');
-                                    continue;
-                                    }
-                                let targetTerrainBase = terrainName.replace(/-[0-9]+$/, '');
-                                tileData.sprite[1] = targetTerrainBase;
-                                }
-                            _self.refreshTerrainEdges(groupTiles);
-                            _self.calculateWalkableMapTiles(true);
-                            }
-                        if (buttonAction === 'remove-group-blocks'){
-                            let groupName = buttonData[0] || false;
-                            let blockFilter = buttonData[1] || false;
-                            if (!groupName){ console.error('-> groupName not provided, cannot remove group blocks!'); return false; }
-                            let groupsIndex = _config.mapGroupsIndex;
-                            let groupTiles = groupsIndex[groupName] || false;
-                            if (!groupsIndex || !groupTiles){ console.error('-> groupsIndex not found, cannot remove group blocks!'); return false; }
-                            let blockSymbols = _config.mapBlockSymbols;
-                            let blocksIndex = _config.mapBlocksIndex;
-                            let blockRemovals = _world.blocks;
-                            let blocksRemoved = 0;
-                            for (let i = 0; i < groupTiles.length; i++){
-                                let tilePosition = groupTiles[i];
-                                let targetBlockName = blockSymbols[tilePosition] || false;
-                                if (!targetBlockName){ continue; }
-                                let blockInfo = blocksIndex[targetBlockName] || false;
-                                if (!blockInfo || blockInfo.removed){ continue; }
-                                if (blockFilter && blockFilter !== 'any' && blockInfo.sprite !== blockFilter){ continue; }
-                                blockInfo.removed = true;
-                                delete blockSymbols[tilePosition];
-                                blocksIndex[targetBlockName] = blockInfo;
-                                blockRemovals[targetBlockName] = new Date().getTime();
-                                let $blockSprite = $('.sprite.block[data-block="' + targetBlockName + '"]', $canvasMap);
-                                if ($blockSprite.length){
-                                    $blockSprite.attr('data-state', 'removed').removeClass('glow');
-                                    $blockSprite.animate({opacity: 0, filter: 'brightness(2)'}, 600, function(){
-                                        $(this).remove();
-                                        });
-                                    blocksRemoved++;
-                                    }
-                                }
-                            if (blocksRemoved > 0){
-                                _self.playSoundEffect('block-destroyed-sound', {delay: 200});
-                                setTimeout(function(){
-                                    _self.calculateWalkableMapTiles(true);
-                                    _self.refreshMapPositionEvents();
-                                    }, 600);
-                                _self.saveWorldState();
-                                }
-                            }
-                        })(buttonInfo);
-                    }
-                else if (isSwitch){
-                    let switchesIndex = _config.mapSwitchesIndex;
-                    let switchStates = _world.switches;
-                    let switchName = $button.attr('data-switch') || false;
-                    let switchInfo = switchName && (switchesIndex && switchesIndex[switchName]) ? switchesIndex[switchName] : false;
-                    let $eventSprite = $(firstEvent.sprite);
-                    let $innerSprite = $eventSprite ? $('> .sprite', $eventSprite) : false;
-                    if (!switchName || !switchInfo){ console.error('-> switch name or info not found, cannot toggle switch!'); return false; }
-                    if (!$eventSprite || !$eventSprite.length){ console.error('-> event sprite not found, cannot toggle switch!'); return false; }
-                    if (!$innerSprite || !$innerSprite.length){ console.error('-> inner sprite not found, cannot toggle switch!'); return false; }
-                    _self.hideActionDropdown(false);
-                    let oldState = switchInfo.state || 'up';
-                    let newState = oldState === 'up' ? 'down' : 'up';
-                    switchInfo.state = newState;
-                    switchesIndex[switchName] = switchInfo;
-                    switchStates[switchName] = newState;
-                    $eventSprite.attr('data-state', newState);
-                    $innerSprite.removeClass(oldState).addClass(newState);
-                    $eventSprite.removeClass('glow');
-                    _self.playSoundEffect('button-click');
-                    _self.playSoundEffect('hyper-stomp-sound', {delay: 200});
-                    $canvasMap.addClass('shake-once');
-                    setTimeout(function(){ $canvasMap.removeClass('shake-once'); }, 1000);
-                    (function(switchInfo, newState){
-                        if (!switchInfo.action){ return false; }
-                        let switchAction = switchInfo.action;
-                        let switchData = switchInfo.data || {};
-                        if (switchAction === 'toggle-group-terrain'){
-                            let groupName = switchData[0] || false;
-                            let terrainUp = switchData[1] || false;
-                            let terrainDown = switchData[2] || false;
-                            if (!groupName){ console.error('-> groupName not provided, cannot set group terrain!'); return false; }
-                            if (!terrainUp || !terrainDown){ console.error('-> terrainUp or terrainDown not provided, cannot toggle group terrain!'); return false; }
-                            let terrainTilesIndex = _world.layerTilesIndex['terrain_0'] || false;
-                            if (!terrainTilesIndex){ console.error('-> terrain_0 not found in _world.layerTilesIndex, cannot toggle group terrain!'); return false; }
-                            let groupsIndex = _config.mapGroupsIndex;
-                            let groupTiles = groupsIndex[groupName] || false;
-                            if (!groupTiles){ console.error('-> groupsIndex not found for groupName "' + groupName + '"!'); return false; }
-                            for (let i = 0; i < groupTiles.length; i++){
-                                let tileKey = groupTiles[i];
-                                let tileData = terrainTilesIndex[tileKey];
-                                if (!tileData) continue;
-                                let currentTerrain = tileData.sprite[1];
-                                let currentTerrainBase = currentTerrain.replace(/-[0-9]+$/, '');
-                                let targetTerrainBase = currentTerrainBase;
-                                if (currentTerrain === terrainUp || currentTerrainBase === terrainUp){ targetTerrainBase = terrainDown; }
-                                else if (currentTerrain === terrainDown || currentTerrainBase === terrainDown){ targetTerrainBase = terrainUp; }
-                                tileData.sprite[1] = targetTerrainBase;
-                                }
-                            _self.refreshTerrainEdges(groupTiles);
-                            _self.calculateWalkableMapTiles(true);
-                            }
-                        })(switchInfo, newState);
+                else if (isMechanism){
+                    return _self.handleMechanismActionClick(action, $button, firstEvent);
                     }
                 else if (isGate){
                     let gateSymbols = _config.mapGateSymbols;
