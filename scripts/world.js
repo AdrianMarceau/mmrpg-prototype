@@ -2084,6 +2084,7 @@ class mmrpgWorldMap {
                 if (callback){ if (typeof callback === 'function'){ queue.push(callback); } return true; }
                 else { while (queue.length > 0){ callback = queue.shift(); callback.call(); } return true; }
                 };
+            _selfRef.onTeamMoveComplete = onTeamMoveComplete;
             }
         let onMoveComplete = function(){
             _worldCursor.col = thisNewCol;
@@ -2180,12 +2181,24 @@ class mmrpgWorldMap {
                 let newFrame = false;
                 let preFrameDelay = 0;
                 if (animateMove && !$thisSprite.is('.disabled')){
-                    $thisSprite.attr('data-frame', '00');
                     newFrame = $thisSprite.is('.player') ? '09' : $thisSprite.is('.robot') ? '07' : '00'; // run for players, slide for robots
                     if (newFrame !== '00'){
                         preFrameDelay = 50;
-                        setTimeout(function(){ $thisSprite.attr('data-frame', newFrame); }, preFrameDelay);
-                        onTeamMoveComplete(index, function(){ $thisSprite.attr('data-frame', '00'); }, true);
+                        // Apply the frame and lock it so the global reset at the top of moveToPosition ignores it
+                        $thisSprite.attr('data-frame', newFrame).addClass('frame-lock');
+                        // Clear any existing slide-removal timeout on this specific sprite
+                        if ($thisSprite.data('slideTimeout')){
+                            clearTimeout($thisSprite.data('slideTimeout'));
+                            }
+                        // Create a dedicated timeout to remove the slide and lock
+                        let slideTimeout = setTimeout(function(){
+                            $thisSprite.attr('data-frame', '00').removeClass('frame-lock');
+                            }, teamTravelDuration);
+                        // Store the timeout ID so consecutive rapid moves can refresh it
+                        $thisSprite.data('slideTimeout', slideTimeout);
+                        } else {
+                        // Fallback for sprites that don't get a special movement frame
+                        $thisSprite.attr('data-frame', '00');
                         }
                     }
                 $thisSprite.prop('worldX', teamOffsetX);
