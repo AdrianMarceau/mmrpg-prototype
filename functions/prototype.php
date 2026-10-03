@@ -121,6 +121,32 @@ function mmrpg_prototype_apply_patches(){
         }
     }
 
+    // Make sure the user's equipped items are using the new format, else leave 'em alone (2026-10-03)
+    $patch_token = '2026-10-03_reformat-equipped-items';
+    if (empty($SESSION_GAME['flags']['patches'][$patch_token])
+        && !empty($SESSION_GAME['values']['battle_settings'])){
+        $all_equipped_items = array();
+        //echo('<pre>$SESSION_GAME[\'values\'][\'battle_settings\'] = '.print_r($SESSION_GAME['values']['battle_settings'], true).'</pre>');
+        foreach ($SESSION_GAME['values']['battle_settings'] AS $ptoken => $psettings){
+            if (empty($psettings['player_robots'])){ continue; }
+            foreach ($psettings['player_robots'] AS $rtoken => $rsettings){
+                if (empty($rsettings['robot_item'])){ continue; }
+                $itoken = $rsettings['robot_item'];
+                if (!isset($all_equipped_items[$itoken])){ $all_equipped_items[$itoken] = 0; }
+                $all_equipped_items[$itoken] += 1;
+            }
+        }
+        //echo('<pre>$all_equipped_items = '.print_r($all_equipped_items, true).'</pre>');
+        foreach ($all_equipped_items AS $itoken => $iquantity){
+            $itoken_equipped = $itoken.'__equipped';
+            if (isset($SESSION_GAME['values']['battle_items'][$itoken_equipped])){ continue; }
+            //echo("\$SESSION_GAME['values']['battle_items'][{$itoken_equipped}] = {$iquantity};<br />");
+            $SESSION_GAME['values']['battle_items'][$itoken_equipped] = $iquantity;
+        }
+        $SESSION_GAME['flags']['patches'][$patch_token] = 'true';
+        //echo('<pre>$SESSION_GAME[\'values\'][\'battle_items\'] = '.print_r($SESSION_GAME['values']['battle_items'], true).'</pre>');
+    }
+
     // Update the session with any changes and then set the flag so this only happens once per session
     $_SESSION[$session_token] = $SESSION_GAME;
     $_SESSION['PATCHES'] = true;
