@@ -54,6 +54,14 @@ foreach ($this_battle_stars AS $temp_key => $temp_data){
 }
 asort($this_star_force);
 $this_star_force = array_reverse($this_star_force);
+$this_star_force_real = $this_star_force;
+
+// Loop through the generated starforce array and apply a hard limit on starforce power per element
+$max_power = 100; // equal to +1000 for each stat
+foreach ($this_star_force AS $type => $power){
+    if ($power <= $max_power){ continue; }
+    $this_star_force[$type] = $max_power;
+}
 
 // Unless we're specifically disabled, include Rogue Star power now
 if (!isset($include_rogue_star_power)){ $include_rogue_star_power = true; }
@@ -73,9 +81,11 @@ if ($include_rogue_star_power){
 
 // Update the session with current starforce values
 $_SESSION[$session_token]['values']['star_force'] = $this_star_force;
+$_SESSION[$session_token]['values']['star_force_real'] = $this_star_force_real;
 $_SESSION[$session_token]['values']['star_force_strict'] = $this_star_force_strict;
 
 //error_log('$this_star_force = '.print_r($this_star_force, true));
+//error_log('$this_star_force_real = '.print_r($this_star_force_real, true));
 //error_log('$this_star_force_strict = '.print_r($this_star_force_strict, true));
 //error_log('$this_star_kind_counts = '.print_r($this_star_kind_counts, true));
 //$player_starforce = rpg_game::starforce_unlocked();
