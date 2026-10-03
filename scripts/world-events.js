@@ -958,67 +958,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         applyActionData(actionData);
         }
     else if (firstEventType === 'actor'){
-        let eventInfo = firstEvent;
-        let actorInfo = _mapActorsIndex[eventInfo.token];
-        let actorSymbol = _mapActorSymbols[eventInfo.position];
-        let $actorEvent = $(eventInfo.sprite);
-        let dataActor = $actorEvent.attr('data-actor');
-        let dataLabel = $actorEvent.attr('data-label');
-        let dataColour = $actorEvent.attr('data-colour');
-        if (dataActor && !actorInfo.removed && !playerIsCursor){
-            showActionArea = true;
-            if (!dataLabel){ dataLabel = 'Denizen'; }
-            if (dataLabel){ actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
-            if (actorInfo.messages){
-                let avatarSprite = '&hellip;';
-                if (actorInfo.kind === 'player'){ avatarSprite = _self.getPlayerSpriteMarkup(actorInfo.sprite, {alt: actorInfo.image, kind: 'mug'}); }
-                else if (actorInfo.kind === 'robot'){ avatarSprite = _self.getRobotSpriteMarkup(actorInfo.sprite, {alt: actorInfo.image, kind: 'mug'}); }
-                let messagesText = typeof actorInfo.messages === 'object' ? actorInfo.messages.join('\n') : actorInfo.messages;
-                messagesText = messagesText.replaceAll('//', '<br />');
-                messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
-                sideButtonsMarkup += '<div class="button-title big-button-title'+(dataColour ? ' type '+dataColour : '')+'">';
-                    sideButtonsMarkup += '<i class="icon">' + avatarSprite + '</i>';
-                    sideButtonsMarkup += '<p class="text">' + messagesText + '</p>';
-                sideButtonsMarkup += '</div>';
-                }
-            if (actorInfo.actions && actorInfo.actions.length){
-                for (let i = 0; i < actorInfo.actions.length; i++){
-                    let action = actorInfo.actions[i];
-                    let label = typeof action[0] !== 'undefined' && action[0] ? action[0] : false;
-                    let token = typeof action[1] !== 'undefined' && action[1] ? action[1] : false;
-                    let colour = typeof action[2] !== 'undefined' && action[2] ? action[2] : false;
-                    if (!label || !token){ continue; }
-                    if (token === 'reset-world-pickups'){
-                        let allItemSymbols = Object.values(_config.mapItemSymbols).join(',');
-                        let hasRandomItems = allItemSymbols.indexOf('random-') !== -1;
-                        if (!hasRandomItems){ continue; }
-                        }
-                    else if (token === 'reset-world-encounters'){
-                        let allBattleSymbols = Object.values(_config.mapBattleSymbols).join(',');
-                        let hasRandomBattles = allBattleSymbols.indexOf('random-') !== -1;
-                        if (!hasRandomBattles){ continue; }
-                        }
-                    let enabled = true;
-                    let currency = typeof action[3] !== 'undefined' && action[3] ? action[3] : false;
-                    let price = typeof action[4] !== 'undefined' && action[4] ? action[4] : false;
-                    let innerHtml = '<span>' + label + '</span>';
-                    if (currency && price){
-                        let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
-                        enabled = currencyCheck.hasEnough;
-                        innerHtml = '<span class="has-sprite">'
-                            + '<strong>' + label + '</strong> '
-                            + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
-                            + currencyCheck.spriteMarkup
-                            + '</span>';
-                        }
-                    if (enabled){ sideButtonsMarkup += '<a class="button big-button'+(colour ? ' type '+colour : '')+'" data-actor="'+dataActor+'" data-action="'+token+'">' + innerHtml + '</a>'; }
-                    else { sideButtonsMarkup += '<a class="button big-button'+(colour ? ' type '+colour : '')+' disabled">' + innerHtml + '</a>'; }
-                    }
-                }
-            sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
-            showActionAreaType = 'actor';
-            zoomTimeoutDuration = 500;
-            }
+        let actionData = _self.prepareActorEventOptions(firstEvent, { stillAtPosition: stillAtPosition, otherMenusActiveNow: otherMenusActiveNow });
+        applyActionData(actionData);
         }
 
     // --- EVENT TRIGGERS AND DROPDOWNS ---
@@ -1129,12 +1070,11 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let isCustomEvent = action === 'trigger-event';
                 let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1 || action === 'use-mecha-whistle';
                 let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
-                let isMechanism = action === 'push-button' || action === 'toggle-switch';
-                let isObstacle = action === 'open-gate' || action === 'open-lock' || action === 'remove-block' || action === 'remove-hazard';
                 let isItem = action.indexOf('-item') !== -1 || action.indexOf('item-') !== -1;
                 let isAbility = action.indexOf('-ability') !== -1 || action.indexOf('ability-') !== -1;
-                let isShop = action.indexOf('-shop') !== -1 || action.indexOf('shop-') !== -1;
-                let isAdvice = action.indexOf('-advice') !== -1 || action.indexOf('advice-') !== -1;
+                let isMechanism = action === 'push-button' || action === 'toggle-switch';
+                let isObstacle = action === 'open-gate' || action === 'open-lock' || action === 'remove-block' || action === 'remove-hazard';
+                let isActorAction = action.indexOf('shop-with-') !== -1 || action.indexOf('advice-from-') !== -1 || action.indexOf('reset-world-') !== -1;
                 let isDismiss = action === 'dismiss';
 
                 if (!isDismiss){ $button.addClass('clicked'); }
@@ -1151,128 +1091,20 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 else if (isPortal){
                     return _self.handlePortalActionClick(action, $button, firstEvent);
                     }
-                else if (isMechanism){
-                    return _self.handleMechanismActionClick(action, $button, firstEvent);
-                    }
-                else if (isObstacle){
-                    return _self.handleObstacleActionClick(action, $button, firstEvent);
-                    }
                 else if (isItem){
                     return _self.handleItemActionClick(action, $button, firstEvent);
                     }
                 else if (isAbility){
                     return _self.handleAbilityActionClick(action, $button, firstEvent);
                     }
-                else if (isShop){
-                    let shopToken = action.replace(/^shop-with-/, '');
-                    let $popupFrame, $popupCloseButton;
-                    let $canvasWrapper = $('> .wrapper', $thisCanvas);
-                    let $progressTracker = $('#progress-tracker', $thisCanvas);
-                    let $zennyCounter = $('.counter.zenny', $progressTracker);
-                    let $robotsOverview = _elements.robotsOverview;
-
-                    let onShopReady = function(){
-                        _self.hideActionDropdown(false);
-                        $popupFrame.removeClass('hidden');
-                        _self.playSoundEffect('inventory-open', {delay: 300});
-                        };
-                    let onUpdateZenny = function(newAmount){
-                        $('.count', $zennyCounter).html(newAmount);
-                        let newIntAmount = parseInt(newAmount.replace(',', ''));
-                        _worldPlayer.zenny = newIntAmount;
-                        };
-                    let onUpdateQuantities = function(newQuantities){
-                        let itemTokens = Object.keys(newQuantities);
-                        for (let i = 0; i < itemTokens.length; i++){
-                            let itemToken = itemTokens[i];
-                            let itemQuantity = newQuantities[itemToken];
-                            let itemInfo = _mmrpgItemsIndex[itemToken];
-                            if (!itemInfo){ continue; }
-                            if (itemQuantity > 0 && typeof _worldPlayer.items[itemToken] === 'undefined'){
-                                _self.addItemToInventory(itemToken, itemQuantity, false, false);
-                                } else {
-                                _worldPlayer.items[itemToken] = itemQuantity;
-                                let $itemInStorage = $('.storage-items .team-item[data-item="' + itemToken + '"]', $robotsOverview);
-                                if ($itemInStorage && $itemInStorage.length){
-                                    $itemInStorage.attr('data-quantity', itemQuantity);
-                                    $itemInStorage.find('.quantity').html('&times; ' + itemQuantity);
-                                    }
-                                }
-                            }
-                        };
-
-                    let frameSource = '';
-                    frameSource = '/frames/shop.php?world=true&shop=' + shopToken + '&player=' + _playerToken;
-                    let popupMarkup = '<div id="popup-iframe" class="chrome active hidden">'
-                            + '<div class="overlay"></div>'
-                            + '<div class="wrapper">'
-                                + '<iframe frameborder="0" scrolling="no"></iframe>'
-                            + '</div>'
-                            + '<a class="close"><i class="fa fas fa-plus"></i><strong>Close Shop</strong></a>'
-                        + '</div>';
-                    $popupFrame = $(popupMarkup);
-                    $popupFrame.appendTo($canvasWrapper);
-                    _self.playSoundEffect('link-click');
-
-                    $popupCloseButton = $('> .close', $popupFrame);
-                    $popupCloseButton.bind('click', function(e){
-                        e.preventDefault();
-                        gameSettings.activeWindowEvent = false;
-                        $popupFrame.addClass('hidden');
-                        $thisWorld.removeClass('has_iframe');
-                        _self.playSoundEffect('back-click');
-                        _self.triggerWindowEventsPull();
-                        setTimeout(function(){
-                            $popupFrame.remove();
-                            }, 1000);
-                        if (_world.refreshRequired){
-                            _self.incZoomLevel();
-                            $thisWorld.addClass('loading');
-                            window.location.href = window.location.href;
-                            _world.refreshRequired = false;
-                            return;
-                            }
-                        });
-
-                    window.prototype_menu_loaded = function(){ onShopReady(); };
-                    window.prototype_update_zenny = function(newZenny){ onUpdateZenny(newZenny.replace(/\s[^0-9]+$/, '')); };
-                    window.prototype_update_item_quantities = function(newQuantities){ onUpdateQuantities(newQuantities);  };
-                    window.prototype_update_battle_points = function(newPoints){ /* ... */ };
-                    window.prototype_update_leaderboard_rank = function(newRank){ /* ... */ };
-
-                    $thisWorld.addClass('has_iframe');
-                    gameSettings.activeWindowEvent = true;
-                    $('iframe', $popupFrame).attr('src', frameSource);
-
+                else if (isMechanism){
+                    return _self.handleMechanismActionClick(action, $button, firstEvent);
                     }
-                else if (isAdvice){
-                    let actorToken, actorNameKey, actorInfo;
-                    actorToken = action.replace(/^advice-from-/, '');
-                    if (actorToken === 'auto'){ actorNameKey = 'good-guy-auto'; }
-                    else if (actorToken === 'reggae'){ actorNameKey = 'weird-bird-reggae'; }
-                    else if (actorToken === 'kalinka'){ actorNameKey = 'star-gazer-kalinka'; }
-                    if (actorNameKey && typeof _mapActorsIndex[actorNameKey] !== 'undefined'){ actorInfo = _mapActorsIndex[actorNameKey]; }
-                    let possibleMessages = [];
-                    if (actorInfo
-                        && typeof actorInfo['advice'] !== 'undefined'
-                        && actorInfo['advice'].length > 0){
-                        possibleMessages = Object.values(actorInfo['advice']);
-                        } else {
-                        possibleMessages.push('I don\'t have any advice to share right now, sorry.');
-                        }
-                    let currentKey = typeof _self.currentAdviceKey !== 'undefined' ? _self.currentAdviceKey : -1;
-                    let randomKey;
-                    if (possibleMessages.length === 1){
-                        randomKey = 0;
-                        } else {
-                        do { randomKey = Math.floor(Math.random() * possibleMessages.length) + 0; }
-                        while (randomKey === currentKey);
-                        }
-                    _self.currentAdviceKey = randomKey;
-                    let selectedMessageText = possibleMessages[randomKey];
-                    $sideButtons.find('.text').html(selectedMessageText);
-                    _self.enableActionDropdown();
-                    $sideButtons.find('.clicked').removeClass('clicked').addClass('hovered maybe');
+                else if (isObstacle){
+                    return _self.handleObstacleActionClick(action, $button, firstEvent);
+                    }
+                else if (isActorAction){
+                    return _self.handleActorActionClick(action, $button, firstEvent);
                     }
                 else if (action === 'use-mecha-whistle'){
                     let delayMessageFor = 300;
@@ -1316,55 +1148,6 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                         } else {
                         _self.showWorldMessage('...but nothing happened.', delayDismissFor);
                         _self.playSoundEffect('small-debuff-received');
-                        }
-                    }
-                else if (action === 'reset-world-pickups' || action === 'reset-world-encounters'){
-                    let actorSymbols = _config.mapActorSymbols;
-                    let actorsIndex = _config.mapActorsIndex;
-                    let actorStates = _world.actors;
-                    let actorName = $button.attr('data-actor') || false;
-                    let actorInfo = actorName && (actorsIndex && actorsIndex[actorName]) ? actorsIndex[actorName] : false;
-                    if (!actorName || !actorInfo){ console.error('-> actor name or info not found, cannot trigger actions!'); return false; }
-                    let actionList = typeof actorInfo.actions === 'object' && actorInfo.actions.length ? actorInfo.actions : false;
-                    if (!actionList){ console.error('-> actor actionlist is empty, nothing to trigger!'); return false; }
-                    let actionListKeys = (function(list){ let keys = []; for (let i = 0; i < list.length; i++){ keys.push(list[i][1]); } return keys; })(actionList);
-                    let actionInfo = actionListKeys.indexOf(action) !== -1 ? actionList[actionListKeys.indexOf(action)] : false;
-                    if (!actionInfo){ console.error('-> actor action info could not be found!'); return false; }
-                    let currency = actionInfo[3], price = actionInfo[4];
-                    let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
-                    let currencyKind = currencyCheck.kind, currencySubKind = currencyCheck.subKind;
-                    let playerHasEnough = currencyCheck.hasEnough;
-                    if (currencyKind === 'stars'){
-                        /* do nothing */
-                        }
-                    else if (currencyKind === 'zenny'){
-                        _self.playSoundEffect('zenny-spent');
-                        _worldPlayer.zenny -= price;
-                        if (_worldPlayer.zenny < 0){ _worldPlayer.zenny = 0; }
-                        }
-                    else if (currencyKind === 'items'){
-                        if (currencySubKind.length && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
-                            _self.playSoundEffect('zenny-spent');
-                            _worldPlayer.items[currencySubKind] -= price;
-                            if (_worldPlayer.items[currencySubKind] < 0){ _worldPlayer.items[currencySubKind] = 0; }
-                            }
-                        }
-                    let resetHref = false;
-                    if (action === 'reset-world-pickups'){ resetHref = 'world.php?reset=pickups'; }
-                    else if (action === 'reset-world-encounters'){ resetHref = 'world.php?reset=encounters'; }
-                    if (resetHref){
-                        _self.playSoundEffect('bounce-sound');
-                        _self.incZoomLevel();
-                        $thisWorld.addClass('busy');
-                        _self.saveWorldState(function(){
-                            _self.incZoomLevel();
-                            $thisWorld.addClass('loading');
-                            window.location.href = resetHref;
-                            _self.incZoomLevel();
-                            }, true, false);
-                        $thisWorld.animate({opacity: 0}, 1200, function(){
-                            $thisWorld.addClass('hidden');
-                            });
                         }
                     }
                 else if (isDismiss){
