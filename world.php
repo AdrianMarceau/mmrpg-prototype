@@ -198,11 +198,12 @@ if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['t
 //$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['last_player'] = $this_prototype_data['this_current_player'];
-$WORLD_SESSION['player_sessions']['allowed'] = $allowed_player_tokens; // store the allowed player tokens in the session
+$WORLD_SESSION['player_sessions']['allowed'] = implode(',', $allowed_player_tokens); // store the allowed player tokens in the session
 //error_log('$WORLD_SESSION[\'player_sessions\'][\'allowed\'] = '. print_r($WORLD_SESSION['player_sessions']['allowed'], true));
 
 // Update the player session history in case we need to review it or switch back
 if (empty($WORLD_SESSION['player_sessions']['history'])){ $WORLD_SESSION['player_sessions']['history'] = array(); }
+elseif (is_string($WORLD_SESSION['player_sessions']['history'])) { $WORLD_SESSION['player_sessions']['history'] = explode(',', $WORLD_SESSION['player_sessions']['history']); }
 //error_log('$WORLD_SESSION[\'player_sessions\'][\'history\'] = '. print_r($WORLD_SESSION['player_sessions']['history'], true));
 $world_player_session_history = !empty($WORLD_SESSION['player_sessions']['history']) ? $WORLD_SESSION['player_sessions']['history'] : array();
 $world_player_session_history = array_reverse($world_player_session_history);
@@ -211,7 +212,7 @@ $world_player_session_history = array_reverse($world_player_session_history);
 $world_player_session_history = array_unique($world_player_session_history);
 $world_player_session_history = array_values($world_player_session_history);
 //error_log('$world_player_session_history = '. print_r($world_player_session_history, true));
-$WORLD_SESSION['player_sessions']['history'] = $world_player_session_history;
+$WORLD_SESSION['player_sessions']['history'] = implode(',', $world_player_session_history);
 
 // Now that we have the player, we should collect the player's robots and other data
 $this_player_id = 1;
@@ -462,10 +463,12 @@ $request_world_direction = $this_prototype_data['this_current_direction'];
 //error_log('$WORLD_PLAYER_SESSION = '. print_r($WORLD_PLAYER_SESSION, true));
 
 // Create arrays for pending actions and transitions before switching just-in-case they're needed
-if (empty($WORLD_PLAYER_SESSION['recent_actions'])){ $WORLD_PLAYER_SESSION['recent_actions'] = array(); }
-if (empty($WORLD_PLAYER_SESSION['pending_actions'])){ $WORLD_PLAYER_SESSION['pending_actions'] = array(); }
+if (!isset($WORLD_PLAYER_SESSION['recent_actions'])){ $WORLD_PLAYER_SESSION['recent_actions'] = ''; }
+if (!isset($WORLD_PLAYER_SESSION['pending_actions'])){ $WORLD_PLAYER_SESSION['pending_actions'] = ''; }
 $recent_world_actions = &$WORLD_PLAYER_SESSION['recent_actions'];
 $pending_world_actions = &$WORLD_PLAYER_SESSION['pending_actions'];
+if (!is_array($recent_world_actions)){ $recent_world_actions = explode(',', $recent_world_actions); }
+if (!is_array($pending_world_actions)){ $pending_world_actions = explode(',', $pending_world_actions); }
 
 // Now that we've collected required args that may have been passed in the URL, reload w/o them to prevent double-entry
 if (!empty($_REQUEST['player'])
@@ -477,6 +480,9 @@ if (!empty($_REQUEST['player'])
     // Check for pending actions or transitions before redirecting
     if (!empty($_REQUEST['player']) && !empty($_REQUEST['switch']) && $_REQUEST['switch'] === 'true'){ array_unshift($recent_world_actions, 'player-switch'); }
     if (!empty($_REQUEST['robots']) && !empty($_REQUEST['switch']) && $_REQUEST['switch'] === 'true'){ array_unshift($recent_world_actions, 'team-switch'); }
+    // Re-compress the recent/pending actions arrays before exiting
+    $recent_world_actions = implode(',', $recent_world_actions);
+    $pending_world_actions = implode(',', $pending_world_actions);
     // Redirect to the clean world URL without any arguments to prevent double-entry
     $allowed_returns = array('world' => 'world.php', 'prototype' => 'prototype.php');
     $return_to = !empty($_REQUEST['return']) && in_array($_REQUEST['return'], array_keys($allowed_returns)) ? $_REQUEST['return'] : 'world';
@@ -524,6 +530,10 @@ $robots_have_changed = !empty($recent_world_actions) && $recent_world_actions[0]
 array_unshift($recent_world_actions, 'start');
 $recent_world_actions = array_slice($recent_world_actions, 0, 9);
 
+// Re-compress the recent/pending actions arrays before moving on
+$recent_world_actions = implode(',', $recent_world_actions);
+$pending_world_actions = implode(',', $pending_world_actions);
+
 // Make sure there's room in relevant session arrays for this map's data
 if (!isset($WORLD_SESSION['world_maps'][$world_map_token])){ $WORLD_SESSION['world_maps'][$world_map_token] = array(); }
 if (!isset($WORLD_SESSION['world_events'][$world_map_token])){ $WORLD_SESSION['world_events'][$world_map_token] = array(); }
@@ -567,8 +577,9 @@ $map_pixel_width = $map_col_size * $map_tile_width;
 $map_pixel_height = $map_row_size * $map_tile_height;
 
 // Generate the map spawn points (source and destination)
-$map_spawn_pos = !empty($WORLD_SESSION['world_maps'][$world_map_token]['spawn_pos']) ? $WORLD_SESSION['world_maps'][$world_map_token]['spawn_pos'] : '';
-$map_exit_pos = !empty($WORLD_SESSION['world_maps'][$world_map_token]['exit_pos']) ? $WORLD_SESSION['world_maps'][$world_map_token]['exit_pos'] : '';
+$map_positions = !empty($WORLD_SESSION['world_maps'][$world_map_token]) ? (is_string($WORLD_SESSION['world_maps'][$world_map_token]) ? json_decode($WORLD_SESSION['world_maps'][$world_map_token], true) : $WORLD_SESSION['world_maps'][$world_map_token]) : array();
+$map_spawn_pos = !empty($map_positions['spawn_pos']) ? $map_positions['spawn_pos'] : '';
+$map_exit_pos = !empty($map_positions['exit_pos']) ? $map_positions['exit_pos'] : '';
 if (empty($map_spawn_pos)){ $map_spawn_pos = '1-1'; }
 if (!empty($map_data_parsed['portals']['spawn'])){ $map_spawn_pos = $map_data_parsed['portals']['spawn'][0]; }
 if (empty($map_exit_pos)){
@@ -577,8 +588,9 @@ if (empty($map_exit_pos)){
         $map_exit_pos = $map_data_parsed['portals']['exit'][0];
     }
 }
-$WORLD_SESSION['world_maps'][$world_map_token]['spawn_pos'] = $map_spawn_pos;
-$WORLD_SESSION['world_maps'][$world_map_token]['exit_pos'] = $map_exit_pos;
+$map_positions['spawn_pos'] = $map_spawn_pos;
+$map_positions['exit_pos'] = $map_exit_pos;
+$WORLD_SESSION['world_maps'][$world_map_token] = json_encode($map_positions);
 
 // If the world position has not been set yet, we can use the spawn position for it as well
 if (empty($this_prototype_data['this_current_position'])){
@@ -599,11 +611,15 @@ $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION[
 $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
 if (empty($world_map_encounters) || $reset_encounters === true){
     $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
-    rpg_world::update_session('world_encounters', $world_map_token, $world_map_encounters);
+    $encoded_encounters = array();
+    foreach ($world_map_encounters AS $k => $v){ $encoded_encounters[$k] = is_string($v) ? $v : json_encode($v); }
+    rpg_world::update_session('world_encounters', $world_map_token, $encoded_encounters);
     if ($reset_encounters === true){
         header('Location: world.php');
         exit();
     }
+} else {
+    foreach ($world_map_encounters AS $k => $v){ if (is_string($v)){ $world_map_encounters[$k] = json_decode($v, true); } }
 }
 
 // If the pickups for this map have not been generated yet, we can do so now
@@ -613,7 +629,9 @@ $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$
 if (empty($world_map_pickups) || $reset_pickups === true){
     //error_log('regenerating pickups!');
     $world_map_pickups = rpg_world::generate_worldmap_pickups($this_prototype_data, $map_data_parsed);
-    rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
+    $encoded_pickups = array();
+    foreach ($world_map_pickups AS $k => $v){ $encoded_pickups[$k] = is_string($v) ? $v : json_encode($v); }
+    rpg_world::update_session('world_pickups', $world_map_token, $encoded_pickups);
     $world_map_items = !empty($WORLD_SESSION['world_items'][$world_map_token]) ? $WORLD_SESSION['world_items'][$world_map_token] : array();
     $world_map_abilities = !empty($WORLD_SESSION['world_abilities'][$world_map_token]) ? $WORLD_SESSION['world_abilities'][$world_map_token] : array();
     foreach ($world_map_pickups AS $key => $pickup){ unset($world_map_items[$pickup[3]]); unset($world_map_abilities[$pickup[3]]); } // clear all "claimed" datestamps
@@ -623,6 +641,8 @@ if (empty($world_map_pickups) || $reset_pickups === true){
         header('Location: world.php');
         exit();
     }
+} else {
+    foreach ($world_map_pickups AS $k => $v){ if (is_string($v)){ $world_map_pickups[$k] = json_decode($v, true); } }
 }
 
 // If requested to do so, make sure we reset the world items

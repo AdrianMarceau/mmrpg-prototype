@@ -223,6 +223,14 @@ class rpg_world {
                 $json_session_file = 'WORLD__'.$key.'.json';
                 $json_session_file_path = $json_session_path.$json_session_file;
                 if (!is_dir(dirname($json_session_file_path))){ mkdir(dirname($json_session_file_path), 0755, true); }
+                // If saving encounters or pickups, decode the individual items first so the JSON file is clean
+                if ($key === 'world_encounters' || $key === 'world_pickups'){
+                    foreach ($values AS $map_token => $map_data){
+                        foreach ($map_data AS $k => $v){
+                            if (is_string($v)){ $values[$map_token][$k] = json_decode($v, true); }
+                        }
+                    }
+                }
                 file_put_contents($json_session_file_path, json_encode($values, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK));
             }
         }
@@ -1456,6 +1464,7 @@ class rpg_world {
                 $world_encounter_cells = array();
                 if (!empty($world_map_encounters)){
                     foreach ($world_map_encounters AS $key => $encounter){
+                        if (is_string($encounter)){ $encounter = json_decode($encounter, true); }
                         list($kind, $token, $alt, $position, $namekey, $label) = $encounter;
                         if (!rpg_battle::has_index_info($namekey)){ continue; }
                         $world_encounter_cells[] = $position;
@@ -1471,6 +1480,7 @@ class rpg_world {
                 $world_pickup_cells = array();
                 if (!empty($world_map_pickups)){
                     foreach ($world_map_pickups AS $key => $pickup){
+                        if (is_string($pickup)){ $pickup = json_decode($pickup, true); }
                         list($kind, $token, $position, $namekey, $label) = $pickup;
                         $world_pickup_cells[] = $position;
                         }
@@ -3833,7 +3843,11 @@ class rpg_world {
         $world_map_encounter_symbols = !empty($world_symbols[$world_map_token]['encounters']) ? $world_symbols[$world_map_token]['encounters'] : array();
         if (empty($world_map_encounters)){
             $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
-            self::update_session('world_encounters', $world_map_token, $world_map_encounters);
+            $encoded_encounters = array();
+            foreach ($world_map_encounters AS $k => $v){ $encoded_encounters[$k] = is_string($v) ? $v : json_encode($v); }
+            self::update_session('world_encounters', $world_map_token, $encoded_encounters);
+        } else {
+            foreach ($world_map_encounters AS $k => $v){ if (is_string($v)){ $world_map_encounters[$k] = json_decode($v, true); } }
         }
         //error_log('$world_map_encounters = '.print_r($world_map_encounters, true));
         $battles_markup = array();
@@ -4308,6 +4322,7 @@ class rpg_world {
         $mmrpg_index_players = self::get_index('players');
         $world_player_sessions = !empty($WORLD_SESSION['player_sessions']) ? $WORLD_SESSION['player_sessions'] : array();
         $allowed_player_tokens = !empty($world_player_sessions['allowed']) ? $world_player_sessions['allowed'] : array_keys($world_player_sessions);
+        if (!empty($allowed_player_tokens) && is_string($allowed_player_tokens)){ $allowed_player_tokens = explode(',', $allowed_player_tokens); }
         $current_player_token = !empty($this_prototype_data['this_player_token']) ? $this_prototype_data['this_player_token'] : 'player';
         foreach ($allowed_player_tokens AS $pkey => $ptoken){
             if ($ptoken === 'player'){ continue; } // skip the default player
@@ -4376,7 +4391,11 @@ class rpg_world {
         $world_map_pickup_symbols = !empty($world_symbols[$world_map_token]['pickups']) ? $world_symbols[$world_map_token]['pickups'] : array();
         if (empty($world_map_pickups)){
             $world_map_pickups = rpg_world::generate_worldmap_pickups($this_prototype_data, $map_data_parsed);
-            self::update_session('world_pickups', $world_map_token, $world_map_pickups);
+            $encoded_pickups = array();
+            foreach ($world_map_pickups AS $k => $v){ $encoded_pickups[$k] = is_string($v) ? $v : json_encode($v); }
+            self::update_session('world_pickups', $world_map_token, $encoded_pickups);
+        } else {
+            foreach ($world_map_pickups AS $k => $v){ if (is_string($v)){ $world_map_pickups[$k] = json_decode($v, true); } }
         }
         $items_markup = array();
         $item_symbols = array();
@@ -4688,6 +4707,7 @@ class rpg_world {
         $world_map_token = $world_token.'__'.$map_token;
         $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
         $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array(); // all encounters generated
+        foreach ($world_map_encounters AS $k => $v){ if (is_string($v)){ $world_map_encounters[$k] = json_decode($v, true); } }
         //error_log('[portal-check] checking for world map portals on map "'.$world_map_token.'"');
         //error_log('-> $map_data_parsed[\'portals\'] = '.print_r($map_data_parsed['portals'], true));
         //error_log('-> $world_map_encounters = '.print_r($world_map_encounters, true));
