@@ -29,10 +29,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'light-laboratory',
         'objects' => ['player-platform'],
-        'encounters' => ['dr-light', 'mega-man'],
+        //'encounters' => ['dr-light', 'mega-man'],
         'encounters2' => ['met'],
         'rescues' => [],
-        'items' => ['light-program!!', 'light-heart!!', 'copy-core!!', 'item-codes', 'equip-codes'],
+        'items' => ['light-program!!', 'light-heart!!', 'light-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'south', 'west']
         ];
@@ -45,7 +45,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
-        'items' => [],
+        'items' => ['equip-codes'],
         'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -59,7 +59,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
-        'rescues' => ['roll'],
+        //'rescues' => ['roll'],
+        'items' => ['item-codes'],
         'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
         'tags' => ['central', 'player'],
         'exits' => ['north', 'south']
@@ -73,7 +74,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
-        'items' => [],
+        'abilities' => ['light-buster'],
         'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -86,10 +87,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'wily-castle',
         'objects' => ['player-platform'],
-        'encounters' => ['dr-wily', 'bass'],
+        //'encounters' => ['dr-wily', 'bass'],
         'encounters2' => ['met'],
         'rescues' => ['heel-bot'],
-        'items' => ['wily-program!!', 'wily-heart!!', 'copy-core!!'],
+        'items' => ['wily-program!!', 'wily-heart!!', 'wily-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -116,7 +117,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'maniacal-hideaway',
         'encounters' => ['trill'],
         'encounters2' => ['met', 'skeleton-joe'],
-        'rescues' => ['disco'],
+        //'rescues' => ['disco'],
+        'abilities' => ['wily-buster'],
         'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -143,10 +145,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'cossack-citadel',
         'objects' => ['player-platform'],
-        'encounters' => ['dr-cossack', 'proto-man'],
+        //'encounters' => ['dr-cossack', 'proto-man'],
         'encounters2' => ['met'],
         'rescues' => ['heal-bot'],
-        'items' => ['cossack-program!!', 'cossack-heart!!', 'copy-core!!'],
+        'items' => ['cossack-program!!', 'cossack-heart!!', 'cossack-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -173,7 +175,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'wintry-forefront',
         'encounters' => ['trill'],
         'encounters2' => ['met', 'crystal-joe'],
-        'rescues' => ['rhythm'],
+        //'rescues' => ['rhythm'],
+        'abilities' => ['cossack-buster'],
         'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -227,6 +230,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => '',
         'encounters' => [],
+        'abilities' => ['lalinde-buster'],
         'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['west']
@@ -239,6 +243,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => '',
         'encounters' => [],
+        'items' => ['extra-life'],
         'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['east']
@@ -1053,7 +1058,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'crystal',
         'field' => 'reflection-chamber',
         'encounters' => ['gemini-man'],
-        'encounters2' => ['nitron-r', 'nitron-b', 'nitron-y', 'spin-fiend', 'ribbitron'],
+        'encounters2' => ['nitron-r', 'nitron-b', 'nitron-y', 'ribbitron'],
         'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'east']
