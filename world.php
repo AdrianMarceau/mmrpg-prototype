@@ -196,6 +196,10 @@ if (empty($request_player_token) && !empty($WORLD_SESSION['player_sessions']['la
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){ $this_prototype_data['this_current_player'] = $request_player_token; }
 if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['this_current_player'] = $default_player_token; }
 //$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
+$new_world_version = MMRPG_VERSION;
+$old_world_version = !empty($WORLD_SESSION['world_version']) ? $WORLD_SESSION['world_version'] : '';
+$diff_world_version = $old_world_version !== $new_world_version;
+$WORLD_SESSION['world_version'] = $new_world_version;
 $WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['last_player'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['allowed'] = implode(',', $allowed_player_tokens); // store the allowed player tokens in the session
@@ -609,7 +613,8 @@ if (empty($this_prototype_data['this_current_position'])){
 $reset_encounters = !empty($_GET['reset']) && $_GET['reset'] === 'encounters' ? true : false;
 $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
 $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
-if (empty($world_map_encounters) || $reset_encounters === true){
+if (empty($world_map_encounters) || $reset_encounters === true || $diff_world_version){
+    //error_log('regenerating world encounters...');
     $world_map_encounters = rpg_world::generate_worldmap_encounters($this_prototype_data, $map_data_parsed);
     $encoded_encounters = array();
     foreach ($world_map_encounters AS $k => $v){ $encoded_encounters[$k] = is_string($v) ? $v : json_encode($v); }
@@ -626,7 +631,8 @@ if (empty($world_map_encounters) || $reset_encounters === true){
 $reset_pickups = !empty($_GET['reset']) && $_GET['reset'] === 'pickups' ? true : false;
 $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
 $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
-if (empty($world_map_pickups) || $reset_pickups === true){
+if (empty($world_map_pickups) || $reset_pickups === true || $diff_world_version){
+    //error_log('regenerating world pickups...');
     //error_log('regenerating pickups!');
     $world_map_pickups = rpg_world::generate_worldmap_pickups($this_prototype_data, $map_data_parsed);
     $encoded_pickups = array();
