@@ -1,7 +1,7 @@
 <?php
 
 // Include mandatory config files
-define('MMRPG_BUILD', 'mmrpg2k23');
+define('MMRPG_BUILD', 'mmrpg2k25');
 //define('MMRPG_VERSION', '3.8.25');
 define('MMRPG_VERSION', '4.0.0-beta.3');
 require('includes/config.php');
