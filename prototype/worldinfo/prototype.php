@@ -738,6 +738,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'atomic-furnace',
         'encounters' => ['heat-man'],
         'encounters2' => ['telly', 'popo-heli', 'nitron-r'],
+        'hazards' => ['flame-pillar'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'south', 'west']
         ];
@@ -749,6 +750,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'egyptian-excavation',
         'encounters' => ['pharaoh-man', 'sword-man'],
         'encounters2' => ['pyre-fly', 'mummira', 'shield-attacker'],
+        'hazards' => ['flame-pillar'],
         'items' => ['forge-circuit'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -761,6 +763,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'solar-inferno',
         'encounters' => ['solar-man'],
         'encounters2' => ['sola-rei', 'petal-anne_alt2', 'shield-attacker-trl', 'cline_alt'],
+        'hazards' => ['flame-pillar'],
         'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -773,6 +776,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'steel-mill',
         'encounters' => ['fire-man', 'torch-man'],
         'encounters2' => ['tackle-fire', 'bombomb', 'telly', 'arc-weldy'],
+        'hazards' => ['flame-pillar'],
         'items' => ['uptick-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -835,6 +839,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'frozen-boulevard',
         'encounters' => ['tundra-man'],
         'encounters2' => ['nitron-b', 'curlinger', 'bomb-sleigh', 'peng'],
+        'hazards' => ['frozen-foothold'],
         'items' => ['bulwark-module'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'south', 'west']
@@ -847,6 +852,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'arctic-jungle',
         'encounters' => ['ice-man', 'blizzard-man', 'big-eye'],
         'encounters2' => ['peng', 'foot-holder', 'adhering-suzy', 'nitron-b'],
+        'hazards' => ['frozen-foothold'],
         'items' => ['charge-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -859,6 +865,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'frosty-slopes',
         'encounters' => ['cold-man', 'frost-man'],
         'encounters2' => ['penpen-ev', 'frosty-throwman', 'nitron-b', 'peng'],
+        'hazards' => ['frozen-foothold'],
         'items' => ['mecha-whistle'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -871,6 +878,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'glacier-cradle',
         'encounters' => ['chill-man', 'freeze-man'],
         'encounters2' => ['frosty-throwman', 'tel-tel', 'bomb-sleigh', 'skullmet'],
+        'hazards' => ['frozen-foothold'],
         'items' => ['resetchi'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -884,6 +892,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'encounters' => ['tornado-man', 'cloud-man'],
         'encounters2' => ['ballonboo', 'skater-boy', 'parabeak', 'tel-tel'],
+        'hazards' => ['woolly-clouds'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['east', 'south', 'west']
         ];
@@ -969,6 +978,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'septic-system',
         'encounters' => ['shadow-man'],
         'encounters2' => ['ribbitron', 'hammer-joe', 'spin-fiend'],
+        'hazards' => ['toxic-sludge'],
         'items' => ['super-capsule'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -993,6 +1003,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'electrical-tower',
         'encounters' => ['elec-man', 'big-eye'],
         'encounters2' => ['spine', 'flea', 'beak', 'adhering-suzy'],
+        'hazards' => ['woolly-clouds'],
         'items' => ['copycat-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -1005,6 +1016,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'voltage-regulator',
         'encounters' => ['dynamo-man', 'fuse-man'],
         'encounters2' => ['electriri', 'plasma-plus', 'elec-n'],
+        'hazards' => ['woolly-clouds'],
         'items' => ['resetchi'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south', 'west']
@@ -1017,6 +1029,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'virtual-dreamscape',
         'encounters' => ['gravity-man', 'sheep-man'],
         'encounters2' => ['pointan', 'flipping-suzy', 'pukapunter'],
+        'hazards' => ['gravity-well', 'woolly-clouds'],
         'items' => ['battery-circuit'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east']
@@ -1193,6 +1206,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'savage-menagerie',
         'encounters' => ['slash-man', 'tengu-man'],
         'encounters2' => ['eggalodon', 'cline', 'shururun', 'bombomboy'],
+        'hazards' => ['bramble-patch'],
         'items' => ['sapling-circuit'],
         'tags' => ['central', 'elemental'],
         'exits' => ['west']
@@ -1205,6 +1219,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'preserved-forest',
         'encounters' => ['wood-man', 'burner-man'],
         'encounters2' => ['batton', 'kabuton', 'tank-oven', 'blocky'],
+        'hazards' => ['bramble-patch'],
         'items' => ['resetchi'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -1217,6 +1232,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'verdant-rainforest',
         'encounters' => ['plant-man', 'hornet-man'],
         'encounters2' => ['petal-anne', 'kabuton', 'propeller-eye'],
+        'hazards' => ['bramble-patch'],
         'rescues' => ['vesper-woman'],
         'items' => ['growth-module'],
         'tags' => ['central', 'elemental'],
@@ -1231,6 +1247,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'rainy-sewers',
         'encounters' => ['toad-man', 'pump-man'],
         'encounters2' => ['robo-fishtot', 'piper-n', 'lady-blader', 'upndown'],
+        'hazards' => ['foamy-bubbles'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -1242,6 +1259,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'waterfall-institute',
         'encounters' => ['bubble-man'],
         'encounters2' => ['snapper', 'octone', 'robo-fishtot'],
+        'hazards' => ['foamy-bubbles'],
         'items' => ['spreader-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
@@ -1254,6 +1272,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'chemical-zone',
         'encounters' => ['burst-man', 'aqua-man', 'acid-man'],
         'encounters2' => ['pipetto', 'shelln', 'bombomb'],
+        'hazards' => ['foamy-bubbles'],
         'items' => ['alchemy-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['west']
@@ -1266,6 +1285,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'deep-ocean',
         'encounters' => ['splash-woman', 'wave-man', 'pirate-man'],
         'encounters2' => ['octone', 'bui-boi', 'ballonboo'],
+        'hazards' => ['foamy-bubbles', 'toxic-sludge'],
         'items' => ['sponge-circuit'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'south']
@@ -1290,6 +1310,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'mineral-quarry',
         'encounters' => ['drill-man', 'ground-man'],
         'encounters2' => ['drill-mole', 'molier'],
+        'hazards' => ['crude-oil'],
         'items' => ['fortune-module'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south', 'west']
@@ -1302,6 +1323,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'oil-wells',
         'encounters' => ['oil-man', 'flame-man'],
         'encounters2' => ['beetle-borg', 'gockroach-s', 'antlin-g', 'pooker'],
+        'hazards' => ['crude-oil', 'flame-pillar'],
         'items' => ['super-capsule'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -1314,6 +1336,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'sunset-gulch',
         'encounters' => ['tomohawk-man', 'charge-man', 'magma-man'],
         'encounters2' => ['colton', 'merserker', 'power-muscler'],
+        'hazards' => ['shifting-sands', 'flame-pillar'],
         'items' => ['energy-tank'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'west']

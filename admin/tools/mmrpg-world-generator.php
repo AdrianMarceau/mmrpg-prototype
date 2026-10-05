@@ -185,6 +185,7 @@ echo('<pre>'.PHP_EOL);
             $area_static_encounters = !empty($area_info['encounters']) ? $area_info['encounters'] : array();
             $area_random_encounters = !empty($area_info['encounters2']) ? $area_info['encounters2'] : array();
             $area_static_rescues = !empty($area_info['rescues']) ? $area_info['rescues'] : array();
+            $area_hazards = !empty($area_info['hazards']) ? $area_info['hazards'] : array();
 
             // Collect or define the inset (area border + padding + extra tile[s])
             $encounter_inset = isset($area_info['encounter_inset']) ? intval($area_info['encounter_inset']) : $area_padding + 1;
@@ -574,6 +575,43 @@ echo('<pre>'.PHP_EOL);
                 }
             }
 
+            // Generate RANDOM HAZARDS for this area (10% of remaining tiles)
+            $hazard_strings = [];
+            if (!empty($area_hazards)){
+
+                // Calculate the total number of walkable tiles inside the inset
+                $zone_w = max(0, $area_size_width - ($encounter_inset * 2));
+                $zone_h = max(0, $area_size_height - ($encounter_inset * 2));
+                $total_zone_tiles = $zone_w * $zone_h;
+
+                // Count how many of our excluded coordinates actually fall inside this random zone
+                $excluded_in_zone = 0;
+                foreach ($exclude_coords as $ex_pos){
+                    list($ex_x, $ex_y) = explode('-', $ex_pos);
+                    if ($ex_x > $encounter_inset && $ex_x <= ($area_size_width - $encounter_inset) &&
+                        $ex_y > $encounter_inset && $ex_y <= ($area_size_height - $encounter_inset)) {
+                        $excluded_in_zone++;
+                    }
+                }
+
+                // Calculate 10% of the strictly available tiles
+                $remaining_walkable = max(0, $total_zone_tiles - $excluded_in_zone);
+                $num_hazards = (int)floor($remaining_walkable * 0.10);
+
+                // Pop coordinates and generate the hazards!
+                for ($i = 1; $i <= $num_hazards; $i++){
+                    $position = $getRandomCoord();
+                    if (!$position) break; // Failsafe if the map is stuffed
+                    // Pick a random hazard from the area's defined array
+                    $hazard_token = $area_hazards[array_rand($area_hazards)];
+                    // Generate a unique ID prefix (e.g. "crude-oil" -> "crude")
+                    $hazard_prefix = explode('-', $hazard_token)[0];
+                    // Builde the hazard markup for the dyanmic system
+                    $hazard_strings[] = '@hazards[]  = '.$hazard_prefix.'-hazard-'.$i.'('.$position.', '.$hazard_token.')';
+                }
+
+            }
+
             // Generate the PICKUPS for this area along with their map positions where relevant
             if (!empty($area_random_pickups) || !empty($regular_pickups) || !empty($static_pickup_strings)){
 
@@ -695,6 +733,12 @@ echo('<pre>'.PHP_EOL);
             if (!empty($block_strings)){
                 $area_file_markup[] = '#---------------------------#';
                 $area_file_markup[] = implode(PHP_EOL, $block_strings);
+            }
+
+            // Generate the HAZARDS for this area
+            if (!empty($hazard_strings)){
+                $area_file_markup[] = '#---------------------------#';
+                $area_file_markup[] = implode(PHP_EOL, $hazard_strings);
             }
 
             // --- HARD-CODED ENCOUNTERS FOR LALINDE AREA 1 ---
