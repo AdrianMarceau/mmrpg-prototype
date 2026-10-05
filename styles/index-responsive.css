@@ -106,7 +106,7 @@ body:before {
     }
     #window .page .body .subbody[data-class="fields"] .float_link_group[data-game="MM99/Master"], /* MMRPG/Events */
     #window .page .body .subbody[data-class="fields"] .float.link.group[data-game="MM99/Master"] {
-        clear: left;
+        clear: none;
     }
     #window .page .subbody .float_link .sprite_size_40x40 span,
     #window .page .subbody .float_link .sprite_size_40x40 img,

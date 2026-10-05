@@ -782,6 +782,7 @@ html, body {
 #world #map .sprite.block.super-block.medieval-castle { background-image: url("../content/fields/medieval-castle/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.galaxy-fantasy { background-image: url("../content/fields/galaxy-fantasy/sprites/battle-field_block.png"); }
 
+#world #map .sprite.block.super-block.sparkling-grotto { background-image: url("../content/fields/sparkling-grotto/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.savage-menagerie { background-image: url("../content/fields/savage-menagerie/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.frozen-boulevard { background-image: url("../content/fields/frozen-boulevard/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.balloon-playground { background-image: url("../content/fields/balloon-playground/sprites/battle-field_block.png"); }
@@ -789,10 +790,12 @@ html, body {
 #world #map .sprite.block.super-block.sunken-metropolis { background-image: url("../content/fields/sunken-metropolis/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.ancient-temple { background-image: url("../content/fields/ancient-temple/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.military-hideout { background-image: url("../content/fields/military-hideout/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.super-block.virtual-dreamscape { background-image: url("../content/fields/virtual-dreamscape/sprites/battle-field_block.png"); }
-
-#world #map .sprite.block.super-block.sparkling-grotto { background-image: url("../content/fields/sparkling-grotto/sprites/battle-field_block.png"); }
-
+#world #map .sprite.block.super-block.voltage-regulator { background-image: url("../content/fields/voltage-regulator/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.secluded-summit { background-image: url("../content/fields/secluded-summit/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.chemical-zone { background-image: url("../content/fields/chemical-zone/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.deep-ocean { background-image: url("../content/fields/deep-ocean/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.barrier-block { background-position: -40px -440px; }
 
