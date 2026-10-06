@@ -44,8 +44,12 @@ function preparePortalEventOptions(firstEvent, options){
         goToDestination = true;
         goToWorld = _config.mapWorld;
         goToMap = dataPortal.replace(/^goto__/i, '');
-        if (goToMap.indexOf('__') !== -1){ let gtm = goToMap.split('__'); goToWorld = gtm[0]; goToMap = gtm[1]; }
-        if (portalInfo['dst']){ goToPosition = portalInfo['dst']; }
+        if (goToMap.indexOf('__') !== -1){
+            let gtm = goToMap.split('__');
+            if (gtm.length >= 3){ goToWorld = gtm[0]; goToMap = gtm[1]; goToPosition = gtm[2]; }
+            else if (gtm.length >= 2){ goToWorld = gtm[0]; goToMap = gtm[1]; }
+            }
+        if (portalInfo && portalInfo['dst']){ goToPosition = portalInfo['dst']; }
         } else if (portalInfo['dst']){
         goToDestination = true;
         goToWorld = _config.mapWorld;
@@ -156,12 +160,14 @@ function handlePortalActionClick(action, $button, firstEvent){
             } else if (portalName === 'exit'){
             portalHref = 'prototype.php'; 
             } else if (portalName.indexOf('goto__') !== -1){
-            let worldToken, mapToken;
+            let worldToken, mapToken, posToken;
             let goToPath = portalName.replace(/^goto__/i, '').split('__');
-            if (goToPath[1]){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
+            if (goToPath.length >= 3){ worldToken = goToPath[0]; mapToken = goToPath[1]; posToken = goToPath[2]; }
+            else if (goToPath.length >= 2){ worldToken = goToPath[0]; mapToken = goToPath[1]; }
             else { worldToken = _config.mapWorld; mapToken = goToPath[0]; }
             finalGoToMap = mapToken;
             portalHref = 'world.php?world=' + worldToken + '&map=' + mapToken;
+            if (posToken){ portalHref += '&position=' + posToken; }
             } else if (portalInfo && portalInfo.dst){
             let goToWorld = _config.mapWorld;
             let goToMap = portalInfo.dst;
