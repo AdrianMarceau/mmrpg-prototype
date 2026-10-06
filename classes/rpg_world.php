@@ -5360,10 +5360,12 @@ class rpg_world {
         $auto_unlock_program = true;
         $auto_unlock_robots = true;
         $auto_unlock_heart = true;
+        $auto_unlock_core = true;
         $auto_unlock_campaign = true;
         $player_unlock_subtext = 'This campaign is undefined and this text should not appear. Do no engage.';
         $player_program_token = str_replace('dr-', '', $player_token).'-program'; // story mcguffin player program
         $player_heart_token = str_replace('dr-', '', $player_token).'-heart__1'; // player's first limit heart
+        $player_core_token = str_replace('dr-', '', $player_token).'-core'; // player's first robot core
         if ($player_token === 'dr-light'){
             $player_unlock_subtext = 'This beginner-level campaign teaches you the basics while you fight through an army of powered-up opponents!';
         } elseif ($player_token === 'dr-wily'){
@@ -5374,11 +5376,13 @@ class rpg_world {
             $player_unlock_subtext = '<span style="display: block; color: red; font-family: monospace; font-size: 12px; padding: 10px 0 0;">System Error: Story Campaign File Is Corrupted</span>';
             $auto_unlock_robots = false;
             $auto_unlock_campaign = false;
-            $auto_unlock_heart = false;
+            $player_heart_token = 'empty-heart';
+            $player_core_token = 'empty-core';
         }
         mmrpg_game_unlock_player(array('player_token' => $player_token), $auto_unlock_robots, true);
         if ($auto_unlock_program){ mmrpg_game_unlock_item($player_program_token, false); }
         if ($auto_unlock_heart){ mmrpg_game_unlock_item($player_heart_token, false); }
+        if ($auto_unlock_core){ mmrpg_game_unlock_item($player_core_token, false); }
         $player_robots_unlocked = mmrpg_prototype_robots_unlocked($player_token, true);
         $first_robot = !empty($player_robots_unlocked[0]) ? $player_robots_unlocked[0] : 'robot';
         $first_robot_info = !empty($mmrpg_index_robots[$first_robot]) ? $mmrpg_index_robots[$first_robot] : array();

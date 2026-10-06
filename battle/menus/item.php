@@ -46,7 +46,11 @@ ob_start();
             $unequip_button_markup = '';
             if ($allow_inventory_access && !empty($this_robot->robot_item)){
                 $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
-                $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
+                $temp_item_token = $this_robot->robot_item;
+                $temp_equipped_token = $this_robot->robot_item.'__equipped';
+                $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token]) ? $_SESSION['GAME']['values']['battle_items'][$temp_item_token] : 0;
+                $temp_equipped = !empty($_SESSION['GAME']['values']['battle_items'][$temp_equipped_token]) ? $_SESSION['GAME']['values']['battle_items'][$temp_equipped_token] : 0;
+                $temp_quantity_displayed = $temp_owned - $temp_equipped;
                 $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
                 ob_start();
                 echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem">';
@@ -54,7 +58,7 @@ ob_start();
                     echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
                     if ($temp_allowed){ echo 'Unequip Item'; }
                     else { echo '<del>Unequip Item</del>'; }
-                    echo ' ('.$temp_owned.' &rsaquo; '.($temp_owned + 1).')';
+                    echo ' ('.$temp_quantity_displayed.' &rsaquo; '.($temp_quantity_displayed + 1).')';
                     echo '<span class="info color" data-click-tooltip="Unequip the '.$temp_iteminfo['item_name'].' and return it to the inventory?" data-tooltip-type="empty">';
                         echo '<i class="fa fas fa-info-circle color empty"></i>';
                     echo '</span>';
@@ -122,7 +126,9 @@ ob_start();
                 $temp_iteminfo = $mmrpg_database_items[$item_token];
 
                 // Define the amount of weapon energy for this item
-                $temp_item_quantity = !empty($_SESSION['GAME']['values']['battle_items'][$item_token]) ? $_SESSION['GAME']['values']['battle_items'][$item_token] : 0;
+                $temp_item_real_quantity = !empty($_SESSION['GAME']['values']['battle_items'][$item_token]) ? $_SESSION['GAME']['values']['battle_items'][$item_token] : 0;
+                $temp_item_equipped = !empty($_SESSION['GAME']['values']['battle_items'][$item_token.'__equipped']) ? $_SESSION['GAME']['values']['battle_items'][$item_token.'__equipped'] : 0;
+                $temp_item_quantity = $temp_item_real_quantity - $temp_item_equipped;
                 $temp_item_cost = 1;
 
                 // If this player has never aquired this item, do not display it
