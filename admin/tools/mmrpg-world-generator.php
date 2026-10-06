@@ -40,28 +40,49 @@ $world_map_filepath = 'prototype/worldmaps/prototype/';
 $world_map_filedir = MMRPG_CONFIG_ROOTDIR.$world_map_filepath;
 
 // Define a quick function for grabbing random map coordinates
-function createCoordinatePicker($width, $height, $padding, $exclude = []) {
+function createCoordinatePicker($width, $height, $padding, $exclude = []){
     $valid_positions = [];
-    // Calculate the walkable boundaries based on padding
     $min_x = $padding + 1;
     $max_x = $width - $padding;
     $min_y = $padding + 1;
     $max_y = $height - $padding;
     // Build an array of every single walkable coordinate
-    for ($x = $min_x; $x <= $max_x; $x++) {
-        for ($y = $min_y; $y <= $max_y; $y++) {
+    for ($x = $min_x; $x <= $max_x; $x++){
+        for ($y = $min_y; $y <= $max_y; $y++){
             $pos = $x . '-' . $y;
             if (!in_array($pos, $exclude)) {
                 $valid_positions[] = $pos;
             }
         }
     }
-    // Shuffle the array to randomize the order
-    shuffle($valid_positions);
+    shuffle($valid_positions); // Randomize once upfront
+    $mid_x = (int)ceil($width / 2);
+    $mid_y = (int)ceil($height / 2);
     // Return an inline function that pops a coordinate off the list
-    return function() use (&$valid_positions){
-        return array_pop($valid_positions); // Returns null if the map is completely full!
-        };
+    return function($centered = false) use (&$valid_positions, $mid_x, $mid_y){
+        if (empty($valid_positions)) return null; // Failsafe if full
+        // If center-bias is requested, find the available tile closest to the middle
+        if ($centered) {
+            $best_idx = 0;
+            $best_dist = 999999;
+            foreach ($valid_positions as $idx => $pos){
+                list($x, $y) = explode('-', $pos);
+                // Calculate Manhattan distance + a tiny random variance (0 to 2)
+                // so multiple bosses don't stack in a perfectly rigid pattern
+                $dist = abs($x - $mid_x) + abs($y - $mid_y) + mt_rand(0, 2);
+                if ($dist < $best_dist){
+                    $best_dist = $dist;
+                    $best_idx = $idx;
+                }
+            }
+            $chosen = $valid_positions[$best_idx];
+            // Swap chosen tile to the end of the array and pop it
+            $valid_positions[$best_idx] = end($valid_positions);
+            array_pop($valid_positions);
+            return $chosen;
+        }
+        return array_pop($valid_positions);
+    };
 }
 // Define quick functions for generating coordinate buffers around interactive objects
 function getBufferBox($pos, $radius, $max_w, $max_h){
@@ -682,7 +703,7 @@ echo('<pre>'.PHP_EOL);
                     if (strstr($encounter, '_')){ list($robot, $alt) = explode('_', $encounter); }
                     else { $robot = $encounter; $alt = ''; }
                     if (!isset($mmrpg_index_robots[$robot])){ continue; }
-                    $position = $getRandomCoord();
+                    $position = $getRandomCoord(true);
                     $robot_num = $key + 1;
                     $robot_info = $mmrpg_index_robots[$robot];
                     $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
