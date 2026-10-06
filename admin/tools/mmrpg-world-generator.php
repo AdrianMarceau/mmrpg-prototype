@@ -399,6 +399,11 @@ echo('<pre>'.PHP_EOL);
                         $area_file_markup[] = '@locks[]    = '.$flower_type.'-portal-flower('.$local_pos.', portal-flower, '.$flower_type.', items:'.$flower_type.'-core, x10, locked)';
                     }
                 }
+                // TEMP TEMP TEMP TEMP TEMP (TODO: Remove this before launch!)
+                // Place one more portal at the bottom-left in case we need to go back to the debug area
+                $area_file_markup[] = '@portals[]  = debug-world-portal('.($area_padding + 1).'-'.($area_size_height - $area_padding).', debug__debug-area-1__spawn, red-alt)';
+                $area_file_markup[] = '#---------------------------#';
+
             }
             // If this area has a PLAYER PLATFORM, we should add its parts and accompanying panels
             if (in_array('player-platform', $area_objects)
