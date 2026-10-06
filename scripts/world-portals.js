@@ -94,6 +94,7 @@ function preparePortalEventOptions(firstEvent, options){
                         if (actionData.triggerEffectSound){ _self.playSoundEffect(actionData.triggerEffectSound); }
                         _self.moveToPosition(goToPosition, function(){
                             _config.allowWorldEvents = true; // re-allow world events after teleport complete
+                            delete _world.isBusyWith.teleporting; // delete the teleporing flag to allow movement
                             return true;
                             });
                         };
@@ -187,6 +188,7 @@ function handlePortalActionClick(action, $button, firstEvent){
             _config.allowWorldEvents = false; // prevent re-triggering events during teleport
             _self.moveToPosition(goToPosition, function(){
                 _config.allowWorldEvents = true; // re-allow world events after teleport complete
+                delete _world.isBusyWith.teleporting; // delete the teleport flag to allow movement
                 return true;
                 });
             } else if (portalHref){
