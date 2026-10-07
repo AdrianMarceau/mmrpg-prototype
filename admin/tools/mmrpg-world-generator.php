@@ -17,6 +17,7 @@ if (!defined('MMRPG_CONFIG_IS_LIVE')
 $mmrpg_index_players = rpg_player::get_index(true);
 $mmrpg_index_robots = rpg_robot::get_index(true);
 $mmrpg_index_items = rpg_item::get_index(true);
+$mmrpg_index_abilities = rpg_ability::get_index(true);
 
 /*
 // Pull the list of areas from the database
@@ -203,6 +204,7 @@ echo('<pre>'.PHP_EOL);
             $area_exits = !empty($area_info['exits']) ? $area_info['exits'] : array();
             $area_random_pickups = !empty($area_info['pickups']) ? $area_info['pickups'] : array();
             $area_static_pickups = !empty($area_info['items']) ? $area_info['items'] : array();
+            $area_static_abilities = !empty($area_info['abilities']) ? $area_info['abilities'] : array();
             $area_static_encounters = !empty($area_info['encounters']) ? $area_info['encounters'] : array();
             $area_random_encounters = !empty($area_info['encounters2']) ? $area_info['encounters2'] : array();
             $area_static_rescues = !empty($area_info['rescues']) ? $area_info['rescues'] : array();
@@ -672,6 +674,24 @@ echo('<pre>'.PHP_EOL);
 
             }
 
+            // Generate the ABILITIES for this area
+            $ability_strings = [];
+            if (!empty($area_static_abilities)){
+                foreach ($area_static_abilities AS $ability){
+                    $ability_clean = trim($ability, '! ');
+
+                    // Safety check against the ability index you added
+                    if (!isset($mmrpg_index_abilities[$ability_clean])){ continue; }
+
+                    // Grab a standard random coordinate
+                    $position = $getRandomCoord();
+                    if (!$position) break; // Stop if the map is completely full
+
+                    // Generate the markup: @abilities[] = buster-shot-pickup(8-9, buster-shot)
+                    $ability_strings[] = '@abilities[]  = '.$ability_clean.'-pickup('.$position.', '.$ability_clean.')';
+                }
+            }
+
             // Generate the ENCOUNTER-ZONE for random encouners and random pickups
             if (!empty($area_random_pickups) || !empty($area_random_encounters)){
                 $area_file_markup[] = '#---------------------------#';
@@ -765,6 +785,12 @@ echo('<pre>'.PHP_EOL);
             if (!empty($hazard_strings)){
                 $area_file_markup[] = '#---------------------------#';
                 $area_file_markup[] = implode(PHP_EOL, $hazard_strings);
+            }
+
+            // Generate the ABILITIES for this area
+            if (!empty($ability_strings)){
+                $area_file_markup[] = '#---------------------------#';
+                $area_file_markup[] = implode(PHP_EOL, $ability_strings);
             }
 
             // --- HARD-CODED ENCOUNTERS FOR LALINDE AREA 1 ---
