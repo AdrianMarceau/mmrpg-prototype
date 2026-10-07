@@ -271,9 +271,19 @@ if (true){
                                             else if (preg_match('/\-star$/i', $item_token)){
                                                 $star_type = preg_replace('/\-star$/i', '', $item_token);
                                                 $star_quantity = isset($this_star_force_strict[$star_type]) ? $this_star_force_strict[$star_type] : 0;
-                                                $item_info_quantity = $star_quantity;
-                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
-                                                $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
+                                                if ($star_quantity > 0){
+                                                    $item_info_quantity = $star_quantity;
+                                                    $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
+                                                    $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
+                                                } else {
+                                                    // Define placeholder, mysterious details for the user
+                                                    $item_info_name = preg_replace('/[-_a-z0-9]/i', '?', $item_info['item_name']);
+                                                    $item_info_type = 'empty';
+                                                    $item_info_quantity = 0;
+                                                    $temp_info_tooltip = '';
+                                                    $temp_is_disabled = true;
+                                                    $temp_is_comingsoon = true;
+                                                }
                                             }
                                             // Otherwise this item slot is mysterious
                                             else {
@@ -297,7 +307,7 @@ if (true){
                                                     'data-tooltip-type="type_'.$item_info_type.'"'
                                                     : '' ?>>
                                                 <span class="item_number item_type item_type_empty"><span>No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span><?= ($temp_is_new ? '<i class="new type electric"></i>' : '') ?></span>
-                                                <span class="item_name item_type item_type_<?= $item_info_type ?>"><?= str_replace(' ', '<br />', $item_info_name) ?></span>
+                                                <span class="item_name item_type item_type_<?= $item_info_type ?>"><?= str_replace(' ', ' <br />', $item_info_name) ?></span>
                                                 <? /* <a class="use_button item_type item_type_none" href="#">Use</a> */ ?>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= $item_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
