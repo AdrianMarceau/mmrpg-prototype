@@ -4884,10 +4884,24 @@ class rpg_world {
         $world_token = $map_data_parsed['world'];
         $map_token = $map_data_parsed['token'];
         $world_map_token = $world_token.'__'.$map_token;
+        if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
+        $WORLD_BUTTONS = &$WORLD_SESSION['world_buttons'];
+        $global_down_buttons = array();
+        foreach ($WORLD_BUTTONS as $temp_maptoken => $temp_mapbuttons){
+            foreach ($temp_mapbuttons as $button_name => $state){
+                if ($state === 'down'){
+                    $global_down_buttons[$button_name] = true;
+                }
+            }
+        }
         $button_sprites = $map_data_parsed['buttons'];
-        $world_buttons = !empty($WORLD_SESSION['world_buttons'][$world_map_token]) ? $WORLD_SESSION['world_buttons'][$world_map_token] : array();
+        $world_buttons = !empty($WORLD_BUTTONS[$world_map_token]) ? $WORLD_BUTTONS[$world_map_token] : array();
         foreach ($button_sprites AS $button_name => $button_data){
             if (empty($button_data) || !is_array($button_data)){ continue; }
+            if ((empty($world_buttons[$button_name]) || $world_buttons[$button_name] !== 'down') && !empty($global_down_buttons[$button_name])){
+                $WORLD_BUTTONS[$world_map_token][$button_name] = 'down';
+                $world_buttons[$button_name] = 'down';
+            }
             $position = $button_data[0]; unset($button_data[0]);
             $colour = !empty($button_data[1]) ? $button_data[1] : 'black'; unset($button_data[1]);
             $state = !empty($button_data[2]) ? $button_data[2] : 'up'; unset($button_data[2]);
