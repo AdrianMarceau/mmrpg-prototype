@@ -1060,7 +1060,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
             <div id="position-display" class="chrome"><?= $position_display_markup ?></div>
             <div id="message-display" class="chrome"><?= $message_display_markup ?></div>
             <div id="back-button" class="chrome chrome-button"><?= $back_button_markup ?></div>
-            <div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div>
+            <? if (count($allowed_player_tokens) > 1){ ?><div id="home-button" class="chrome chrome-button"><?= $home_button_markup ?></div><? } ?>
             <? /* <div id="reset-button" class="chrome chrome-button"><?= $reset_button_markup ?></div> */ ?>
             <div id="side-buttons" class="chrome"><?= $side_buttons_markup ?></div>
             <div id="loading-icon" class="chrome"><i class="fa fas fa-spinner"></i></div>
