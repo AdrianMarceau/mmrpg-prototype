@@ -8,7 +8,7 @@
 define('MMRPG_EXTERNAL_TOP_INCLUDE', true);
 define('MMRPG_EXCLUDE_GAME_LOGIC', true);
 define('MMRPG_EXCLUDE_SESSION', true);
-require('../top.php');
+require_once('../top.php');
 
 // Define the root directory we'll be scanning for save data
 $save_data_dir = MMRPG_CONFIG_ROOTDIR . '.saves/';
@@ -66,6 +66,9 @@ foreach ($pending_saves as $file_path){
     $date_modified = $payload['date_modified'];
     $has_board = !empty($payload['has_board']) ? true : false;
     $has_world = !empty($payload['has_world']) ? true : false;
+
+    // Skip erroneous demo sessions without IDs
+    if (empty($user_id) || $user_id === MMRPG_SETTINGS_GUEST_ID){ continue; }
 
     // 3. EXECUTE DATABASE UPDATES
 
