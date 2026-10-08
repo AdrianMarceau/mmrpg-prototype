@@ -123,6 +123,8 @@ html, body {
     will-change: transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    outline: 200px solid rgba(0, 0, 0, 0.7);
+    border-radius: 9px;
 }
 
 #world #canvas #map div,
