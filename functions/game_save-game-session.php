@@ -29,6 +29,7 @@ function mmrpg_save_game_session($force_db_save = false){
 
     // Define the flag for whether this is a new user
     $is_new_user = false;
+    $has_user_id = false;
 
     // -- NORMAL MODE SAVE GAME SESSION -- //
     $this_save_array = array();
@@ -194,44 +195,36 @@ function mmrpg_save_game_session($force_db_save = false){
                     //if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
                     unset($this_values['battle_settings']); //, $this_values['battle_settings_hash']
                 }
-                /*
-                if (!empty($this_values['battle_items']) || $reset_in_progress){
-                    $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_items']);
-                    if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
-                    unset($this_values['battle_items'], $this_values['battle_items_hash']);
+                if (!empty($this_values['battle_items']) || $reset_in_progress){ // DEPRECATED
+                    $this_save_array['save_values_battle_items'] = '[]'; //json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
+                    //$temp_hash = md5($this_save_array['save_values_battle_items']);
+                    //if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
+                    unset($this_values['battle_items']); //, $this_values['battle_items_hash']
                 }
-                */
-                /*
-                if (!empty($this_values['battle_abilities']) || $reset_in_progress){
-                    $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_abilities']);
-                    if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
-                    unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
+                if (!empty($this_values['battle_abilities']) || $reset_in_progress){ // DEPRECATED
+                    $this_save_array['save_values_battle_abilities'] = '[]'; //json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
+                    //$temp_hash = md5($this_save_array['save_values_battle_abilities']);
+                    //if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
+                    unset($this_values['battle_abilities']); //, $this_values['battle_abilities_hash']
                 }
-                */
-                /*
-                if (!empty($this_values['battle_stars']) || $reset_in_progress){
-                    $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
-                    $temp_hash = md5($this_save_array['save_values_battle_stars']);
-                    if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
+                if (!empty($this_values['battle_stars']) || $reset_in_progress){ // DEPRECATED
+                    $this_save_array['save_values_battle_stars'] = '[]'; //json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
+                    //$temp_hash = md5($this_save_array['save_values_battle_stars']);
+                    //if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
                     unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
                 }
-                */
                 if (!empty($this_values['robot_alts']) || $reset_in_progress){
                     $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
                     //$temp_hash = md5($this_save_array['save_values_robot_alts']);
                     //if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
                     unset($this_values['robot_alts']); //, $this_values['robot_alts_hash']
                 }
-                /*
-                if (!empty($this_values['robot_database']) || $reset_in_progress){
-                    $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
-                    $temp_hash = md5($this_save_array['save_values_robot_database']);
-                    if (isset($this_values['robot_database_hash']) && $this_values['robot_database_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_database']); }
-                    unset($this_values['robot_database'], $this_values['robot_database_hash']);
+                if (!empty($this_values['robot_database']) || $reset_in_progress){ // DEPRECATED
+                    $this_save_array['save_values_robot_database'] = '[]'; //json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
+                    //$temp_hash = md5($this_save_array['save_values_robot_database']);
+                    //if (isset($this_values['robot_database_hash']) && $this_values['robot_database_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_database']); }
+                    unset($this_values['robot_database']); //, $this_values['robot_database_hash']
                 }
-                */
 
                 unset($this_values['battle_index']);
                 unset($this_values['battle_items']); //, $this_values['battle_items_hash']
@@ -345,44 +338,36 @@ function mmrpg_save_game_session($force_db_save = false){
             //if (isset($this_values['battle_settings_hash']) && $this_values['battle_settings_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_settings']); }
             unset($this_values['battle_settings']); //, $this_values['battle_settings_hash']
         }
-        /*
-        if (!empty($this_values['battle_items']) || $reset_in_progress){
-            $this_save_array['save_values_battle_items'] = json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_items']);
-            if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
-            unset($this_values['battle_items'], $this_values['battle_items_hash']);
+        if (!empty($this_values['battle_items']) || $reset_in_progress){ // DEPRECATED
+            $this_save_array['save_values_battle_items'] = '[]'; //json_encode(!empty($this_values['battle_items']) ? $this_values['battle_items'] : array());
+            //$temp_hash = md5($this_save_array['save_values_battle_items']);
+            //if (isset($this_values['battle_items_hash']) && $this_values['battle_items_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_items']); }
+            unset($this_values['battle_items']); //, $this_values['battle_items_hash']
         }
-        */
-        /*
-        if (!empty($this_values['battle_abilities']) || $reset_in_progress){
-            $this_save_array['save_values_battle_abilities'] = json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_abilities']);
-            if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
-            unset($this_values['battle_abilities'], $this_values['battle_abilities_hash']);
+        if (!empty($this_values['battle_abilities']) || $reset_in_progress){ // DEPRECATED
+            $this_save_array['save_values_battle_abilities'] = '[]'; //json_encode(!empty($this_values['battle_abilities']) ? $this_values['battle_abilities'] : array());
+            //$temp_hash = md5($this_save_array['save_values_battle_abilities']);
+            //if (isset($this_values['battle_abilities_hash']) && $this_values['battle_abilities_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_abilities']); }
+            unset($this_values['battle_abilities']); //, $this_values['battle_abilities_hash']
         }
-        */
-        /*
-        if (!empty($this_values['battle_stars']) || $reset_in_progress){
-            $this_save_array['save_values_battle_stars'] = json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
-            $temp_hash = md5($this_save_array['save_values_battle_stars']);
-            if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
-            unset($this_values['battle_stars'], $this_values['battle_stars_hash']);
+        if (!empty($this_values['battle_stars']) || $reset_in_progress){ // DEPRECATED
+            $this_save_array['save_values_battle_stars'] = ''; //json_encode(!empty($this_values['battle_stars']) ? $this_values['battle_stars'] : array());
+            //$temp_hash = md5($this_save_array['save_values_battle_stars']);
+            //if (isset($this_values['battle_stars_hash']) && $this_values['battle_stars_hash'] == $temp_hash){ unset($this_save_array['save_values_battle_stars']); }
+            unset($this_values['battle_stars']); //, $this_values['battle_stars_hash']
         }
-        */
         if (!empty($this_values['robot_alts']) || $reset_in_progress){
             $this_save_array['save_values_robot_alts'] = json_encode(!empty($this_values['robot_alts']) ? $this_values['robot_alts'] : array());
             //$temp_hash = md5($this_save_array['save_values_robot_alts']);
             //if (isset($this_values['robot_alts_hash']) && $this_values['robot_alts_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_alts']); }
             unset($this_values['robot_alts'], $this_values['robot_alts_hash']);
         }
-        /*
-        if (!empty($this_values['robot_database']) || $reset_in_progress){
-            $this_save_array['save_values_robot_database'] = json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
-            $temp_hash = md5($this_save_array['save_values_robot_database']);
-            if (isset($this_values['robot_database_hash']) && $this_values['robot_database_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_database']); }
-            unset($this_values['robot_database'], $this_values['robot_database_hash']);
+        if (!empty($this_values['robot_database']) || $reset_in_progress){ // DEPRECATED
+            $this_save_array['save_values_robot_database'] = '[]'; //json_encode(!empty($this_values['robot_database']) ? $this_values['robot_database'] : array());
+            //$temp_hash = md5($this_save_array['save_values_robot_database']);
+            //if (isset($this_values['robot_database_hash']) && $this_values['robot_database_hash'] == $temp_hash){ unset($this_save_array['save_values_robot_database']); }
+            unset($this_values['robot_database']); //, $this_values['robot_database_hash']
         }
-        */
 
         unset($this_values['battle_index']);
         unset($this_values['battle_items']); //, $this_values['battle_items_hash']
@@ -469,13 +454,13 @@ function mmrpg_save_game_session($force_db_save = false){
 
     }
 
-    // -- NORMAL MODE SAVE WORLD SESSION -- //
-    $world_save_data = array();
-    if (!empty($WORLD_SESSION)){
+    // Ensure an ID was actually collected or we can't do a lot of stuff
+    if (!empty($this_user['userid']) && $this_user['userid'] !== MMRPG_SETTINGS_GUEST_ID){
+        $has_user_id = true;
+    }
 
-        //error_log('Saving world session for user ID '.$this_user['userid']);
-
-        // UPDATE DATABASE INFO
+    // Only saving stuff long-term if a user ID was actually collected
+    if ($has_user_id){
 
         // Collect the world ID if it exists, else create one for this user
         $get_world_id_query = "SELECT `world_id` FROM `mmrpg_users_worlds` WHERE `user_id` = {$this_user['userid']};";
@@ -495,184 +480,196 @@ function mmrpg_save_game_session($force_db_save = false){
                 return false;
                 }
             }
-        //error_log('$world_id = '.print_r($world_id, true));
-        //error_log('$user_id = '.print_r($user_id, true));
 
-        // Wrao the collection of world data in a function to limit scope and reduce markup
-        $get_json_encoded = function($array){ return json_encode($array, JSON_NUMERIC_CHECK); };
-        $get_world_save_data = function($WORLD_SESSION, $world_id, $user_id) use ($GAME_SESSION, $get_json_encoded){
+        // -- NORMAL MODE SAVE WORLD SESSION -- //
+        $world_save_data = array();
+        if (!empty($WORLD_SESSION)){
 
-            // Collect the rest of the world info from the session
-            $world_cache_date = MMRPG_CONFIG_CACHE_DATE;
-            $world_date_created = !empty($WORLD_SESSION['date_created']) ? $WORLD_SESSION['date_created'] : time();
-            $world_date_accessed = time();
-            $world_date_modified = time();
-            //error_log('$world_cache_date = '.print_r($world_cache_date, true));
-            //error_log('$world_date_created = '.print_r($world_date_created, true));
-            //error_log('$world_date_accessed = '.print_r($world_date_accessed, true));
-            //error_log('$world_date_modified = '.print_r($world_date_modified, true));
-            $last_world_token = !empty($WORLD_SESSION['last_world_token']) ? $WORLD_SESSION['last_world_token'] : '';
-            $last_map_token = !empty($WORLD_SESSION['last_map_token']) ? $WORLD_SESSION['last_map_token'] : '';
-            $last_player_token = !empty($WORLD_SESSION['last_player_token']) ? $WORLD_SESSION['last_player_token'] : '';
-            if (empty($last_player_token) && !empty($WORLD_SESSION['player_sessions']['last_player'])){ $last_player_token = $WORLD_SESSION['player_sessions']['last_player']; }
-            //error_log('$last_world_token = '.print_r($last_world_token, true));
-            //error_log('$last_map_token = '.print_r($last_map_token, true));
-            //error_log('$last_player_token = '.print_r($last_player_token, true));
-            $player_sessions = !empty($WORLD_SESSION['player_sessions']) ? $WORLD_SESSION['player_sessions'] : array();
-            $robot_sessions = !empty($WORLD_SESSION['robot_sessions']) ? $WORLD_SESSION['robot_sessions'] : array();
-            $mecha_sessions = !empty($WORLD_SESSION['mecha_sessions']) ? $WORLD_SESSION['mecha_sessions'] : array();
-            //error_log('$player_sessions = '.print_r($player_sessions, true));
-            //error_log('$robot_sessions = '.print_r($robot_sessions, true));
-            //error_log('$mecha_sessions = '.print_r($mecha_sessions, true));
-            $world_maps = !empty($WORLD_SESSION['world_maps']) ? $WORLD_SESSION['world_maps'] : array();
-            $world_buttons = !empty($WORLD_SESSION['world_buttons']) ? $WORLD_SESSION['world_buttons'] : array();
-            $world_switches = !empty($WORLD_SESSION['world_switches']) ? $WORLD_SESSION['world_switches'] : array();
-            $world_gates = !empty($WORLD_SESSION['world_gates']) ? $WORLD_SESSION['world_gates'] : array();
-            $world_locks = !empty($WORLD_SESSION['world_locks']) ? $WORLD_SESSION['world_locks'] : array();
-            $world_blocks = !empty($WORLD_SESSION['world_blocks']) ? $WORLD_SESSION['world_blocks'] : array();
-            $world_hazards = !empty($WORLD_SESSION['world_hazards']) ? $WORLD_SESSION['world_hazards'] : array();
-            $world_items = !empty($WORLD_SESSION['world_items']) ? $WORLD_SESSION['world_items'] : array();
-            $world_abilities = !empty($WORLD_SESSION['world_abilities']) ? $WORLD_SESSION['world_abilities'] : array();
-            $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
-            $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
-            $world_actors = !empty($WORLD_SESSION['world_actors']) ? $WORLD_SESSION['world_actors'] : array();
-            $world_symbols = !empty($WORLD_SESSION['world_symbols']) ? $WORLD_SESSION['world_symbols'] : array();
-            $world_events = !empty($WORLD_SESSION['world_events']) ? $WORLD_SESSION['world_events'] : array();
-            $world_battles = !empty($GAME_SESSION['values']['battle_index']) ? $GAME_SESSION['values']['battle_index'] : array();
-            foreach ($world_battles AS $token => $battle){
-                if (substr($token, 0, 13) !== 'world-battle_'){ unset($world_battles[$token]); continue; }
-                $world_battles[$token] = json_decode($battle, true);
-                }
-            //error_log('$world_maps = '.print_r($world_maps, true));
-            //error_log('$world_buttons = '.print_r($world_buttons, true));
-            //error_log('$world_switches = '.print_r($world_switches, true));
-            //error_log('$world_gates = '.print_r($world_gates, true));
-            //error_log('$world_locks = '.print_r($world_locks, true));
-            //error_log('$world_blocks = '.print_r($world_blocks, true));
-            //error_log('$world_hazards = '.print_r($world_hazards, true));
-            //error_log('$world_items = '.print_r($world_items, true));
-            //error_log('$world_abilities = '.print_r($world_abilities, true));
-            //error_log('$world_encounters = '.print_r($world_encounters, true));
-            //error_log('$world_pickups = '.print_r($world_pickups, true));
-            //error_log('$world_actors = '.print_r($world_actors, true));
-            //error_log('$world_symbols = '.print_r($world_symbols, true));
-            //error_log('$world_events = '.print_r($world_events, true));
-            //error_log('$world_battles = '.print_r($world_battles, true));
-            // Generate the return array with any encoding necessary
-            $return_array = array(
-                'world_cache_date' => $world_cache_date,
-                'world_date_accessed' => $world_date_accessed,
-                'world_date_modified' => $world_date_modified,
-                'last_world_token' => $last_world_token,
-                'last_map_token' => $last_map_token,
-                'last_player_token' => $last_player_token,
-                'player_sessions' => $get_json_encoded($player_sessions),
-                'robot_sessions' => $get_json_encoded($robot_sessions),
-                'mecha_sessions' => $get_json_encoded($mecha_sessions),
-                'world_maps' => $get_json_encoded($world_maps),
-                'world_buttons' => $get_json_encoded($world_buttons),
-                'world_switches' => $get_json_encoded($world_switches),
-                'world_gates' => $get_json_encoded($world_gates),
-                'world_locks' => $get_json_encoded($world_locks),
-                'world_blocks' => $get_json_encoded($world_blocks),
-                'world_hazards' => $get_json_encoded($world_hazards),
-                'world_items' => $get_json_encoded($world_items),
-                'world_abilities' => $get_json_encoded($world_abilities),
-                'world_encounters' => $get_json_encoded($world_encounters),
-                'world_pickups' => $get_json_encoded($world_pickups),
-                'world_actors' => $get_json_encoded($world_actors),
-                'world_symbols' => $get_json_encoded($world_symbols),
-                'world_events' => $get_json_encoded($world_events),
-                'world_battles' => $get_json_encoded($world_battles),
-                );
-            // Return the generated world save data array
-            return $return_array;
-            };
-        $world_save_data = $get_world_save_data($WORLD_SESSION, $world_id, $user_id);
-        //error_log('$world_save_data = '.print_r($world_save_data, true));
+            //error_log('Saving world session for user ID '.$this_user['userid']);
 
-        /*
-        // Update the database with the new session data (if not empty of course)
-        $success = false;
-        if (!empty($world_save_data)){
-            $success = $db->update('mmrpg_users_worlds', $world_save_data, array(
-                'world_id' => $world_id,
-                'user_id' => $user_id
-                ));
-            if ($success === false){
+            // UPDATE DATABASE INFO
+            //error_log('$world_id = '.print_r($world_id, true));
+            //error_log('$user_id = '.print_r($user_id, true));
+
+            // Wrao the collection of world data in a function to limit scope and reduce markup
+            $get_json_encoded = function($array){ return json_encode($array, JSON_NUMERIC_CHECK); };
+            $get_world_save_data = function($WORLD_SESSION, $world_id, $user_id) use ($GAME_SESSION, $get_json_encoded){
+
+                // Collect the rest of the world info from the session
+                $world_cache_date = MMRPG_CONFIG_CACHE_DATE;
+                $world_date_created = !empty($WORLD_SESSION['date_created']) ? $WORLD_SESSION['date_created'] : time();
+                $world_date_accessed = time();
+                $world_date_modified = time();
+                //error_log('$world_cache_date = '.print_r($world_cache_date, true));
+                //error_log('$world_date_created = '.print_r($world_date_created, true));
+                //error_log('$world_date_accessed = '.print_r($world_date_accessed, true));
+                //error_log('$world_date_modified = '.print_r($world_date_modified, true));
+                $last_world_token = !empty($WORLD_SESSION['last_world_token']) ? $WORLD_SESSION['last_world_token'] : '';
+                $last_map_token = !empty($WORLD_SESSION['last_map_token']) ? $WORLD_SESSION['last_map_token'] : '';
+                $last_player_token = !empty($WORLD_SESSION['last_player_token']) ? $WORLD_SESSION['last_player_token'] : '';
+                if (empty($last_player_token) && !empty($WORLD_SESSION['player_sessions']['last_player'])){ $last_player_token = $WORLD_SESSION['player_sessions']['last_player']; }
+                //error_log('$last_world_token = '.print_r($last_world_token, true));
+                //error_log('$last_map_token = '.print_r($last_map_token, true));
+                //error_log('$last_player_token = '.print_r($last_player_token, true));
+                $player_sessions = !empty($WORLD_SESSION['player_sessions']) ? $WORLD_SESSION['player_sessions'] : array();
+                $robot_sessions = !empty($WORLD_SESSION['robot_sessions']) ? $WORLD_SESSION['robot_sessions'] : array();
+                $mecha_sessions = !empty($WORLD_SESSION['mecha_sessions']) ? $WORLD_SESSION['mecha_sessions'] : array();
+                //error_log('$player_sessions = '.print_r($player_sessions, true));
+                //error_log('$robot_sessions = '.print_r($robot_sessions, true));
+                //error_log('$mecha_sessions = '.print_r($mecha_sessions, true));
+                $world_maps = !empty($WORLD_SESSION['world_maps']) ? $WORLD_SESSION['world_maps'] : array();
+                $world_buttons = !empty($WORLD_SESSION['world_buttons']) ? $WORLD_SESSION['world_buttons'] : array();
+                $world_switches = !empty($WORLD_SESSION['world_switches']) ? $WORLD_SESSION['world_switches'] : array();
+                $world_gates = !empty($WORLD_SESSION['world_gates']) ? $WORLD_SESSION['world_gates'] : array();
+                $world_locks = !empty($WORLD_SESSION['world_locks']) ? $WORLD_SESSION['world_locks'] : array();
+                $world_blocks = !empty($WORLD_SESSION['world_blocks']) ? $WORLD_SESSION['world_blocks'] : array();
+                $world_hazards = !empty($WORLD_SESSION['world_hazards']) ? $WORLD_SESSION['world_hazards'] : array();
+                $world_items = !empty($WORLD_SESSION['world_items']) ? $WORLD_SESSION['world_items'] : array();
+                $world_abilities = !empty($WORLD_SESSION['world_abilities']) ? $WORLD_SESSION['world_abilities'] : array();
+                $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+                $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
+                $world_actors = !empty($WORLD_SESSION['world_actors']) ? $WORLD_SESSION['world_actors'] : array();
+                $world_symbols = !empty($WORLD_SESSION['world_symbols']) ? $WORLD_SESSION['world_symbols'] : array();
+                $world_events = !empty($WORLD_SESSION['world_events']) ? $WORLD_SESSION['world_events'] : array();
+                $world_battles = !empty($GAME_SESSION['values']['battle_index']) ? $GAME_SESSION['values']['battle_index'] : array();
+                foreach ($world_battles AS $token => $battle){
+                    if (substr($token, 0, 13) !== 'world-battle_'){ unset($world_battles[$token]); continue; }
+                    $world_battles[$token] = json_decode($battle, true);
+                    }
+                //error_log('$world_maps = '.print_r($world_maps, true));
+                //error_log('$world_buttons = '.print_r($world_buttons, true));
+                //error_log('$world_switches = '.print_r($world_switches, true));
+                //error_log('$world_gates = '.print_r($world_gates, true));
+                //error_log('$world_locks = '.print_r($world_locks, true));
+                //error_log('$world_blocks = '.print_r($world_blocks, true));
+                //error_log('$world_hazards = '.print_r($world_hazards, true));
+                //error_log('$world_items = '.print_r($world_items, true));
+                //error_log('$world_abilities = '.print_r($world_abilities, true));
+                //error_log('$world_encounters = '.print_r($world_encounters, true));
+                //error_log('$world_pickups = '.print_r($world_pickups, true));
+                //error_log('$world_actors = '.print_r($world_actors, true));
+                //error_log('$world_symbols = '.print_r($world_symbols, true));
+                //error_log('$world_events = '.print_r($world_events, true));
+                //error_log('$world_battles = '.print_r($world_battles, true));
+                // Generate the return array with any encoding necessary
+                $return_array = array(
+                    'world_cache_date' => $world_cache_date,
+                    'world_date_accessed' => $world_date_accessed,
+                    'world_date_modified' => $world_date_modified,
+                    'last_world_token' => $last_world_token,
+                    'last_map_token' => $last_map_token,
+                    'last_player_token' => $last_player_token,
+                    'player_sessions' => $get_json_encoded($player_sessions),
+                    'robot_sessions' => $get_json_encoded($robot_sessions),
+                    'mecha_sessions' => $get_json_encoded($mecha_sessions),
+                    'world_maps' => $get_json_encoded($world_maps),
+                    'world_buttons' => $get_json_encoded($world_buttons),
+                    'world_switches' => $get_json_encoded($world_switches),
+                    'world_gates' => $get_json_encoded($world_gates),
+                    'world_locks' => $get_json_encoded($world_locks),
+                    'world_blocks' => $get_json_encoded($world_blocks),
+                    'world_hazards' => $get_json_encoded($world_hazards),
+                    'world_items' => $get_json_encoded($world_items),
+                    'world_abilities' => $get_json_encoded($world_abilities),
+                    'world_encounters' => $get_json_encoded($world_encounters),
+                    'world_pickups' => $get_json_encoded($world_pickups),
+                    'world_actors' => $get_json_encoded($world_actors),
+                    'world_symbols' => $get_json_encoded($world_symbols),
+                    'world_events' => $get_json_encoded($world_events),
+                    'world_battles' => $get_json_encoded($world_battles),
+                    'user_id' => $user_id,
+                    );
+                // Return the generated world save data array
+                return $return_array;
+                };
+            $world_save_data = $get_world_save_data($WORLD_SESSION, $world_id, $user_id);
+            //error_log('$world_save_data = '.print_r($world_save_data, true));
+
+            /*
+            // Update the database with the new session data (if not empty of course)
+            $success = false;
+            if (!empty($world_save_data)){
+                $success = $db->update('mmrpg_users_worlds', $world_save_data, array(
+                    'world_id' => $world_id,
+                    'user_id' => $user_id
+                    ));
+                if ($success === false){
+                    //error_log('mmrpg_save_game_session() failure!');
+                    //error_log('ERROR: Unable to save world data to database for user_id '.$user_id.'!');
+                    }
+                } else {
                 //error_log('mmrpg_save_game_session() failure!');
-                //error_log('ERROR: Unable to save world data to database for user_id '.$user_id.'!');
+                //error_log('ERROR: There was no world data to save for user_id '.$user_id.'!');
                 }
+            */
+
+        }
+
+        // --- ASSEMBLE THE PAYLOAD --- //
+        $save_payload = array(
+            'user_id' => $this_user['userid'],
+            'save_array' => $this_save_array,
+            'board_array' => $this_board_array,
+            'world_data' => $world_save_data,
+            'has_board' => !empty($check_tables['has_board']) ? 1 : 0, // Keep track if they need an insert or update
+            'has_world' => !empty($check_tables['has_world']) ? 1 : 0, // Keep track if they need an insert or update
+            'date_accessed' => time(),
+            'date_modified' => time(),
+            // Capture the sub-tables data directly from the session instead of running mmrpg_save_game_session_user_tables()
+            'user_tables' => array(
+                'counters' => !empty($GAME_SESSION['counters']) ? $GAME_SESSION['counters'] : array(),
+                'robot_database' => !empty($GAME_SESSION['values']['robot_database']) ? $GAME_SESSION['values']['robot_database'] : array(),
+                'battle_items' => !empty($GAME_SESSION['values']['battle_items']) ? $GAME_SESSION['values']['battle_items'] : array(),
+                'battle_abilities' => !empty($GAME_SESSION['values']['battle_abilities']) ? $GAME_SESSION['values']['battle_abilities'] : array(),
+                'battle_stars' => !empty($GAME_SESSION['values']['battle_stars']) ? $GAME_SESSION['values']['battle_stars'] : array()
+                )
+            );
+
+        // --- NEW LOGIC: EXECUTE THE SAVE --- //
+        if ($force_db_save === true){
+
+            // 1. Force the database updates right now
+            $db->update('mmrpg_saves', $save_payload['save_array'], 'user_id = '.$this_user['userid']);
+            if (!empty($save_payload['has_board'])){
+                $db->update('mmrpg_leaderboard', $save_payload['board_array'], 'user_id = '.$this_user['userid']);
             } else {
-            //error_log('mmrpg_save_game_session() failure!');
-            //error_log('ERROR: There was no world data to save for user_id '.$user_id.'!');
+                $save_payload['board_array']['user_id'] = $check_tables['user_id'];
+                $save_payload['board_array']['save_id'] = $check_tables['save_id'];
+                $db->insert('mmrpg_leaderboard', $save_payload['board_array']);
             }
-        */
+            if (!empty($save_payload['world_data'])){
+                if (!empty($save_payload['has_world'])){
+                    $db->update('mmrpg_users_worlds', $save_payload['world_data'], array('world_id' => $world_id, 'user_id' => $this_user['userid']));
+                } else {
+                    $save_payload['world_data']['user_id'] = $check_tables['user_id'];
+                    $db->insert('mmrpg_users_worlds', $save_payload['world_data']);
+                }
+            }
 
-    }
+            // 2. Run the sub-tables function
+            mmrpg_save_game_session_user_tables($session_token, $this_user['userid']);
 
-    // --- ASSEMBLE THE PAYLOAD --- //
-    $save_payload = array(
-        'user_id' => $this_user['userid'],
-        'save_array' => $this_save_array,
-        'board_array' => $this_board_array,
-        'world_data' => $world_save_data,
-        'has_board' => !empty($check_tables['has_board']) ? 1 : 0, // Keep track if they need an insert or update
-        'has_world' => !empty($check_tables['has_world']) ? 1 : 0, // Keep track if they need an insert or update
-        'date_accessed' => time(),
-        'date_modified' => time(),
-        // Capture the sub-tables data directly from the session instead of running mmrpg_save_game_session_user_tables()
-        'user_tables' => array(
-            'counters' => !empty($GAME_SESSION['counters']) ? $GAME_SESSION['counters'] : array(),
-            'robot_database' => !empty($GAME_SESSION['values']['robot_database']) ? $GAME_SESSION['values']['robot_database'] : array(),
-            'battle_items' => !empty($GAME_SESSION['values']['battle_items']) ? $GAME_SESSION['values']['battle_items'] : array(),
-            'battle_abilities' => !empty($GAME_SESSION['values']['battle_abilities']) ? $GAME_SESSION['values']['battle_abilities'] : array(),
-            'battle_stars' => !empty($GAME_SESSION['values']['battle_stars']) ? $GAME_SESSION['values']['battle_stars'] : array()
-            )
-        );
+            // 3. Clean up any lingering cache files since the DB is now the source of truth
+            $existing_file = MMRPG_CONFIG_ROOTDIR . '.saves/save_' . $this_user['userid'] . '.json';
+            if (file_exists($existing_file)) { unlink($existing_file); }
 
-    // --- NEW LOGIC: EXECUTE THE SAVE --- //
-    if ($force_db_save === true){
-
-        // 1. Force the database updates right now
-        $db->update('mmrpg_saves', $save_payload['save_array'], 'user_id = '.$this_user['userid']);
-        if (!empty($save_payload['has_board'])){
-            $db->update('mmrpg_leaderboard', $save_payload['board_array'], 'user_id = '.$this_user['userid']);
         } else {
-            $save_payload['board_array']['user_id'] = $check_tables['user_id'];
-            $save_payload['board_array']['save_id'] = $check_tables['save_id'];
-            $db->insert('mmrpg_leaderboard', $save_payload['board_array']);
+
+            // 1. Defer to Write-Behind Caching (Atomic File Write)
+            $json_payload = json_encode($save_payload, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT);
+            $save_dir = MMRPG_CONFIG_ROOTDIR . '.saves/';
+
+            // Ensure the directory exists
+            if (!file_exists($save_dir)) { mkdir($save_dir, 0777, true); }
+
+            $final_file = $save_dir . 'save_' . $this_user['userid'] . '.json';
+            $temp_file = $save_dir . 'temp_' . $this_user['userid'] . '.json';
+
+            file_put_contents($temp_file, $json_payload);
+            rename($temp_file, $final_file);
         }
-        if (!empty($save_payload['world_data'])){
-            if (!empty($save_payload['has_world'])){
-                $db->update('mmrpg_users_worlds', $save_payload['world_data'], array('world_id' => $world_id, 'user_id' => $this_user['userid']));
-            } else {
-                $save_payload['world_data']['user_id'] = $check_tables['user_id'];
-                $db->insert('mmrpg_users_worlds', $save_payload['world_data']);
-            }
-        }
 
-        // 2. Run the sub-tables function
-        mmrpg_save_game_session_user_tables($session_token, $this_user['userid']);
 
-        // 3. Clean up any lingering cache files since the DB is now the source of truth
-        $existing_file = MMRPG_CONFIG_ROOTDIR . '.saves/save_' . $this_user['userid'] . '.json';
-        if (file_exists($existing_file)) { unlink($existing_file); }
-
-    } else {
-
-        // 1. Defer to Write-Behind Caching (Atomic File Write)
-        $json_payload = json_encode($save_payload, JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT);
-        $save_dir = MMRPG_CONFIG_ROOTDIR . '.saves/';
-
-        // Ensure the directory exists
-        if (!file_exists($save_dir)) { mkdir($save_dir, 0777, true); }
-
-        $final_file = $save_dir . 'save_' . $this_user['userid'] . '.json';
-        $temp_file = $save_dir . 'temp_' . $this_user['userid'] . '.json';
-
-        file_put_contents($temp_file, $json_payload);
-        rename($temp_file, $final_file);
     }
 
     // Unset the reset flag in the session

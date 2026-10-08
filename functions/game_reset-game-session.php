@@ -105,6 +105,13 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
             $db->delete('mmrpg_users_stars_unlocked', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_challenges_waveboard', array('user_id' => $delete_db_records_user_id));
+            $db->update('mmrpg_saves', array(
+                'save_values_battle_items' => '[]',
+                'save_values_battle_abilities' => '[]',
+                'save_values_battle_stars' => '[]',
+                'save_values_robot_alts' => '[]',
+                'save_values_robot_database' => '[]',
+                ), array('user_id' => $delete_db_records_user_id));
         }
 
         // Define a session var to ensure full reset
