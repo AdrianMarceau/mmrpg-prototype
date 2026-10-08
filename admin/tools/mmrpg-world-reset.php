@@ -1,7 +1,7 @@
 <?
 
 // Require the global top file
-require('../../top.php');
+require_once('../../top.php');
 
 // Print out the title regardless of if confirmed or not
 echo('<strong>MMRPG World Reset Script</strong><br />'.PHP_EOL);
