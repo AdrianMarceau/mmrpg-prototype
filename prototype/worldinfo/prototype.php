@@ -30,6 +30,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'light-laboratory',
         'objects' => ['player-platform'],
         //'encounters' => ['dr-light', 'mega-man'],
+        'encounters' => ['sniper-joe@west-exit', 'sniper-joe@east-exit', 'sniper-joe@south-exit'],
         'encounters2' => ['met'],
         'rescues' => [],
         'items' => ['light-program!!', 'light-heart!!', 'light-core!!'],
@@ -44,7 +45,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'gentle-countryside',
         'encounters' => [],
-        'encounters2' => ['met', 'sniper-joe'],
+        'encounters2' => ['met', 'sniper-joe', 'killer-bullet'],
         'items' => ['equip-codes@west-exit', 'mecha-whistle'],
         'abilities' => ['light-buster'],
         'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
@@ -59,7 +60,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'gentle-countryside',
         'encounters' => [],
-        'encounters2' => ['met', 'sniper-joe'],
+        'encounters2' => ['met', 'sniper-joe', 'picket-men'],
         //'rescues' => ['roll'],
         'items' => ['equip-codes@south-exit', 'mecha-whistle'],
         'abilities' => ['light-buster'],
@@ -75,7 +76,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'gentle-countryside',
         'encounters' => [],
-        'encounters2' => ['met', 'sniper-joe'],
+        'encounters2' => ['met', 'sniper-joe', 'flea'],
         'items' => ['equip-codes@east-exit', 'mecha-whistle'],
         'abilities' => ['light-buster'],
         'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
@@ -630,7 +631,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'explode',
         'field' => 'orb-city',
         'encounters' => ['bomb-man'],
-        'encounters2' => ['bombomb', 'met', 'sniper-joe', 'killer-bullet'],
+        'encounters2' => ['bombomb', 'killer-bullet', 'met'],
         'items' => ['energy-tank'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
@@ -857,7 +858,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['peng', 'foot-holder', 'adhering-suzy', 'nitron-b'],
         'hazards' => ['frozen-foothold'],
         'items' => ['charge-module'],
-        'tags' => ['central', 'elemental'],
+        'tags' => ['central', 'elemental', 'water'],
         'exits' => ['east', 'west']
         ];
     $index['freeze-area-1s'] = [
@@ -1125,7 +1126,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['centaur-man'],
         'encounters2' => ['pelicanu', 'pooker', 'kabuton'],
         'items' => ['hourglass-module'],
-        'tags' => ['central', 'elemental'],
+        'tags' => ['central', 'elemental', 'water'],
         'exits' => ['south', 'west']
         ];
     $index['time-area-1w'] = [
@@ -1134,7 +1135,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 90,
         'element' => 'time',
         'field' => 'lighting-control',
-        'encounters' => ['bright-man'],
+        'encounters' => ['bright-man', 'gachappon'],
         'encounters2' => ['bulb-blaster', 'electriri'],
         'items' => ['resetchi'],
         'tags' => ['central', 'elemental'],
@@ -1148,8 +1149,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'missile',
         'field' => 'military-hideout',
         'encounters' => ['search-man'],
-        'encounters2' => ['sniper-joe', 'eggalodon', 'goriblue', 'covercannon'],
+        'encounters2' => ['goriblue', 'ribbitron_alt2', 'eggalodon'],
         'items' => ['super-capsule'],
+        'hazards' => ['bramble-patch'],
         'tags' => ['central', 'elemental', 'main'],
         'exits' => ['north', 'east', 'south']
         ];
@@ -1160,9 +1162,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'missile',
         'field' => 'submerged-armory',
         'encounters' => ['dive-man'],
-        'encounters2' => ['manta-missile', 'covercannon', 'sniper-joe'],
+        'encounters2' => ['manta-missile', 'covercannon', 'robo-fishtot_alt'],
         'items' => ['mecha-whistle'],
-        'tags' => ['central', 'elemental'],
+        'tags' => ['central', 'elemental', 'water'],
         'exits' => ['south']
         ];
     $index['missile-area-1e'] = [
@@ -1264,7 +1266,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['snapper', 'octone', 'robo-fishtot'],
         'hazards' => ['foamy-bubbles'],
         'items' => ['spreader-module'],
-        'tags' => ['central', 'elemental'],
+        'tags' => ['central', 'elemental', 'water'],
         'exits' => ['north', 'south']
         ];
     $index['water-area-1e'] = [
@@ -1290,7 +1292,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['octone', 'bui-boi', 'ballonboo'],
         'hazards' => ['foamy-bubbles', 'toxic-sludge'],
         'items' => ['sponge-circuit'],
-        'tags' => ['central', 'elemental'],
+        'tags' => ['central', 'elemental', 'water'],
         'exits' => ['east', 'south']
         ];
     //--------------------------//
