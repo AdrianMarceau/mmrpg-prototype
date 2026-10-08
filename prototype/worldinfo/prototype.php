@@ -609,6 +609,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['blast-man'],
         'encounters2' => ['shimobey', 'killer-bullet', 'oni-robo', 'bikky-bomb'],
         'items' => ['extra-life'],
+        'abilities' => ['explode-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -621,6 +622,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['napalm-man', 'grenade-man'],
         'encounters2' => ['bombardier', 'molier', 'kakinba-tank'],
         'items' => ['xtreme-module'],
+        'abilities' => ['explode-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north']
         ];
@@ -633,6 +635,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['bomb-man'],
         'encounters2' => ['bombomb', 'killer-bullet', 'met'],
         'items' => ['energy-tank'],
+        'abilities' => ['explode-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -657,6 +660,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['guts-man'],
         'encounters2' => ['picket-man', 'met', 'killer-bullet', 'bunby-heli'],
         'items' => ['guard-module'],
+        'abilities' => ['impact-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -669,6 +673,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['strike-man'],
         'encounters2' => ['pitchan', 'monking-r', 'goriblue'],
         'items' => ['weapon-upgrade'],
+        'abilities' => ['impact-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['west']
         ];
@@ -681,6 +686,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['concrete-man', 'impact-man'],
         'encounters2' => ['bombomboy', 'picket-man'],
         'items' => ['energy-upgrade'],
+        'abilities' => ['impact-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east']
         ];
@@ -706,6 +712,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['cut-man', 'big-eye'],
         'encounters2' => ['flea', 'adhering-suzy', 'beak', 'met', 'spine', 'killer-bullet'],
         'items' => ['weapon-tank'],
+        'abilities' => ['cutter-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -718,6 +725,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['blade-man', 'yamato-man', 'knight-man'],
         'encounters2' => ['merserker', 'molier', 'kabuton', 'ben-k', 'shield-attacker-gtr'],
         'items' => ['repair-module'],
+        'abilities' => ['cutter-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north']
         ];
@@ -730,6 +738,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['needle-man'],
         'encounters2' => ['needle-ned', 'hammer-joe', 'elec-n'],
         'items' => ['extra-life'],
+        'abilities' => ['cutter-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -756,6 +765,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['pyre-fly', 'mummira', 'shield-attacker'],
         'hazards' => ['flame-pillar'],
         'items' => ['forge-circuit'],
+        'abilities' => ['flame-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -769,6 +779,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['sola-rei', 'petal-anne_alt2', 'shield-attacker-trl', 'cline_alt'],
         'hazards' => ['flame-pillar'],
         'items' => ['mecha-whistle'],
+        'abilities' => ['flame-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -782,6 +793,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['tackle-fire', 'bombomb', 'telly', 'arc-weldy'],
         'hazards' => ['flame-pillar'],
         'items' => ['uptick-module'],
+        'abilities' => ['flame-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -807,6 +819,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['quick-man'],
         'encounters2' => ['spring-head', 'tackle-fire'],
         'items' => ['mecha-whistle'],
+        'abilities' => ['swift-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -819,6 +832,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['bounce-man'],
         'encounters2' => ['tosanaizer-v', 'ballonboo', 'pukapunter', 'coiln'],
         'items' => ['weapon-tank'],
+        'abilities' => ['swift-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -831,6 +845,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['turbo-man', 'nitro-man'],
         'encounters2' => ['robo-transport', 'cannon-roader', 'trio-the-wheel'],
         'items' => ['energy-tank'],
+        'abilities' => ['swift-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -858,6 +873,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['peng', 'foot-holder', 'adhering-suzy', 'nitron-b'],
         'hazards' => ['frozen-foothold'],
         'items' => ['charge-module'],
+        'abilities' => ['freeze-shot'],
         'tags' => ['central', 'elemental', 'water'],
         'exits' => ['east', 'west']
         ];
@@ -871,6 +887,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['penpen-ev', 'frosty-throwman', 'nitron-b', 'peng'],
         'hazards' => ['frozen-foothold'],
         'items' => ['mecha-whistle'],
+        'abilities' => ['freeze-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -884,6 +901,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['frosty-throwman', 'tel-tel', 'bomb-sleigh', 'skullmet'],
         'hazards' => ['frozen-foothold'],
         'items' => ['resetchi'],
+        'abilities' => ['freeze-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -910,6 +928,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['pandeeta', 'krushdiver', 'bombardier', 'pukapunter'],
         'rescues' => ['quake-woman'],
         'items' => ['transport-module'],
+        'abilities' => ['wind-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'west']
         ];
@@ -922,6 +941,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['air-man'],
         'encounters2' => ['fan-fiend', 'foot-holder', 'parabeak'],
         'items' => ['resetchi'],
+        'abilities' => ['wind-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -934,6 +954,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['dust-man', 'junk-man'],
         'encounters2' => ['lady-blader', 'upndown', 'gockroach-s'],
         'items' => ['salvage-module'],
+        'abilities' => ['wind-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east']
         ];
@@ -959,6 +980,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['shade-man'],
         'encounters2' => ['astro-zombieg', 'batton', 'anti-eddie'],
         'items' => ['siphon-module'],
+        'abilities' => ['shadow-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'south']
         ];
@@ -971,6 +993,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['magic-man', 'clown-man'],
         'encounters2' => ['romper', 'pierrobot', 'shimobey'],
         'items' => ['weapon-tank'],
+        'abilities' => ['shadow-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'north']
         ];
@@ -984,6 +1007,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['ribbitron', 'hammer-joe', 'spin-fiend'],
         'hazards' => ['toxic-sludge'],
         'items' => ['super-capsule'],
+        'abilities' => ['shadow-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1009,6 +1033,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['spine', 'flea', 'beak', 'adhering-suzy'],
         'hazards' => ['woolly-clouds'],
         'items' => ['copycat-module'],
+        'abilities' => ['electric-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -1022,6 +1047,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['electriri', 'plasma-plus', 'elec-n'],
         'hazards' => ['woolly-clouds'],
         'items' => ['resetchi'],
+        'abilities' => ['electric-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south', 'west']
         ];
@@ -1035,6 +1061,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['pointan', 'flipping-suzy', 'pukapunter'],
         'hazards' => ['gravity-well', 'woolly-clouds'],
         'items' => ['battery-circuit'],
+        'abilities' => ['electric-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east']
         ];
@@ -1065,6 +1092,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['jewel-man'],
         'encounters2' => ['diaymon', 'spike-pusher', 'crystal-joe'],
         'items' => ['distill-module'],
+        'abilities' => ['crystal-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south']
         ];
@@ -1077,6 +1105,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['gemini-man'],
         'encounters2' => ['nitron-r', 'nitron-b', 'nitron-y', 'ribbitron'],
         'items' => ['mecha-whistle'],
+        'abilities' => ['crystal-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'east']
         ];
@@ -1089,6 +1118,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['crystal-man'],
         'encounters2' => ['crystal-joe', 'tatepakkan', 'diaymon'],
         'items' => ['hyperscan-module'],
+        'abilities' => ['crystal-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1114,6 +1144,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['time-man'],
         'encounters2' => ['flutter-fly', 'fooley'],
         'items' => ['extra-life'],
+        'abilities' => ['time-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -1126,6 +1157,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['centaur-man'],
         'encounters2' => ['pelicanu', 'pooker', 'kabuton'],
         'items' => ['hourglass-module'],
+        'abilities' => ['time-buster'],
         'tags' => ['central', 'elemental', 'water'],
         'exits' => ['south', 'west']
         ];
@@ -1138,6 +1170,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['bright-man', 'gachappon'],
         'encounters2' => ['bulb-blaster', 'electriri'],
         'items' => ['resetchi'],
+        'abilities' => ['time-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'south']
         ];
@@ -1164,6 +1197,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['dive-man'],
         'encounters2' => ['manta-missile', 'covercannon', 'robo-fishtot_alt'],
         'items' => ['mecha-whistle'],
+        'abilities' => ['missile-shot'],
         'tags' => ['central', 'elemental', 'water'],
         'exits' => ['south']
         ];
@@ -1176,6 +1210,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['magnet-man'],
         'encounters2' => ['mag-fly', 'elec-n', 'peterchy'],
         'items' => ['magnet-module'],
+        'abilities' => ['missile-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1188,6 +1223,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['commando-man'],
         'encounters2' => ['antlin-g', 'bombardier', 'dodonpa-cannon'],
         'items' => ['target-module'],
+        'abilities' => ['missile-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'west']
         ];
@@ -1213,6 +1249,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['eggalodon', 'cline', 'shururun', 'bombomboy'],
         'hazards' => ['bramble-patch'],
         'items' => ['sapling-circuit'],
+        'abilities' => ['nature-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['west']
         ];
@@ -1226,6 +1263,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['batton', 'kabuton', 'tank-oven', 'blocky'],
         'hazards' => ['bramble-patch'],
         'items' => ['resetchi'],
+        'abilities' => ['nature-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -1240,6 +1278,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'hazards' => ['bramble-patch'],
         'rescues' => ['vesper-woman'],
         'items' => ['growth-module'],
+        'abilities' => ['nature-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'east']
         ];
@@ -1266,6 +1305,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['snapper', 'octone', 'robo-fishtot'],
         'hazards' => ['foamy-bubbles'],
         'items' => ['spreader-module'],
+        'abilities' => ['water-shot'],
         'tags' => ['central', 'elemental', 'water'],
         'exits' => ['north', 'south']
         ];
@@ -1279,6 +1319,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['pipetto', 'shelln', 'bombomb'],
         'hazards' => ['foamy-bubbles'],
         'items' => ['alchemy-module'],
+        'abilities' => ['water-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['west']
         ];
@@ -1292,6 +1333,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['octone', 'bui-boi', 'ballonboo'],
         'hazards' => ['foamy-bubbles', 'toxic-sludge'],
         'items' => ['sponge-circuit'],
+        'abilities' => ['water-overdrive'],
         'tags' => ['central', 'elemental', 'water'],
         'exits' => ['east', 'south']
         ];
@@ -1317,6 +1359,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['drill-mole', 'molier'],
         'hazards' => ['crude-oil'],
         'items' => ['fortune-module'],
+        'abilities' => ['earth-shot'],
         'tags' => ['central', 'elemental'],
         'exits' => ['south', 'west']
         ];
@@ -1330,6 +1373,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['beetle-borg', 'gockroach-s', 'antlin-g', 'pooker'],
         'hazards' => ['crude-oil', 'flame-pillar'],
         'items' => ['super-capsule'],
+        'abilities' => ['earth-buster'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1343,6 +1387,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['colton', 'merserker', 'power-muscler'],
         'hazards' => ['shifting-sands', 'flame-pillar'],
         'items' => ['energy-tank'],
+        'abilities' => ['earth-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['north', 'west']
         ];
@@ -1357,6 +1402,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters2' => ['ring-ring', 'pukapunter', 'adamski'],
         'rescues' => ['rush'],
         'items' => ['reverse-module'],
+        'abilities' => ['space-shot'],
         'tags' => ['upper', 'elemental', 'main'],
         'exits' => ['north', 'south']
         ];
@@ -1370,6 +1416,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'satellite-deck',
         'encounters' => ['star-man'],
         'encounters2' => ['novamite', 'shururun', 'malmet', 'pukapunter'],
+        'abilities' => ['space-buster'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1407,6 +1454,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'galaxy-fantasy',
         'encounters' => ['galaxy-man'],
         'encounters2' => ['novamite', 'ring-ring', 'adamski', 'tamp'],
+        'abilities' => ['space-buster'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1455,6 +1503,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'final-destination-3',
         'encounters' => ['proxy'],
         'items' => ['empty-core'],
+        'abilities' => ['space-overdrive'],
         'tags' => ['upper', 'elemental', 'postgame'],
         'exits' => ['south']
         ];
@@ -1514,6 +1563,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['laser-man'],
         'encounters2' => ['sola-rei', 'beak', 'propeller-eye', 'malmet'],
         'items' => ['hyper-screw'],
+        'abilities' => ['laser-overdrive'],
         'tags' => ['outer', 'special', 'elemental', 'main'],
         'exits' => ['east']
         ];
@@ -1525,6 +1575,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'encounters' => [],
         'encounters2' => ['sola-rei', 'beak'],
+        'abilities' => ['laser-buster'],
         'tags' => ['outer', 'special', 'elemental'],
         'exits' => ['north', 'west']
         ];
@@ -1537,6 +1588,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => [],
         'encounters2' => ['beak'],
         'items' => ['extra-life'],
+        'abilities' => ['laser-shot'],
         'tags' => ['outer', 'special', 'elemental'],
         'exits' => ['north', 'south']
         ];
@@ -1550,6 +1602,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => ['shield-man'],
         'encounters2' => ['vavaliant', 'shield-attacker', 'shield-attacker-gtr', 'shield-attacker-trl'],
         'items' => ['hyper-screw'],
+        'abilities' => ['shield-overdrive'],
         'tags' => ['outer', 'special', 'elemental', 'main'],
         'exits' => ['west']
         ];
@@ -1561,6 +1614,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'encounters' => [],
         'encounters2' => ['shield-attacker', 'shield-attacker-gtr'],
+        'abilities' => ['shield-buster'],
         'tags' => ['outer', 'special', 'elemental'],
         'exits' => ['north', 'east']
         ];
@@ -1573,6 +1627,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => [],
         'encounters2' => ['shield-attacker'],
         'items' => ['extra-life'],
+        'abilities' => ['shield-shot'],
         'tags' => ['outer', 'special', 'elemental'],
         'exits' => ['north', 'south']
         ];
