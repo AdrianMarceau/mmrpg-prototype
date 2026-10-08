@@ -1,7 +1,7 @@
 <?
 
 // Require the global top file
-require('../../top.php');
+require_once('../../top.php');
 
 // Print out the title regardless of if confirmed or not
 echo('<strong>MMRPG World Area Generator Script</strong><br />'.PHP_EOL);
@@ -403,7 +403,7 @@ echo('<pre>'.PHP_EOL);
                 }
                 // TEMP TEMP TEMP TEMP TEMP (TODO: Remove this before launch!)
                 // Place one more portal at the bottom-left in case we need to go back to the debug area
-                $area_file_markup[] = '@portals[]  = debug-world-portal('.($area_padding + 1).'-'.($area_size_height - $area_padding).', debug__debug-area-1__spawn, red-alt)';
+                $area_file_markup[] = '@portals[]  = debug-world-portal('.($area_padding + 1).'-'.($area_size_height - $area_padding).', debug__debug-area-1__spawn, void-alt, confirm)';
                 $area_file_markup[] = '#---------------------------#';
 
             }
@@ -433,13 +433,15 @@ echo('<pre>'.PHP_EOL);
                 $area_file_markup[] = '@events[]   = '.$ptoken.'-platform-right('.$position3.', '.$ptoken.'pad-right, any, drop-zone, item:'.$itoken3.', activate-player-platform)';
                 $area_file_markup[] = '@events[]   = auto-heal('.$healpad_pos.', healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)';
                 $area_file_markup[] = '@events[]   = auto-reset('.$resetpad_pos.', resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)';
-                $area_file_markup[] = '@portals[]  = exit-portal('.$portal_pos.', prototype-area-0__spawn, void-alt, confirm)';
+                $area_file_markup[] = '#---------------------------#';
+                $area_file_markup[] = '@portals[]  = exit-portal-void('.$portal_pos.', prototype-area-0__spawn, void-alt, confirm)';
+                if (in_array('intro', $area_tags)){ $area_file_markup[] = '@mechas[]   = exit-portal-mecha('.$portal_pos.', sniper-joe, 1)'; }
                 $protected_zones['player-platform-left-buffer'] = $position1;
                 $protected_zones['player-platform-middle-buffer'] = $position2;
                 $protected_zones['player-platform-right-buffer'] = $position3;
                 $protected_zones['player-healpad-buffer'] = $healpad_pos;
                 $protected_zones['player-resetpad-buffer'] = $resetpad_pos;
-                $protected_zones['player-return-portal-buffer'] = $portal_pos;
+                $protected_zones['player-exit-portal-buffer'] = $portal_pos;
             }
 
             // Create an array to hold any actor strings we want to add
@@ -517,34 +519,64 @@ echo('<pre>'.PHP_EOL);
             // Pre-place anchored pickups so they can generate their own protected zones
             $static_pickup_strings = [];
             $exact_protected_coords = [];
+            // Helper function to translate @location tags into absolute grid coordinates
+            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $encounter_inset) {
+                $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
+                $zone_min_x = 1 + $encounter_inset;
+                $zone_max_x = $area_size_width - $encounter_inset;
+                $zone_min_y = 1 + $encounter_inset;
+                $zone_max_y = $area_size_height - $encounter_inset;
+                if ($loc === 'north-exit') return $area_middle_col . '-3';
+                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 2);
+                if ($loc === 'east-exit') return ($area_size_width - 2) . '-' . $area_middle_row;
+                if ($loc === 'west-exit') return '3-' . $area_middle_row;
+                if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
+                if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
+                if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
+                if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
+                if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
+                if ($loc === 'north') return $area_middle_col . '-' . $zone_min_y;
+                if ($loc === 'south') return $area_middle_col . '-' . $zone_max_y;
+                if ($loc === 'east') return $zone_max_x . '-' . $area_middle_row;
+                if ($loc === 'west') return $zone_min_x . '-' . $area_middle_row;
+                return null;
+                };
             if (!empty($anchored_pickups)){
                 foreach ($anchored_pickups AS $key => $pickup){
-                    $pickup_clean = trim($pickup, '! ');
+                    // Parse out the location tag and clean the item token
+                    $location = '';
+                    $pickup_raw = trim($pickup);
+                    if (strpos($pickup_raw, '@') !== false){
+                        list($pickup_raw, $location) = explode('@', $pickup_raw);
+                    }
+                    $pickup_clean = trim($pickup_raw, '! ');
                     if (strstr($pickup_clean, '__')){ list($item, $num) = explode('__', $pickup_clean); }
                     else { $item = $pickup_clean; $num = ''; }
                     if (!isset($mmrpg_index_items[$item])){ continue; }
-                    // Rebuild temporary exclusions based on CURRENT protected zones
-                    $tmp_exclude_coords = [];
-                    foreach ($protected_zones as $zone_name => $pos){
-                        $box = getBufferBox($pos, 1, $area_size_width, $area_size_height);
-                        $tmp_exclude_coords = array_merge($tmp_exclude_coords, getBufferCoords($box));
+                    // Attempt to place via location tag first
+                    $position = !empty($location) ? $getLocationCoords($location) : null;
+                    // Fallback to random isolated coordinate if no location was defined
+                    if (empty($position)){
+                        $tmp_exclude_coords = [];
+                        foreach ($protected_zones as $zone_name => $pos){
+                            $box = getBufferBox($pos, 1, $area_size_width, $area_size_height);
+                            $tmp_exclude_coords = array_merge($tmp_exclude_coords, getBufferCoords($box));
+                        }
+                        // Include previously placed anchored items so they don't overlap
+                        $tmp_exclude_coords = array_unique(array_merge($tmp_exclude_coords, $exact_protected_coords));
+                        $tmpPicker = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $tmp_exclude_coords);
+                        $position = $tmpPicker();
                     }
-                    $tmp_exclude_coords = array_unique($tmp_exclude_coords);
-                    // Pick a safe coordinate just for this anchored item
-                    $tmpPicker = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $tmp_exclude_coords);
-                    $position = $tmpPicker();
-                    if (!$position){ continue; } // Skip if no space left
-                    // Register this item as a protected zone!
+                    if (!$position){ continue; }
+                    // Register this item as a protected coordinate!
                     $item_num = $key + 1;
                     $exact_protected_coords[] = $position;
-                    //$protected_zones['anchored-item-'.$item_num] = $position;
-                    // Save the markup string for later
+                    //$protected_zones['anchored-item-'.$item_num] = $position; // (Uncomment if want a 3x3 buffer around these items)
                     $static_pickup_key = 'static-pickup-'.$item_num;
-                    if (in_array('player', $area_tags)
-                        && preg_match('/\-(program|heart|core)(__[0-9]+)?$/i', $pickup_clean, $matches)){
+                    if (in_array('player', $area_tags) && preg_match('/\-(program|heart|core)(__[0-9]+)?$/i', $pickup_clean, $matches)){
                         $ptoken = explode('-', $area_token)[0]; $itoken = $matches[1];
                         $static_pickup_key = $ptoken.'-init-'.$itoken;
-                        }
+                    }
                     $static_pickup_strings[] = '@items[]    = '.$static_pickup_key.'('.$position.', '.$pickup_clean.', anchored)';
                 }
             }
@@ -656,11 +688,22 @@ echo('<pre>'.PHP_EOL);
                 // Loop through the regular static pickups and place them
                 if (!empty($regular_pickups)){
                     foreach ($regular_pickups AS $key => $pickup){
-                        $pickup_clean = trim($pickup, '! ');
+                        // Parse out the location tag and clean the item token
+                        $location = '';
+                        $pickup_raw = trim($pickup);
+                        if (strpos($pickup_raw, '@') !== false){
+                            list($pickup_raw, $location) = explode('@', $pickup_raw);
+                        }
+                        $pickup_clean = trim($pickup_raw, '! ');
                         if (strstr($pickup_clean, '__')){ list($item, $num) = explode('__', $pickup_clean); }
                         else { $item = $pickup_clean; $num = ''; }
                         if (!isset($mmrpg_index_items[$item])){ continue; }
-                        $position = $getRandomCoord();
+                        // Attempt to place via location tag first
+                        $position = !empty($location) ? $getLocationCoords($location) : null;
+                        // Fallback to safe random coordinate
+                        if (empty($position)){
+                            $position = $getRandomCoord();
+                        }
                         if (!$position){ continue; }
                         $item_num = $key + 1;
                         $static_pickup_strings[] = '@items[]    = static-pickup-'.$item_num.'('.$position.', '.$pickup_clean.')';
@@ -724,23 +767,40 @@ echo('<pre>'.PHP_EOL);
                 // Loop through the static encounters and add them here too
                 $static_encounter_strings = array();
                 $num_static_encounters = count($area_static_encounters);
+                // Calculate encounter zone bounds for directional edge placement
+                $zone_min_x = 1 + $encounter_inset;
+                $zone_max_x = $area_size_width - $encounter_inset;
+                $zone_min_y = 1 + $encounter_inset;
+                $zone_max_y = $area_size_height - $encounter_inset;
                 foreach ($area_static_encounters AS $key => $encounter){
-                    if (strstr($encounter, '_')){ list($robot, $alt) = explode('_', $encounter); }
-                    else { $robot = $encounter; $alt = ''; }
+                    // Parse out any anchored location tags (e.g., trill@north-exit)
+                    $location = '';
+                    $encounter_clean = trim($encounter);
+                    if (strpos($encounter_clean, '@') !== false){
+                        list($encounter_token, $location) = explode('@', $encounter_clean);
+                    } else {
+                        $encounter_token = $encounter_clean;
+                    }
+                    if (strstr($encounter_token, '_')){ list($robot, $alt) = explode('_', $encounter_token); }
+                    else { $robot = $encounter_token; $alt = ''; }
                     if (!isset($mmrpg_index_robots[$robot])){ continue; }
-                    $position = $getRandomCoord(true);
+                    // Determine the position based on the location tag
+                    $position = !empty($location) ? $getLocationCoords($location) : null;
+                    // If no location was defined (or it didn't match), fall back to center-biased random
+                    if (empty($position)){ $position = $getRandomCoord(true); }
+                    if (!$position){ continue; } // Failsafe
                     $robot_num = $key + 1;
                     $robot_info = $mmrpg_index_robots[$robot];
                     $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
                     $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
-                    if ($robot_core === 'copy' && $robot_class === 'master'){ continue; }
+                    //if ($robot_core === 'copy' && $robot_class === 'master'){ continue; }
                     if ($robot_class === 'master'){
-                        $static_encounter_strings[] = '@bosses[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter.')';
-                        if (!empty($robot_core)){ $static_encounter_strings[] = '@items[]    = boss-star-'.$robot_num.'('.$position.', '.$robot_core.'-star, '.$encounter.')'; }
+                        $static_encounter_strings[] = '@bosses[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter_token.')';
+                        if (!empty($robot_core)){ $static_encounter_strings[] = '@items[]    = boss-star-'.$robot_num.'('.$position.', '.$robot_core.'-star, '.$encounter_token.')'; }
                     } elseif ($robot_class === 'mecha'){
-                        $static_encounter_strings[] = '@bosses[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter.')';
+                        $static_encounter_strings[] = '@bosses[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter_token.')';
                     } elseif ($robot_class === 'boss'){
-                        $static_encounter_strings[] = '@bosses[]   = boss-boss-'.$robot_num.'('.$position.', '.$encounter.')';
+                        $static_encounter_strings[] = '@bosses[]   = boss-boss-'.$robot_num.'('.$position.', '.$encounter_token.')';
                     }
                 }
                 if (!empty($static_encounter_strings)){
@@ -791,20 +851,6 @@ echo('<pre>'.PHP_EOL);
             if (!empty($ability_strings)){
                 $area_file_markup[] = '#---------------------------#';
                 $area_file_markup[] = implode(PHP_EOL, $ability_strings);
-            }
-
-            // --- HARD-CODED ENCOUNTERS FOR LALINDE AREA 1 ---
-            if ($area_token === 'lalinde-area-1') {
-                $area_file_markup[] = '#---------------------------#';
-
-                // Trill bosses on the directional exits
-                $area_file_markup[] = '@bosses[]   = boss-robo-trill-n('.$area_middle_col.'-1, trill)';
-                $area_file_markup[] = '@bosses[]   = boss-robo-trill-e('.$area_size_width.'-'.$area_middle_row.', trill)';
-                $area_file_markup[] = '@bosses[]   = boss-robo-trill-w(1-'.$area_middle_row.', trill)';
-
-                // Dark-Frag mecha on the main exit portal
-                $portal_y = $area_middle_row + 3; // Calculated from ($positiony + 5)
-                $area_file_markup[] = '@mechas[]   = boss-mech-portal-g('.$area_middle_col.'-'.$portal_y.', sniper-joe, 1)';
             }
 
             // Generate layer tiles for LAYER 0 and LAYER -1
@@ -915,6 +961,9 @@ echo('<pre>'.PHP_EOL);
 
 }
 echo('</pre>'.PHP_EOL);
+
+$_GET['confirm'] = 'true';
+require('mmrpg-world-reset.php');
 
 exit();
 
