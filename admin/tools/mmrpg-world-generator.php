@@ -194,7 +194,7 @@ echo('<pre>'.PHP_EOL);
             elseif (in_array('path', $area_tags)){ $area_size = '13 x 13';  }
             elseif (in_array('start', $area_tags)){ $area_size = '29 x 29';  }
             elseif (!in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
-            elseif (in_array('main', $area_tags)){ $area_size = '31 x 31'; }
+            elseif (in_array('main', $area_tags)){ $area_size = '27 x 27'; }
             $area_size_xy = explode(' x ', $area_size);
             $area_size_width = intval($area_size_xy[0]);
             $area_size_height = intval($area_size_xy[1]);
