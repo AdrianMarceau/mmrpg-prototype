@@ -181,6 +181,7 @@ echo('<pre>'.PHP_EOL);
             $area_position_row = intval($area_position_xy[1]);
             $area_size = !empty($area_info['size']) ? $area_info['size'] : '21 x 21';
             if (in_array('stargate', $area_tags)){ $area_size = '11 x 11';  }
+            elseif (in_array('player', $area_tags)){ $area_size = '15 x 15'; }
             elseif (in_array('path', $area_tags)){ $area_size = '13 x 13';  }
             elseif (in_array('start', $area_tags)){ $area_size = '29 x 29';  }
             elseif (!in_array('elemental', $area_tags)){ $area_size = '15 x 15';  }
@@ -936,7 +937,7 @@ echo('<pre>'.PHP_EOL);
             }
             $area_file_markup[] = '#---------------------------#';
             // Append an extra WATER LAYER if this is a relevant field with water
-            $has_water_layer = $area_type === 'water' || $area_type === 'freeze';
+            $has_water_layer = in_array('water', $area_tags);
             if ($has_water_layer){
                 $area_file_markup[] = '@layer = 1';
                 $area_file_markup[] = '#---------------------------#';
