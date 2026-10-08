@@ -3,6 +3,9 @@
 // Require the global top file
 require_once('../../top.php');
 
+// Define a salt for deterministic map generation (change to re-randomize)
+define('MMRPG_MAP_GENERATOR_SALT', 'prototype-2k25-v1');
+
 // Print out the title regardless of if confirmed or not
 echo('<strong>MMRPG World Area Generator Script</strong><br />'.PHP_EOL);
 
@@ -162,6 +165,12 @@ echo('<pre>'.PHP_EOL);
         // Loop through the world area again and this time actually generate the file markup
         foreach ($mmrpg_prototype_world_areas AS $area_token => $area_info){
             echo('Generating '.$area_info['name'].' ('.$area_token.') ... '.PHP_EOL);
+
+            // Generate a unique, deterministic numeric seed for this specific area
+            $area_seed = crc32(MMRPG_MAP_GENERATOR_SALT . '_' . $area_token);
+            mt_srand($area_seed);
+
+            // Generate the filename for the map and directory
             $area_file_name = $area_token.'.map';
             $area_file_dir = $world_map_filedir.$area_file_name;
 
