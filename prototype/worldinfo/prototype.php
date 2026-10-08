@@ -14,10 +14,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 1,
         'element' => 'space',
         'field' => 'prototype-subspace',
-        'encounters' => ['trill'],
+        'encounters' => ['trill@north-exit'],
         'encounters2' => ['dark-frag'],
-        'mechas' => ['met'],
-        'items' => ['mecha-whistle'],
+        'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
+        'items' => ['item-codes@south-exit'],
         'tags' => ['start'],
         'exits' => ['north', 'south']
         ];
@@ -45,7 +45,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
-        'items' => ['equip-codes'],
+        'items' => ['equip-codes@west-exit', 'mecha-whistle'],
+        'abilities' => ['light-buster'],
         'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'west']
@@ -60,7 +61,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
         //'rescues' => ['roll'],
-        'items' => ['item-codes'],
+        'items' => ['equip-codes@south-exit', 'mecha-whistle'],
+        'abilities' => ['light-buster'],
         'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
         'tags' => ['central', 'player'],
         'exits' => ['north', 'south']
@@ -74,6 +76,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'gentle-countryside',
         'encounters' => [],
         'encounters2' => ['met', 'sniper-joe'],
+        'items' => ['equip-codes@east-exit', 'mecha-whistle'],
         'abilities' => ['light-buster'],
         'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
         'tags' => ['central', 'player'],
@@ -203,9 +206,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => '',
         'objects' => ['player-platform'],
-        'encounters' => ['dr-lalinde'],
+        'encounters' => ['trill@north-exit-portal', 'trill@east-exit-portal', 'trill@west-exit-portal'],
         'items' => ['lalinde-program!!', 'empty-heart!!', 'empty-core!!', 'mecha-whistle'],
-        'tags' => ['central', 'player', 'main', 'spawn'],
+        'tags' => ['central', 'player', 'main', 'spawn', 'intro'],
         'exits' => ['north', 'east', 'west']
         ];
     $index['lalinde-area-1n'] = [
@@ -1669,7 +1672,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'space',
         'field' => 'prototype-subspace',
         'tags' => ['stargate'],
-        'exits' => ['east', 'north']
+        'exits' => ['north', 'south', 'east']
         ];
     $index['star-gate-30nw'] = [
         'name' => 'STAR Gate 30NW',
@@ -1696,7 +1699,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'space',
         'field' => 'prototype-subspace',
         'tags' => ['stargate'],
-        'exits' => ['north', 'west']
+        'exits' => ['north', 'south', 'west']
         ];
     $index['star-gate-40ne'] = [
         'name' => 'STAR Gate 40NE',
