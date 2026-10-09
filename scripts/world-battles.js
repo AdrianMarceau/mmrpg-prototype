@@ -127,6 +127,100 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
 
         let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' ? true : false;
         let isSoloMechaRescue = isSoloMechaBattle && firstBattleEvent.kind2 === 'rescue' ? true : false;
+
+        let showBattleButton = true;
+        let showRecruitButton = false;
+        let showWhistleButton = false;
+        let showPelletButton = false;
+        let pelletStat = '';
+        let pelletToken = '';
+        let pelletType = '';
+
+        if (!playerIsCursor && isSoloMechaBattle){
+            if (isSoloMechaRescue){
+                showBattleButton = false;
+                showRecruitButton = true;
+            } else {
+                if (_worldPlayer.token === 'dr-lalinde'){
+                    showWhistleButton = true;
+                } else if (_worldPlayer.token === 'dr-light'){
+                    showPelletButton = true;
+                    pelletStat = 'Defense';
+                    pelletToken = 'defense-pellet';
+                    pelletType = 'defense';
+                } else if (_worldPlayer.token === 'dr-wily'){
+                    showPelletButton = true;
+                    pelletStat = 'Attack';
+                    pelletToken = 'attack-pellet';
+                    pelletType = 'attack';
+                } else if (_worldPlayer.token === 'dr-cossack'){
+                    showPelletButton = true;
+                    pelletStat = 'Speed';
+                    pelletToken = 'speed-pellet';
+                    pelletType = 'speed';
+                }
+            }
+        }
+
+        if (showBattleButton){
+            if (playerActiveRobots >= 1){
+                actionData.sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
+                } else {
+                actionData.sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
+                }
+            }
+
+        if (showRecruitButton || showWhistleButton || showPelletButton){
+            let playerHasTeamSlot = _worldPlayer.team.length < _config.maxRobotsPerPlayer ? true : false;
+            let mechaBattleEvent = firstBattleEvent;
+            let mechaTarget = mechaBattleEvent.token;
+
+            if (showRecruitButton){
+                let recruitActionToken = 'recruit-friendly-mecha';
+                let recruitSpanLabel = '<sup>Recruit</sup> Friendly Mecha';
+                if (playerHasTeamSlot){
+                    actionData.sideButtonsMarkup += '<a class="button big-button type shield" data-action="' + recruitActionToken + '" data-target="' + mechaTarget + '" data-is-rescue="true">';
+                    actionData.sideButtonsMarkup += '<span>' + recruitSpanLabel + '</span>';
+                    actionData.sideButtonsMarkup += '</a>';
+                    } else {
+                    actionData.sideButtonsMarkup += '<a class="button big-button disabled">';
+                    actionData.sideButtonsMarkup += '<span>' + recruitSpanLabel + '</span>';
+                    actionData.sideButtonsMarkup += '</a>';
+                    }
+                }
+            else if (showWhistleButton){
+                let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
+                let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
+                let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle <sub>&times; ' + mechaWhistleQuantity + '</sub>';
+                if (playerHasTeamSlot && mechaWhistleQuantity > 0){
+                    actionData.sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaTarget + '" data-is-rescue="false">';
+                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>';
+                    actionData.sideButtonsMarkup += '</a>';
+                    } else {
+                    actionData.sideButtonsMarkup += '<a class="button big-button disabled">';
+                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>';
+                    actionData.sideButtonsMarkup += '</a>';
+                    }
+                }
+            else if (showPelletButton){
+                let pelletQuantity = _self.getItemQuantity(pelletToken);
+                let pelletSpriteMarkup = _self.getItemSpriteMarkup(pelletToken);
+                let pelletSpanLabel = '<sup>Throw</sup> ' + pelletStat + ' Pellet <sub>&times; ' + pelletQuantity + '</sub>';
+                if (playerHasTeamSlot && pelletQuantity > 0){
+                    actionData.sideButtonsMarkup += '<a class="button big-button type ' + pelletType + '" data-action="throw-stat-pellet" data-target="' + mechaTarget + '" data-pellet="' + pelletToken + '">';
+                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + pelletSpanLabel + pelletSpriteMarkup + '</span>';
+                    actionData.sideButtonsMarkup += '</a>';
+                    } else {
+                    actionData.sideButtonsMarkup += '<a class="button big-button disabled">';
+                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + pelletSpanLabel + pelletSpriteMarkup + '</span>';
+                    actionData.sideButtonsMarkup += '</a>';
+                    }
+                }
+            }
+
+        /*
+        let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' ? true : false;
+        let isSoloMechaRescue = isSoloMechaBattle && firstBattleEvent.kind2 === 'rescue' ? true : false;
         let showBattleButton = true, showRecruitButton = false;
         if (!playerIsCursor && isSoloMechaBattle){ showRecruitButton = true; }
         if (showRecruitButton && isSoloMechaRescue){ showBattleButton = false; }
@@ -165,6 +259,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                 actionData.sideButtonsMarkup += '</a>';
                 }
             }
+        */
 
         actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
         actionData.showActionAreaType = 'battle';
@@ -265,6 +360,47 @@ function handleBattleActionClick(action, $button, firstEvent){
                 }, delayEffectFor);
             } else {
             _self.showWorldMessage('...but nothing happened.', delayDismissFor);
+            _self.playSoundEffect('small-debuff-received');
+            }
+        }
+    else if (action === 'throw-stat-pellet'){
+        let delayMessageFor = 300;
+        let delayDismissFor = 1200;
+        let delayEffectFor = 2100;
+        let playerToken = _worldPlayer.token;
+        let playerNameSpan = _self.getPlayerNameSpan(playerToken);
+        let battleTarget = $button.attr('data-target') || false;
+        let pelletToken = $button.attr('data-pellet') || false;
+        let itemNameSpan = _self.getItemNameSpan(pelletToken);
+        console.log('Action: throw-stat-pellet | Target: ' + battleTarget + ' | Pellet: ' + pelletToken);
+        _self.playSoundEffect('get-weird-item');
+        _self.showWorldMessage(playerNameSpan + ' throws a ' + itemNameSpan + '!', delayMessageFor);
+        if (true){
+            _self.showWorldMessage('...the mecha accepted the bribe!', delayDismissFor);
+            console.warn('disabled _self.decrementItemQuantity(pelletToken);');
+            //_self.decrementItemQuantity(pelletToken);
+            setTimeout(function(){ _self.hideActionDropdown(false); }, delayDismissFor);
+            setTimeout(function(){
+                let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
+                $eventSprite.attr('data-frame', '02').addClass('zoom');
+                let bribeHref = 'world.php?bribe=' + battleTarget;
+                if (bribeHref){
+                    _self.playSoundEffect('get-big-item');
+                    _self.incZoomLevel();
+                    $thisWorld.addClass('busy');
+                    _self.saveWorldState(function(){
+                        _self.incZoomLevel();
+                        $thisWorld.addClass('loading');
+                        window.location.href = bribeHref;
+                        _self.incZoomLevel();
+                        }, true, false);
+                    $thisWorld.animate({opacity: 0}, 1200, function(){
+                        $thisWorld.addClass('hidden');
+                        });
+                    }
+                }, delayEffectFor);
+            } else {
+            _self.showWorldMessage('...but the mecha ignored it.', delayDismissFor);
             _self.playSoundEffect('small-debuff-received');
             }
         }

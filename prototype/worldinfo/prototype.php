@@ -60,7 +60,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'gentle-countryside',
         'encounters' => [],
-        'encounters2' => ['met', 'sniper-joe', 'picket-men'],
+        'encounters2' => ['met', 'sniper-joe', 'picket-man'],
         //'rescues' => ['roll'],
         'items' => ['equip-codes@south-exit', 'mecha-whistle'],
         'abilities' => ['light-buster'],

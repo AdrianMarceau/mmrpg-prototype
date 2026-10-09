@@ -1070,6 +1070,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let isCustomEvent = action === 'trigger-event';
                 let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1;
                 let isMechaAction = action === 'use-mecha-whistle' || action === 'recruit-friendly-mecha';
+                let isPelletAction = action === 'throw-stat-pellet';
                 let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
                 let isItem = action.indexOf('-item') !== -1 || action.indexOf('item-') !== -1;
                 let isAbility = action.indexOf('-ability') !== -1 || action.indexOf('ability-') !== -1;
@@ -1086,7 +1087,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if (isCustomEvent){
                     return _self.handleCustomEventActionClick(action, $button, firstEvent);
                     }
-                else if (isBattle || isMechaAction){
+                else if (isBattle || isMechaAction|| isPelletAction){
                     return _self.handleBattleActionClick(action, $button, firstEvent);
                     }
                 else if (isPortal){
