@@ -812,6 +812,61 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
     exit();
 }
 
+// If requested to do so, make sure we bribe the mecha from the provided battle token
+$bribe_from_battle = !empty($_GET['bribe']) && strstr($_GET['bribe'], 'world-battle_') ? trim($_GET['bribe']) : false;
+$bribe_item_token = $bribe_from_battle && !empty($_GET['item']) ? trim($_GET['item']) : false;
+if (!empty($bribe_from_battle) && rpg_battle::has_index_info($bribe_from_battle)){
+    $battle_index_token = $bribe_from_battle;
+    // We still need to loop briefly just to find the battle's position on the map
+    $battle_data = array();
+    $battle_position = false;
+    $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+    $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
+    if (!empty($world_map_encounters)){
+        foreach ($world_map_encounters AS $encounter_data){
+            if (is_string($encounter_data)){ $encounter_data = json_decode($encounter_data, true); }
+            // Check if this encounter matches the battle token we are bribing
+            if (!empty($encounter_data[4]) && $encounter_data[4] === $battle_index_token){
+                $battle_data = $encounter_data;
+                $battle_position = $encounter_data[3];
+                break;
+            }
+        }
+    }
+    // If we found the position, let's create an item drop in its wake
+    if (!empty($battle_data) && !empty($battle_position)){
+        $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
+        $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
+        // Collect info about the target mecha including best stat
+        $mecha_token = $battle_data[1];
+        $mecha_info = $mmrpg_index_robots[$mecha_token];
+        $mecha_best_stat = rpg_robot::get_best_stat($mecha_info, true);
+        $bribe_item_stat = strstr($bribe_item_token, '-') ? explode('-', $bribe_item_token)[0] : $bribe_item_token;
+        $is_perfect_item = $bribe_item_stat === $mecha_best_stat;
+        //echo('<pre>$bribe_from_battle = '.print_r($bribe_from_battle, true).'</pre>');
+        //echo('<pre>$bribe_item_token = '.print_r($bribe_item_token, true).'</pre>');
+        //echo('<pre>$battle_data = '.print_r($battle_data, true).'</pre>');
+        //echo('<pre>$battle_position = '.print_r($battle_position, true).'</pre>');
+        //echo('<pre>$mecha_token = '.print_r($mecha_token, true).'</pre>');
+        //echo('<pre>$mecha_best_stat = '.print_r($mecha_best_stat, true).'</pre>');
+        //echo('<pre>$bribe_item_stat = '.print_r($bribe_item_stat, true).'</pre>');
+        //echo('<pre>$is_perfect_item = '.($is_perfect_item ? 'true' : 'false').'</pre>');
+        // Define the item and generate a unique pickup token using the coordinates
+        if ($is_perfect_item){ $drop_item_token = 'large-screw'; $drop_pickup_label = 'Large Screw'; }
+        else { $drop_item_token = 'small-screw'; $drop_pickup_label = 'Small Screw'; }
+        $drop_pickup_token = 'bribe-drop-item_'.str_replace('-', '_', $battle_position);
+        // Append the new pickup to the map's pickups array
+        $world_map_pickups[] = json_encode(array('item', $drop_item_token, $battle_position, $drop_pickup_token, $drop_pickup_label));
+        // Only update the pickups session
+        rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
+    }
+    // Unset the battle from the index so the engine naturally skips it (matching the recruit logic)
+    rpg_battle::unset_index_info($battle_index_token);
+    // Redirect back to the world map to refresh the visuals
+    header('Location: world.php');
+    exit();
+}
+
 // Calculate remaining encounters for this area for later reference
 $battles_remaining = array();
 foreach ($world_map_encounters AS $namekey => $encounter){

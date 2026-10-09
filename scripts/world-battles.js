@@ -188,7 +188,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                     actionData.sideButtonsMarkup += '</a>';
                     }
                 }
-            else if (showWhistleButton){
+            else if (showWhistleButton && typeof _worldPlayer.items['mecha-whistle'] !== 'undefined'){
                 let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
                 let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
                 let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle <sub>&times; ' + mechaWhistleQuantity + '</sub>';
@@ -202,11 +202,11 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                     actionData.sideButtonsMarkup += '</a>';
                     }
                 }
-            else if (showPelletButton){
+            else if (showPelletButton && typeof _worldPlayer.items[pelletToken] !== 'undefined'){
                 let pelletQuantity = _self.getItemQuantity(pelletToken);
                 let pelletSpriteMarkup = _self.getItemSpriteMarkup(pelletToken);
                 let pelletSpanLabel = '<sup>Throw</sup> ' + pelletStat + ' Pellet <sub>&times; ' + pelletQuantity + '</sub>';
-                if (playerHasTeamSlot && pelletQuantity > 0){
+                if (pelletQuantity > 0){
                     actionData.sideButtonsMarkup += '<a class="button big-button type ' + pelletType + '" data-action="throw-stat-pellet" data-target="' + mechaTarget + '" data-pellet="' + pelletToken + '">';
                     actionData.sideButtonsMarkup += '<span class="has-sprite">' + pelletSpanLabel + pelletSpriteMarkup + '</span>';
                     actionData.sideButtonsMarkup += '</a>';
@@ -217,49 +217,6 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                     }
                 }
             }
-
-        /*
-        let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' ? true : false;
-        let isSoloMechaRescue = isSoloMechaBattle && firstBattleEvent.kind2 === 'rescue' ? true : false;
-        let showBattleButton = true, showRecruitButton = false;
-        if (!playerIsCursor && isSoloMechaBattle){ showRecruitButton = true; }
-        if (showRecruitButton && isSoloMechaRescue){ showBattleButton = false; }
-        if (typeof _worldPlayer.items['mecha-whistle'] === 'undefined'){ showRecruitButton = false; }
-
-        if (showBattleButton){
-            if (playerActiveRobots >= 1){
-                actionData.sideButtonsMarkup += '<a class="button big-button" data-action="start-battle"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
-                } else {
-                actionData.sideButtonsMarkup += '<a class="button big-button disabled"' + joinedDataAttrs + '><span><sup>Ready To</sup> Start Battle</span></a>';
-                }
-            }
-
-        if (showRecruitButton){
-            let playerHasTeamSlot = _worldPlayer.team.length < _config.maxRobotsPerPlayer ? true : false;
-            let hasPermanentWhistle = false;
-            let mechaBattleEvent = firstBattleEvent;
-            let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
-            let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
-            let isRescueMecha = mechaBattleEvent.kind2 === 'rescue';
-            let mechaWhistleSpanLabel = isRescueMecha ? '<sup>Recruit</sup> Friendly Mecha' : '<sup>Use</sup> Mecha Whistle';
-            let mechaWhistleTarget = mechaBattleEvent.token;
-            if (!hasPermanentWhistle && !isRescueMecha){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
-            let playerCanUseWhistle = (isRescueMecha || mechaWhistleQuantity > 0 || hasPermanentWhistle) && playerHasTeamSlot ? true : false;
-            if (playerCanUseWhistle){
-                let whistleActionToken = isRescueMecha ? 'recruit-friendly-mecha' : 'use-mecha-whistle';
-                actionData.sideButtonsMarkup += '<a class="button big-button type shield" data-action="' + whistleActionToken + '" data-target="' + mechaWhistleTarget + '" data-is-rescue="' + (isRescueMecha ? 'true' : 'false') + '">';
-                    if (!isRescueMecha){ actionData.sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
-                    else {actionData.sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
-                actionData.sideButtonsMarkup += '</a>';
-                }
-            else {
-                actionData.sideButtonsMarkup += '<a class="button big-button disabled">';
-                    if (!isRescueMecha){ actionData.sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
-                    else { actionData.sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
-                actionData.sideButtonsMarkup += '</a>';
-                }
-            }
-        */
 
         actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
         actionData.showActionAreaType = 'battle';
@@ -372,18 +329,18 @@ function handleBattleActionClick(action, $button, firstEvent){
         let battleTarget = $button.attr('data-target') || false;
         let pelletToken = $button.attr('data-pellet') || false;
         let itemNameSpan = _self.getItemNameSpan(pelletToken);
-        console.log('Action: throw-stat-pellet | Target: ' + battleTarget + ' | Pellet: ' + pelletToken);
+        //console.log('Action: throw-stat-pellet | Target: ' + battleTarget + ' | Pellet: ' + pelletToken);
         _self.playSoundEffect('get-weird-item');
-        _self.showWorldMessage(playerNameSpan + ' throws a ' + itemNameSpan + '!', delayMessageFor);
+        _self.showWorldMessage(playerNameSpan + ' throws ' + (pelletToken.match(/^[aeiou]+/) ? 'an' : 'a') + ' ' + itemNameSpan + '!', delayMessageFor);
         if (true){
             _self.showWorldMessage('...the mecha accepted the bribe!', delayDismissFor);
-            console.warn('disabled _self.decrementItemQuantity(pelletToken);');
-            //_self.decrementItemQuantity(pelletToken);
+            //console.warn('disabled _self.decrementItemQuantity(pelletToken);');
+            _self.decrementItemQuantity(pelletToken);
             setTimeout(function(){ _self.hideActionDropdown(false); }, delayDismissFor);
             setTimeout(function(){
                 let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
                 $eventSprite.attr('data-frame', '02').addClass('zoom');
-                let bribeHref = 'world.php?bribe=' + battleTarget;
+                let bribeHref = 'world.php?bribe=' + battleTarget + '&item=' + pelletToken;
                 if (bribeHref){
                     _self.playSoundEffect('get-big-item');
                     _self.incZoomLevel();
