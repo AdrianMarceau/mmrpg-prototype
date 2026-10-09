@@ -340,6 +340,54 @@ if (!empty($form_actions)){
 
         };
 
+    // Define an update function for the "Control Settings" tab
+    $update_functions['control_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data){
+        global $db, $current_user_id, $current_user_info;
+        // Map our UI-friendly string values back to real KeyboardEvent.key values
+        $key_translation_map = array(
+            'up' => 'ArrowUp',
+            'down' => 'ArrowDown',
+            'left' => 'ArrowLeft',
+            'right' => 'ArrowRight',
+            'return' => 'Enter',
+            'shift' => 'Shift',
+            'space' => ' ',
+            'tab' => 'Tab',
+            'escape' => 'Escape'
+            );
+        // Define the keys we expect from the form and their internal config names
+        $input_fields = array(
+            'Up' => 'key_up', 'Down' => 'key_down', 'Left' => 'key_left', 'Right' => 'key_right',
+            'A' => 'key_a', 'B' => 'key_b', 'X' => 'key_x', 'Y' => 'key_y',
+            'L1' => 'key_l1', 'R1' => 'key_r1', 'L2' => 'key_l2', 'R2' => 'key_r2',
+            'Start' => 'key_start', 'Select' => 'key_select',
+            'LR1' => 'key_lr1', 'LR2' => 'key_lr2'
+            );
+        $keyboard_mapping = array();
+
+        // Loop through expected fields and translate them if necessary
+        foreach ($input_fields as $config_key => $post_key) {
+            $raw_value = isset($_POST[$post_key]) ? trim(strtolower($_POST[$post_key])) : '';
+            if (!empty($raw_value)){
+                $mapped_value = isset($key_translation_map[$raw_value]) ? $key_translation_map[$raw_value] : $raw_value;
+                // Wrap the mapped value in an array to match the JS watcherConfig structure
+                $keyboard_mapping[$config_key] = array($mapped_value);
+                }
+            }
+        // Save the compiled array to the battle settings session
+        if (!empty($keyboard_mapping)){
+            $session_token = rpg_game::session_token();
+            // Initialize buttonMapping array if it doesn't exist yet
+            if (!isset($_SESSION[$session_token]['battle_settings']['buttonMapping'])){
+                $_SESSION[$session_token]['battle_settings']['buttonMapping'] = array();
+                }
+            // Overwrite the keyboard mappings with the newly built array
+            $_SESSION[$session_token]['battle_settings']['buttonMapping']['keyboard'] = $keyboard_mapping;
+            }
+        return true;
+
+    };
+
     // Define an update function for the "Player Settings" tab
     $update_functions['proxy_settings'] = function() use (&$updated_tabs, &$form_messages, &$form_data, &$current_proxy_info){
         global $db, $current_user_id, $current_user_info;
@@ -463,6 +511,7 @@ $settings_tabs_index = array();
 $settings_tabs_order = array(
     'account_settings',
     'profile_settings',
+    'control_settings',
     'audio_settings',
     'performance_settings',
     'misc_settings',
@@ -1214,6 +1263,251 @@ if (mmrpg_prototype_item_unlocked('omega-seed')){
         'markup' => $tab_markup,
         'icon' => '<i class="fa fas fa-greek-omega"></i>',
         'class' => 'float_right icon_only'
+        );
+    }
+
+}
+
+// Generate markup for CONTROL SETTINGS if applicable
+if (true){
+
+    // Define the markup for this section
+    $tab_token = 'control_settings';
+    $tab_name = 'Controls';
+    ob_start();
+    ?>
+
+        <div class="game-settings control-settings">
+
+            <p class="description">
+                <strong class="label">Control Mapping</strong>
+                Customize your keyboard inputs for the game. Click an input box and press your desired key to reassign it.
+            </p>
+
+            <div class="subwrap field fullsize">
+                <table class="controls-table" style="width: 100%; text-align: left; border-spacing: 5px 10px;">
+                    <colgroup>
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                    </colgroup>
+                    <tbody>
+                        <!-- D-Pad -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Up</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_up" value="up" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Down</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_down" value="down" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Left</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_left" value="left" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Right</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_right" value="right" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                        </tr>
+                        <!-- Face Buttons -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>A</strong> <em style="font-size: 85%;">Yes</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_a" value="d" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>B</strong> <em style="font-size: 85%;">No</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_b" value="s" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>X</strong> <em style="font-size: 85%;">Menu</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_x" value="f" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Y</strong> <em style="font-size: 85%;">Info</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_y" value="a" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                        </tr>
+                        <!-- Shoulder Buttons -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>L1</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_l1" value="q" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>R1</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_r1" value="e" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>L2</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_l2" value="z" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>R2</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_r2" value="c" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                        </tr>
+                        <!-- Menu Buttons -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Start</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_start" value="return" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Select</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_select" value="shift" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td colspan="4"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    <?
+    $tab_markup = trim(ob_get_clean());
+    if (!empty($tab_markup)){
+        $settings_tabs_index[$tab_token] = array(
+        'token' => $tab_token,
+        'name' => $tab_name,
+        'markup' => $tab_markup,
+        //'icon' => '<i class="fa fas fa-gamepad"></i>'
+        );
+    }
+
+}
+
+// Generate markup for CONTROL SETTINGS if applicable
+if (true){
+
+    // Define the markup for this section
+    $tab_token = 'control_settings';
+    $tab_name = 'Controls';
+    ob_start();
+
+    // Collect current values from the session if they exist
+    $session_token = rpg_game::session_token();
+    $battleSettings = isset($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+    $custom_keyboard_mapping = isset($battleSettings['buttonMapping']['keyboard']) ? $battleSettings['buttonMapping']['keyboard'] : array();
+
+    // Map strict KeyboardEvent.key values back to our UI-friendly string values
+    $reverse_key_translation_map = array(
+        'ArrowUp' => 'up',
+        'ArrowDown' => 'down',
+        'ArrowLeft' => 'left',
+        'ArrowRight' => 'right',
+        'Enter' => 'return',
+        'Shift' => 'shift',
+        ' ' => 'space',
+        'Tab' => 'tab',
+        'Escape' => 'escape'
+    );
+
+    // Define defaults to fall back on if no custom setting exists
+    $default_keyboard_mapping = array(
+        'Up' => 'up', 'Down' => 'down', 'Left' => 'left', 'Right' => 'right',
+        'A' => 'd', 'B' => 's', 'X' => 'f', 'Y' => 'a',
+        'L1' => 'q', 'R1' => 'e', 'L2' => 'z', 'R2' => 'c',
+        'Start' => 'return', 'Select' => 'shift',
+        'LR1' => 'w', 'LR2' => 'x',
+    );
+
+    // Build the final array of values for the UI
+    $ui_keys = array();
+    foreach ($default_keyboard_mapping as $button => $default_val) {
+        $raw_value = isset($custom_keyboard_mapping[$button][0]) ? $custom_keyboard_mapping[$button][0] : $default_val;
+        $ui_value = isset($reverse_key_translation_map[$raw_value]) ? $reverse_key_translation_map[$raw_value] : $raw_value;
+        $ui_keys[$button] = strtolower(trim($ui_value));
+    }
+    ?>
+
+        <div class="game-settings control-settings">
+
+            <p class="description">
+                <strong class="label">Control Mapping</strong>
+                Customize your keyboard inputs for the game. Click an input box and press your desired key to reassign it.
+            </p>
+
+            <div class="subwrap field fullsize">
+                <table class="controls-table" style="width: 100%; text-align: left; border-spacing: 5px 10px;">
+                    <colgroup>
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                        <col width="10%" />
+                        <col width="15%" />
+                    </colgroup>
+                    <tbody>
+                        <!-- D-Pad -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Up</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_up" value="<?= $ui_keys['Up'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Down</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_down" value="<?= $ui_keys['Down'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Left</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_left" value="<?= $ui_keys['Left'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Right</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_right" value="<?= $ui_keys['Right'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                        </tr>
+                        <!-- Face Buttons -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>A</strong> <em style="font-size: 85%;">Yes</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_a" value="<?= $ui_keys['A'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>B</strong> <em style="font-size: 85%;">No</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_b" value="<?= $ui_keys['B'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>X</strong> <em style="font-size: 85%;">Menu</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_x" value="<?= $ui_keys['X'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Y</strong> <em style="font-size: 85%;">Info</em></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_y" value="<?= $ui_keys['Y'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                        </tr>
+                        <!-- Shoulder Buttons (Row 1) -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>L1</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_l1" value="<?= $ui_keys['L1'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>R1</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_r1" value="<?= $ui_keys['R1'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>LR1</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_lr1" value="<?= $ui_keys['LR1'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                            <td colspan="2"><div class="label"><em style="font-size: 85%;">L1+R1</em></div></td>
+                        </tr>
+                        <!-- Shoulder Buttons (Row 2) -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>L2</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_l2" value="<?= $ui_keys['L2'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>R2</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_r2" value="<?= $ui_keys['R2'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>LR2</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_lr2" value="<?= $ui_keys['LR2'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+                            <td colspan="2"><div class="label"><em style="font-size: 85%;">L2+R2</em></div></td>
+                        </tr>
+                        <!-- Menu Buttons -->
+                        <tr>
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Start</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_start" value="<?= $ui_keys['Start'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td style="vertical-align: middle;"><div class="label" style="margin: 0;"><strong>Select</strong></div></td>
+                            <td style="padding-right: 10px;"><input class="textbox" type="text" name="key_select" value="<?= $ui_keys['Select'] ?>" readonly="readonly" style="margin: 0; cursor: pointer; text-align: center;" /></td>
+
+                            <td colspan="4"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    <?
+    $tab_markup = trim(ob_get_clean());
+    if (!empty($tab_markup)){
+        $settings_tabs_index[$tab_token] = array(
+        'token' => $tab_token,
+        'name' => $tab_name,
+        'markup' => $tab_markup,
+        'icon' => '',
         );
     }
 

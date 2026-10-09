@@ -740,6 +740,64 @@ $(document).ready(function(){
 
         }
 
+    // Process complex control setting updates
+    var $controlSettings = $('.control-settings', $thisSettings);
+    if ($controlSettings.length){
+        // Collect all control mapping inputs
+        var $controlInputs = $('.controls-table input.textbox', $controlSettings);
+        $controlInputs.bind('focus', function(){
+            var _selfRef = $(this);
+            var originalValue = _selfRef.val();
+            // Save the original value and indicate the input is listening
+            _selfRef.data('originalValue', originalValue);
+            _selfRef.val('...');
+            _selfRef.css({borderColor: '#00ff00', color: '#00ff00'});
+            // Bind a targeted keydown event to capture the user's input
+            _selfRef.bind('keydown.controlCapture', function(e){
+                console.log('e =', e);
+                e.preventDefault(); // Prevent scrolling (Space/Arrows) or navigating (Tab)
+                // Read from the native event directly to bypass old jQuery limitations
+                var keyName = e.originalEvent ? e.originalEvent.key : e.key;
+                // Safety check: if keyName is somehow still undefined, bail out
+                if (typeof keyName === 'undefined') { return; }
+                var mappedKey = '';
+                // Map special keys to clean string values
+                if (keyName === ' ') { mappedKey = 'space'; }
+                else if (keyName === 'Enter') { mappedKey = 'return'; }
+                else if (keyName === 'Shift') { mappedKey = 'shift'; }
+                else if (keyName === 'Tab') { mappedKey = 'tab'; }
+                else if (keyName === 'ArrowUp') { mappedKey = 'up'; }
+                else if (keyName === 'ArrowDown') { mappedKey = 'down'; }
+                else if (keyName === 'ArrowLeft') { mappedKey = 'left'; }
+                else if (keyName === 'ArrowRight') { mappedKey = 'right'; }
+                else if (keyName === 'Escape') { mappedKey = 'escape'; }
+                else if (keyName.length === 1){ mappedKey = keyName.toLowerCase(); }
+                // If a valid key was captured, update the input and release focus
+                if (mappedKey !== '') {
+                    _selfRef.val(mappedKey);
+                    _selfRef.data('originalValue', mappedKey); // Update fallback memory
+                    _selfRef.unbind('keydown.controlCapture');
+                    _selfRef.blur();
+                    // Trigger interface sound effect if function is available
+                    if (typeof playSoundEffect !== 'undefined'){
+                        playSoundEffect.call(this, 'icon-click-mini', {volume: 1.0});
+                    }
+                }
+            });
+        });
+        // Ensure cleanup and value restoration if the user clicks away without pressing a key
+        $controlInputs.bind('blur', function(){
+            var _selfRef = $(this);
+            // Remove listening styles and event bindings
+            _selfRef.css({borderColor: '', color: ''});
+            _selfRef.unbind('keydown.controlCapture');
+            // Revert to original value if blurred while still waiting for input
+            if (_selfRef.val() === '...'){
+                _selfRef.val(_selfRef.data('originalValue'));
+            }
+        });
+    }
+
 
     /*
      * OTHER STUFF
