@@ -149,13 +149,11 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
             let isRescueMecha = mechaBattleEvent.kind2 === 'rescue';
             let mechaWhistleSpanLabel = isRescueMecha ? '<sup>Recruit</sup> Friendly Mecha' : '<sup>Use</sup> Mecha Whistle';
             let mechaWhistleTarget = mechaBattleEvent.token;
-
             if (!hasPermanentWhistle && !isRescueMecha){ mechaWhistleSpanLabel += ' <sub>&times; ' + mechaWhistleQuantity + '</sub>' ; }
-
             let playerCanUseWhistle = (isRescueMecha || mechaWhistleQuantity > 0 || hasPermanentWhistle) && playerHasTeamSlot ? true : false;
-
             if (playerCanUseWhistle){
-                actionData.sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaWhistleTarget + '" data-is-rescue="' + (isRescueMecha ? 'true' : 'false') + '">';
+                let whistleActionToken = isRescueMecha ? 'recruit-friendly-mecha' : 'use-mecha-whistle';
+                actionData.sideButtonsMarkup += '<a class="button big-button type shield" data-action="' + whistleActionToken + '" data-target="' + mechaWhistleTarget + '" data-is-rescue="' + (isRescueMecha ? 'true' : 'false') + '">';
                     if (!isRescueMecha){ actionData.sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>'; }
                     else {actionData.sideButtonsMarkup += '<span>' + mechaWhistleSpanLabel + '</span>'; }
                 actionData.sideButtonsMarkup += '</a>';
@@ -227,7 +225,7 @@ function handleBattleActionClick(action, $button, firstEvent){
                 }, true, false);
             }
         }
-    else if (action === 'use-mecha-whistle'){
+    else if (action === 'use-mecha-whistle' || action === 'recruit-friendly-mecha'){
         let delayMessageFor = 300;
         let delayDismissFor = 1200;
         let delayEffectFor = 2100;
@@ -244,7 +242,7 @@ function handleBattleActionClick(action, $button, firstEvent){
 
         if (true){
             _self.showWorldMessage('...the mecha responded!', delayDismissFor);
-            if (!isRescueMecha){ _self.decrementItemQuantity('mecha-whistle'); }
+            if (action === 'use-mecha-whistle'){ _self.decrementItemQuantity('mecha-whistle'); }
             setTimeout(function(){ _self.hideActionDropdown(false); }, delayDismissFor);
             setTimeout(function(){
                 let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');

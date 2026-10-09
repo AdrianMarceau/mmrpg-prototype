@@ -1068,7 +1068,8 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if ($button.is('.disabled') || $button.is('[disabled]')){ return false; }
                 if (!action){ console.error('-> no action found on button, skipping!'); return false; }
                 let isCustomEvent = action === 'trigger-event';
-                let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1 || action === 'use-mecha-whistle';
+                let isBattle = action.indexOf('-battle') !== -1 || action.indexOf('battle-') !== -1;
+                let isMechaAction = action === 'use-mecha-whistle' || action === 'recruit-friendly-mecha';
                 let isPortal = action.indexOf('-portal') !== -1 || action.indexOf('portal-') !== -1;
                 let isItem = action.indexOf('-item') !== -1 || action.indexOf('item-') !== -1;
                 let isAbility = action.indexOf('-ability') !== -1 || action.indexOf('ability-') !== -1;
@@ -1085,7 +1086,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 if (isCustomEvent){
                     return _self.handleCustomEventActionClick(action, $button, firstEvent);
                     }
-                else if (isBattle){
+                else if (isBattle || isMechaAction){
                     return _self.handleBattleActionClick(action, $button, firstEvent);
                     }
                 else if (isPortal){
@@ -1105,50 +1106,6 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                     }
                 else if (isActorAction){
                     return _self.handleActorActionClick(action, $button, firstEvent);
-                    }
-                else if (action === 'use-mecha-whistle'){
-                    let delayMessageFor = 300;
-                    let delayDismissFor = 1200;
-                    let delayEffectFor = 2100;
-                    let playerToken = _worldPlayer.token;
-                    let playerNameSpan = _self.getPlayerNameSpan(playerToken);
-                    let itemToken = 'mecha-whistle';
-                    let itemNameSpan = _self.getItemNameSpan(itemToken);
-                    let battleSymbols = _config.mapBattleSymbols;
-                    let battlesIndex = _config.mapBattlesIndex;
-                    let battleTarget = $button.attr('data-target') || false;
-                    let battleInfo = battleTarget && (battlesIndex && battlesIndex[battleTarget]) ? battlesIndex[battleTarget] : false;
-                    let isRescueMecha = $button.attr('data-is-rescue') === 'true';
-                    _self.playSoundEffect('get-weird-item');
-                    if (isRescueMecha){ _self.showWorldMessage(playerNameSpan + ' calls out to the friendly mecha!', delayMessageFor); }
-                    else { _self.showWorldMessage(playerNameSpan + ' uses a ' + itemNameSpan + '!', delayMessageFor); }
-                    if (true){
-                        _self.showWorldMessage('...the mecha responded!', delayDismissFor);
-                        if (!isRescueMecha){ _self.decrementItemQuantity('mecha-whistle'); }
-                        setTimeout(function(){ _self.hideActionDropdown(false); }, delayDismissFor);
-                        setTimeout(function(){
-                            let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
-                            $eventSprite.attr('data-frame', '02').addClass('zoom');
-                            let recruitHref = 'world.php?recruit=' + battleTarget;
-                            if (recruitHref){
-                                _self.playSoundEffect('get-big-item');
-                                _self.incZoomLevel();
-                                $thisWorld.addClass('busy');
-                                _self.saveWorldState(function(){
-                                    _self.incZoomLevel();
-                                    $thisWorld.addClass('loading');
-                                    window.location.href = recruitHref;
-                                    _self.incZoomLevel();
-                                    }, true, false);
-                                $thisWorld.animate({opacity: 0}, 1200, function(){
-                                    $thisWorld.addClass('hidden');
-                                    });
-                                }
-                            }, delayEffectFor);
-                        } else {
-                        _self.showWorldMessage('...but nothing happened.', delayDismissFor);
-                        _self.playSoundEffect('small-debuff-received');
-                        }
                     }
                 else if (isDismiss){
                     _self.hideActionDropdown(true);
