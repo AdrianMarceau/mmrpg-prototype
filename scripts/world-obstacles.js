@@ -8,6 +8,7 @@ function prepareObstacleEventOptions(firstEvent, options){
     let _config = _self.config;
     let _world = _self.state;
     let _indexes = _self.indexes;
+    let _elements = _self.elements;
     let _worldCursor = _world.cursor;
     let _worldPlayer = _world.player;
     let _worldPlayerRobots = _worldPlayer.robots;
