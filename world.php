@@ -833,32 +833,37 @@ if (!empty($bribe_from_battle) && rpg_battle::has_index_info($bribe_from_battle)
             }
         }
     }
-    // If we found the position, let's create an item drop in its wake
+    // If we found the position, let's create an item drop in its wake (unless there's a portal there)
     if (!empty($battle_data) && !empty($battle_position)){
-        $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
-        $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
-        // Collect info about the target mecha including best stat
-        $mecha_token = $battle_data[1];
-        $mecha_info = $mmrpg_index_robots[$mecha_token];
-        $mecha_best_stat = rpg_robot::get_best_stat($mecha_info, true);
-        $bribe_item_stat = strstr($bribe_item_token, '-') ? explode('-', $bribe_item_token)[0] : $bribe_item_token;
-        $is_perfect_item = $bribe_item_stat === $mecha_best_stat;
-        //echo('<pre>$bribe_from_battle = '.print_r($bribe_from_battle, true).'</pre>');
-        //echo('<pre>$bribe_item_token = '.print_r($bribe_item_token, true).'</pre>');
-        //echo('<pre>$battle_data = '.print_r($battle_data, true).'</pre>');
-        //echo('<pre>$battle_position = '.print_r($battle_position, true).'</pre>');
-        //echo('<pre>$mecha_token = '.print_r($mecha_token, true).'</pre>');
-        //echo('<pre>$mecha_best_stat = '.print_r($mecha_best_stat, true).'</pre>');
-        //echo('<pre>$bribe_item_stat = '.print_r($bribe_item_stat, true).'</pre>');
-        //echo('<pre>$is_perfect_item = '.($is_perfect_item ? 'true' : 'false').'</pre>');
-        // Define the item and generate a unique pickup token using the coordinates
-        if ($is_perfect_item){ $drop_item_token = 'large-screw'; $drop_pickup_label = 'Large Screw'; }
-        else { $drop_item_token = 'small-screw'; $drop_pickup_label = 'Small Screw'; }
-        $drop_pickup_token = 'bribe-drop-item_'.str_replace('-', '_', $battle_position);
-        // Append the new pickup to the map's pickups array
-        $world_map_pickups[] = json_encode(array('item', $drop_item_token, $battle_position, $drop_pickup_token, $drop_pickup_label));
-        // Only update the pickups session
-        rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
+        // First, check if there's already a portal at this position
+        $portal_at_position = false;
+        if (!empty($map_data_parsed['portals'])){
+            foreach ($map_data_parsed['portals'] AS $portal_name => $portal_data){
+                if (!empty($portal_data[0]) && $portal_data[0] === $battle_position){
+                    $portal_at_position = true;
+                    break;
+                }
+            }
+        }
+        // Only drop the item if a portal wasn't found at this position
+        if (!$portal_at_position){
+            $world_pickups = !empty($WORLD_SESSION['world_pickups']) ? $WORLD_SESSION['world_pickups'] : array();
+            $world_map_pickups = !empty($world_pickups[$world_map_token]) ? $world_pickups[$world_map_token] : array();
+            // Collect info about the target mecha including best stat
+            $mecha_token = $battle_data[1];
+            $mecha_info = $mmrpg_index_robots[$mecha_token];
+            $mecha_best_stat = rpg_robot::get_best_stat($mecha_info, true);
+            $bribe_item_stat = strstr($bribe_item_token, '-') ? explode('-', $bribe_item_token)[0] : $bribe_item_token;
+            $is_perfect_item = $bribe_item_stat === $mecha_best_stat;
+            // Define the item and generate a unique pickup token using the coordinates
+            if ($is_perfect_item){ $drop_item_token = 'large-screw'; $drop_pickup_label = 'Large Screw'; }
+            else { $drop_item_token = 'small-screw'; $drop_pickup_label = 'Small Screw'; }
+            $drop_pickup_token = 'bribe-drop-item_'.str_replace('-', '_', $battle_position);
+            // Append the new pickup to the map's pickups array
+            $world_map_pickups[] = json_encode(array('item', $drop_item_token, $battle_position, $drop_pickup_token, $drop_pickup_label));
+            // Only update the pickups session
+            rpg_world::update_session('world_pickups', $world_map_token, $world_map_pickups);
+        }
     }
     // Unset the battle from the index so the engine naturally skips it (matching the recruit logic)
     rpg_battle::unset_index_info($battle_index_token);
