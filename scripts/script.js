@@ -2328,7 +2328,8 @@ class mmrpgUserInputWatcher {
             keyboardIcon: '[F]', keyboardName: 'F'
             };
         userInputs.Y = {
-            gamepad: [3], keyboard: ['a', 'Tab'],
+            gamepad: [3],
+            keyboard: ['a', 'Tab'],
             icon: 'Ⓨ', name: 'Y',
             sonyIcon: '△', sonyName: 'Triangle',
             keyboardIcon: '[A]', keyboardName: 'A'
@@ -2440,10 +2441,10 @@ class mmrpgUserInputWatcher {
         // Collect (or set) the button mapping customizations if any
         let buttonMapping = _config.buttonMapping;
         if (_config.autoButtonMapping){
-            //if (typeof buttonMapping.nintendo === 'undefined'){ buttonMapping.nintendo = {}; }
             if (typeof buttonMapping.standard === 'undefined'){ buttonMapping.standard = {}; }
-            //buttonMapping.nintendo.X = 'X'; buttonMapping.nintendo.Y = 'Y';
-            buttonMapping.standard.X = 'Y'; buttonMapping.standard.Y = 'X';
+            // Swap using the actual gamepad array indices instead of logical strings
+            buttonMapping.standard.X = [3];
+            buttonMapping.standard.Y = [2];
             }
         _self.buttonMapping = buttonMapping;
 
@@ -2454,36 +2455,6 @@ class mmrpgUserInputWatcher {
             _self.lastInputEvent = event;
             returnUserInputs = JSON.parse(JSON.stringify(userInputs));
             returnActiveInputs = JSON.parse(JSON.stringify(activeInputs));
-            let buttonMapping = _self.buttonMapping || null;
-            let gamepadLayout = _self.gamepadLayout || null;
-            //console.log('-> buttonMapping =', buttonMapping);
-            //console.log('-> gamepadLayout =', gamepadLayout);
-            //console.log('-> returnUserInputs =', returnUserInputs);
-            //console.log('-> returnActiveInputs =', returnActiveInputs);
-            if (!!buttonMapping && !!gamepadLayout
-                && Object.keys(buttonMapping).length > 0
-                && typeof buttonMapping[gamepadLayout] !== 'undefined'){
-                //console.log('buttonMapping[' + gamepadLayout + '] exists! let us loop...');
-                //let baseKeys = Object.keys(buttonMapping[gamepadLayout]);
-                //let pseudoKeys = Object.values(buttonMapping[gamepadLayout]);
-                let checkInputs = Object.keys(userInputs);
-                let mappedInputs = buttonMapping[gamepadLayout];
-                let newUserInputs = {};
-                let newActiveInputs = {};
-                for (let i = 0; i < checkInputs.length; i++){
-                    //console.log('adding definition for checkInputs[' + i + '] = ', checkInputs[i]);
-                    let thisInput = checkInputs[i];
-                    let thisUserInput = typeof userInputs[thisInput] !== 'undefined' ? userInputs[thisInput] : null;
-                    let thisActiveInput = typeof activeInputs[thisInput] !== 'undefined' ? activeInputs[thisInput] : null;
-                    if (typeof mappedInputs[thisInput] !== 'undefined'){ thisInput = mappedInputs[thisInput]; }
-                    if (thisUserInput){ newUserInputs[thisInput] = thisUserInput; }
-                    if (thisActiveInput){ newActiveInputs[thisInput] = thisActiveInput; }
-                    }
-                //console.log('-> newUserInputs =', newUserInputs);
-                //console.log('-> newActiveInputs =', newActiveInputs);
-                returnUserInputs = newUserInputs;
-                returnActiveInputs = newActiveInputs;
-                }
             _self.returnUserInputs = returnUserInputs;
             _self.returnActiveInputs = returnActiveInputs;
             if (_config.autoRunCallbacks){
@@ -2491,8 +2462,6 @@ class mmrpgUserInputWatcher {
                 }
             let isGamepadEvent = (kind === 'gamepadinput' || kind === 'gamepadconnected' || kind === 'gamepaddisconnected');
             if (isGamepadEvent){ return; }
-            //console.log('-> _config.bubbleIframeInputs =', _config.bubbleIframeInputs);
-            //console.log('-> _config.drillIframeInputs =', _config.drillIframeInputs);
             if (_config.bubbleIframeInputs){
                 if (window !== window.parent){
                     window.parent.postMessage({
@@ -2506,11 +2475,9 @@ class mmrpgUserInputWatcher {
             if (_config.drillIframeInputs){
                 let activeFrames = document.querySelectorAll('#mmrpg iframe:not(.blank)');
                 if (activeFrames && activeFrames.length){
-                    //console.log('there are ', activeFrames.length, 'activeFrames!');
                     for (let frameKey = 0; frameKey < activeFrames.length; frameKey++){
                         let activeIframe = activeFrames[frameKey];
                         if (activeIframe && activeIframe.contentWindow){
-                            //console.log('emitting a postmessage to activeFrame', frameKey);
                             activeIframe.contentWindow.postMessage({
                                 action: 'drillUserInput',
                                 kind: kind,
@@ -2664,6 +2631,7 @@ class mmrpgUserInputWatcher {
             let baseUserInputs = _self.baseUserInputs, baseButtonKeys = {};
             baseButtonKeys.A = baseUserInputs.A.gamepad, baseButtonKeys.B = baseUserInputs.B.gamepad;
             baseButtonKeys.X = baseUserInputs.X.gamepad, baseButtonKeys.Y = baseUserInputs.Y.gamepad;
+            // 1. Apply default hardware layouts for gamepads
             if (gamepadLayout === 'nintendo'){
                 // nintendo controllers use original A/B and X/Y placement
                 userInputs.A.gamepad = Object.values(baseButtonKeys.B);
@@ -2678,30 +2646,55 @@ class mmrpgUserInputWatcher {
                 userInputs.X.gamepad = Object.values(baseButtonKeys.X);
                 userInputs.Y.gamepad = Object.values(baseButtonKeys.Y);
                 }
-            // Also update the icons on a per-console basis in case they're different
+            // 2. Reset keyboard arrays to base before applying any custom mapping
             let userInputKeys = Object.keys(userInputs);
+            for (let i = 0; i < userInputKeys.length; i++){
+                let inputKey = userInputKeys[i];
+                if (baseUserInputs[inputKey].keyboard) {
+                    userInputs[inputKey].keyboard = Object.values(baseUserInputs[inputKey].keyboard);
+                    }
+                }
+            // 3. Apply custom user button mappings (Hardware Override)
+            let buttonMapping = _self.config.buttonMapping || {};
+            // Gamepad Custom Mapping
+            if (gamepadLayout && buttonMapping[gamepadLayout]){
+                let mappedGamepad = buttonMapping[gamepadLayout];
+                let mappedKeys = Object.keys(mappedGamepad);
+                for (let i = 0; i < mappedKeys.length; i++){
+                    let logicalAction = mappedKeys[i];
+                    if (userInputs[logicalAction] && Array.isArray(userInputs[logicalAction])){
+                        userInputs[logicalAction].gamepad = mappedGamepad[logicalAction];
+                        }
+                    }
+                }
+            // Keyboard Custom Mapping
+            if (buttonMapping.keyboard){
+                let mappedKeyboard = buttonMapping.keyboard;
+                let mappedKeys = Object.keys(mappedKeyboard);
+                for (let i = 0; i < mappedKeys.length; i++){
+                    let logicalAction = mappedKeys[i];
+                    if (userInputs[logicalAction] && Array.isArray(userInputs[logicalAction])){
+                        userInputs[logicalAction].keyboard = mappedKeyboard[logicalAction];
+                        }
+                    }
+                }
+            // 4. Update the icons on a per-console basis in case they're different
             let userInputDefaults = Object.values(_self.baseUserInputs);
             for (let i = 0; i < userInputKeys.length; i++){
                 let inputKey = userInputKeys[i];
                 let inputDefaults = userInputDefaults[i];
                 let userInput = userInputs[inputKey];
                 let returnUserInput = returnUserInputs[inputKey];
-                //console.log('checking inputKey', inputKey, 'w/ inputDefaults', inputDefaults);
                 let inputIcon = inputDefaults.icon, newInputIcon = inputIcon;
-                //console.log('-> default is ', inputDefaults.icon, ', checking for console-specific (', gamepadKind, ') icon ...');
                 if (gamepadKind && inputDefaults[gamepadKind + 'Icon']){
-                    //console.log('--> ', gamepadKind, 'gamepad connected, getting custom icon ...');
                     newInputIcon = inputDefaults[gamepadKind + 'Icon'];
                     } else if (!gamepadKind && inputDefaults['keyboardIcon']){
-                    //console.log('--> gamepad not connected, resetting to keyboard ....');
                     newInputIcon = inputDefaults['keyboardIcon'];
                     } else {
-                    //console.log('--> keyboard not defined, resetting to default ....');
                     newInputIcon = inputDefaults['icon'];
                     }
                 userInput.icon = newInputIcon;
                 returnUserInput.icon = newInputIcon;
-                //console.log('-> final icon is ', userInput.icon);
                 }
             };
         _self.gamepadKind = gamepadKind;
