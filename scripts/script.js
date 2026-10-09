@@ -2322,7 +2322,7 @@ class mmrpgUserInputWatcher {
             };
         userInputs.X = {
             gamepad: [2],
-            keyboard: ['f', 'Escape', '\\'],
+            keyboard: ['f', '\\'],
             icon: 'Ⓧ', name: 'X',
             sonyIcon: '▢', sonyName: 'Square',
             keyboardIcon: '[F]', keyboardName: 'F'
