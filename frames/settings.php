@@ -1417,6 +1417,7 @@ if (true){
             <p class="description">
                 <strong class="label">Control Mapping</strong>
                 Customize your keyboard inputs for the game. Click an input box and press your desired key to reassign it.
+                You will need to refresh your browser after saving for these changes to take effect. Thank you.
             </p>
 
             <div class="subwrap field fullsize">
