@@ -2303,6 +2303,13 @@ class mmrpgUserInputWatcher {
         _config.buttonMapping = typeof config.buttonMapping === 'object' ? config.buttonMapping : {}; // custom
         _self.config = _config;
 
+        // Check to see if custom button mapping was already defined
+        if (typeof gameSettings.customButtonMapping !== 'undefined'){
+            let customButtonMapping = JSON.parse(JSON.stringify(gameSettings.customButtonMapping));
+            //console.log('customButtonMapping =', customButtonMapping);
+            _config.buttonMapping = customButtonMapping;
+            }
+
         // Define an index of symbolic "userInputs" we can abstract actions behind, and then
         // worry about specific key-bindings and button-mappings later on to keep things clean
         let userInputs = {}; // below will be the default for now, but we'll allow customizing later
@@ -2656,13 +2663,15 @@ class mmrpgUserInputWatcher {
                 }
             // 3. Apply custom user button mappings (Hardware Override)
             let buttonMapping = _self.config.buttonMapping || {};
+            //console.log('buttonMapping =', buttonMapping);
             // Gamepad Custom Mapping
             if (gamepadLayout && buttonMapping[gamepadLayout]){
                 let mappedGamepad = buttonMapping[gamepadLayout];
                 let mappedKeys = Object.keys(mappedGamepad);
                 for (let i = 0; i < mappedKeys.length; i++){
                     let logicalAction = mappedKeys[i];
-                    if (userInputs[logicalAction] && Array.isArray(userInputs[logicalAction])){
+                    // Check if the mapped config is an array, not the parent object
+                    if (userInputs[logicalAction] && Array.isArray(mappedGamepad[logicalAction])){
                         userInputs[logicalAction].gamepad = mappedGamepad[logicalAction];
                         }
                     }
@@ -2673,7 +2682,8 @@ class mmrpgUserInputWatcher {
                 let mappedKeys = Object.keys(mappedKeyboard);
                 for (let i = 0; i < mappedKeys.length; i++){
                     let logicalAction = mappedKeys[i];
-                    if (userInputs[logicalAction] && Array.isArray(userInputs[logicalAction])){
+                    // Check if the mapped config is an array, not the parent object
+                    if (userInputs[logicalAction] && Array.isArray(mappedKeyboard[logicalAction])){
                         userInputs[logicalAction].keyboard = mappedKeyboard[logicalAction];
                         }
                     }
