@@ -4577,8 +4577,9 @@ display: block;
     top: 1px;
 }
 
-#world.moving #canvas #robots-overview:before {
+#world.moving #canvas #robots-overview:not(:hover):not(.expanded):before {
     left: -570px;
+    border-color: rgba(0, 0, 0, 0.0);
     background-color: rgba(0, 0, 0, 0.0);
     box-shadow: 0 0 0 transparent;
 }
