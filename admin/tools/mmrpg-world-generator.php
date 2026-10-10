@@ -400,6 +400,17 @@ echo('<pre>'.PHP_EOL);
                 }
 
             }
+            // If this area is a STAR GATE map, add a healpad to the very center
+            if (in_array('stargate', $area_tags)){
+                $area_file_markup[] = '#---------------------------#';
+                $healpad_pos = $area_middle_col.'-'.$area_middle_row;
+
+                // Add the event using the standard auto-heal markup
+                $area_file_markup[] = '@events[]   = auto-heal('.$healpad_pos.', healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)';
+
+                // Register this to protected zones so items don't drop on it
+                $protected_zones['stargate-healpad-buffer'] = $healpad_pos;
+            }
             // If this area is the START area, generate all the parallel quanta flowers here!
             if (in_array('start', $area_tags) && !empty($quanta_positions_index)){
                 $vertical_offset = 4;
