@@ -2682,9 +2682,26 @@ class mmrpgUserInputWatcher {
                 let mappedKeys = Object.keys(mappedKeyboard);
                 for (let i = 0; i < mappedKeys.length; i++){
                     let logicalAction = mappedKeys[i];
-                    // Check if the mapped config is an array, not the parent object
                     if (userInputs[logicalAction] && Array.isArray(mappedKeyboard[logicalAction])){
-                        userInputs[logicalAction].keyboard = mappedKeyboard[logicalAction];
+                        let newKeys = mappedKeyboard[logicalAction];
+                        userInputs[logicalAction].keyboard = newKeys;
+                        // Dynamically update the keyboard labels based on the first assigned key
+                        if (newKeys.length > 0) {
+                            let firstKey = newKeys[0];
+                            let keyName = firstKey.charAt(0).toUpperCase() + firstKey.slice(1);
+                            let keyIcon = '[' + firstKey.toUpperCase() + ']';
+                            // Map special keys back to nicely formatted symbols
+                            if (firstKey === 'ArrowUp') { keyName = 'Up'; keyIcon = '[⏶]'; }
+                            else if (firstKey === 'ArrowDown') { keyName = 'Down'; keyIcon = '[⏷]'; }
+                            else if (firstKey === 'ArrowLeft') { keyName = 'Left'; keyIcon = '[⏴]'; }
+                            else if (firstKey === 'ArrowRight') { keyName = 'Right'; keyIcon = '[⏵]'; }
+                            else if (firstKey === 'Enter') { keyName = 'Enter'; keyIcon = '[_↵]'; }
+                            else if (firstKey === 'Shift') { keyName = 'Shift'; keyIcon = '[↑_]'; }
+                            else if (firstKey === ' ') { keyName = 'Space'; keyIcon = '[_]'; }
+                            // Add any other special key symbols you want here!
+                            userInputs[logicalAction].keyboardName = keyName;
+                            userInputs[logicalAction].keyboardIcon = keyIcon;
+                            }
                         }
                     }
                 }
@@ -2696,13 +2713,9 @@ class mmrpgUserInputWatcher {
                 let userInput = userInputs[inputKey];
                 let returnUserInput = returnUserInputs[inputKey];
                 let inputIcon = inputDefaults.icon, newInputIcon = inputIcon;
-                if (gamepadKind && inputDefaults[gamepadKind + 'Icon']){
-                    newInputIcon = inputDefaults[gamepadKind + 'Icon'];
-                    } else if (!gamepadKind && inputDefaults['keyboardIcon']){
-                    newInputIcon = inputDefaults['keyboardIcon'];
-                    } else {
-                    newInputIcon = inputDefaults['icon'];
-                    }
+                if (gamepadKind && inputDefaults[gamepadKind + 'Icon']){ newInputIcon = inputDefaults[gamepadKind + 'Icon']; }
+                else if (!gamepadKind && userInput['keyboardIcon']){ newInputIcon = userInput['keyboardIcon']; }
+                else { newInputIcon = inputDefaults['icon']; }
                 userInput.icon = newInputIcon;
                 returnUserInput.icon = newInputIcon;
                 }
