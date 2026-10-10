@@ -272,6 +272,7 @@ function bindEventsToInputs($thisWorld){
         let _selfRef = this;
         let worldMapIsHidden = _self.worldMapIsHidden();
         let sideButtonsActive = $sideButtons.is('.active') ? true : false;
+        let sideButtonsMaybe = $sideButtons.is('.maybe') ? true : false;
         let popupFrameActive = $('#popup-iframe.active').length ? true : false;
         let playerSwitcherFocused = $playerSwitcher.is('.focused') ? true : false;
         let robotsOverviewIsExpanded = $robotsOverview && $robotsOverview.length && $robotsOverview.is('.expanded') ? true : false;
@@ -286,9 +287,9 @@ function bindEventsToInputs($thisWorld){
             let $confirmButton = $bigButtons.filter('.maybe');
             if (!$confirmButton || !$confirmButton.length){ $confirmButton = $bigButtons.first(); }
             //let $confirmButton = $('.button[data-action]:not([data-action="dismiss"])', $sideButtons).first();
-            if (!$confirmButton || !$confirmButton.length){ /* console.error('bindEventsToWorld() unable to find confirm button!'); */ return false; }
+            if (!$confirmButton || !$confirmButton.length){ return false; }
             if ($confirmButton.is('.clicked')){ return }
-            if (!$confirmButton.is('.maybe')){ $confirmButton.addClass('maybe'); return; }
+            if (!$confirmButton.is('.maybe')){ $sideButtons.addClass('maybe'); $confirmButton.addClass('maybe'); return; }
             $confirmButton.removeClass('maybe');
             //console.log('Triggering click on confirm button:', $confirmButton);
             $confirmButton.trigger('click');
@@ -868,7 +869,7 @@ function bindEventsToInputs($thisWorld){
                 return true;
                 }
             // Else if the player has pressed up/down trying to scroll to a different button
-            else if (activeInputs.Up || activeInputs.Down){
+            else if (sideButtonsMaybe && (activeInputs.Up || activeInputs.Down)){
                 //console.log('----> Vertical direction clicked (' + (activeInputs.Up ? 'UP' : 'DOWN') + ')!');
                 if (event){ event.preventDefault(); }
                 if ($sideButtons.is('.busy')){ return false; }
@@ -907,7 +908,7 @@ function bindEventsToInputs($thisWorld){
                     }
                 }
             // Else if the player has pressed left/right, we do nothing if the panel is busy
-            else if (activeInputs.Left || activeInputs.Right){
+            else if (sideButtonsMaybe && (activeInputs.Left || activeInputs.Right)){
                 if (event){ event.preventDefault(); }
                 if ($sideButtons.is('.busy')){ return false; }
                 }
