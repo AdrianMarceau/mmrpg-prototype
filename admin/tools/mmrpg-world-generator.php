@@ -4,7 +4,7 @@
 require_once('../../top.php');
 
 // Define a salt for deterministic map generation (change to re-randomize)
-define('MMRPG_MAP_GENERATOR_SALT', 'prototype-2k25-v1');
+define('MMRPG_MAP_GENERATOR_SALT', 'prototype-2k25-v2');
 
 // Print out the title regardless of if confirmed or not
 echo('<strong>MMRPG World Area Generator Script</strong><br />'.PHP_EOL);
@@ -63,16 +63,16 @@ function createCoordinatePicker($width, $height, $padding, $exclude = []){
     $mid_x = (int)ceil($width / 2);
     $mid_y = (int)ceil($height / 2);
     // Return an inline function that pops a coordinate off the list
-    return function($centered = false) use (&$valid_positions, $mid_x, $mid_y){
+    return function($centered = false, $spacing = 0) use (&$valid_positions, $mid_x, $mid_y){
         if (empty($valid_positions)) return null; // Failsafe if full
+        $chosen = null;
         // If center-bias is requested, find the available tile closest to the middle
         if ($centered) {
             $best_idx = 0;
             $best_dist = 999999;
             foreach ($valid_positions as $idx => $pos){
                 list($x, $y) = explode('-', $pos);
-                // Calculate Manhattan distance + a tiny random variance (0 to 2)
-                // so multiple bosses don't stack in a perfectly rigid pattern
+                // Calculate Manhattan distance + a tiny random variance
                 $dist = abs($x - $mid_x) + abs($y - $mid_y) + mt_rand(0, 2);
                 if ($dist < $best_dist){
                     $best_dist = $dist;
@@ -83,9 +83,23 @@ function createCoordinatePicker($width, $height, $padding, $exclude = []){
             // Swap chosen tile to the end of the array and pop it
             $valid_positions[$best_idx] = end($valid_positions);
             array_pop($valid_positions);
-            return $chosen;
+        } else {
+            $chosen = array_pop($valid_positions);
         }
-        return array_pop($valid_positions);
+        // If spacing is requested, remove any nearby coordinates from the remaining valid pool
+        if ($spacing > 0 && !empty($valid_positions)){
+            list($cx, $cy) = explode('-', $chosen);
+            foreach ($valid_positions as $idx => $pos){
+                list($px, $py) = explode('-', $pos);
+                // Delete any tiles that fall within the requested spacing radius
+                if (abs($px - $cx) <= $spacing && abs($py - $cy) <= $spacing){
+                    unset($valid_positions[$idx]);
+                }
+            }
+            // Re-index the array so array_pop and end() continue to work properly
+            $valid_positions = array_values($valid_positions);
+        }
+        return $chosen;
     };
 }
 // Define quick functions for generating coordinate buffers around interactive objects
@@ -569,7 +583,8 @@ echo('<pre>'.PHP_EOL);
                     if (empty($position)){
                         $tmp_exclude_coords = [];
                         foreach ($protected_zones as $zone_name => $pos){
-                            $box = getBufferBox($pos, 1, $area_size_width, $area_size_height);
+                            $radius = ($zone_name === 'spawn-buffer') ? 0 : 1;
+                            $box = getBufferBox($pos, $radius, $area_size_width, $area_size_height);
                             $tmp_exclude_coords = array_merge($tmp_exclude_coords, getBufferCoords($box));
                         }
                         // Include previously placed anchored items so they don't overlap
@@ -596,7 +611,8 @@ echo('<pre>'.PHP_EOL);
             $no_encounter_strings = [];
             foreach ($protected_zones as $zone_name => $pos){
                 // Get the bounding box, constrained to the edges of the map
-                $box = getBufferBox($pos, 1, $area_size_width, $area_size_height);
+                $radius = ($zone_name === 'spawn-buffer') ? 0 : 1;
+                $box = getBufferBox($pos, $radius, $area_size_width, $area_size_height);
                 // Add all tiles in this 3x3 box to the exclusion list for static drops
                 $coords = getBufferCoords($box);
                 $exclude_coords = array_merge($exclude_coords, $coords);
@@ -633,7 +649,7 @@ echo('<pre>'.PHP_EOL);
 
                 // Calculate 10% of the strictly available tiles
                 $remaining_walkable = max(0, $total_zone_tiles - $excluded_in_zone);
-                $num_super_blocks = (int)floor($remaining_walkable * 0.10);
+                $num_super_blocks = (int)floor($remaining_walkable * 0.20);
 
                 // Pop coordinates and generate the blocks!
                 for ($i = 1; $i <= $num_super_blocks; $i++) {
@@ -666,7 +682,7 @@ echo('<pre>'.PHP_EOL);
 
                 // Calculate 10% of the strictly available tiles
                 $remaining_walkable = max(0, $total_zone_tiles - $excluded_in_zone);
-                $num_hazards = (int)floor($remaining_walkable * 0.10);
+                $num_hazards = (int)floor($remaining_walkable * 0.20);
 
                 // Pop coordinates and generate the hazards!
                 for ($i = 1; $i <= $num_hazards; $i++){
@@ -797,7 +813,7 @@ echo('<pre>'.PHP_EOL);
                     // Determine the position based on the location tag
                     $position = !empty($location) ? $getLocationCoords($location) : null;
                     // If no location was defined (or it didn't match), fall back to center-biased random
-                    if (empty($position)){ $position = $getRandomCoord(true); }
+                    if (empty($position)){ $position = $getRandomCoord(true, 1); }
                     if (!$position){ continue; } // Failsafe
                     $robot_num = $key + 1;
                     $robot_info = $mmrpg_index_robots[$robot];
