@@ -1007,6 +1007,13 @@ class mmrpgWorldMap {
                 let img = new Image();
                 // 1. Ensure we only have the raw token/slug (strip any accidental extensions)
                 let imageToken = tileSpriteImage.replace(/\.[^/.]+$/, "");
+                imageToken = imageToken
+                        .replace(/\-v/i, '-5')
+                        .replace(/\-iv/i, '-4')
+                        .replace(/\-iii$/i, '-3')
+                        .replace(/\-ii$/i, '-2')
+                        .replace(/\-i$/i, '-1')
+                        ;
                 // 2. Build the URL using your new template, replacing {image} with the token
                 let imageUrl = _config.mapTerrainFiles.replace('{image}', imageToken);
                 img.onload = function(){
