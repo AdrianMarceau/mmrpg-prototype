@@ -356,6 +356,16 @@ if (!empty($current_player_robots) && !empty($allowed_player_robots)){
     //error_log('$this_player_robots_index = '.print_r($this_player_robots_index, true));
     $this_prototype_data['this_player_robots'] = $this_player_robots;
     $this_prototype_data['this_player_robots_index'] = $this_player_robots_index;
+} elseif (empty($current_player_robots)){
+    $index_tokens_required = array_values(array_unique($allowed_player_robots));
+    foreach ($index_tokens_required AS $robot_string){
+        list($robot_id, $robot_token) = explode('_', $robot_string);
+        if (empty($mmrpg_index_robots[$robot_token])){ continue; }
+        $robot_info = rpg_world::get_player_robot_overview($this_player_token, $robot_token, $robot_id);
+        if (in_array($robot_string, $current_player_robots)){ $this_player_robots[] = $robot_string; }
+        $this_player_robots_index[$robot_string] = $robot_info;
+    }
+    $this_prototype_data['this_player_robots_index'] = $this_player_robots_index;
 }
 $WORLD_PLAYER_SESSION['last_robots'] = implode(',', $this_prototype_data['this_player_robots']);
 //error_log('-> $WORLD_PLAYER_SESSION[\'last_robots\'] (final) = '. print_r($WORLD_PLAYER_SESSION['last_robots'], true));
@@ -1105,6 +1115,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
             $side_buttons_markup = $wrap_markup('&hellip;');
             $player_switcher_players = $allowed_player_tokens;
             $robot_overview_robots = $current_player_robots;
+            $robot_storage_robots = $unlocked_robot_tokens;
             $player_switcher_markup = $wrap_markup(rpg_world::get_player_switcher_markup($this_prototype_data, $player_switcher_players));
             $cursor_palette_markup = $wrap_markup(rpg_world::get_cursor_palette_markup($this_prototype_data));
             $robots_overview_markup = $wrap_markup(rpg_world::get_robots_overview_markup($this_prototype_data, $robot_overview_robots));
@@ -1113,7 +1124,7 @@ $_SESSION[$session_token]['EVENTS'][] = array(
             ?>
             <? if (!empty($cursor_palette_markup)){ ?><div id="cursor-palette" class="chrome"><?= $cursor_palette_markup ?></div><? } ?>
             <? if (!empty($player_switcher_markup)){ ?><div id="player-switcher" class="chrome"><?= $player_switcher_markup ?></div><? } ?>
-            <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome<?= empty($robot_overview_robots) ? ' no-robots' : ''?>"><?= $robots_overview_markup ?></div><? } ?>
+            <? if (!empty($robots_overview_markup)){ ?><div id="robots-overview" class="chrome<?= empty($robot_overview_robots) && empty($robot_storage_robots) ? ' no-robots' : ''?>"><?= $robots_overview_markup ?></div><? } ?>
             <? if (!empty($minimap_overview_markup)){ ?><div id="minimap-overview" class="chrome"><?= $minimap_overview_markup ?></div><? } ?>
             <? if (!empty($progress_tracker_markup)){ ?><div id="progress-tracker" class="chrome"><?= $progress_tracker_markup ?></div><? } ?>
             <div id="zoom-controls" class="chrome"><?= $zoom_controls_markup ?></div>
