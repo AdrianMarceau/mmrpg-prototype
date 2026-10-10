@@ -6002,10 +6002,12 @@ display: block;
 #world #canvas #action-modal .content .subtitle.for-current {
     font-size: 16px;
 }
+/*
 #world #canvas #action-modal .content .subtitle.for-selected:after,
 #world #canvas #action-modal .content .subtitle.for-current:after {
     content: ":";
 }
+*/
 #world #canvas #action-modal .content .subtitle.for-tooltip {
     color: #bababa;
     text-shadow: 1px 1px 0 #000000;

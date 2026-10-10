@@ -4053,11 +4053,11 @@ class mmrpgWorldMap {
             //console.log('--> selectedAbilityInfo =', selectedAbilityInfo);
             if (actionToken === 'equip-ability'){
                 let selectedAbilityList = '' + generateAbilitySelectButtonMarkup(selectedAbilityToken, playerRobotInfo, {selected: false, locked: selectedAbilityIsLocked});
-                modalDetails.subtitles.forTooltip = 'Select Ability To Replace';
+                modalDetails.subtitles.forTooltip = 'Select Ability To Replace:';
                 modalDetails.containers.forSelected = '<div class="ability-list selected">' + selectedAbilityList + '</div>';
                 }
             else if (actionToken === 'remove-ability'){
-                modalDetails.subtitles.forTooltip = 'Select Ability To Remove';
+                modalDetails.subtitles.forTooltip = 'Select Ability To Remove:';
                 modalDetails.subtitles.forSelected = '';
                 modalDetails.containers.forSelected = '';
                 }
