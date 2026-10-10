@@ -103,9 +103,15 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     // Define the array for holding all of this robot's abilities
     $this_robot_abilities = array();
 
-    // Loop through this robot's level-up abilities looking for one
+    // Assume this is index info but pull the compatible abilities array if not provided
     $robot_index_info = $robot_info;
     if (!is_array($robot_index_info['robot_abilities'])){ $robot_index_info['robot_abilities'] = array(); }
+    if (empty($robot_index_info['robot_abilities'])){
+        $real_info = rpg_robot::get_index_info($robot_index_info['robot_token']);
+        $robot_index_info['robot_abilities'] = $real_info['robot_abilities'];
+    }
+
+    // Loop through this robot's level-up abilities looking for one
     if (!empty($robot_index_info['robot_rewards']['abilities'])){
         foreach ($robot_index_info['robot_rewards']['abilities'] AS $info){
             // If this is the buster shot or too high of a level, continue
@@ -127,7 +133,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
     // Collect the robot cores so we can reference (or tweak) them later
     $robot_core_type = !empty($robot_index_info['robot_core']) ? $robot_index_info['robot_core'] : '';
-    $robot_core2_type = !empty($robot_core2_type) ? $robot_core2_type : '';
+    $robot_core2_type = !empty($robot_index_info['robot_core2']) ? $robot_index_info['robot_core2'] : '';
 
     // Define a new array to hold all the addon abilities
     $this_robot_abilities_addons = array('base' => $this_robot_abilities, 'weapons' => array(), 'support' => array());
