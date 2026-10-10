@@ -32,12 +32,18 @@ $event_timeout = !empty($GAME_SESSION['battle_settings']['eventTimeout']) ? $GAM
 if (!empty($event_timeout)){ echo "gameSettings.eventTimeout = {$event_timeout};\n"; }
 
 // Update the audio balance config setting if set
-$audio_balance_config = !empty($GAME_SESSION['battle_settings']['audioBalanceConfig']) ? $GAME_SESSION['battle_settings']['audioBalanceConfig'] : '';
+$audio_balance_config = !empty($GAME_SESSION['battle_settings']['audioBalanceConfig']) ? $GAME_SESSION['battle_settings']['audioBalanceConfig'] : array();
 if (!empty($audio_balance_config)){
     echo "gameSettings.audioBalanceConfig = ".json_encode($audio_balance_config).";\n";
     echo "gameSettings.masterVolume = ".$audio_balance_config['masterVolume'].";\n";
     echo "gameSettings.musicVolume = ".$audio_balance_config['musicVolume'].";\n";
     echo "gameSettings.effectVolume = ".$audio_balance_config['effectVolume'].";\n";
+}
+
+// Update the custom keyboard mapping if it's been set
+$custom_button_mapping = !empty($GAME_SESSION['battle_settings']['buttonMapping']) ? $GAME_SESSION['battle_settings']['buttonMapping'] : array();
+if (!empty($custom_button_mapping)){
+    echo "gameSettings.customButtonMapping = ".json_encode($custom_button_mapping).";\n";
 }
 
 // Update any animation effects that have been defined in the session
