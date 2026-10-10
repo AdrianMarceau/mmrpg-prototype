@@ -1909,8 +1909,9 @@ class rpg_robot extends rpg_object {
         // Define the frequency of the buster charge ability if set
         if ($this_robot->has_ability('buster-charge')){
             $options[] = 'buster-charge';
-            if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 10;  }
-            elseif ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 2)){ $weights[] = 5;  }
+            if ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 3)){ $weights[] = 20;  }
+            elseif ($this_robot->robot_weapons < ($this_robot->robot_base_weapons / 2)){ $weights[] = 10;  }
+            elseif ($this_robot->robot_weapons < $this_robot->robot_base_weapons){ $weights[] = 5;  }
             else { $weights[] = 0;  }
         }
 
@@ -2108,7 +2109,7 @@ class rpg_robot extends rpg_object {
         foreach ($deprecated_abilities AS $ability_token){
             if ($this_robot->has_ability($ability_token)){
                 $options[] = $ability_token;
-                $weights[$ability_token] = 0;
+                $weights[] = 0;
             }
         }
 
@@ -2159,7 +2160,7 @@ class rpg_robot extends rpg_object {
 
         // Loop through any leftover abilities and add them to the weighted ability options
         static $temp_abilities_index;
-        if ($temp_abilities_index){ $temp_abilities_index = rpg_ability::get_index(true); }
+        if (empty($temp_abilities_index)){ $temp_abilities_index = rpg_ability::get_index(true); }
         foreach ($this_robot->robot_abilities AS $key => $token){
             //error_log('checking ability['.$key.'] '.$token);
             if (!in_array($token, $options)){
@@ -2245,11 +2246,22 @@ class rpg_robot extends rpg_object {
         // If there's an allowed abilities filter, make sure we remove disabled ones
         if (!empty($allowed_abilities_filter)){
             foreach ($options AS $key => $token){
-                if (substr($token, 7) === 'action-'){ continue;}
+                if (substr($token, 0, 7) === 'action-'){ continue; }
                 if (!in_array($token, $allowed_abilities_filter)){
                     unset($options[$key]);
                     unset($weights[$key]);
                 }
+            }
+        }
+
+        // Filter out any options that the robot doesn't have the weapon energy to use
+        if (empty($temp_abilities_index)){ $temp_abilities_index = rpg_ability::get_index(true); }
+        $this_robot_info = $this_robot->export_array();
+        foreach ($options AS $key => $token){
+            $info = isset($temp_abilities_index[$token]) ? $temp_abilities_index[$token] : array();
+            $ability_energy_cost = rpg_robot::calculate_weapon_energy_static($this_robot_info, $info);
+            if ($this_robot->robot_weapons < $ability_energy_cost){
+                $weights[$key] = 0;
             }
         }
 
