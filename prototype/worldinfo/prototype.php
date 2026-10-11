@@ -898,7 +898,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'freeze',
         'field' => 'glacier-cradle',
         'encounters' => ['chill-man', 'freeze-man'],
-        'encounters2' => ['frosty-throwman', 'tel-tel', 'bomb-sleigh', 'skullmet'],
+        'encounters2' => ['frosty-throwman', 'tel-tel', 'mokumokumo', 'skullmet'],
         'hazards' => ['frozen-foothold'],
         'items' => ['resetchi'],
         'abilities' => ['freeze-overdrive'],

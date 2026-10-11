@@ -30,7 +30,7 @@
 @groups[]   = no-encounters_east-exit-buffer(20-10...21-12)
 @groups[]   = no-encounters_purple-reset-dude-buffer(16-16...18-18)
 #---------------------------#
-@encounters = frosty-throwman(4),tel-tel(3),bomb-sleigh(2),skullmet(1)
+@encounters = frosty-throwman(4),tel-tel(3),mokumokumo(2),skullmet(1)
 #---------------------------#
 @bosses[]  = boss-robo-1(10-11, chill-man)
 @items[]    = boss-star-1(10-11, freeze-star, chill-man)
