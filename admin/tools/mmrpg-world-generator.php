@@ -636,41 +636,99 @@ echo('<pre>'.PHP_EOL);
             }
             $exclude_coords = array_unique($exclude_coords);
 
-            // Initialize the permanent inline coordinate picker for all remaining randomized entities
-            $getRandomCoord = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $exclude_coords);
+            // Generate RANDOM VOID HOLES for the map
+            $map_holes = [];
+            // Only add holes if the map is decently sized (e.g., width >= 15)
+            // and is not one of the player areas or the warp hub (area 0)
+            if (!in_array('player', $area_tags)
+                && !in_array('start', $area_tags)
+                && !in_array('postgame', $area_tags)
+                && $area_size_width >= 15 && $area_size_height >= 15){
+                // Main maps get 3-5 holes, smaller maps get 1-2
+                $num_holes = in_array('main', $area_tags) ? mt_rand(4, 6) : mt_rand(3, 5);
+                // Use a temporary picker to grab safe hole seeds (enforcing a 2-tile buffer so holes don't clump)
+                $holePicker = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $exclude_coords);
+                for ($h = 0; $h < $num_holes; $h++) {
+                    $seed = $holePicker(false, 2); // Get seed coordinate
+                    if (!$seed) break;
+                    $current_hole = [$seed];
+                    $hole_size = mt_rand(2, 5); // Holes will be organically shaped between 2 and 5 tiles large
+                    $directions = [[0,1], [1,0], [0,-1], [-1,0]];
+                    // Randomly grow the hole by walking to adjacent tiles
+                    $curr_pos = $seed;
+                    for ($s = 1; $s < $hole_size; $s++) {
+                        list($curr_x, $curr_y) = explode('-', $curr_pos);
+                        shuffle($directions); // Randomize direction to step
+                        $found_next = false;
+                        foreach ($directions as $dir) {
+                            $nx = (int)$curr_x + $dir[0];
+                            $ny = (int)$curr_y + $dir[1];
+                            // Constrain the hole to the safe inner zone
+                            if ($nx > $encounter_inset && $nx <= ($area_size_width - $encounter_inset) &&
+                                $ny > $encounter_inset && $ny <= ($area_size_height - $encounter_inset)) {
+                                $npos = $nx.'-'.$ny;
+                                // If the tile is safe to eat, add it to the hole
+                                if (!in_array($npos, $exclude_coords) && !in_array($npos, $current_hole)) {
+                                    $current_hole[] = $npos;
+                                    $curr_pos = $npos; // Move the walker to the new tile to continue growing
+                                    $found_next = true;
+                                    break;
+                                }
+                            }
+                        }
+                        // If it got trapped by items/borders and couldn't grow, stop growing this specific hole
+                        if (!$found_next) break;
+                    }
+                    // Only keep the hole if it managed to find a neighbor (size >= 2)
+                    if (count($current_hole) >= 2) {
+                        $map_holes = array_merge($map_holes, $current_hole);
+                        $exclude_coords = array_merge($exclude_coords, $current_hole); // Claim these tiles so items don't drop here
+                    }
+                }
+                // Clean up the exclude array before handing it to the main picker
+                $exclude_coords = array_unique($exclude_coords);
+            }
 
-            // Generate RANDOM SUPER-BLOCKS for elemental areas (10% of remaining tiles)
+            // Generate RANDOM SUPER-BLOCKS for elemental areas (20% of remaining tiles)
             $block_strings = [];
             if (in_array('elemental', $area_tags)) {
-
-                // Calculate the total number of walkable tiles inside the inset
-                $zone_w = max(0, $area_size_width - ($encounter_inset * 2));
-                $zone_h = max(0, $area_size_height - ($encounter_inset * 2));
+                // Allow super-blocks to spawn 1 tile further out than the standard encounter zone
+                $block_inset = max(0, $encounter_inset - 1);
+                // Calculate the total number of walkable tiles inside this wider inset
+                $zone_w = max(0, $area_size_width - ($block_inset * 2));
+                $zone_h = max(0, $area_size_height - ($block_inset * 2));
                 $total_zone_tiles = $zone_w * $zone_h;
-
-                // Count how many of our excluded coordinates actually fall inside this random zone
+                // Count how many of our excluded coordinates fall inside this wider zone
                 $excluded_in_zone = 0;
                 foreach ($exclude_coords as $ex_pos) {
                     list($ex_x, $ex_y) = explode('-', $ex_pos);
-                    if ($ex_x > $encounter_inset && $ex_x <= ($area_size_width - $encounter_inset) &&
-                        $ex_y > $encounter_inset && $ex_y <= ($area_size_height - $encounter_inset)) {
+                    if ($ex_x > $block_inset && $ex_x <= ($area_size_width - $block_inset) &&
+                        $ex_y > $block_inset && $ex_y <= ($area_size_height - $block_inset)) {
                         $excluded_in_zone++;
                     }
                 }
-
-                // Calculate 10% of the strictly available tiles
+                // Calculate 20% of the strictly available tiles
                 $remaining_walkable = max(0, $total_zone_tiles - $excluded_in_zone);
                 $num_super_blocks = (int)floor($remaining_walkable * 0.20);
-
+                // Initialize a temporary coordinate picker JUST for super-blocks using the wider inset
+                $getBlockCoord = createCoordinatePicker($area_size_width, $area_size_height, $block_inset, $exclude_coords);
                 // Pop coordinates and generate the blocks!
                 for ($i = 1; $i <= $num_super_blocks; $i++) {
-                    $position = $getRandomCoord();
+                    $position = $getBlockCoord();
                     if (!$position) break; // Failsafe if the map is stuffed
-
-                    // Generate standard super-block markup without the specific image alt
+                    // Generate standard super-block markup
                     $block_strings[] = '@blocks[]   = super-block-'.$i.'('.$position.', super-block)';
+                    // CRITICAL: Add this block's position to the exclude list so items/enemies don't spawn inside it
+                    $exclude_coords[] = $position;
                 }
             }
+
+            // Clean up the exclude list just in case
+            $exclude_coords = array_unique($exclude_coords);
+
+            // NOW initialize the permanent inline coordinate picker for all REMAINING randomized entities
+            // (Using the standard $encounter_inset so items and enemies stay properly constrained)
+            $getRandomCoord = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $exclude_coords);
 
             // Generate RANDOM HAZARDS for this area (10% of remaining tiles)
             $hazard_strings = [];
@@ -927,6 +985,12 @@ echo('<pre>'.PHP_EOL);
                             $tile_minus_1 = '[20]'; // 1-tile outer border moved to layer -1
                         } elseif (!$isPadding) {
                             $tile_0 = '[30]'; // Inner walkable field stays on layer 0
+                        }
+
+                        // Punch holes in the field if this coordinate was flagged as a void
+                        if (in_array($c.'-'.$r, $map_holes)) {
+                            $tile_0 = '[__]';
+                            $tile_minus_1 = '[__]';
                         }
 
                         // Check if we are aligned with the middle row or column
