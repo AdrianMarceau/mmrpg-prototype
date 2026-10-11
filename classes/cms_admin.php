@@ -1012,7 +1012,7 @@ class cms_admin {
                 && $search_data[$flag_name] !== ''){
                 foreach ($search_results AS $key => $data){
                     if ($object_kind === 'star' || $object_kind === 'challenge'){ $search_token = self::git_get_id_token($object_kind, $data[$object_kind.'_id']); }
-                    elseif ($object_kind === 'page'){ $search_token = git_get_url_token($object_kind, $data[$object_kind.'_url']); }
+                    elseif ($object_kind === 'page'){ $search_token = self::git_get_url_token($object_kind, $data[$object_kind.'_url']); }
                     else { $search_token = $data[$object_kind.'_token']; }
                     if ($search_data[$flag_name] && !in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
                     elseif (!$search_data[$flag_name] && in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
