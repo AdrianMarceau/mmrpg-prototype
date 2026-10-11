@@ -183,6 +183,9 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
                         <?
                         foreach ($sub_menu_links AS $sub_token => $sub_info){
 
+                            // Skip if the user is not logged in yet, we don't want them searching
+                            if ($parent_token == 'community' && $sub_token === 'search' && rpg_user::is_guest()){ continue; }
+
                             // Collect basic info about this link
                             $name = !empty($sub_info['name']) ? $sub_info['name'] : ucfirst($sub_token);
                             $url = !empty($sub_info['url']) ? $sub_info['url'] : $parent_token.'/'.$sub_token.'/';
