@@ -205,7 +205,8 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
             else if (showPelletButton && typeof _worldPlayer.items[pelletToken] !== 'undefined'){
                 let pelletQuantity = _self.getItemQuantity(pelletToken);
                 let pelletSpriteMarkup = _self.getItemSpriteMarkup(pelletToken);
-                let pelletSpanLabel = '<sup>Throw</sup> ' + pelletStat + ' Pellet <sub>&times; ' + pelletQuantity + '</sub>';
+                //let pelletSpanLabel = '<sup>Throw</sup> ' + pelletStat + ' Pellet <sub>&times; ' + pelletQuantity + '</sub>';
+                let pelletSpanLabel = '<sup>Throw</sup> Stat Pellet <sub>&times; ' + pelletQuantity + '</sub>';
                 if (pelletQuantity > 0){
                     actionData.sideButtonsMarkup += '<a class="button big-button type ' + pelletType + '" data-action="throw-stat-pellet" data-target="' + mechaTarget + '" data-pellet="' + pelletToken + '">';
                     actionData.sideButtonsMarkup += '<span class="has-sprite">' + pelletSpanLabel + pelletSpriteMarkup + '</span>';
