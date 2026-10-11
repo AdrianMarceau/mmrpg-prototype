@@ -1,5 +1,11 @@
 <?
 
+// If the user is not logged in yet, require a login first
+if (rpg_user::is_guest()){
+    header('Location: '.MMRPG_CONFIG_ROOTURL.'file/load/?return=community/search/');
+    exit();
+}
+
 // Prevent this page from being indexed
 $this_seo_robots = 'noindex,nofollow';
 
