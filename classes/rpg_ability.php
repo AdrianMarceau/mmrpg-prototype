@@ -1263,7 +1263,7 @@ class rpg_ability extends rpg_object {
         $temp_ability_type = !empty($ability_info['ability_type']) ? $mmrpg_types[$ability_info['ability_type']] : false;
         $temp_ability_type2 = !empty($ability_info['ability_type2']) ? $mmrpg_types[$ability_info['ability_type2']] : false;
         $temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
-        //$temp_ability_speed = !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : 1;
+        $temp_ability_speed = !empty($ability_info['ability_speed']) ? $ability_info['ability_speed'] : 1;
         $temp_ability_damage = !empty($ability_info['ability_damage']) ? $ability_info['ability_damage'] : 0;
         $temp_ability_damage2 = !empty($ability_info['ability_damage2']) ? $ability_info['ability_damage2'] : 0;
         $temp_ability_recovery = !empty($ability_info['ability_recovery']) ? $ability_info['ability_recovery'] : 0;
@@ -1292,6 +1292,8 @@ class rpg_ability extends rpg_object {
         if (!empty($ability_info['ability_recovery'])){ $temp_ability_title2[] = $ability_info['ability_recovery'].' Recovery '; }
         if ($print_options['show_accuracy'] && !empty($ability_info['ability_accuracy'])){ $temp_ability_title2[] = $ability_info['ability_accuracy'].'% Accuracy'; }
         if (!empty($temp_ability_energy)){ $temp_ability_title2[] = $temp_ability_energy.' Energy'; }
+        if ($temp_ability_speed > 1){ $temp_ability_title2[] = 'Fast (+'.($temp_ability_speed - 1).')'; }
+        elseif ($temp_ability_speed < 1){ $temp_ability_title2[] = 'Slow ('.($temp_ability_speed - 1).')'; }
         if ($temp_ability_target != 'auto'){ $temp_ability_title2[] = 'Select Target'; }
         $temp_ability_title2 = implode(' | ', $temp_ability_title2);
 
@@ -1333,6 +1335,7 @@ class rpg_ability extends rpg_object {
         $temp_ability_type = !empty($ability_info['ability_type']) ? rpg_type::get_index_info($ability_info['ability_type']) : false;
         $temp_ability_type2 = !empty($ability_info['ability_type2']) ? rpg_type::get_index_info($ability_info['ability_type2']) : false;
         $temp_ability_energy = rpg_robot::calculate_weapon_energy_static($robot_info, $ability_info);
+        $temp_ability_speed = isset($ability_info['ability_speed']) ? $ability_info['ability_speed'] : 1;
         $temp_type_array = array();
         $temp_incompatible = false;
         $temp_global_abilities = self::get_global_abilities();
@@ -1366,6 +1369,8 @@ class rpg_ability extends rpg_object {
         elseif ($ability_info['ability_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_ability_token])){ $temp_ability_option .= ' | U:'.$_SESSION[$session_token]['values']['battle_items'][$temp_ability_token]; }
         elseif ($ability_info['ability_class'] == 'item'){ $temp_ability_option .= ' | U:0'; }
         if (!empty($temp_ability_energy)){ $temp_ability_option .= ' | E:'.$temp_ability_energy; }
+        if ($temp_ability_speed > 1){ $temp_ability_option .= ' | S:+'.($temp_ability_speed - 1); }
+        elseif ($temp_ability_speed < 1){ $temp_ability_option .= ' | S:'.($temp_ability_speed - 1); }
 
         // Return the generated option markup
         $this_option_markup = '<option value="'.$temp_ability_token.'" data-label="'.$temp_ability_label.'" data-type="'.(!empty($temp_ability_type) ? $temp_ability_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_ability_type2) ? $temp_ability_type2['type_token'] : '').'" title="'.$temp_ability_title_plain.'" data-tooltip="'.$temp_ability_title_tooltip.'">'.$temp_ability_option.'</option>';
