@@ -8,7 +8,7 @@ if (empty($this_current_sub) || preg_match('/^([0-9]+)$/i', $this_current_sub)){
 // If a player has been provided in the URL as a sub
 elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_current_sub)){
   // Attempt to collect data for this player from the database
-  $temp_playerquery = 'SELECT
+  $temp_playerquery = "SELECT
     mmrpg_users.user_id,
     mmrpg_users.role_id,
     mmrpg_roles.role_token,
@@ -59,14 +59,25 @@ elseif (!empty($this_current_sub) && preg_match('/^([-_a-z0-9]+)$/i', $this_curr
     mmrpg_saves.save_settings,
     (SELECT COUNT(thread_id) FROM mmrpg_threads WHERE mmrpg_threads.user_id = mmrpg_users.user_id AND thread_published = 1) AS thread_count,
     (SELECT COUNT(post_id) FROM mmrpg_posts WHERE mmrpg_posts.user_id = mmrpg_users.user_id AND post_deleted = 0) AS post_count,
-    (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE (mmrpg_battles.this_user_id = mmrpg_users.user_id AND mmrpg_battles.this_player_result = \'victory\' AND mmrpg_battles.battle_flag_legacy = 0) OR (mmrpg_battles.target_user_id = mmrpg_users.user_id AND mmrpg_battles.target_player_result = \'victory\' AND mmrpg_battles.battle_flag_legacy = 0)) AS victory_count,
-    (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE (mmrpg_battles.this_user_id = mmrpg_users.user_id AND mmrpg_battles.this_player_result = \'defeat\' AND mmrpg_battles.battle_flag_legacy = 0) OR (mmrpg_battles.target_user_id = mmrpg_users.user_id AND mmrpg_battles.target_player_result = \'defeat\' AND mmrpg_battles.battle_flag_legacy = 0)) AS defeat_count,
+    -- Split the OR condition into two separate indexed counts for Victories
+    (
+        (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE this_user_id = mmrpg_users.user_id AND this_player_result = 'victory' AND battle_flag_legacy = 0)
+        +
+        (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE target_user_id = mmrpg_users.user_id AND target_player_result = 'victory' AND battle_flag_legacy = 0)
+    ) AS victory_count,
+    -- Split the OR condition into two separate indexed counts for Defeats
+    (
+        (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE this_user_id = mmrpg_users.user_id AND this_player_result = 'defeat' AND battle_flag_legacy = 0)
+        +
+        (SELECT COUNT(battle_id) FROM mmrpg_battles WHERE target_user_id = mmrpg_users.user_id AND target_player_result = 'defeat' AND battle_flag_legacy = 0)
+    ) AS defeat_count,
     0 AS like_count
     FROM mmrpg_users
     LEFT JOIN mmrpg_leaderboard ON mmrpg_leaderboard.user_id = mmrpg_users.user_id
     LEFT JOIN mmrpg_roles ON mmrpg_users.role_id = mmrpg_roles.role_id
     LEFT JOIN mmrpg_saves ON mmrpg_saves.user_id = mmrpg_users.user_id
-    WHERE mmrpg_users.user_name_clean = \''.$this_current_sub.'\';';
+    WHERE mmrpg_users.user_name_clean = '{$this_current_sub}'
+    ;";
   $this_playerinfo = $db->get_array($temp_playerquery);
 
   // If the userinfo exists in the database, display it
