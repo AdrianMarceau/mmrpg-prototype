@@ -4086,9 +4086,8 @@ class rpg_robot extends rpg_object {
                     <div class="this_sprite sprite_left" style="height: 40px;">
                         <? if($print_options['show_mugshot']): ?>
                             <? if($print_options['show_key'] !== false): ?>
-                                <div class="number robot_type <?= $robot_header_types ?>"><?= 'No.'.$robot_info['robot_key'] ?></div>
+                                <div class="number robot_type <?= $robot_header_types ?>"><?= 'No.'.$robot_info['robot_key'] ?> </div>
                             <? endif; ?>
-                            &nbsp;
                             <? if (!in_array($robot_image_token, $default_robot_class_tokens)){ ?>
                                 <div class="mugshot robot_type <?= $robot_header_types ?>"><div style="background-image: url(images/robots/<?= $robot_image_token ?>/mug_right_<?= $robot_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>); " class="sprite sprite_robot sprite_40x40 sprite_40x40_mug sprite_size_<?= $robot_image_size_text ?> sprite_size_<?= $robot_image_size_text ?>_mug robot_status_active robot_position_active"></div></div>
                             <? } else { ?>
