@@ -197,7 +197,8 @@ if ($export_img_required){
     $args[] = '--disable-smart-width';
     $args[] = '--width '.$base_export_width_px;
     $args[] = '--javascript-delay '.$base_export_delay;
-    $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"';
+    $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15"';
+    $args[] = '--custom-header "Referer" "https://imgur.com/"';
     //$args[] = '';
     $args[] = escapeshellarg($this_source_url);
     $args[] = escapeshellarg($export_img_path);
@@ -253,7 +254,8 @@ if ($export_doc_required){
     $args[] = '--javascript-delay '.$base_export_delay;
     $args[] = '--disable-external-links';
     $args[] = '--load-media-error-handling skip';
-    $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"';
+    $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15"';
+    $args[] = '--custom-header "Referer" "https://imgur.com/"';
     //$args[] = '--log-level error';
     //$args[] = '';
     $args[] = escapeshellarg($this_source_url);
