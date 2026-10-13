@@ -135,7 +135,7 @@ $base_export_dir = MMRPG_CONFIG_ROOTDIR.'.cache/';
 $base_export_name = 'export-'.date('Y-m-d-H-i-s');
 $base_export_width_px = 1040;
 $base_export_width_pt = 780;
-$base_export_delay = 200;
+$base_export_delay = 2000;
 $this_source_url = MMRPG_CONFIG_ROOTURL.$export_src;
 $this_export_dir = rtrim($base_export_dir.dirname($export_dst), '/').'/';
 $this_export_name = preg_replace('/\.[a-z0-9]{2,4}$/i', '', basename($export_dst));
@@ -197,6 +197,7 @@ if ($export_img_required){
     $args[] = '--disable-smart-width';
     $args[] = '--width '.$base_export_width_px;
     $args[] = '--javascript-delay '.$base_export_delay;
+    $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"';
     //$args[] = '';
     $args[] = escapeshellarg($this_source_url);
     $args[] = escapeshellarg($export_img_path);
@@ -252,6 +253,7 @@ if ($export_doc_required){
     $args[] = '--javascript-delay '.$base_export_delay;
     $args[] = '--disable-external-links';
     $args[] = '--load-media-error-handling skip';
+    $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"';
     //$args[] = '--log-level error';
     //$args[] = '';
     $args[] = escapeshellarg($this_source_url);
