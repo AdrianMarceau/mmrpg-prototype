@@ -312,12 +312,16 @@ ob_start();
 
                 // Attach the click event to the start & stop buttons
                 let allowNextExport = false;
+                let activeExports = 0;   // Track how many exports are currently running
+                let maxConcurrent = 3;   // Set the batch limit (3-5 is usually safe)
                 let startExport = function(){
+                    $start.prop('disabled', true);
                     $stop.prop('disabled', false);
                     allowNextExport = true;
                     startNextExport();
                     };
                 let stopExport = function(){
+                    $start.prop('disabled', false);
                     $stop.prop('disabled', true);
                     allowNextExport = false;
                     };
@@ -342,22 +346,21 @@ ob_start();
                     if (!allowNextExport){ stopExport(); return false; }
                     let $itemsToDo = $pending.find('.item[data-status="pending"]');
                     let mergeExists = false;
-                    let readyToMerge = $itemsToDo.length == 0 ? true : false;
+                    let readyToMerge = ($itemsToDo.length == 0 && activeExports === 0) ? true : false;
                     //console.log('Items to do:', $itemsToDo.length);
 
-                    // If there are still items to do, let's do that, else stop the auto
-                    if ($itemsToDo.length){
-                        //console.log('Items to do:', $itemsToDo.length);
-                        $itemsToDo.each(function(index, element){
-                            //console.log('Searching for next export item...');
+                    // If there are still items to do, and we have open slots, let's do that
+                    if ($itemsToDo.length > 0 && activeExports < maxConcurrent){
+                        let availableSlots = maxConcurrent - activeExports;
+                        $itemsToDo.slice(0, availableSlots).each(function(index, element){
                             let $item = $(element);
                             let itemStatus = $item.attr('data-status');
-                            //console.log('Item:', $item, 'Status:', itemStatus);
-                            if (itemStatus !== 'pending'){ return true; } // continue the loop
-                            else { exportItem($item); } // start the export
-                            return false; // stop the loop
+                            if (itemStatus === 'pending'){
+                                exportItem($item); // start the export
+                                }
                             });
-                        } else {
+                        }
+                    else if ($itemsToDo.length === 0 && activeExports === 0){
                         stopExport();
                         }
                     // If ready to merge them, let's attempt to merge them
@@ -444,6 +447,7 @@ ob_start();
                 let exportItem = function($item){
                     //console.log('Exporting item:', $item);
                     if (!$item.length){ return false; }
+                    activeExports++;
                     let itemStatus = $item.attr('data-status');
                     let itemNum = $item.find('.num').text();
                     let itemName = $item.find('.name').text();
@@ -487,6 +491,7 @@ ob_start();
                             $completeTitle.find('.progress').attr('value', numComplete);
                             $completeTitle.find('.count').text(numComplete + ' / ' + manifestTotal);
                             setTimeout(function(){ $item.removeClass('slide-in'); }, 1000);
+                            activeExports--; // Free up the slot
                             startNextExport();
                             },
                         error: function(response){
@@ -497,6 +502,7 @@ ob_start();
                             let msg = 'An error occurred while exporting item '+itemNum+' ('+itemName+').';
                             if (responseData && responseData.message){ msg += '\n' + 'Error: ' + responseData.message; }
                             msg += '\n' + 'Would you like to continue to the next?';
+                            activeExports--; // Free up the slot
                             if (confirm(msg)){ startNextExport(); }
                             else { stopExport(); }
                             }
@@ -564,6 +570,7 @@ ob_start();
                                         $download.attr('href', downloadButtonHref);
                                         //console.log('Download button href:', downloadButtonHref);
                                         $download.prop('disabled', false);
+                                        $start.prop('disabled', true);
                                         } else {
                                         $item.attr('data-status', 'error');
                                         let msg = 'An error occurred while merging items.';
