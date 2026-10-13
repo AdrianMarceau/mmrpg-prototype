@@ -180,55 +180,6 @@ echo('<pre>$export_doc_fmtime = '.print_r($export_doc_fmtime, true).($export_doc
 echo('<pre>$export_doc_width = '.print_r($export_doc_width, true).'</pre>'.PHP_EOL);
 echo('<pre>$export_doc_height = '.print_r($export_doc_height, true).'</pre>'.PHP_EOL);
 
-// Set a default modern User-Agent so the live server doesn't block its own request
-$context_options = [
-    'http' => [
-        'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n"
-        ]
-];
-
-// Only bypass SSL verification on the local development environment
-if (MMRPG_CONFIG_IS_LIVE !== true){
-    $context_options['ssl'] = [
-        'verify_peer' => false,
-        'verify_peer_name' => false,
-        ];
-}
-
-// Create a temporary HTML file with embedded Base64 Imgur images to bypass TLS limitations
-$temp_html_path = $this_export_dir . $this_export_name . '_temp.html';
-$local_context = stream_context_create($context_options);
-$html_content = file_get_contents($this_source_url, false, $local_context);
-
-// Inject a <base> tag so relative CSS/JS/images resolve correctly when loaded from the local temp file
-$html_content = preg_replace('/<head>/i', '<head><base href="' . $this_source_url . '">', $html_content, 1);
-
-// Find and replace Imgur image URLs with Base64 data URIs
-$html_content = preg_replace_callback('/<img[^>]+src=["\'](https:\/\/i\.imgur\.com\/[^"\']+)["\']/i', function($matches) {
-    $image_url = $matches[1];
-    // Add robust headers to bypass Imgur's data center IP blocks
-    $context = stream_context_create([
-        'http' => [
-            'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\r\n" .
-                        "Accept: image/webp,image/apng,image/*,*/*;q=0.8\r\n" .
-                        "Referer: https://imgur.com/\r\n",
-            'ignore_errors' => true // Allows PHP to fetch headers even if a 403/429 is returned
-            ]
-        ]);
-    // Removed the @ symbol so errors are visible in logs if Imgur still blocks the IP
-    $image_data = file_get_contents($image_url, false, $context);
-    // Only encode if data was successfully returned and we got a 200 OK status
-    if ($image_data && strpos($http_response_header[0], '200') !== false) {
-        $base64 = base64_encode($image_data);
-        $ext = pathinfo(parse_url($image_url, PHP_URL_PATH), PATHINFO_EXTENSION);
-        $mime = $ext === 'jpg' ? 'jpeg' : ($ext ?: 'png');
-        return str_replace($image_url, 'data:image/'.$mime.';base64,'.$base64, $matches[0]);
-    }
-    return $matches[0];
-}, $html_content);
-
-file_put_contents($temp_html_path, $html_content);
-
 /* -- EXPORT IMAGE AND DOCUMENT -- */
 
 // Check to see if the image and document already exist and if they need to be re-exported
@@ -249,8 +200,7 @@ if ($export_img_required){
     $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15"';
     $args[] = '--custom-header "Referer" "https://imgur.com/"';
     //$args[] = '';
-    //$args[] = escapeshellarg($this_source_url);
-    $args[] = escapeshellarg($temp_html_path);
+    $args[] = escapeshellarg($this_source_url);
     $args[] = escapeshellarg($export_img_path);
     $args = array_filter($args);
     $cmd = implode(' ', $args);
@@ -308,8 +258,7 @@ if ($export_doc_required){
     $args[] = '--custom-header "Referer" "https://imgur.com/"';
     //$args[] = '--log-level error';
     //$args[] = '';
-    //$args[] = escapeshellarg($this_source_url);
-    $args[] = escapeshellarg($temp_html_path);
+    $args[] = escapeshellarg($this_source_url);
     $args[] = escapeshellarg($export_doc_path);
     $args = array_filter($args);
     $cmd = implode(' ', $args);
@@ -336,9 +285,6 @@ echo('<pre style="color: magenta;">Final test on line '.__LINE__.'!</pre>'.PHP_E
 // One last time, confirm both the image and document exist before returning
 if (!file_exists($export_img_path)){ killScript(__LINE__, "Image could not be generated for thread!", 500); }
 if (!file_exists($export_doc_path)){ killScript(__LINE__, "Document could not be generated for thread!", 500); }
-
-// Cleanup step
-if (file_exists($temp_html_path)){ unlink($temp_html_path); }
 
 // Return the output of the export process
 $return_data = array();
