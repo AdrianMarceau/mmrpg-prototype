@@ -154,6 +154,21 @@ echo('<pre>$merge_export_file_dir = '.print_r($merge_export_file_dir, true).'</p
 if (!file_exists($merge_export_dir)){ die("Error: Merge path not found at &quot;{$merge_export_dir}&quot;."); }
 else { echo('<pre style="color: lime;">Merge path exists at &quot;'.$merge_export_dir.'&quot;!</pre>'.PHP_EOL); }
 
+// If a purge/delete-all action was requested, wipe the target directory contents
+if (isset($_REQUEST['action']) && $_REQUEST['action'] === 'purge'){
+    if (file_exists($merge_export_dir) && is_dir($merge_export_dir)){
+        $files = glob($merge_export_dir . '*');
+        foreach ($files as $file){
+            if (is_file($file)){
+                unlink($file);
+            }
+        }
+        exitScript(array('purged' => true));
+    } else {
+        killScript(__LINE__, "Target export directory does not exist to purge.");
+    }
+}
+
 
 // -- PARSE MANIFEST FILE -- //
 

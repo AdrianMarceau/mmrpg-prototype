@@ -247,6 +247,9 @@ ob_start();
             <?= $export_manifest_markup ?>
         </div>
     </div>
+    <div style="text-align: right; max-width: 1024px; margin: -10px auto 20px;">
+        <a href="#" id="purge-all" style="font-size: 11px; color: #777; text-decoration: none;">&times; Delete All Generated Files &amp; Reset</a>
+    </div>
     <div id="debug-output">
         <strong class="title">Debug Output</strong>
         <div class="output hide-on-blur"><?= $debug_output ?></div>
@@ -620,6 +623,59 @@ ob_start();
                         }
                     //console.log('Sending delete request for item:', $item);
                     return deleteItem($item);
+                    });
+
+                // Attach mass-delete purge handler
+                $('#purge-all').bind('click', function(e){
+                    e.preventDefault();
+                    if (!confirm('Are you sure you want to delete all generated files for this thread and reset?')){
+                        return false;
+                        }
+                    let $purgeLink = $(this);
+                    $purgeLink.text('Deleting...');
+                    let purgeUrl = mergeScriptPath + '?' + [
+                        'path=' + urlEncode(baseExportPath),
+                        'action=purge',
+                        'return=json'
+                        ].join('&');
+                    $.ajax({
+                        url: purgeUrl,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response){
+                            $purgeLink.html('&times; Delete All Generated Files &amp; Reset');
+                            if (response && response.status === 'success'){
+                                // Move all completed items back to pending
+                                $complete.find('.item').each(function(){
+                                    let $item = $(this);
+                                    $item.find('.file').removeAttr('href').html('');
+                                    $item.find('.delete').remove();
+                                    if (!$item.find('.bullet').length){
+                                        $item.prepend('<i class="bullet">&raquo;</i>');
+                                        }
+                                    $item.attr('data-status', 'pending');
+                                    $pending.append($item);
+                                    });
+                                // Reset progress counters
+                                let totalPending = $pending.find('.item').length;
+                                $pendingTitle.find('.progress').attr('value', 0);
+                                $pendingTitle.find('.count').text('0 / ' + manifestTotal);
+                                $completeTitle.find('.progress').attr('value', 0);
+                                $completeTitle.find('.count').text('0 / ' + manifestTotal);
+                                // Reset control buttons and context status
+                                $context.attr('data-status', '');
+                                $start.prop('disabled', false);
+                                $stop.prop('disabled', true);
+                                $download.prop('disabled', true).removeAttr('href');
+                                } else {
+                                alert('Failed to delete files: ' + (response.message || 'Unknown error'));
+                                }
+                            },
+                        error: function(response){
+                            $purgeLink.html('&times; Delete All Generated Files &amp; Reset');
+                            alert('An error occurred while deleting cached files.');
+                            }
+                        });
                     });
 
                 // Make sure we mark the context area as ready for animation purposes
