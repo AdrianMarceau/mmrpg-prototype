@@ -135,7 +135,7 @@ $base_export_dir = MMRPG_CONFIG_ROOTDIR.'.cache/';
 $base_export_name = 'export-'.date('Y-m-d-H-i-s');
 $base_export_width_px = 1040;
 $base_export_width_pt = 780;
-$base_export_delay = 2000;
+$base_export_delay = 200;
 $this_source_url = MMRPG_CONFIG_ROOTURL.$export_src;
 $this_export_dir = rtrim($base_export_dir.dirname($export_dst), '/').'/';
 $this_export_name = preg_replace('/\.[a-z0-9]{2,4}$/i', '', basename($export_dst));
@@ -180,6 +180,37 @@ echo('<pre>$export_doc_fmtime = '.print_r($export_doc_fmtime, true).($export_doc
 echo('<pre>$export_doc_width = '.print_r($export_doc_width, true).'</pre>'.PHP_EOL);
 echo('<pre>$export_doc_height = '.print_r($export_doc_height, true).'</pre>'.PHP_EOL);
 
+/* -- PRE-PROCESS IMGUR LINKS VIA PROXY -- */
+
+echo('<pre style="color: magenta;">Fetching and parsing HTML for Proxy injection on line '.__LINE__.'!</pre>'.PHP_EOL);
+$temp_html_name = $this_export_name . '_source.html';
+$temp_html_path = $this_export_dir . $temp_html_name;
+
+// Fetch the raw HTML using cURL
+$ch = curl_init($this_source_url);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+$html_content = curl_exec($ch);
+curl_close($ch);
+
+if ($html_content) {
+    // Rewrite Imgur URLs to use DuckDuckGo's Image Proxy to bypass datacenter IP blocks
+    $html_content = preg_replace(
+        '/src=["\'](https?:\/\/(?:i\.)?imgur\.com\/[^"\']+)["\']/i',
+        'src="https://proxy.duckduckgo.com/iu/?u=$1"',
+        $html_content
+    );
+
+    // Save the proxy-injected HTML to the cache folder
+    file_put_contents($temp_html_path, $html_content);
+
+    // CRITICAL FIX: Convert the local path back to a LIVE URL so wkhtmltopdf can load CSS correctly!
+    $this_source_target = MMRPG_CONFIG_ROOTURL . cleanPaths($temp_html_path);
+} else {
+    // Fallback to the live URL if the initial cURL fails
+    $this_source_target = $this_source_url;
+}
+
 /* -- EXPORT IMAGE AND DOCUMENT -- */
 
 // Check to see if the image and document already exist and if they need to be re-exported
@@ -199,8 +230,10 @@ if ($export_img_required){
     $args[] = '--javascript-delay '.$base_export_delay;
     $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15"';
     $args[] = '--custom-header "Referer" "https://imgur.com/"';
+    $args[] = '--custom-header-propagation';
     //$args[] = '';
-    $args[] = escapeshellarg($this_source_url);
+    //$args[] = escapeshellarg($this_source_url);
+    $args[] = escapeshellarg($this_source_target);
     $args[] = escapeshellarg($export_img_path);
     $args = array_filter($args);
     $cmd = implode(' ', $args);
@@ -256,9 +289,11 @@ if ($export_doc_required){
     $args[] = '--load-media-error-handling skip';
     $args[] = '--custom-header "User-Agent" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.2 Safari/605.1.15"';
     $args[] = '--custom-header "Referer" "https://imgur.com/"';
+    $args[] = '--custom-header-propagation';
     //$args[] = '--log-level error';
     //$args[] = '';
-    $args[] = escapeshellarg($this_source_url);
+    //$args[] = escapeshellarg($this_source_url);
+    $args[] = escapeshellarg($this_source_target);
     $args[] = escapeshellarg($export_doc_path);
     $args = array_filter($args);
     $cmd = implode(' ', $args);
@@ -285,6 +320,9 @@ echo('<pre style="color: magenta;">Final test on line '.__LINE__.'!</pre>'.PHP_E
 // One last time, confirm both the image and document exist before returning
 if (!file_exists($export_img_path)){ killScript(__LINE__, "Image could not be generated for thread!", 500); }
 if (!file_exists($export_doc_path)){ killScript(__LINE__, "Document could not be generated for thread!", 500); }
+
+// Cleanup step
+//if (file_exists($temp_html_path)){ unlink($temp_html_path); }
 
 // Return the output of the export process
 $return_data = array();

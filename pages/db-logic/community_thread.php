@@ -663,6 +663,8 @@ ob_start();
                     // Print out the comment listing's footer and links if allowed
                     if ($show_posts_footer){
                         $thread_export_href = MMRPG_CONFIG_ROOTURL.'scripts/thread-to-pdf.php?thread='.$this_thread_info['thread_id'];
+                        $thread_download_dir = MMRPG_CONFIG_ROOTDIR.'.cache/threads/news/'.$this_thread_info['thread_id'].'/export.pdf';
+                        $thread_download_url = MMRPG_CONFIG_ROOTURL.'.cache/threads/news/'.$this_thread_info['thread_id'].'/export.pdf';
                         ?>
                         <div class="<?= $comment_header_class ?>">
                             <strong class="thread_posts_total">
@@ -672,6 +674,12 @@ ob_start();
                             <? if (rpg_user::is_member() && MMRPG_INDEX_FULL_VIEW === true){ ?>
                                 <a class="thread_export_link" href="<?= $thread_export_href ?>" target="_blank" rel="noindex,nofollow">
                                     <strong>Export to PDF</strong>
+                                    <i class="fa fas fa-file-pdf"></i>
+                                </a>
+                            <? } ?>
+                            <? if (file_exists($thread_download_dir)){ ?>
+                                <a class="thread_export_link thread_download_link" href="<?= $thread_download_url ?>" target="_blank" rel="noindex,nofollow">
+                                    <strong>Download PDF</strong>
                                     <i class="fa fas fa-file-pdf"></i>
                                 </a>
                             <? } ?>
