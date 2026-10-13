@@ -663,8 +663,8 @@ ob_start();
                     // Print out the comment listing's footer and links if allowed
                     if ($show_posts_footer){
                         $thread_export_href = MMRPG_CONFIG_ROOTURL.'scripts/thread-to-pdf.php?thread='.$this_thread_info['thread_id'];
-                        $thread_download_dir = MMRPG_CONFIG_ROOTDIR.'.cache/threads/news/'.$this_thread_info['thread_id'].'/export.pdf';
-                        $thread_download_url = MMRPG_CONFIG_ROOTURL.'.cache/threads/news/'.$this_thread_info['thread_id'].'/export.pdf';
+                        $thread_download_dir = MMRPG_CONFIG_ROOTDIR.'.cache/threads/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/export.pdf';
+                        $thread_download_url = MMRPG_CONFIG_ROOTURL.'.cache/threads/'.$this_category_info['category_token'].'/'.$this_thread_info['thread_id'].'/export.pdf';
                         ?>
                         <div class="<?= $comment_header_class ?>">
                             <strong class="thread_posts_total">
