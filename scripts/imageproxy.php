@@ -41,6 +41,7 @@ if (!file_exists($image_hash_path)){
     if (!strstr($image_content_type, 'image/')){
         header('HTTP/1.0 404 Not Found');
         header('Details: Image Not Valid or No Longer Exists');
+        header('Details2: Content-Type Was '.$image_content_type);
         exit;
     }
 
