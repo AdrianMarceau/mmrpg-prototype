@@ -671,15 +671,15 @@ ob_start();
                                 <i class="fa fas fa-comments"></i>
                                 <?= $comment_header_title ?>
                             </strong>
-                            <? if (rpg_user::is_member() && MMRPG_INDEX_FULL_VIEW === true){ ?>
-                                <a class="thread_export_link" href="<?= $thread_export_href ?>" target="_blank" rel="noindex,nofollow">
-                                    <strong>Export to PDF</strong>
-                                    <i class="fa fas fa-file-pdf"></i>
-                                </a>
-                            <? } ?>
                             <? if (file_exists($thread_download_dir)){ ?>
                                 <a class="thread_export_link thread_download_link" href="<?= $thread_download_url ?>" target="_blank" rel="noindex,nofollow">
                                     <strong>Download PDF</strong>
+                                    <i class="fa fas fa-file-pdf"></i>
+                                </a>
+                            <? } ?>
+                            <? if (rpg_user::is_member() && MMRPG_INDEX_FULL_VIEW === true){ ?>
+                                <a class="thread_export_link" href="<?= $thread_export_href ?>" target="_blank" rel="noindex,nofollow">
+                                    <strong>Export to PDF</strong>
                                     <i class="fa fas fa-file-pdf"></i>
                                 </a>
                             <? } ?>
