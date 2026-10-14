@@ -220,6 +220,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => '',
         'encounters' => ['trill'],
+        'encounters2' => ['bunby-heli', 'flutter-fly', 'petit-snakey', 'batton'],
         'rescues' => ['beat'],
         'items' => ['field-booster'],
         'pickups' => ['small-screw', 'energy-pellet', 'weapon-pellet'],
@@ -234,6 +235,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['petit-snakey', 'batton', 'petal-anne', 'air-stone'],
         'abilities' => ['lalinde-buster'],
         'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
         'tags' => ['central', 'player'],
@@ -247,6 +249,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['air-stone', 'rockscotch', 'drill-mole', 'colton'],
         'items' => ['extra-life'],
         'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
         'tags' => ['central', 'player'],
@@ -259,8 +262,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '23-7',
         'level' => 120,
         'field' => 'robot-museum',
-        'encounters' => ['doc-robot'],
-        'encounters2' => ['sniper-joe', 'skeleton-joe', 'crystal-joe'],
+        'encounters' => ['doc-robot@north-exit'],
+        'encounters2' => ['sniper-joe', 'robo-transport', 'blocky', 'ben-k'],
         'items' => ['extra-life'],
         'tags' => ['outer', 'main'],
         'exits' => ['north', 'west']
@@ -271,10 +274,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '23-6',
         'level' => 140,
         'field' => 'robot-museum',
-        'encounters' => ['trill'],
-        'rescues' => ['treble'],
-        'items' => ['speed-booster', 'hyper-screw'],
-        'tags' => ['outer', 'main2'],
+        'encounters' => ['trill@south-exit'],
+        'encounters2' => ['blocky', 'robo-transport', 'trio-the-wheel', 'power-muscler'],
+        'rescues' => ['treble@west'],
+        'items' => ['speed-booster@east', 'hyper-screw@north'],
+        'tags' => ['outer', 'main2', 'button'],
         'exits' => ['south']
         ];
     //--------------------------//
@@ -284,7 +288,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '23-9',
         'level' => 160,
         'field' => 'robot-museum',
-        'encounters' => ['weapon-archivist'],
+        'encounters' => ['weapon-archivist@west-exit'],
         'encounters2' => ['weapon-archivist_explode', 'weapon-archivist_flame', 'weapon-archivist_wind', 'weapon-archivist_shadow', 'weapon-archivist_electric'],
         'items' => ['defense-booster', 'hyper-screw'],
         'tags' => ['outer'],
@@ -297,8 +301,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '1-7',
         'level' => 120,
         'field' => 'royal-palace',
-        'encounters' => ['king_alt'],
-        'encounters2' => ['pyre-fly', 'flea'],
+        'encounters' => ['king_alt@north-exit'],
+        'encounters2' => ['pyre-fly', 'flea', 'merserker', 'oni-robo'],
         'items' => ['extra-life'],
         'tags' => ['outer', 'main'],
         'exits' => ['north', 'east']
@@ -309,10 +313,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '1-6',
         'level' => 140,
         'field' => 'royal-palace',
-        'encounters' => ['trill'],
-        'rescues' => ['tango'],
-        'items' => ['speed-diverter', 'hyper-screw'],
-        'tags' => ['outer', 'main2'],
+        'encounters' => ['trill@south-exit'],
+        'encounters2' => ['merserker', 'oni-robo', 'pandeeta', 'goriblue'],
+        'rescues' => ['tango@east'],
+        'items' => ['speed-diverter@west', 'hyper-screw@north'],
+        'tags' => ['outer', 'main2', 'button'],
         'exits' => ['south']
         ];
     //--------------------------//
@@ -322,7 +327,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '1-9',
         'level' => 160,
         'field' => 'royal-palace',
-        'encounters' => ['weapon-archivist'],
+        'encounters' => ['weapon-archivist@east-exit'],
         'encounters2' => ['weapon-archivist_cutter', 'weapon-archivist_freeze', 'weapon-archivist_nature', 'weapon-archivist_earth', 'weapon-archivist_water'],
         'items' => ['defense-diverter', 'hyper-screw'],
         'tags' => ['outer'],
@@ -336,6 +341,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 100,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['spine_alt', 'cannon-roader_alt', 'tatepakkan_alt2', 'crazy-cannon_alt2'],
         'items' => ['yashichi'],
         'tags' => ['outer', 'main'],
         'exits' => ['east', 'west']
@@ -347,6 +353,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['cannon-roader', 'tatepakkan_alt', 'kakinba-tank', 'dodonpa-cannon_alt2'],
+        'items' => ['attack-booster'],
         'tags' => ['outer'],
         'exits' => ['east', 'west']
         ];
@@ -356,10 +364,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '16-16',
         'level' => 140,
         'field' => '',
-        'encounters' => ['trill'],
-        'rescues' => ['reggae'],
-        'items' => ['attack-booster', 'hyper-screw'],
-        'tags' => ['outer'],
+        'encounters' => ['trill@west-exit'],
+        'encounters2' => ['tatepakkan_alt2', 'dodonpa-cannon_alt', 'hammer-joe', 'vavaliant'],
+        'rescues' => ['heel-bot@east'],
+        'items' => ['hyper-screw@north'],
+        'tags' => ['outer', 'button'],
         'exits' => ['west']
         ];
     //--------------------------//
@@ -370,6 +379,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 100,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['pointan', 'bulb-blaster', 'plasma-plus', 'flipping-suzy'],
         'items' => ['yashichi'],
         'tags' => ['outer', 'main'],
         'exits' => ['east', 'west']
@@ -381,6 +391,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['plasma-plus', 'electriri', 'arc-weldy', 'coiln'],
+        'items' => ['attack-diverter'],
         'tags' => ['outer'],
         'exits' => ['east', 'west']
         ];
@@ -390,10 +402,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'position' => '8-16',
         'level' => 140,
         'field' => '',
-        'encounters' => ['trill'],
-        'rescues' => ['eddie'],
-        'items' => ['attack-diverter', 'hyper-screw'],
-        'tags' => ['outer'],
+        'encounters' => ['trill@east-exit'],
+        'encounters2' => ['electriri', 'coiln', 'pitchan', 'tosanaizer-v'],
+        'rescues' => ['heal-bot@west'],
+        'items' => ['hyper-screw@north'],
+        'tags' => ['outer', 'button'],
         'exits' => ['east']
         ];
     //--------------------------//
@@ -1956,6 +1969,7 @@ if (!empty($mmrpg_worlds[$this_world]['areas'])){
     $elemental_area_stat_prefs['attack'] = array('impact', 'freeze', 'wind', 'shadow', 'electric', 'laser');
     $elemental_area_stat_prefs['defense'] = array('explode', 'swift', 'nature', 'earth', 'water', 'shield');
     $elemental_area_stat_prefs['speed'] = array('cutter', 'flame', 'crystal', 'time', 'missile');
+    $button_area_colours = array('research' => 'green', 'security' => 'blue', 'control' => 'purple', 'storage' => 'red');
     // Apply logic to discern which checklist items are needed for each area
     foreach ($mmrpg_worlds[$this_world]['areas'] AS $token => $info){
         // collect info we need before starting
@@ -1985,6 +1999,15 @@ if (!empty($mmrpg_worlds[$this_world]['areas'])){
             }
         }
         if (in_array('stargate', $tags)){ $objects[] = 'star-gate'; }
+        if (in_array('button', $tags)){
+            $frag = explode('-', $token)[0];
+            if (isset($button_area_colours[$frag])){
+                $colour = $button_area_colours[$frag];
+                $objects[] = 'big-'.$colour.'-button';
+            } else {
+                $objects[] = 'big-button';
+            }
+        }
         // update all the info variables and write back to the main index
         $info['stat'] = $stat;
         $info['objects'] = $objects;
