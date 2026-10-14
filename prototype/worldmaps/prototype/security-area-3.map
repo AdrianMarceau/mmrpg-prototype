@@ -20,12 +20,33 @@
 #---------------------------#
 @portals[]  = west-exit(1-8, security-area-2__east-exit, left-only)
 #---------------------------#
-@items[]    = static-pickup-1(9-8, attack-booster)
-@items[]    = static-pickup-2(9-9, hyper-screw)
+@buttons[]  = blue-world-button(8-8, blue, up, remove-group-blocks, blue-world-barriers, barrier-block)
 #---------------------------#
-@bosses[]   = boss-boss-1(7-8, trill)
+@groups[]    = no-encounters_blue-enclosure(7-4...9-5)
+@groups[]    = blue-world-barriers(7-6...9-6)
+@blocks[]    = black-barrier-block-1(6-4, barrier-block, black-vert)
+@blocks[]    = black-barrier-block-2(6-5, barrier-block, black-vert)
+@blocks[]    = black-barrier-block-3(6-6, barrier-block, black-midd)
+@blocks[]    = black-barrier-block-4(10-4, barrier-block, black-vert)
+@blocks[]    = black-barrier-block-5(10-5, barrier-block, black-vert)
+@blocks[]    = black-barrier-block-6(10-6, barrier-block, black-midd)
+@blocks[]    = blue-barrier-block-1(7-6, barrier-block, blue-horz)
+@blocks[]    = blue-barrier-block-2(8-6, barrier-block, blue-horz)
+@blocks[]    = blue-barrier-block-3(9-6, barrier-block, blue-horz)
 #---------------------------#
-@rescues[]  = rescue-robo-1(10-6, reggae)
+@items[]    = static-pickup-1(8-5, hyper-screw)
+#---------------------------#
+@groups[]   = encounter-zone_main-area(5-5...11-11)
+@groups[]   = no-encounters_spawn-buffer(8-8...8-8)
+@groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
+@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+#---------------------------#
+@encounters = tatepakkan_alt2(4),dodonpa-cannon_alt(3),hammer-joe(2),vavaliant(1)
+@population = 60%
+#---------------------------#
+@bosses[]   = boss-boss-1(3-8, trill)
+#---------------------------#
+@rescues[]  = rescue-robo-1(11-8, heel-bot)
 #---------------------------#
 @actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
 #---------------------------#
@@ -37,11 +58,11 @@
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[30],[__],[__],[__],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[30],[__],[30],[30],[__],[__],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[30],[__],[__],[30],[__],[__],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
