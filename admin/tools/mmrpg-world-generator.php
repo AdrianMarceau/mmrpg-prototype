@@ -479,6 +479,27 @@ echo('<pre>'.PHP_EOL);
                 $protected_zones['player-exit-portal-buffer'] = $portal_pos;
             }
 
+            // If this area has a BUTTON, add it to the very center
+            if (in_array('button', $area_tags)){
+                $area_file_markup[] = '#---------------------------#';
+
+                // Determine the correct colour from the objects array
+                $button_colour = 'base'; // Fallback if no specific colour is defined
+                foreach ($area_objects as $obj) {
+                    if (preg_match('/^big-([a-z]+)-button$/', $obj, $matches)) {
+                        $button_colour = $matches[1];
+                        break;
+                    }
+                }
+
+                // Add the button to the markup with a placeholder 'set-group-terrain' event targeting a 'button-path' group
+                // We can safely modify this later based on what we actually want these buttons to unlock
+                $area_file_markup[] = '@buttons[]  = '.$button_colour.'-world-button('.$area_spawn.', '.$button_colour.', up, set-group-terrain, button-path, '.$area_field_tile.')';
+
+                // We do NOT need to add this to $protected_zones because 'spawn-buffer'
+                // already protects the exact center coordinate ($area_spawn) with a 0-radius buffer!
+            }
+
             // Create an array to hold any actor strings we want to add
             $actor_strings = [];
 
@@ -557,23 +578,23 @@ echo('<pre>'.PHP_EOL);
             // Helper function to translate @location tags into absolute grid coordinates
             $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $encounter_inset) {
                 $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
-                $zone_min_x = 1 + $encounter_inset;
-                $zone_max_x = $area_size_width - $encounter_inset;
-                $zone_min_y = 1 + $encounter_inset;
-                $zone_max_y = $area_size_height - $encounter_inset;
-                if ($loc === 'north-exit') return $area_middle_col . '-3';
-                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 2);
-                if ($loc === 'east-exit') return ($area_size_width - 2) . '-' . $area_middle_row;
-                if ($loc === 'west-exit') return '3-' . $area_middle_row;
+                // Portal locations (exact outer edges of the map)
                 if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
                 if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
                 if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
                 if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
+                // Exit path locations (2 tiles inward from portals)
+                if ($loc === 'north-exit') return $area_middle_col . '-3';
+                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 2);
+                if ($loc === 'east-exit') return ($area_size_width - 2) . '-' . $area_middle_row;
+                if ($loc === 'west-exit') return '3-' . $area_middle_row;
+                // Inner perimeter locations (1 tile inward from the exit paths / safely off the path)
+                if ($loc === 'north') return $area_middle_col . '-5';
+                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - 4);
+                if ($loc === 'east') return ($area_size_width - 4) . '-' . $area_middle_row;
+                if ($loc === 'west') return '5-' . $area_middle_row;
+                // Absolute center
                 if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
-                if ($loc === 'north') return $area_middle_col . '-' . $zone_min_y;
-                if ($loc === 'south') return $area_middle_col . '-' . $zone_max_y;
-                if ($loc === 'east') return $zone_max_x . '-' . $area_middle_row;
-                if ($loc === 'west') return $zone_min_x . '-' . $area_middle_row;
                 return null;
                 };
             if (!empty($anchored_pickups)){
@@ -642,6 +663,7 @@ echo('<pre>'.PHP_EOL);
             // and is not one of the player areas or the warp hub (area 0)
             if (!in_array('player', $area_tags)
                 && !in_array('start', $area_tags)
+                && !in_array('button', $area_tags)
                 && !in_array('postgame', $area_tags)
                 && $area_size_width >= 15 && $area_size_height >= 15){
                 // Main maps get 3-5 holes, smaller maps get 1-2
@@ -859,6 +881,14 @@ echo('<pre>'.PHP_EOL);
                     $area_file_markup[] = '@encounters = '.$random_encounters_string;
                 }
 
+                // Add a population value if this is a special area that needs one
+                $random_encounters_population = '';
+                if (in_array('button', $area_tags)){ $random_encounters_population = '60%'; }
+                if (!empty($random_encounters_string)
+                    && !empty($random_encounters_population)){
+                    $area_file_markup[] = '@population = '.$random_encounters_population;
+                }
+
                 // Loop through the static encounters and add them here too
                 $static_encounter_strings = array();
                 $num_static_encounters = count($area_static_encounters);
@@ -907,15 +937,28 @@ echo('<pre>'.PHP_EOL);
                 $static_rescue_strings = array();
                 $num_static_rescues = count($area_static_rescues);
                 foreach ($area_static_rescues AS $key => $rescue){
-                    if (strstr($rescue, '_')){ list($robot, $alt) = explode('_', $rescue); }
-                    else { $robot = $rescue; $alt = ''; }
+                    // Parse out any anchored location tags (e.g., roll@center)
+                    $location = '';
+                    $rescue_raw = trim($rescue);
+                    if (strpos($rescue_raw, '@') !== false){
+                        list($rescue_token, $location) = explode('@', $rescue_raw);
+                    } else {
+                        $rescue_token = $rescue_raw;
+                    }
+                    if (strstr($rescue_token, '_')){ list($robot, $alt) = explode('_', $rescue_token); }
+                    else { $robot = $rescue_token; $alt = ''; }
                     if (!isset($mmrpg_index_robots[$robot])){ continue; }
-                    $position = $getRandomCoord();
+                    // Attempt to place via location tag first
+                    $position = !empty($location) ? $getLocationCoords($location) : null;
+                    // Fallback to safe random coordinate if no location was defined
+                    if (empty($position)){ $position = $getRandomCoord(); }
+                    if (!$position){ continue; } // Failsafe
                     $robot_num = $key + 1;
                     $robot_info = $mmrpg_index_robots[$robot];
                     $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
                     $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
-                    $static_rescue_strings[] = '@rescues[]  = rescue-robo-'.$robot_num.'('.$position.', '.$rescue.')';
+                    // Make sure to use $rescue_token here so the @location string doesn't get printed into the map file
+                    $static_rescue_strings[] = '@rescues[]  = rescue-robo-'.$robot_num.'('.$position.', '.$rescue_token.')';
                 }
                 if (!empty($static_rescue_strings)){
                     $area_file_markup[] = '#---------------------------#';
