@@ -477,27 +477,67 @@ echo('<pre>'.PHP_EOL);
                 $protected_zones['player-healpad-buffer'] = $healpad_pos;
                 $protected_zones['player-resetpad-buffer'] = $resetpad_pos;
                 $protected_zones['player-exit-portal-buffer'] = $portal_pos;
-            }
+            }// Initialize exact protected coordinates early so we can add barriers to it
+            $exact_protected_coords = [];
 
-            // If this area has a BUTTON, add it to the very center
+            // If this area has a BUTTON, add it to the very center with a U-shaped barrier
             if (in_array('button', $area_tags)){
                 $area_file_markup[] = '#---------------------------#';
-
                 // Determine the correct colour from the objects array
-                $button_colour = 'base'; // Fallback if no specific colour is defined
+                $button_colour = 'base';
                 foreach ($area_objects as $obj) {
                     if (preg_match('/^big-([a-z]+)-button$/', $obj, $matches)) {
                         $button_colour = $matches[1];
                         break;
                     }
                 }
-
-                // Add the button to the markup with a placeholder 'set-group-terrain' event targeting a 'button-path' group
-                // We can safely modify this later based on what we actually want these buttons to unlock
-                $area_file_markup[] = '@buttons[]  = '.$button_colour.'-world-button('.$area_spawn.', '.$button_colour.', up, set-group-terrain, button-path, '.$area_field_tile.')';
-
-                // We do NOT need to add this to $protected_zones because 'spawn-buffer'
-                // already protects the exact center coordinate ($area_spawn) with a 0-radius buffer!
+                $barrier_group = $button_colour.'-world-barriers';
+                // Add the button to the markup (triggering the removal of the horizontal barriers)
+                $area_file_markup[] = '@buttons[]  = '.$button_colour.'-world-button('.$area_spawn.', '.$button_colour.', up, remove-group-blocks, '.$barrier_group.', barrier-block)';
+                $area_file_markup[] = '#---------------------------#';
+                // Calculate the grid coordinates of the "U" shape (cast to int to fix strict comparison)
+                $horz_y = (int)($area_middle_row - 2);
+                $horz_min_x = (int)($area_middle_col - 1);
+                $horz_max_x = (int)($area_middle_col + 1);
+                $vert_min_y = (int)($area_padding + 1);
+                $vert_left_x = (int)($area_middle_col - 2);
+                $vert_right_x = (int)($area_middle_col + 2);
+                // Define the NO-ENCOUNTER zone for the inside of the U-shape
+                $inner_min_x = $vert_left_x + 1;
+                $inner_max_x = $vert_right_x - 1;
+                $inner_min_y = $vert_min_y;
+                $inner_max_y = $horz_y - 1;
+                $area_file_markup[] = '@groups[]    = no-encounters_'.$button_colour.'-enclosure('.$inner_min_x.'-'.$inner_min_y.'...'.$inner_max_x.'-'.$inner_max_y.')';
+                // Add all these inner coordinates to exact_protected_coords so items don't drop inside
+                for ($ix = $inner_min_x; $ix <= $inner_max_x; $ix++) {
+                    for ($iy = $inner_min_y; $iy <= $inner_max_y; $iy++) {
+                        $exact_protected_coords[] = $ix.'-'.$iy;
+                    }
+                }
+                // 1) Define the group for the colored horizontal blocks
+                $area_file_markup[] = '@groups[]    = '.$barrier_group.'('.$horz_min_x.'-'.$horz_y.'...'.$horz_max_x.'-'.$horz_y.')';
+                $b_idx = 1;
+                // 2) Left Vertical Barriers (Black)
+                for ($y = $vert_min_y; $y <= $horz_y; $y++) {
+                    $alt = ($y === $horz_y) ? 'black-midd' : 'black-vert';
+                    $area_file_markup[] = '@blocks[]    = black-barrier-block-'.$b_idx.'('.$vert_left_x.'-'.$y.', barrier-block, '.$alt.')';
+                    $exact_protected_coords[] = $vert_left_x.'-'.$y; // Make solid
+                    $b_idx++;
+                }
+                // 3) Right Vertical Barriers (Black)
+                for ($y = $vert_min_y; $y <= $horz_y; $y++) {
+                    $alt = ($y === $horz_y) ? 'black-midd' : 'black-vert';
+                    $area_file_markup[] = '@blocks[]    = black-barrier-block-'.$b_idx.'('.$vert_right_x.'-'.$y.', barrier-block, '.$alt.')';
+                    $exact_protected_coords[] = $vert_right_x.'-'.$y; // Make solid
+                    $b_idx++;
+                }
+                // 4) Colored Horizontal Barriers (These are removed when the button is pressed)
+                $h_idx = 1;
+                for ($x = $horz_min_x; $x <= $horz_max_x; $x++) {
+                    $area_file_markup[] = '@blocks[]    = '.$button_colour.'-barrier-block-'.$h_idx.'('.$x.'-'.$horz_y.', barrier-block, '.$button_colour.'-horz)';
+                    $exact_protected_coords[] = $x.'-'.$horz_y; // Make solid
+                    $h_idx++;
+                }
             }
 
             // Create an array to hold any actor strings we want to add
@@ -574,7 +614,6 @@ echo('<pre>'.PHP_EOL);
 
             // Pre-place anchored pickups so they can generate their own protected zones
             $static_pickup_strings = [];
-            $exact_protected_coords = [];
             // Helper function to translate @location tags into absolute grid coordinates
             $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $encounter_inset) {
                 $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
