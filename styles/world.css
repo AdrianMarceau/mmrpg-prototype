@@ -686,6 +686,7 @@ html, body {
 #world #map .sprite.tile.button.purple.down { background-position: -440px -360px; }
 #world #map .sprite.tile.button.orange.up { background-position: -520px -280px; }
 #world #map .sprite.tile.button.orange.down { background-position: -520px -360px; }
+#world #map .sprite.tile.button.hidden { display: none; }
 
 #world #map .sprite.tile.switch-up { background-position: 0 0; }
 #world #map .sprite.tile.switch-down { background-position: 0 0; }
@@ -695,6 +696,7 @@ html, body {
 #world #map .sprite.tile.switch.red-blue.down { background-position: -920px -360px; }
 #world #map .sprite.tile.switch.green-purple.up { background-position: -1000px -280px; }
 #world #map .sprite.tile.switch.green-purple.down { background-position: -1000px -360px; }
+#world #map .sprite.tile.switch.hidden { display: none;  }
 
 #world #map .sprite.block.fence-block {
     background-image: url("../content/fields/gentle-countryside/sprites/battle-field_block.png");
