@@ -29,9 +29,9 @@
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
 @groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
 #---------------------------#
-@encounters = sniper-joe(3),skeleton-joe(2),crystal-joe(1)
+@encounters = sniper-joe(4),robo-transport(3),blocky(2),ben-k(1)
 #---------------------------#
-@bosses[]   = boss-boss-1(9-8, doc-robot)
+@bosses[]   = boss-boss-1(8-3, doc-robot)
 #---------------------------#
 @actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
 #---------------------------#

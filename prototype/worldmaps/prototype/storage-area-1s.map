@@ -30,7 +30,7 @@
 #---------------------------#
 @encounters = weapon-archivist_explode(5),weapon-archivist_flame(4),weapon-archivist_wind(3),weapon-archivist_shadow(2),weapon-archivist_electric(1)
 #---------------------------#
-@bosses[]   = boss-mech-1(7-7, weapon-archivist)
+@bosses[]   = boss-mech-1(3-8, weapon-archivist)
 #---------------------------#
 @actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
 #---------------------------#
