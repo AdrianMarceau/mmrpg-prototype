@@ -25,6 +25,11 @@
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
+@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+#---------------------------#
+@encounters = petit-snakey(4),batton(3),petal-anne(2),air-stone(1)
+#---------------------------#
+@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
 #---------------------------#
 @layer = 0
 #---------------------------#
