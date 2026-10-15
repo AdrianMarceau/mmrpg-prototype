@@ -458,9 +458,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'element' => 'shadow',
         'field' => 'genesis-tower',
-        'encounters' => ['buster-rod-g'],
+        'encounters' => ['buster-rod-g@north-exit'],
         'encounters2' => ['beak', 'pooker', 'molier'],
-        'tags' => ['upper', 'main'],
+        'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
+        'tags' => ['upper', 'main', 'blocks'],
         'exits' => ['north', 'east']
         ];
     $index['genesis-area-2'] = [
@@ -470,9 +471,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 150,
         'element' => 'shadow',
         'field' => 'genesis-tower',
-        'encounters' => ['mega-water-s'],
+        'encounters' => ['mega-water-s@north-exit'],
         'encounters2' => ['molier', 'colton', 'shield-attacker-gtr'],
-        'tags' => ['upper'],
+        'pickups' => ['attack-capsule', 'defense-capsule', 'speed-capsule'],
+        'tags' => ['upper', 'blocks'],
         'exits' => ['north', 'south']
         ];
     $index['genesis-area-3'] = [
@@ -482,10 +484,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'element' => 'shadow',
         'field' => 'genesis-tower',
-        'encounters' => ['hyper-storm-h'],
+        'encounters' => ['hyper-storm-h@center'],
         'encounters2' => ['beak', 'pooker', 'shield-attacker-gtr', 'propeller-eye'],
-        'items' => ['hyper-screw'],
-        'tags' => ['upper'],
+        'pickups' => ['super-pellet', 'super-capsule'],
+        'items' => ['hyper-screw@center-up'],
+        'tags' => ['upper', 'blocks'],
         'exits' => ['south']
         ];
     //--------------------------//
