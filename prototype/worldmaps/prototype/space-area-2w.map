@@ -20,6 +20,20 @@
 @portals[]  = west-exit(1-11, space-area-2w2__east-exit, left-only)
 @portals[]  = east-exit(21-11, star-gate-40nw__west-exit, right-only)
 #---------------------------#
+@buttons[]  = blue-world-button(1-1, blue, up, remove-group-blocks, blue-world-barriers, barrier-block, hidden)
+@groups[]   = blue-world-barriers(16-5...16-17)
+@blocks[]   = blue-barrier-block-1(16-5, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-2(16-8, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-3(16-9, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-4(16-10, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-5(16-11, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-6(16-12, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-7(16-13, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-8(16-14, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-9(16-15, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-10(16-16, barrier-block, blue-vert)
+@blocks[]   = blue-barrier-block-11(16-17, barrier-block, blue-vert)
+#---------------------------#
 @pickups    = small-screw(2),space-shard(1)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(6-6...16-16)
@@ -30,37 +44,38 @@
 #---------------------------#
 @encounters = trille-bot(4),mummira(3),astro-zombieg(2),ring-ring(1)
 #---------------------------#
+@bosses[]   = boss-boss-1(18-11, quake-woman-ds)
+#---------------------------#
 @actors[]   = purple-reset-dude(17-17, robot, anti-eddie, -, default)
 #---------------------------#
-@blocks[]   = super-block-1(9-5, super-block)
-@blocks[]   = super-block-2(7-7, super-block)
-@blocks[]   = super-block-3(10-7, super-block)
-@blocks[]   = super-block-4(12-5, super-block)
-@blocks[]   = super-block-5(10-16, super-block)
-@blocks[]   = super-block-6(15-14, super-block)
-@blocks[]   = super-block-7(15-8, super-block)
-@blocks[]   = super-block-8(7-15, super-block)
-@blocks[]   = super-block-9(17-11, super-block)
-@blocks[]   = super-block-10(5-5, super-block)
-@blocks[]   = super-block-11(9-14, super-block)
-@blocks[]   = super-block-12(13-12, super-block)
-@blocks[]   = super-block-13(17-15, super-block)
-@blocks[]   = super-block-14(13-15, super-block)
-@blocks[]   = super-block-15(7-13, super-block)
-@blocks[]   = super-block-16(12-16, super-block)
-@blocks[]   = super-block-17(13-6, super-block)
-@blocks[]   = super-block-18(11-13, super-block)
-@blocks[]   = super-block-19(8-14, super-block)
-@blocks[]   = super-block-20(13-14, super-block)
-@blocks[]   = super-block-21(9-10, super-block)
-@blocks[]   = super-block-22(14-10, super-block)
-@blocks[]   = super-block-23(11-7, super-block)
-@blocks[]   = super-block-24(6-11, super-block)
-@blocks[]   = super-block-25(8-13, super-block)
-@blocks[]   = super-block-26(11-10, super-block)
-@blocks[]   = super-block-27(6-12, super-block)
-@blocks[]   = super-block-28(9-6, super-block)
-@blocks[]   = super-block-29(15-6, super-block)
+@blocks[]   = super-block-1(14-16, super-block)
+@blocks[]   = super-block-2(9-10, super-block)
+@blocks[]   = super-block-3(15-9, super-block)
+@blocks[]   = super-block-4(7-17, super-block)
+@blocks[]   = super-block-5(12-11, super-block)
+@blocks[]   = super-block-6(11-7, super-block)
+@blocks[]   = super-block-7(14-15, super-block)
+@blocks[]   = super-block-8(11-8, super-block)
+@blocks[]   = super-block-9(6-14, super-block)
+@blocks[]   = super-block-10(5-16, super-block)
+@blocks[]   = super-block-11(13-15, super-block)
+@blocks[]   = super-block-12(6-5, super-block)
+@blocks[]   = super-block-13(9-14, super-block)
+@blocks[]   = super-block-14(6-9, super-block)
+@blocks[]   = super-block-15(12-5, super-block)
+@blocks[]   = super-block-16(11-5, super-block)
+@blocks[]   = super-block-17(9-15, super-block)
+@blocks[]   = super-block-18(9-17, super-block)
+@blocks[]   = super-block-19(5-5, super-block)
+@blocks[]   = super-block-20(17-12, super-block)
+@blocks[]   = super-block-21(5-13, super-block)
+@blocks[]   = super-block-22(5-7, super-block)
+@blocks[]   = super-block-23(15-13, super-block)
+@blocks[]   = super-block-24(8-8, super-block)
+@blocks[]   = super-block-25(10-8, super-block)
+@blocks[]   = super-block-26(15-16, super-block)
+#---------------------------#
+@abilities[]  = experience-booster-pickup(12-6, experience-booster)
 #---------------------------#
 @layer = 0
 #---------------------------#
@@ -69,17 +84,17 @@
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[__],[__],[30],[30],[30],[30],[30],[30],[30],[__],[__],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[__],[__],[30],[30],[30],[30],[30],[30],[30],[__],[__],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
 [__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[30],[__],[__],[__],[__]
-[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[30],[30],[30],[30],[30]
-[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[30],[30],[__],[__],[__],[__]
-[__],[__],[__],[__],[30],[__],[__],[__],[30],[30],[30],[30],[__],[__],[__],[30],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[30],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
+[30],[30],[30],[30],[30],[30],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30]
+[__],[__],[__],[__],[30],[30],[__],[30],[30],[__],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[30],[30],[30],[30],[__],[__],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[__],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
+[__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[__],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
 [__],[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]

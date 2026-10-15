@@ -21,6 +21,8 @@
 @portals[]  = north-exit(8-1, hunter-area-2__south-exit, up-only)
 @portals[]  = west-exit(1-8, star-gate-80ne__east-exit, left-only)
 #---------------------------#
+@pickups    = attack-pellet(3),defense-pellet(2),speed-pellet(1)
+#---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_north-exit-buffer(7-1...9-2)
@@ -29,9 +31,21 @@
 #---------------------------#
 @encounters = mouslider(2),picket-man(1)
 #---------------------------#
-@bosses[]   = boss-boss-1(8-6, enker)
+@bosses[]   = boss-boss-1(8-3, enker)
 #---------------------------#
 @actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+#---------------------------#
+@blocks[]   = super-block-1(11-9, super-block)
+@blocks[]   = super-block-2(5-6, super-block)
+@blocks[]   = super-block-3(7-12, super-block)
+@blocks[]   = super-block-4(12-7, super-block)
+@blocks[]   = super-block-5(4-6, super-block)
+@blocks[]   = super-block-6(8-12, super-block)
+@blocks[]   = super-block-7(12-6, super-block)
+@blocks[]   = super-block-8(5-8, super-block)
+@blocks[]   = super-block-9(4-12, super-block)
+@blocks[]   = super-block-10(7-6, super-block)
+@blocks[]   = super-block-11(7-9, super-block)
 #---------------------------#
 @layer = 0
 #---------------------------#

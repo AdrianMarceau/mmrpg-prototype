@@ -56,8 +56,6 @@
 @locks[]    = laser-portal-flower(24-23, portal-flower, laser, items:laser-core, x10, locked)
 @portals[]  = shield-portal(6-23, shield-area-1__subspace-portal, blue-alt)
 @locks[]    = shield-portal-flower(6-23, portal-flower, shield, items:shield-core, x10, locked)
-@portals[]  = debug-world-portal(4-26, debug__debug-area-1__spawn, void-alt, confirm)
-#---------------------------#
 #---------------------------#
 @pickups    = attack-pellet(3),defense-pellet(2),speed-pellet(1)
 #---------------------------#
