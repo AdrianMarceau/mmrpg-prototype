@@ -104,7 +104,7 @@ ob_start();
     //$temp_options[] = '<a data-order="'.$block_num.'" class="button action_option button_disabled block_'.$block_num.'" type="button">&nbsp;</a>';
 
 	// If we're on the LOCAL or DEV build, display exrta options
-	if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
+	if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_ADMIN_MODE){
 
 		// Add enough padding to push these options to another page
 		if ($block_num < 8){
@@ -140,7 +140,7 @@ ob_start();
                 echo '<span class="float_links">';
                     echo '<span class="page">Page</span>';
                     for ($i = 1; $i <= $current_options_pages; $i++){ echo '<a class="button num'.($i == $temp_selected_page ? ' active' : '').'" href="#'.$i.'">'.$i.'</a>'; }
-                    if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_SERVER_ENV === 'dev'){
+                    if (MMRPG_CONFIG_SERVER_ENV === 'local' || MMRPG_CONFIG_ADMIN_MODE){
                     	echo '<a class="button num" data-action="ability_10_action-devpower-clearmission" style="position: absolute; right: 120px; top: 120px; z-index: 9;"><i class="fa fas fa-skull"></i></a>';
                     }
                     if (MMRPG_CONFIG_SERVER_ENV === 'local'){
