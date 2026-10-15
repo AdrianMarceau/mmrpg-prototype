@@ -449,7 +449,7 @@ function bindEventsToInputs($thisWorld){
                 // If the player has pressed the start button again, attempt to close the storage area via the same button
                 if (activeInputs.Start){
                     // removed: || activeInputs.B  reason: we need B for other actions in-menu sorry
-                    //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                    console.log('%c' + 'Start key pressed!', 'color: orange;');
                     return closeRobotsOverviewPanel();
                     }
                 // If the player has pressed the select button, try to click the team-rotate button if exists/not-disabled
@@ -963,9 +963,27 @@ function bindEventsToInputs($thisWorld){
                     thisCache.leftSideButtonHovered = false;
                     }, 200);
                 }
-            // If the player has pressed the Start button, try to click the minimap-overview button if exists/not-disabled
+            // If the player has pressed the Start button, try to click the robots-overview button (team-switch) button if exists/not-disabled
             if (activeInputs.Start){
                 //console.log('%c' + 'Start key pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                //let $switchButton = $('.team-switch', $robotsOverview);
+                let $storageButtons = $('.storage-button', $robotsOverview);
+                let $firstButton = $storageButtons && $storageButtons.length ? $storageButtons.first() : false;
+                if ($firstButton
+                    && $firstButton.length
+                    && $firstButton.is(':visible')
+                    && !$firstButton.is('.disabled')){
+                    //$switchButton.addClass('clicked');
+                    $firstButton.trigger('click');
+                    setTimeout(function(){ $firstButton.removeClass('clicked'); }, 200);
+                    ignoreInputFor(300);
+                    return true;
+                    }
+                }
+            // If the player has pressed the X button, try to click the minimap-overview button if exists/not-disabled
+            if (activeInputs.X){
+                //console.log('%c' + 'X key pressed!', 'color: orange;');
                 if (event){ event.preventDefault(); }
                 if ($minimapOverview.length
                     && $minimapOverview.is(':visible')
@@ -992,24 +1010,6 @@ function bindEventsToInputs($thisWorld){
                     $minimapOverview.trigger('mouseleave');
                     thisCache.minimapOverviewHovered = false;
                     }, 200);
-                }
-            // If the player has pressed the X button, try to click the robots-overview button (team-switch) button if exists/not-disabled
-            if (activeInputs.X){
-                //console.log('%c' + 'X key pressed!', 'color: orange;');
-                if (event){ event.preventDefault(); }
-                //let $switchButton = $('.team-switch', $robotsOverview);
-                let $storageButtons = $('.storage-button', $robotsOverview);
-                let $firstButton = $storageButtons && $storageButtons.length ? $storageButtons.first() : false;
-                if ($firstButton
-                    && $firstButton.length
-                    && $firstButton.is(':visible')
-                    && !$firstButton.is('.disabled')){
-                    //$switchButton.addClass('clicked');
-                    $firstButton.trigger('click');
-                    setTimeout(function(){ $firstButton.removeClass('clicked'); }, 200);
-                    ignoreInputFor(300);
-                    return true;
-                    }
                 }
             // If the player has pressed the Y button, ?????
             if (activeInputs.Y){
