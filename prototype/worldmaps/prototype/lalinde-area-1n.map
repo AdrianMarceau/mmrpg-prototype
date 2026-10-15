@@ -24,7 +24,7 @@
 #---------------------------#
 @pickups    = small-screw(3),energy-pellet(2),weapon-pellet(1)
 #---------------------------#
-@items[]    = static-pickup-1(11-8, field-booster)
+@items[]    = static-pickup-1(8-5, field-booster)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
@@ -35,9 +35,9 @@
 #---------------------------#
 @encounters = bunby-heli(4),flutter-fly(3),petit-snakey(2),batton(1)
 #---------------------------#
-@bosses[]   = boss-boss-1(8-9, trill)
+@bosses[]   = boss-boss-1(8-8, trill)
 #---------------------------#
-@rescues[]  = rescue-robo-1(10-5, beat)
+@rescues[]  = rescue-robo-1(8-7, beat)
 #---------------------------#
 @actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
 #---------------------------#
