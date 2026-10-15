@@ -2400,11 +2400,29 @@ class mmrpgWorldMap {
         let _elements = _self.elements;
         let _world = _self.state;
         updateUserZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
-        forceZoom = typeof updateUserZoom === 'boolean' ? updateUserZoom : false;
+        forceZoom = typeof forceZoom === 'boolean' ? forceZoom : false;
         //console.log('-> newZoomLevel =', newZoomLevel, '-> _config.defaultZoomLevel =', _config.defaultZoomLevel, '\n-> _world.userZoomLevel =', _world.userZoomLevel);
         if (!forceZoom && newZoomLevel === _world.zoomLevel){ return true; } // we are already at the requested zoom level
         _world.zoomLevel = newZoomLevel;
         if (updateUserZoom){ _world.userZoomLevel = newZoomLevel; }
+        // --- UI SYNC: Update the minimap zoom button states ---
+        if (_elements.zoomControls && _elements.zoomControls.length){
+            // Target the zoom buttons (broadened selectors to ensure we catch elements)
+            let $zoomIn = _elements.zoomControls.find('[data-action="zoom-in"], .zoom-in, [data-action="in"]');
+            let $zoomOut = _elements.zoomControls.find('[data-action="zoom-out"], .zoom-out, [data-action="out"]');
+            // Disable zoom-in if at or above max
+            if (newZoomLevel >= _config.maxZoomLevel){
+                $zoomIn.addClass('disabled').attr('disabled', 'disabled');
+                } else {
+                $zoomIn.removeClass('disabled').removeAttr('disabled');
+                }
+            // Disable zoom-out if at or below min
+            if (newZoomLevel <= _config.minZoomLevel){
+                $zoomOut.addClass('disabled').attr('disabled', 'disabled');
+                } else {
+                $zoomOut.removeClass('disabled').removeAttr('disabled');
+                }
+            }
         //console.log('-> re-scrolling map to update zoom...');
         _self.scrollMap(null, null, true);
         return true;

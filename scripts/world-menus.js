@@ -223,19 +223,14 @@ function initMenuZoomControls($thisWorld, $zoomControls){
         else if ($zoomButton.is('.zoom-in')){ zoomDir = 'in'; }
         //console.log('-> zoomDir =', zoomDir);
         if (!zoomDir){ return false; }
-        let maxZoom = _config.maxZoomLevel;
-        let minZoom = _config.minZoomLevel;
         let oldZoom = _world.zoomLevel || 1;
         if (zoomDir === 'out'){ _self.decZoomLevel(null, true); }
         else if (zoomDir === 'in'){ _self.incZoomLevel(null, true); }
         let newZoom = _world.zoomLevel || 1;
         if (newZoom !== oldZoom){ _self.playSoundEffect('spawn-sound'); }
-        if (newZoom >= maxZoom){ $zoomInButton.addClass('disabled'); }
-        else { $zoomInButton.removeClass('disabled'); }
-        if (newZoom <= minZoom){ $zoomOutButton.addClass('disabled'); }
-        else { $zoomOutButton.removeClass('disabled'); }
         return true;
         });
+
     return true;
     }
 
