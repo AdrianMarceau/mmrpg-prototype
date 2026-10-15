@@ -627,7 +627,7 @@ echo('<pre>'.PHP_EOL);
                 if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
                 // Exit path locations (2 tiles inward from portals)
                 if ($loc === 'north-exit') return $area_middle_col . '-4';
-                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 2);
+                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 3);
                 if ($loc === 'east-exit') return ($area_size_width - 3) . '-' . $area_middle_row;
                 if ($loc === 'west-exit') return '4-' . $area_middle_row;
                 // Inner perimeter locations (1 tile inward from the exit paths / safely off the path)
@@ -710,6 +710,7 @@ echo('<pre>'.PHP_EOL);
                 && $area_size_width >= 15 && $area_size_height >= 15){
                 // Main maps get 3-5 holes, smaller maps get 1-2
                 $num_holes = in_array('main', $area_tags) ? mt_rand(4, 6) : mt_rand(3, 5);
+                if ($area_size_width >= 21 && $area_size_height >= 21){ $num_holes = mt_rand(5, 7); }
                 // Use a temporary picker to grab safe hole seeds (enforcing a 2-tile buffer so holes don't clump)
                 $holePicker = createCoordinatePicker($area_size_width, $area_size_height, $encounter_inset, $exclude_coords);
                 for ($h = 0; $h < $num_holes; $h++) {
@@ -774,8 +775,8 @@ echo('<pre>'.PHP_EOL);
                     if ($b_dir === 'vert') {
                         // Vertical slice means X is fixed, Y varies
                         $fixed_x = $area_middle_col; // Default to center
-                        if ($b_loc === 'west') $fixed_x = 5;
-                        elseif ($b_loc === 'east') $fixed_x = $area_size_width - 4;
+                        if ($b_loc === 'west') $fixed_x = 6;
+                        elseif ($b_loc === 'east') $fixed_x = $area_size_width - 5;
                         $end_val = $area_size_height - $area_padding;
                         for ($y = $start_val; $y <= $end_val; $y++) {
                             $pos = $fixed_x.'-'.$y;
@@ -787,8 +788,8 @@ echo('<pre>'.PHP_EOL);
                     } elseif ($b_dir === 'horz'){
                         // Horizontal slice means Y is fixed, X varies
                         $fixed_y = $area_middle_row; // Default to center
-                        if ($b_loc === 'north') $fixed_y = 5;
-                        elseif ($b_loc === 'south') $fixed_y = $area_size_height - 4;
+                        if ($b_loc === 'north') $fixed_y = 6;
+                        elseif ($b_loc === 'south') $fixed_y = $area_size_height - 5;
                         $end_val = $area_size_width - $area_padding;
                         for ($x = $start_val; $x <= $end_val; $x++) {
                             $pos = $x.'-'.$fixed_y;
@@ -821,6 +822,13 @@ echo('<pre>'.PHP_EOL);
             if (in_array('elemental', $area_tags)) {
                 // Allow super-blocks to spawn 1 tile further out than the standard encounter zone
                 $block_inset = max(0, $encounter_inset - 1);
+                // CRITICAL: Protect the exact choke-point tiles in front of active exits
+                // so the wider block_inset doesn't accidentally wall the player in!
+                $clean_area_exits = array_map('trim', $area_exits);
+                if (in_array('north', $clean_area_exits)) { $exclude_coords[] = $area_middle_col.'-'.($block_inset + 1); }
+                if (in_array('south', $clean_area_exits)) { $exclude_coords[] = $area_middle_col.'-'.($area_size_height - $block_inset); }
+                if (in_array('west', $clean_area_exits)) { $exclude_coords[] = ($block_inset + 1).'-'.$area_middle_row; }
+                if (in_array('east', $clean_area_exits)) { $exclude_coords[] = ($area_size_width - $block_inset).'-'.$area_middle_row; }
                 // Calculate the total number of walkable tiles inside this wider inset
                 $zone_w = max(0, $area_size_width - ($block_inset * 2));
                 $zone_h = max(0, $area_size_height - ($block_inset * 2));
