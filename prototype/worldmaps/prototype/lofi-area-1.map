@@ -21,6 +21,16 @@
 @portals[]  = north-exit(7-1, lofi-area-2__south-exit, up-only)
 @portals[]  = east-exit(13-7, star-gate-50w__west-exit, right-only)
 #---------------------------#
+@groups[]   = encounter-zone_main-area(5-5...9-9)
+@groups[]   = no-encounters_spawn-buffer(7-7...7-7)
+@groups[]   = no-encounters_north-exit-buffer(6-1...8-2)
+@groups[]   = no-encounters_east-exit-buffer(12-6...13-8)
+@groups[]   = no-encounters_purple-reset-dude-buffer(9-9...11-11)
+#---------------------------#
+@encounters = heel-bot(1)
+#---------------------------#
+@actors[]   = purple-reset-dude(10-10, robot, anti-eddie, -, default)
+#---------------------------#
 @layer = 0
 #---------------------------#
 [__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__]
