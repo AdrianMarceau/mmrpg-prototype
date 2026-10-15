@@ -2,6 +2,7 @@
 
 // Require the global top file
 require_once('../../top.php');
+if (rpg_user::is_guest()){ die('You shouldn\'t be here...'); }
 
 // Define a salt for deterministic map generation (change to re-randomize)
 define('MMRPG_MAP_GENERATOR_SALT', 'prototype-2k25-v2');
@@ -436,11 +437,13 @@ echo('<pre>'.PHP_EOL);
                         $area_file_markup[] = '@locks[]    = '.$flower_type.'-portal-flower('.$local_pos.', portal-flower, '.$flower_type.', items:'.$flower_type.'-core, x10, locked)';
                     }
                 }
-                // TEMP TEMP TEMP TEMP TEMP (TODO: Remove this before launch!)
-                // Place one more portal at the bottom-left in case we need to go back to the debug area
-                $area_file_markup[] = '@portals[]  = debug-world-portal('.($area_padding + 1).'-'.($area_size_height - $area_padding).', debug__debug-area-1__spawn, void-alt, confirm)';
+            }
+            // If this area is the postgame Backdoor, place the debug portal in the exact center
+            if (in_array('postgame', $area_tags)) {
                 $area_file_markup[] = '#---------------------------#';
-
+                $area_file_markup[] = '@portals[]  = debug-world-portal('.$area_spawn.', debug__debug-area-1__spawn, void-alt, confirm)';
+                // We don't need to add this to $protected_zones because 'spawn-buffer'
+                // already protects the exact center coordinate ($area_spawn) with a 0-radius buffer
             }
             // If this area has a PLAYER PLATFORM, we should add its parts and accompanying panels
             if (in_array('player-platform', $area_objects)
@@ -623,15 +626,15 @@ echo('<pre>'.PHP_EOL);
                 if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
                 if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
                 // Exit path locations (2 tiles inward from portals)
-                if ($loc === 'north-exit') return $area_middle_col . '-3';
+                if ($loc === 'north-exit') return $area_middle_col . '-4';
                 if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 2);
-                if ($loc === 'east-exit') return ($area_size_width - 2) . '-' . $area_middle_row;
-                if ($loc === 'west-exit') return '3-' . $area_middle_row;
+                if ($loc === 'east-exit') return ($area_size_width - 3) . '-' . $area_middle_row;
+                if ($loc === 'west-exit') return '4-' . $area_middle_row;
                 // Inner perimeter locations (1 tile inward from the exit paths / safely off the path)
                 if ($loc === 'north') return $area_middle_col . '-5';
                 if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - 4);
-                if ($loc === 'east') return ($area_size_width - 4) . '-' . $area_middle_row;
-                if ($loc === 'west') return '5-' . $area_middle_row;
+                if ($loc === 'east') return ($area_size_width - 5) . '-' . $area_middle_row;
+                if ($loc === 'west') return '6-' . $area_middle_row;
                 // Absolute center
                 if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
                 return null;
@@ -748,6 +751,69 @@ echo('<pre>'.PHP_EOL);
                 }
                 // Clean up the exclude array before handing it to the main picker
                 $exclude_coords = array_unique($exclude_coords);
+            }
+
+            // Generate BARRIER SLICES if defined for the area
+            $area_barriers = !empty($area_info['barriers']) ? $area_info['barriers'] : array();
+            if (!empty($area_barriers)){
+                $area_file_markup[] = '#---------------------------#';
+                foreach ($area_barriers as $barrier_str) {
+                    // Parse syntax: [colour]-[dir]@[loc] (e.g., "red-vert@center")
+                    $parts = explode('@', trim($barrier_str));
+                    if (count($parts) !== 2) continue;
+                    list($b_type, $b_loc) = $parts;
+                    $type_parts = explode('-', trim($b_type));
+                    if (count($type_parts) !== 2) continue;
+                    list($b_colour, $b_dir) = $type_parts;
+                    $group_name = $b_colour.'-world-barriers';
+                    // Add the hidden button at 1-1 to control this group
+                    $area_file_markup[] = '@buttons[]  = '.$b_colour.'-world-button(1-1, '.$b_colour.', up, remove-group-blocks, '.$group_name.', barrier-block, hidden)';
+                    // Determine slice coordinates based on direction and location
+                    $slice_coords = [];
+                    $start_val = $area_padding + 1;
+                    if ($b_dir === 'vert') {
+                        // Vertical slice means X is fixed, Y varies
+                        $fixed_x = $area_middle_col; // Default to center
+                        if ($b_loc === 'west') $fixed_x = 5;
+                        elseif ($b_loc === 'east') $fixed_x = $area_size_width - 4;
+                        $end_val = $area_size_height - $area_padding;
+                        for ($y = $start_val; $y <= $end_val; $y++) {
+                            $pos = $fixed_x.'-'.$y;
+                            // Critical: Only add this block if it isn't a punched-out void hole!
+                            if (!in_array($pos, $map_holes)) {
+                                $slice_coords[] = $pos;
+                            }
+                        }
+                    } elseif ($b_dir === 'horz'){
+                        // Horizontal slice means Y is fixed, X varies
+                        $fixed_y = $area_middle_row; // Default to center
+                        if ($b_loc === 'north') $fixed_y = 5;
+                        elseif ($b_loc === 'south') $fixed_y = $area_size_height - 4;
+                        $end_val = $area_size_width - $area_padding;
+                        for ($x = $start_val; $x <= $end_val; $x++) {
+                            $pos = $x.'-'.$fixed_y;
+                            // Critical: Only add this block if it isn't a punched-out void hole!
+                            if (!in_array($pos, $map_holes)) {
+                                $slice_coords[] = $pos;
+                            }
+                        }
+                    }
+                    // If we successfully mapped valid coordinates for the slice, generate the markup
+                    if (!empty($slice_coords)){
+                        // The engine group parser will target the bounding box of min...max
+                        $first_pos = $slice_coords[0];
+                        $last_pos = end($slice_coords);
+                        $area_file_markup[] = '@groups[]   = '.$group_name.'('.$first_pos.'...'.$last_pos.')';
+                        $b_idx = 1;
+                        foreach ($slice_coords as $pos){
+                            $area_file_markup[] = '@blocks[]   = '.$b_colour.'-barrier-block-'.$b_idx.'('.$pos.', barrier-block, '.$b_type.')';
+                            // Add these to both protection lists so nothing drops on them
+                            $exclude_coords[] = $pos;
+                            $exact_protected_coords[] = $pos;
+                            $b_idx++;
+                        }
+                    }
+                }
             }
 
             // Generate RANDOM SUPER-BLOCKS for elemental areas (20% of remaining tiles)
