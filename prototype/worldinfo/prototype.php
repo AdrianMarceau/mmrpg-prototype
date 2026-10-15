@@ -1427,9 +1427,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 110,
         'element' => 'space',
         'field' => 'satellite-deck',
-        'encounters' => ['star-man'],
+        'encounters' => ['star-man@west'],
         'encounters2' => ['novamite', 'shururun', 'malmet', 'pukapunter'],
-        'abilities' => ['space-buster'],
+        'abilities' => ['space-buster@east'],
+        'barriers' => ['red-vert@center'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1440,8 +1441,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'element' => 'space',
         'field' => 'satellite-deck',
-        'encounters' => ['astro-man'],
+        'encounters' => ['astro-man@east-exit', 'gachappon@west'],
         'encounters2' => ['novamite', 'shururun', 'flipping-suzy', 'pukapunter'],
+        'barriers' => ['purple-vert@center'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1453,7 +1455,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'space',
         'field' => 'satellite-deck',
         'encounters2' => ['novamite', 'shururun', 'malmet', 'flipping-suzy', 'trille-bot'],
-        'encounters' => ['terra'],
+        'encounters' => ['terra@north-exit'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -1465,9 +1467,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 110,
         'element' => 'space',
         'field' => 'galaxy-fantasy',
-        'encounters' => ['galaxy-man'],
+        'encounters' => ['galaxy-man@east'],
         'encounters2' => ['novamite', 'ring-ring', 'adamski', 'tamp'],
-        'abilities' => ['space-buster'],
+        'abilities' => ['space-buster@west'],
+        'barriers' => ['purple-vert@center'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1478,8 +1481,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 120,
         'element' => 'space',
         'field' => 'galaxy-fantasy',
-        'encounters' => ['gachappon'],
+        'encounters' => ['astro-man@west-exit', 'gachappon@east'],
         'encounters2' => ['novamite', 'ring-ring', 'malmet', 'tamp'],
+        'barriers' => ['red-vert@center'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1490,7 +1494,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 130,
         'element' => 'space',
         'field' => 'galaxy-fantasy',
-        'encounters' => ['ra-thor'],
+        'encounters' => ['ra-thor@north-exit'],
         'encounters2' => ['novamite', 'ring-ring', 'adamski', 'malmet', 'trille-bot'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['north', 'east', 'west']
@@ -1502,8 +1506,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 200,
         'element' => 'space',
         'field' => 'final-destination-3',
-        'encounters' => ['slur'],
-        'encounters2' => ['trille-bot'],
+        'encounters' => ['slur@north-exit'],
+        'encounters2' => ['trill', 'trille-bot'],
+        'pickups' => ['energy-capsule', 'weapon-capsule', 'attack-capsule', 'defense-capsule', 'speed-capsule'],
         'tags' => ['upper', 'elemental', 'main', 'final'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -1527,8 +1532,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 150,
         'element' => 'space',
         'field' => 'final-destination-2',
-        'encounters' => ['dark-man-4'],
+        'encounters' => ['dark-man-4@west-exit'],
         'encounters2' => ['trille-bot', 'shimobey', 'romper', 'shururun'],
+        'barriers' => ['green-vert@west'],
+        'abilities' => ['experience-booster'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1538,8 +1545,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'element' => 'space',
         'field' => 'final-destination',
-        'encounters' => ['dark-man', 'dark-man-2', 'dark-man-3'],
+        'encounters' => ['dark-man@south-exit', 'dark-man-2@center', 'dark-man-3@west-exit'],
         'encounters2' => ['trille-bot', 'shimobey', 'romper', 'shururun'],
+        'abilities' => ['recovery-booster', 'recovery-breaker'],
+        'barriers' => ['blue-vert@west'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['south', 'west']
         ];
@@ -1550,8 +1559,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 150,
         'element' => 'space',
         'field' => 'final-destination-2',
-        'encounters' => ['quake-woman-ds'],
+        'encounters' => ['quake-woman-ds@east-exit'],
         'encounters2' => ['trille-bot', 'mummira', 'astro-zombieg', 'ring-ring'],
+        'barriers' => ['blue-vert@east'],
+        'abilities' => ['experience-booster'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'west']
         ];
@@ -1561,8 +1572,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'element' => 'space',
         'field' => 'final-destination',
-        'encounters' => ['mega-man-ds', 'bass-ds', 'proto-man-ds'],
+        'encounters' => ['mega-man-ds@south-exit', 'bass-ds@center', 'proto-man-ds@east-exit'],
         'encounters2' => ['trille-bot', 'mummira', 'astro-zombieg', 'ring-ring'],
+        'barriers' => ['green-vert@east'],
+        'abilities' => ['damage-booster', 'damage-breaker'],
         'tags' => ['upper', 'elemental'],
         'exits' => ['east', 'south']
         ];
