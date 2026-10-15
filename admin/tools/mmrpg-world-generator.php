@@ -615,30 +615,35 @@ echo('<pre>'.PHP_EOL);
                 }
             }
 
-            // Pre-place anchored pickups so they can generate their own protected zones
-            $static_pickup_strings = [];
             // Helper function to translate @location tags into absolute grid coordinates
-            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $encounter_inset) {
+            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $area_padding) {
                 $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
                 // Portal locations (exact outer edges of the map)
                 if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
                 if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
                 if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
                 if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
-                // Exit path locations (2 tiles inward from portals)
-                if ($loc === 'north-exit') return $area_middle_col . '-4';
-                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - 3);
-                if ($loc === 'east-exit') return ($area_size_width - 3) . '-' . $area_middle_row;
-                if ($loc === 'west-exit') return '4-' . $area_middle_row;
-                // Inner perimeter locations (1 tile inward from the exit paths / safely off the path)
-                if ($loc === 'north') return $area_middle_col . '-5';
-                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - 4);
-                if ($loc === 'east') return ($area_size_width - 5) . '-' . $area_middle_row;
-                if ($loc === 'west') return '6-' . $area_middle_row;
-                // Absolute center
+                // Exit path locations (Directly on the path, right before the main platform)
+                if ($loc === 'north-exit') return $area_middle_col . '-' . $area_padding;
+                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - $area_padding + 1);
+                if ($loc === 'east-exit') return ($area_size_width - $area_padding + 1) . '-' . $area_middle_row;
+                if ($loc === 'west-exit') return $area_padding . '-' . $area_middle_row;
+                // Inner perimeter locations (1 tile safely inside the main room, completely off the path)
+                if ($loc === 'north') return $area_middle_col . '-' . ($area_padding + 2);
+                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - $area_padding - 1);
+                if ($loc === 'east') return ($area_size_width - $area_padding - 1) . '-' . $area_middle_row;
+                if ($loc === 'west') return ($area_padding + 2) . '-' . $area_middle_row;
+                // Center and Center-Offset locations
                 if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
+                if ($loc === 'center-left') return ($area_middle_col - 1) . '-' . $area_middle_row;
+                if ($loc === 'center-right') return ($area_middle_col + 1) . '-' . $area_middle_row;
+                if ($loc === 'center-up') return $area_middle_col . '-' . ($area_middle_row - 1);
+                if ($loc === 'center-down') return $area_middle_col . '-' . ($area_middle_row + 1);
                 return null;
                 };
+
+            // Pre-place anchored pickups so they can generate their own protected zones
+            $static_pickup_strings = [];
             if (!empty($anchored_pickups)){
                 foreach ($anchored_pickups AS $key => $pickup){
                     // Parse out the location tag and clean the item token
@@ -693,7 +698,21 @@ echo('<pre>'.PHP_EOL);
                 // Build the no-encounters markup for the dynamic system
                 $no_encounter_strings[] = '@groups[]   = no-encounters_'.$zone_name.'(' . $box['range'] . ')';
             }
-            // Merge in the exact coordinates of anchored items without applying a buffer box
+
+            // Pre-scan all explicit @location tags to protect them from void holes!
+            // If the user requested a specific tile for an encounter/item/rescue, make it solid ground.
+            $entities_to_scan = array_merge($regular_pickups, $area_static_encounters, $area_static_rescues);
+            foreach ($entities_to_scan as $entity_str) {
+                if (strpos($entity_str, '@') !== false) {
+                    list($entity_token, $location) = explode('@', trim($entity_str));
+                    $pos = !empty($location) ? $getLocationCoords($location) : null;
+                    if ($pos) {
+                        $exact_protected_coords[] = $pos;
+                    }
+                }
+            }
+
+            // Merge in the exact coordinates of anchored items and @location tags without applying a buffer box
             if (!empty($exact_protected_coords)){
                 $exclude_coords = array_merge($exclude_coords, $exact_protected_coords);
             }
@@ -819,7 +838,8 @@ echo('<pre>'.PHP_EOL);
 
             // Generate RANDOM SUPER-BLOCKS for elemental areas (20% of remaining tiles)
             $block_strings = [];
-            if (in_array('elemental', $area_tags)) {
+            if (in_array('blocks', $area_tags)
+                || in_array('elemental', $area_tags)){
                 // Allow super-blocks to spawn 1 tile further out than the standard encounter zone
                 $block_inset = max(0, $encounter_inset - 1);
                 // CRITICAL: Protect the exact choke-point tiles in front of active exits
