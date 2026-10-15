@@ -149,7 +149,10 @@ if ($this_battle->battle_status === 'complete'
         }
     }
 
-    // Level-up any mechas in the party by 1 after a victorious world battle
+    // Calculate the level increment based on the number of targets on the opponent's side
+    $level_increment = !empty($target_player->player_robots) ? count($target_player->player_robots) : 1;
+
+    // Level-up any mechas in the party after a victorious world battle
     $game_session_token = rpg_game::session_token();
     if (!empty($this_player->player_robots)){
         foreach ($this_player->player_robots AS $robot_info){
@@ -161,11 +164,12 @@ if ($this_battle->battle_status === 'complete'
             $robot_energy = !empty($robot_info['robot_energy']) && $robot_info['robot_energy'] > 0 ? $robot_info['robot_energy'] : 0;
             $is_disabled = empty($robot_energy) || (!empty($robot_info['robot_status']) && $robot_info['robot_status'] === 'disabled');
             if ($is_disabled){ continue; }
-            // Locate the mecha in the session rewards and increment its level
+            // Locate the mecha in the session rewards and increment its level by the number of targets
             $robot_session_token = $robot_info['robot_base_id'].'_'.$robot_token;
             if (isset($_SESSION[$game_session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$robot_session_token])){
                 $reward_stats = &$_SESSION[$game_session_token]['values']['battle_rewards'][$this_player->player_token]['player_robots'][$robot_session_token];
-                $reward_stats['robot_level'] = isset($reward_stats['robot_level']) ? $reward_stats['robot_level'] + 1 : 2;
+                // Add the dynamic increment instead of a flat +1
+                $reward_stats['robot_level'] = isset($reward_stats['robot_level']) ? $reward_stats['robot_level'] + $level_increment : 1 + $level_increment;
                 // Cap at level 100 just to be safe
                 if ($reward_stats['robot_level'] > 100){ $reward_stats['robot_level'] = 100; }
             }
