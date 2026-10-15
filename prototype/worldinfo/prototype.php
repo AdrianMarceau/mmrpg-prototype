@@ -417,9 +417,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 140,
         'element' => 'shadow',
         'field' => 'hunter-compound',
-        'encounters' => ['enker'],
+        'encounters' => ['enker@north-exit'],
         'encounters2' => ['mouslider', 'picket-man'],
-        'tags' => ['upper', 'main'],
+        'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
+        'tags' => ['upper', 'main', 'blocks'],
         'exits' => ['north', 'west']
         ];
     $index['hunter-area-2'] = [
@@ -430,8 +431,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'shadow',
         'field' => 'hunter-compound',
         'encounters2' => ['mouslider', 'picket-man'],
-        'encounters' => ['punk'],
-        'tags' => ['upper'],
+        'encounters' => ['punk@north-exit'],
+        'pickups' => ['attack-capsule', 'defense-capsule', 'speed-capsule'],
+        'tags' => ['upper', 'blocks'],
         'exits' => ['north', 'south']
         ];
     $index['hunter-area-3'] = [
@@ -441,10 +443,11 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'element' => 'shadow',
         'field' => 'hunter-compound',
-        'encounters' => ['ballade'],
+        'encounters' => ['ballade@center'],
         'encounters2' => ['mouslider', 'picket-man'],
-        'items' => ['hyper-screw'],
-        'tags' => ['upper'],
+        'pickups' => ['super-pellet', 'super-capsule'],
+        'items' => ['hyper-screw@center-up'],
+        'tags' => ['upper', 'blocks'],
         'exits' => ['south']
         ];
     //--------------------------//
