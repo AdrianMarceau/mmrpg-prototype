@@ -1995,7 +1995,7 @@ class rpg_world {
 
         // RANDOM PICKUPS (within defined limits)
         $allowed_random_pickups = $map_pickups;
-        $max_random_pickups = ceil($available_pickup_cells['total'] * 0.10); // TODO: make this configurable in the map file
+        $max_random_pickups = ceil($available_pickup_cells['total'] * 0.20); // TODO: make this configurable in the map file
         //error_log('$allowed_random_pickups = '.print_r($allowed_random_pickups, true));
         //error_log('$available_pickup_terrain = '.print_r($available_pickup_terrain, true));
         //error_log('$available_pickup_cells = '.print_r($available_pickup_cells, true));
