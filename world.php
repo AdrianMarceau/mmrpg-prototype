@@ -1243,7 +1243,8 @@ $(document).ready(function(){
                 //console.log('-> mapFieldName = '+mapFieldName);
                 //let titleText = worldName + ' &raquo; ' + mapName + ' &raquo; ';
                 let titleText, subtitleText;
-                if (mapName.match(/^STAR Gate/i)){
+                if (mapName.match(/^STAR Gate/i)
+                    || mapName.match(/^(HiFi|LoFi) Area/i)){
                     titleText = ''; //'?????? &raquo;'; //worldName + ' &raquo;';
                     subtitleText = mapName;
                     } else {
