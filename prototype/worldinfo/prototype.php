@@ -219,10 +219,10 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 90,
         'element' => 'copy',
         'field' => '',
-        'encounters' => ['trill'],
+        'encounters' => ['trill@center'],
         'encounters2' => ['bunby-heli', 'flutter-fly', 'petit-snakey', 'batton'],
-        'rescues' => ['beat'],
-        'items' => ['field-booster'],
+        'rescues' => ['beat@center-up'],
+        'items' => ['field-booster@north'],
         'pickups' => ['small-screw', 'energy-pellet', 'weapon-pellet'],
         'tags' => ['central', 'player'],
         'exits' => ['east', 'south', 'west']
@@ -499,6 +499,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 100,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['heal-bot'],
         'tags' => ['upper', 'path'],
         'exits' => ['north', 'west']
         ];
@@ -509,6 +510,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 100,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['heal-bot', 'heal-bot_alt4'],
         'tags' => ['upper', 'path'],
         'exits' => ['north', 'south']
         ];
@@ -544,9 +546,9 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'element' => 'space',
         'field' => 'stardroid-base',
-        'encounters' => ['sunstar'],
+        'encounters' => ['sunstar@center'],
         'encounters2' => ['novamite', 'malmet'],
-        'items' => ['cosmo-circuit'],
+        'items' => ['cosmo-circuit@center-up'],
         'tags' => ['upper', 'special'],
         'exits' => ['south']
         ];
@@ -558,6 +560,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 100,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['heel-bot'],
         'tags' => ['upper', 'path'],
         'exits' => ['north', 'east']
         ];
@@ -568,6 +571,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 100,
         'field' => '',
         'encounters' => [],
+        'encounters2' => ['heel-bot', 'heel-bot_alt2'],
         'tags' => ['upper', 'path'],
         'exits' => ['north', 'south']
         ];
@@ -601,8 +605,8 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 160,
         'element' => 'shadow',
         'field' => 'prototype-complete',
-        'encounters' => ['quint'],
-        'items' => ['gambit-module'],
+        'encounters' => ['quint@center'],
+        'items' => ['gambit-module@center-up'],
         'tags' => ['upper', 'special'],
         'exits' => ['south']
         ];
