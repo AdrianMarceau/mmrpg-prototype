@@ -4808,6 +4808,9 @@ class rpg_robot extends rpg_object {
                                                     && !in_array($info['ability_token'], $level_up_abilities)){
                                                     continue;
                                                     }
+                                                if (!self::has_ability_compatibility($robot_info['robot_token'], $info['ability_token'])){
+                                                    continue;
+                                                }
                                                 if (
                                                     (!empty($info['ability_type']) && ($robot_copy_program || $info['ability_type'] == $robot_ability_core || $info['ability_type'] == $robot_ability_core2)) ||
                                                     (!empty($info['ability_type2']) && ($info['ability_type2'] == $robot_ability_core || $info['ability_type2'] == $robot_ability_core2))
@@ -4825,6 +4828,7 @@ class rpg_robot extends rpg_object {
                                         }
                                         foreach ($robot_ability_list AS $this_token){
                                             if ($this_token == '*'){ continue; }
+                                            if (!self::has_ability_compatibility($robot_info['robot_token'], $this_token)){ continue; }
                                             if (!isset($new_ability_rewards[$this_token])){
                                                 if (in_array($this_token, $global_abilities)){ $new_ability_rewards[$this_token] = array('level' => 'Global', 'token' => $this_token); }
                                                 elseif (in_array($this_token, $robot_ability_core_list)){ $new_ability_rewards[$this_token] = array('level' => 'Core', 'token' => $this_token); }
@@ -4845,11 +4849,22 @@ class rpg_robot extends rpg_object {
                                         //error_log('<pre>$temp_ability_index_order = '.print_r($temp_ability_index_order, true).'</pre>');
 
                                         // Define some inline sort functions that we can use later for display
-                                        $sort_abilities_by_index = function($a, $b) use ($temp_ability_index_order) {
+                                        $sort_abilities_by_index = function($a, $b) use ($temp_ability_index_order){
                                             $a_index = in_array($a['token'], $temp_ability_index_order) ? array_search($a['token'], $temp_ability_index_order) : 9999;
                                             $b_index = in_array($b['token'], $temp_ability_index_order) ? array_search($b['token'], $temp_ability_index_order) : 9999;
                                             if ($a_index === $b_index){ return 0; }
                                             return ($a_index < $b_index) ? -1 : 1;
+                                            };
+                                        $sort_abilities_by_level = function($a, $b) use ($temp_ability_index_order){
+                                            $a_level = isset($a['level']) && is_numeric($a['level']) ? intval($a['level']) : 0;
+                                            $b_level = isset($b['level']) && is_numeric($b['level']) ? intval($b['level']) : 0;
+                                            if ($a_level === $b_level){
+                                                $a_index = in_array($a['token'], $temp_ability_index_order) ? array_search($a['token'], $temp_ability_index_order) : 9999;
+                                                $b_index = in_array($b['token'], $temp_ability_index_order) ? array_search($b['token'], $temp_ability_index_order) : 9999;
+                                                if ($a_index === $b_index){ return 0; }
+                                                return ($a_index < $b_index) ? -1 : 1;
+                                                }
+                                            return ($a_level < $b_level) ? -1 : 1;
                                             };
                                         $sort_abilities_by_corematch = function($a, $b) use ($temp_custom_type_order, $temp_abilities_index, $temp_ability_index_order){
                                             $a_type = !empty($temp_abilities_index[$a['token']]['ability_type']) ? $temp_abilities_index[$a['token']]['ability_type'] : 'none';
@@ -4897,6 +4912,11 @@ class rpg_robot extends rpg_object {
                                                     $method = !is_numeric($a['level']) ? strtolower($a['level']) : 'level';
                                                     return $method == $current_method;
                                                     });
+
+                                                // If this is a "level" category, make sure we sort by level
+                                                if ($current_method === 'level'){
+                                                    uasort($robot_this_ability_rewards, $sort_abilities_by_level);
+                                                }
 
                                                 // If this is a "core" or "subcore" category, make sure we sort by type
                                                 if (in_array($current_method, array('core', 'subcore'))){
