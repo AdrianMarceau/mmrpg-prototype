@@ -449,7 +449,7 @@ function bindEventsToInputs($thisWorld){
                 // If the player has pressed the start button again, attempt to close the storage area via the same button
                 if (activeInputs.Start){
                     // removed: || activeInputs.B  reason: we need B for other actions in-menu sorry
-                    console.log('%c' + 'Start key pressed!', 'color: orange;');
+                    //console.log('%c' + 'Start key pressed!', 'color: orange;');
                     return closeRobotsOverviewPanel();
                     }
                 // If the player has pressed the select button, try to click the team-rotate button if exists/not-disabled
