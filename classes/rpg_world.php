@@ -135,6 +135,8 @@ class rpg_world {
         if (!isset($WORLD_SESSION['world_actors'])){ $WORLD_SESSION['world_actors'] = array(); }
         if (!isset($WORLD_SESSION['world_symbols'])){ $WORLD_SESSION['world_symbols'] = array(); }
         if (!isset($WORLD_SESSION['world_events'])){ $WORLD_SESSION['world_events'] = array(); }
+        if (!isset($WORLD_SESSION['world_battles'])){ $WORLD_SESSION['world_battles'] = array(); }
+        if (!isset($WORLD_SESSION['world_records'])){ $WORLD_SESSION['world_records'] = array(); }
         // ...as well as any nested variables inside those parent arrays
         if (!isset($WORLD_SESSION['player_sessions']['last_player'])){ $WORLD_SESSION['player_sessions']['last_player'] = ''; }
         // Return true now that we're done preparing the session
@@ -192,7 +194,7 @@ class rpg_world {
         return true;
     }
 
-    // Define a function for saving the current world session to the system
+    // Define a function for saving the current world session to the system (not used?)
     public static function save_session(){
         //error_log('rpg_world::save_session() called!');
         // loop through and update the json session files with new data

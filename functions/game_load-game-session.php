@@ -92,11 +92,11 @@ function mmrpg_load_game_session(){
         // Pull the world data early so we have it ready
         $this_database_world = $db->get_array("SELECT
             `last_world_token`, `last_map_token`, `last_player_token`,
-            `player_sessions`, `robot_sessions`, `mecha_sessions`,
+            `player_sessions`, `robot_sessions`, `mecha_sessions`, `world_version`,
             `world_maps`, `world_buttons`, `world_switches`, `world_gates`, `world_locks`,
             `world_blocks`, `world_hazards`, `world_items`, `world_abilities`,
             `world_encounters`, `world_pickups`, `world_actors`, `world_symbols`,
-            `world_events`, `world_battles`
+            `world_events`, `world_battles`, `world_records`
             FROM `mmrpg_users_worlds`
             WHERE `user_id` = {$login_user_id}
             LIMIT 1;");
@@ -211,6 +211,7 @@ function mmrpg_load_game_session(){
         `player_sessions`,
         `robot_sessions`,
         `mecha_sessions`,
+        `world_version`,
         `world_maps`,
         `world_buttons`,
         `world_switches`,
@@ -225,7 +226,8 @@ function mmrpg_load_game_session(){
         `world_actors`,
         `world_symbols`,
         `world_events`,
-        `world_battles`
+        `world_battles`,
+        `world_records`
         FROM `mmrpg_users_worlds`
         WHERE `user_id` = {$login_user_id}
         LIMIT 1;");
