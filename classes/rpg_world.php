@@ -4692,6 +4692,49 @@ class rpg_world {
         // If there are any platforms defined, check to see if any of them have been interacted with already
         self::refresh_map_platforms($this_prototype_data, $map_data_parsed);
 
+        // ---
+
+        // Collect references to the game and world sessions for the next step
+        $game_session_token = rpg_game::session_token();
+        $world_session_token = self::session_token();
+        $GAME_SESSION = &$_SESSION[$game_session_token];
+        $WORLD_SESSION = &$_SESSION[$world_session_token];
+        $temp_game_flags = &$GAME_SESSION['flags'];
+        $current_player_token = $this_prototype_data['this_player_token'];
+
+        // Check to see if the player has completed the end-game and create a message if so
+        $world_records = !empty($WORLD_SESSION['world_records']) ? $WORLD_SESSION['world_records'] : array();
+        $prototype_world_complete = !empty($world_records['slur_defeated']) && $world_records['slur_defeated'] >= 1 ? true : false;
+        $temp_event_flag = 'player-event-99_prototype-world-complete';
+        if ($prototype_world_complete && empty($temp_game_flags['events'][$temp_event_flag])){
+            $temp_game_flags['events'][$temp_event_flag] = true;
+            $_SESSION[$game_session_token]['EVENTS'][] = array(
+                'canvas_markup' => '&hellip;',
+                'console_markup' => '<p style="text-align: center; padding: 30px 0;">'.
+                    '<strong>Congratulations! You Defeated Slur!</strong> <br /> '.
+                    'You\'ve completed Mega Man RPG: Legacy of Prototype! <br /> '.
+                    'Thank you so much for playing! :D <br /> '.
+                    '</p>',
+                'player_token' => $current_player_token,
+                'event_type' => 'other'
+                );
+            $_SESSION[$game_session_token]['EVENTS'][] = array(
+                'canvas_markup' => '&hellip;',
+                'console_markup' => '<p style="text-align: center; padding: 30px 0;">'.
+                    '<strong>This fangame game was brought to you by;</strong> <br /> '.
+                    'Ageman20XX (Adrian Marceau) - Lead Developer<br /> '.
+                    'MegaBossMan (milansaponja) - Sprite Artist & Flavour-Text Master<br /> '.
+                    'Rhythm (Rhythm_BCA) - Sprite Artist & Peak Community Manager <br /> '.
+                    'Special Thanks: TheLegendOfRenegade (Music) <br /> '.
+                    '<a href="credits/" target="_blank">And So Many More!</a> <br /> '.
+                    '</p>',
+                'player_token' => $current_player_token,
+                'event_type' => 'other'
+                );
+        }
+
+        // ---
+
         // Return true on success
         return true;
     }
