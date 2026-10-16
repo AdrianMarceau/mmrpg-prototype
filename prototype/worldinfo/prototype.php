@@ -30,7 +30,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'light-laboratory',
         'objects' => ['player-platform'],
         //'encounters' => ['dr-light', 'mega-man'],
-        'encounters' => ['sniper-joe@west-exit', 'sniper-joe@east-exit', 'sniper-joe@south-exit'],
+        'encounters' => [], //'sniper-joe@west-exit', 'sniper-joe@east-exit', 'sniper-joe@south-exit'
         'encounters2' => ['met'],
         'rescues' => [],
         'items' => ['light-program!!', 'light-heart!!', 'light-core!!'],
