@@ -646,7 +646,7 @@ body.prototype {
     text-align: center;
 }
 #music {
-    left: calc(50% - 5px);
+    left: calc(50% + 36px);
     transform: translateX(-100%);
 }
 #animate {
