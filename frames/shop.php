@@ -14,6 +14,7 @@ require(MMRPG_CONFIG_ROOTDIR.'/frames/remote_top.php');
 $session_token = mmrpg_game_token();
 
 // Include the DATABASE file
+define('FORCE_INCLUDE_HIDDEN_ROBOTS', true);
 //require_once('../database/include.php');
 require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
