@@ -268,7 +268,7 @@ echo('<pre>'.PHP_EOL);
             $area_file_markup[] = '@aliases[]  = 10:plain';
             $area_file_markup[] = '@aliases[]  = 20:type-'.$area_type;
             $area_file_markup[] = '@aliases[]  = 30:'.$area_field_tile;
-            $area_file_markup[] = '@aliases[]  = 90:water';
+            if (in_array('water', $area_tags)){ $area_file_markup[] = '@aliases[]  = 90:water'; }
             $area_file_markup[] = '#---------------------------#';
             $area_file_markup[] = '@portals[]  = spawn('.$area_spawn.(!$area_spawn_visible ? ', hidden' : '').')';
             $protected_zones['spawn-buffer'] = $area_spawn;
@@ -480,8 +480,64 @@ echo('<pre>'.PHP_EOL);
                 $protected_zones['player-healpad-buffer'] = $healpad_pos;
                 $protected_zones['player-resetpad-buffer'] = $resetpad_pos;
                 $protected_zones['player-exit-portal-buffer'] = $portal_pos;
-            }// Initialize exact protected coordinates early so we can add barriers to it
+            }
+
+            // Helper function to translate @location tags into absolute grid coordinates
+            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $area_padding) {
+                $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
+                // Portal locations (exact outer edges of the map)
+                if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
+                if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
+                if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
+                if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
+                // Exit path locations (Directly on the path, right before the main platform)
+                if ($loc === 'north-exit') return $area_middle_col . '-' . $area_padding;
+                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - $area_padding + 1);
+                if ($loc === 'east-exit') return ($area_size_width - $area_padding + 1) . '-' . $area_middle_row;
+                if ($loc === 'west-exit') return $area_padding . '-' . $area_middle_row;
+                // Inner perimeter locations (1 tile safely inside the main room, completely off the path)
+                if ($loc === 'north') return $area_middle_col . '-' . ($area_padding + 2);
+                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - $area_padding - 1);
+                if ($loc === 'east') return ($area_size_width - $area_padding - 1) . '-' . $area_middle_row;
+                if ($loc === 'west') return ($area_padding + 2) . '-' . $area_middle_row;
+                // Center and Center-Offset locations
+                if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
+                if ($loc === 'center-left') return ($area_middle_col - 1) . '-' . $area_middle_row;
+                if ($loc === 'center-right') return ($area_middle_col + 1) . '-' . $area_middle_row;
+                if ($loc === 'center-up') return $area_middle_col . '-' . ($area_middle_row - 1);
+                if ($loc === 'center-down') return $area_middle_col . '-' . ($area_middle_row + 1);
+                return null;
+            };
+
+            // Initialize exact protected coordinates early so we can add barriers to it
             $exact_protected_coords = [];
+
+            // Hardcode standard guards for the main player hubs
+            if ($area_token === 'light-area-1'){
+                $area_file_markup[] = '#---------------------------#';
+                $west_pos = $getLocationCoords('west-exit');
+                if ($west_pos) { $area_file_markup[] = '@mechas[]   = light-guard-west('.$west_pos.', sniper-joe, 1)'; $exact_protected_coords[] = $west_pos; }
+                $east_pos = $getLocationCoords('east-exit');
+                if ($east_pos) { $area_file_markup[] = '@mechas[]   = light-guard-east('.$east_pos.', sniper-joe, 2)'; $exact_protected_coords[] = $east_pos; }
+                $south_pos = $getLocationCoords('south-exit');
+                if ($south_pos) { $area_file_markup[] = '@mechas[]   = light-guard-south('.$south_pos.', sniper-joe, 3)'; $exact_protected_coords[] = $south_pos; }
+            } elseif ($area_token === 'wily-area-1'){
+                $area_file_markup[] = '#---------------------------#';
+                $west_pos = $getLocationCoords('west-exit');
+                if ($west_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-west('.$west_pos.', skeleton-joe, 1)'; $exact_protected_coords[] = $west_pos; }
+                $east_pos = $getLocationCoords('east-exit');
+                if ($east_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-east('.$east_pos.', skeleton-joe, 2)'; $exact_protected_coords[] = $east_pos; }
+                $north_pos = $getLocationCoords('north-exit');
+                if ($north_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-north('.$north_pos.', skeleton-joe, 3)'; $exact_protected_coords[] = $north_pos; }
+            } elseif ($area_token === 'cossack-area-1'){
+                $area_file_markup[] = '#---------------------------#';
+                $west_pos = $getLocationCoords('west-exit');
+                if ($west_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-west('.$west_pos.', crystal-joe, 1)'; $exact_protected_coords[] = $west_pos; }
+                $east_pos = $getLocationCoords('east-exit');
+                if ($east_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-east('.$east_pos.', crystal-joe, 2)'; $exact_protected_coords[] = $east_pos; }
+                $north_pos = $getLocationCoords('north-exit');
+                if ($north_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-north('.$north_pos.', crystal-joe, 3)'; $exact_protected_coords[] = $north_pos; }
+            }
 
             // If this area has a BUTTON, add it to the very center with a U-shaped barrier
             if (in_array('button', $area_tags)){
@@ -614,33 +670,6 @@ echo('<pre>'.PHP_EOL);
                     else { $regular_pickups[$key] = $pickup; }
                 }
             }
-
-            // Helper function to translate @location tags into absolute grid coordinates
-            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $area_padding) {
-                $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
-                // Portal locations (exact outer edges of the map)
-                if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
-                if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
-                if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
-                if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
-                // Exit path locations (Directly on the path, right before the main platform)
-                if ($loc === 'north-exit') return $area_middle_col . '-' . $area_padding;
-                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - $area_padding + 1);
-                if ($loc === 'east-exit') return ($area_size_width - $area_padding + 1) . '-' . $area_middle_row;
-                if ($loc === 'west-exit') return $area_padding . '-' . $area_middle_row;
-                // Inner perimeter locations (1 tile safely inside the main room, completely off the path)
-                if ($loc === 'north') return $area_middle_col . '-' . ($area_padding + 2);
-                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - $area_padding - 1);
-                if ($loc === 'east') return ($area_size_width - $area_padding - 1) . '-' . $area_middle_row;
-                if ($loc === 'west') return ($area_padding + 2) . '-' . $area_middle_row;
-                // Center and Center-Offset locations
-                if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
-                if ($loc === 'center-left') return ($area_middle_col - 1) . '-' . $area_middle_row;
-                if ($loc === 'center-right') return ($area_middle_col + 1) . '-' . $area_middle_row;
-                if ($loc === 'center-up') return $area_middle_col . '-' . ($area_middle_row - 1);
-                if ($loc === 'center-down') return $area_middle_col . '-' . ($area_middle_row + 1);
-                return null;
-                };
 
             // Pre-place anchored pickups so they can generate their own protected zones
             $static_pickup_strings = [];
