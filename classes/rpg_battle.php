@@ -1639,9 +1639,19 @@ class rpg_battle extends rpg_object {
             $reward_mod_strings[] = ' Turns vs Goal: '.$current_turn.' / '.$turn_goal;
             if ($current_turn != $turn_goal){
                 $temp_bonus_multiplier = number_format(round(($turn_goal / $current_turn), 2), 1, '.', ',');
-                if ($current_turn < $turn_goal){  $this_star_rating += 1; $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.''; }
-                else { $this_star_rating -= 1; $reward_mod_strings[] = 'Turn Penalty: x'.$temp_bonus_multiplier.''; }
-                $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
+                if ($current_turn < $turn_goal){
+                    $this_star_rating += 1;
+                    $reward_mod_strings[] = 'Turn Bonus: x'.$temp_bonus_multiplier.'';
+                    $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
+                } else {
+                    if (empty($this->flags['world_battle'])){
+                        $this_star_rating -= 1;
+                        $reward_mod_strings[] = 'Turn Penalty: x'.$temp_bonus_multiplier.'';
+                        $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
+                    } else {
+                        $reward_mod_strings[] = 'Turn Bonus: ---';
+                    }
+                }
             } else {
                 $reward_mod_strings[] = 'Turn Bonus: ---';
             }
@@ -1658,9 +1668,19 @@ class rpg_battle extends rpg_object {
             $reward_mod_strings[] = ' Robots vs '.$temp_target_limit_kind.': '.$this_player->counters['robots_start_total'].' / '.$temp_target_robot_limit;
             if ($this_player->counters['robots_start_total'] != $temp_target_robot_limit){
                 $temp_bonus_multiplier = number_format(round(($temp_target_robot_limit / $this_player->counters['robots_start_total']), 2), 1, '.', ',');
-                if ($this_player->counters['robots_start_total'] < $temp_target_robot_limit){  $this_star_rating += 1; $reward_mod_strings[] = 'Team Bonus: x'.$temp_bonus_multiplier.''; }
-                else { $this_star_rating -= 1; $reward_mod_strings[] = 'Team Penalty: x'.$temp_bonus_multiplier.''; }
-                $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
+                if ($this_player->counters['robots_start_total'] < $temp_target_robot_limit){
+                    $this_star_rating += 1;
+                    $reward_mod_strings[] = 'Team Bonus: x'.$temp_bonus_multiplier.'';
+                    $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
+                } else {
+                    if (empty($this->flags['world_battle'])){
+                        $this_star_rating -= 1;
+                        $reward_mod_strings[] = 'Team Penalty: x'.$temp_bonus_multiplier.'';
+                        $total_zenny_rewards = ceil($total_zenny_rewards * $temp_bonus_multiplier);
+                    } else {
+                        $reward_mod_strings[] = 'Team Bonus: ---';
+                    }
+                }
             } else {
                 if ($temp_target_robot_limit == 1 && $this_player->counters['robots_start_total'] == 1){ $this_star_rating += 1; }
                 $reward_mod_strings[] = 'Team Bonus: ---';
@@ -1672,8 +1692,13 @@ class rpg_battle extends rpg_object {
             }
 
             // If the player hasn't lost any robots, we can give them another star, else remove one
-            if (empty($this_player->counters['robots_disabled'])){ $this_star_rating += 1;  }
-            else { $this_star_rating -= 1;  }
+            if (empty($this_player->counters['robots_disabled'])){
+                $this_star_rating += 1;
+            } else {
+                if (empty($this->flags['world_battle'])){
+                    $this_star_rating -= 1;
+                }
+            }
 
             // Define the victory results for calculating
             if (!empty($this->flags['challenge_battle'])){
