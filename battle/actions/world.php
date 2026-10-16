@@ -129,6 +129,26 @@ if (!empty($this_player->player_token)
 
 }
 
+// Initialize the world records array in the session if it doesn't exist
+if (!isset($_SESSION['WORLD']['world_records'])){ $_SESSION['WORLD']['world_records'] = array(); }
+$world_records = &$_SESSION['WORLD']['world_records'];
+// Loop through the target player's robots to track encounters and defeats unconditionally
+if (!empty($target_player->player_robots)){
+    foreach ($target_player->player_robots AS $robot_info){
+        if (empty($robot_info['robot_token'])){ continue; }
+        $target_token = $robot_info['robot_token'];
+        // Initialize this specific robot's records if they don't exist yet
+        if (!isset($world_records[$target_token.'_encountered'])){ $world_records[$target_token.'_encountered'] = 0; }
+        if (!isset($world_records[$target_token.'_defeated'])){ $world_records[$target_token.'_defeated'] = 0; }
+        // Increment the encounter count
+        $world_records[$target_token.'_encountered']++;
+        // Only increment the defeat count if the robot was actually disabled
+        $target_energy = isset($robot_info['robot_energy']) && $robot_info['robot_energy'] > 0 ? $robot_info['robot_energy'] : 0;
+        $is_disabled = empty($target_energy) || (!empty($robot_info['robot_status']) && $robot_info['robot_status'] === 'disabled');
+        if ($is_disabled){ $world_records[$target_token.'_defeated']++; }
+    }
+}
+
 // If this battle was completed, check to see if we should be running any post-complete actions
 if ($this_battle->battle_status === 'complete'
     && $this_battle->battle_result === 'victory'){
