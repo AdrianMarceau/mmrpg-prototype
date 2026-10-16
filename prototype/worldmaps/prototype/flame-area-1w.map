@@ -13,7 +13,6 @@
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-flame
 @aliases[]  = 30:steel-mill
-@aliases[]  = 90:water
 #---------------------------#
 @portals[]  = spawn(11-11, hidden)
 #---------------------------#

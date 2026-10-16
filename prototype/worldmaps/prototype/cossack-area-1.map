@@ -13,7 +13,6 @@
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-copy
 @aliases[]  = 30:cossack-citadel
-@aliases[]  = 90:water
 #---------------------------#
 @portals[]  = spawn(8-8)
 #---------------------------#
@@ -28,6 +27,10 @@
 @events[]   = auto-reset(11-5, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
 #---------------------------#
 @portals[]  = exit-portal-void(8-11, prototype-area-0__spawn, void-alt, confirm)
+#---------------------------#
+@mechas[]   = cossack-guard-west(3-8, crystal-joe, 1)
+@mechas[]   = cossack-guard-east(13-8, crystal-joe, 2)
+@mechas[]   = cossack-guard-north(8-3, crystal-joe, 3)
 #---------------------------#
 @items[]    = cossack-init-program(7-9, cossack-program, anchored)
 @items[]    = cossack-init-heart(5-7, cossack-heart, anchored)

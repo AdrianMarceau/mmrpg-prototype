@@ -14,7 +14,6 @@
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-space
 @aliases[]  = 30:final-destination-iii
-@aliases[]  = 90:water
 #---------------------------#
 @portals[]  = spawn(11-11, hidden)
 #---------------------------#

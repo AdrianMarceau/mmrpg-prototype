@@ -13,7 +13,6 @@
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-copy
 @aliases[]  = 30:light-laboratory
-@aliases[]  = 90:water
 #---------------------------#
 @portals[]  = spawn(8-8)
 #---------------------------#
@@ -29,6 +28,10 @@
 @events[]   = auto-reset(11-5, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
 #---------------------------#
 @portals[]  = exit-portal-void(8-11, prototype-area-0__spawn, void-alt, confirm)
+#---------------------------#
+@mechas[]   = light-guard-west(3-8, sniper-joe, 1)
+@mechas[]   = light-guard-east(13-8, sniper-joe, 2)
+@mechas[]   = light-guard-south(8-13, sniper-joe, 3)
 #---------------------------#
 @items[]    = light-init-program(10-9, light-program, anchored)
 @items[]    = light-init-heart(7-8, light-heart, anchored)
@@ -49,10 +52,6 @@
 @groups[]   = no-encounters_good-guy-auto-buffer(4-10...6-12)
 #---------------------------#
 @encounters = met(1)
-#---------------------------#
-@bosses[]   = boss-mech-1(3-8, sniper-joe)
-@bosses[]   = boss-mech-2(13-8, sniper-joe)
-@bosses[]   = boss-mech-3(8-13, sniper-joe)
 #---------------------------#
 @actors[]   = good-guy-auto(5-11, robot, auto, -, default)
 #---------------------------#

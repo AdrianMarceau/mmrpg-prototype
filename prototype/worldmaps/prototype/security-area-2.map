@@ -14,7 +14,6 @@
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-none
 @aliases[]  = 30:plain-field
-@aliases[]  = 90:water
 #---------------------------#
 @portals[]  = spawn(8-8, hidden)
 #---------------------------#
