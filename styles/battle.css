@@ -1393,7 +1393,8 @@
 }
 
 #canvas .event .battle_scene .sprite[data-item-id*="field-boost"].sprite_fullscreen,
-#canvas .event .battle_scene .sprite[data-skill-id*="field-boost"].sprite_fullscreen {
+#canvas .event .battle_scene .sprite[data-skill-id*="field-boost"].sprite_fullscreen,
+#canvas .event .battle_scene .sprite[data-ability-id*="field-support"].sprite_fullscreen {
     animation-name: battle-scene-rising-background;
     animation-duration: 0.6s;
     animation-iteration-count: 1;
