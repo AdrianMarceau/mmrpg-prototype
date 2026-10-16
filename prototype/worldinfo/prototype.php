@@ -1516,7 +1516,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 200,
         'element' => 'space',
         'field' => 'final-destination-3',
-        'encounters' => ['slur@north-exit'],
+        'encounters' => ['slur@north-exit', 'trill@north'],
         'encounters2' => ['trill', 'trille-bot'],
         'pickups' => ['energy-capsule', 'weapon-capsule', 'attack-capsule', 'defense-capsule', 'speed-capsule'],
         'tags' => ['upper', 'elemental', 'main', 'final'],
