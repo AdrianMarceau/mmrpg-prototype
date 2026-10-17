@@ -108,9 +108,19 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                 } return markup;
             })(dataLabels).join('');
 
+        let skipFadein = true;
+        for (let i = 0; i < eventsAtPosition.length; i++){
+            let targetType = eventsAtPosition[i].kind2;
+            if (targetType === 'master' || targetType === 'boss'){
+                skipFadein = false;
+                break;
+            }
+        }
+
         let joinedDataAttrs = '';
         if (dataBattles.length){ joinedDataAttrs += ' data-battle="'+dataBattlesJoined+'"'; }
         if (dataBattleStars.length){ joinedDataAttrs += ' data-battle-star="'+dataBattleStarsJoined+'"'; }
+        joinedDataAttrs += ' data-skip-fadein="' + (skipFadein ? 'true' : 'false') + '"';
 
         actionData.actionAreaMarkup += dataLabelsJoined;
         actionData.sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> ' + (dataBattles.length > 1 ? dataBattles.length+' ' : '') + 'Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
@@ -249,6 +259,7 @@ function handleBattleActionClick(action, $button, firstEvent){
     if (action === 'start-battle' || action === 'battle-info'){
         let battleId = $button.attr('data-battle') || false;
         let battleStarId = $button.attr('data-battle-star') || false;
+        let skipFadein = $button.attr('data-skip-fadein') || 'true';
 
         if (action === 'battle-info'){
             alert('Battle ID: ' + battleId + '\n\nThis is where you would show battle details.');
@@ -258,7 +269,7 @@ function handleBattleActionClick(action, $button, firstEvent){
             _self.playSoundEffect('lets-go-robots');
             let battleVars = [];
             battleVars.push('wap=false');
-            battleVars.push('flag_skip_fadein=true');
+            battleVars.push('flag_skip_fadein=' + skipFadein);
             battleVars.push('this_user_id=' + _userId);
             battleVars.push('this_player_id=' + _playerId);
             battleVars.push('this_player_token=' + _playerToken);
