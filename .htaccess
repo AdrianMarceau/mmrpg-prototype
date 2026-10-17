@@ -10,6 +10,8 @@ BrowserMatchNoCase "Elisabot" bad_bot
 BrowserMatchNoCase "UptimeRobot" bad_bot
 BrowserMatchNoCase "UptimeRobot/1.0" bad_bot
 BrowserMatchNoCase "UptimeRobot/2.0" bad_bot
+BrowserMatchNoCase "PerplexityBot" bad_bot
+BrowserMatchNoCase "PetalBot" bad_bot
 Order Deny,Allow
 Deny from env=bad_bot
 
@@ -48,6 +50,22 @@ ExpiresByType text/css "access plus 1 months"
 # Turn on URL rewriting and set the base
 RewriteEngine on
 
+###################################
+# -- PREVENT BAD BOT BEHAVIOR --  #
+##################################
+
+# Matches "leaderboard" followed by anything, then "leaderboard" again
+RewriteCond %{REQUEST_URI} /leaderboard/.*/leaderboard/ [NC]
+RewriteRule ^.*$ - [F,L]
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Block bad bots, AI scrapers, and rogue clones
+# [NC] makes it case-insensitive, so "ClaudeBot" catches "claudebot" and "ClaudeBot/1.0"
+RewriteCond %{HTTP_USER_AGENT} (Semrush|AhrefsBot|ClaudeBot|anthropic-ai|PerplexityBot|PetalBot|BLEXBot|CCBot|ChatGPT|Elisabot|GPTBot|UptimeRobot|MJ12Bot|DotBot|MMRPG-Local-Backup) [NC]
+RewriteRule ^ - [F,L]
+</IfModule>
 
 ####################################
 # -- LEGACY PAGE/ASSET REWRITES -- #
