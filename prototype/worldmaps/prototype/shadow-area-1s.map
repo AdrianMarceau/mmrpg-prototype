@@ -8,11 +8,11 @@
 @size       = 21 x 21
 @sheet      = mmrpg-overworld-2k25-v6
 #---------------------------#
-@field      = field
+@field      = twilight-carnival
 #---------------------------#
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-shadow
-@aliases[]  = 30:plain-field
+@aliases[]  = 30:twilight-carnival
 #---------------------------#
 @portals[]  = spawn(11-11, hidden)
 #---------------------------#

@@ -8,11 +8,11 @@
 @size       = 27 x 27
 @sheet      = mmrpg-overworld-2k25-v6
 #---------------------------#
-@field      = field
+@field      = thunder-tornado
 #---------------------------#
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-wind
-@aliases[]  = 30:plain-field
+@aliases[]  = 30:thunder-tornado
 #---------------------------#
 @portals[]  = spawn(14-14, hidden)
 #---------------------------#

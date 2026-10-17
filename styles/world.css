@@ -804,6 +804,9 @@ html, body {
 #world #map .sprite.block.super-block.chemical-zone { background-image: url("../content/fields/chemical-zone/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.deep-ocean { background-image: url("../content/fields/deep-ocean/sprites/battle-field_block.png"); }
 
+#world #map .sprite.block.super-block.thunder-tornado { background-image: url("../content/fields/thunder-tornado/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.twilight-carnival { background-image: url("../content/fields/twilight-carnival/sprites/battle-field_block.png"); }
+
 #world #map .sprite.block.barrier-block { background-position: -40px -440px; }
 
 #world #map .sprite.block.barrier-block.black-midd { background-position: -40px -440px; }
