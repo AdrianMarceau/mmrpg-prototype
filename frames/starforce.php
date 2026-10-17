@@ -23,16 +23,17 @@ $global_frame_source = !empty($_GET['source']) ? trim($_GET['source']) : 'protot
 
 // Require the prototype omega data file
 require_once('../prototype/omega.php');
-$unlocked_factor_one_robots = false;
-$unlocked_factor_two_robots = false;
-$unlocked_factor_three_robots = false;
-$unlocked_factor_four_robots = false;
+$unlocked_factor_robots = array();
 $temp_omega_factor_options = array();
 $temp_omega_factor_options_unlocked = array();
-$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_one); $unlocked_factor_one_robots = true;
-$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_two); $unlocked_factor_two_robots = true;
-$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_three); $unlocked_factor_three_robots = true;
-$temp_omega_factor_options = array_merge($temp_omega_factor_options, $this_omega_factors_four); $unlocked_factor_four_robots = true;
+// Loop through the game index to dynamically merge available factors
+foreach ($omega_game_index AS $game_token => $factor_varname){
+    $unlocked_factor_robots[$game_token] = false;
+    if (!empty($$factor_varname)){
+        $temp_omega_factor_options = array_merge($temp_omega_factor_options, $$factor_varname);
+        $unlocked_factor_robots[$game_token] = true;
+    }
+}
 //error_log('$temp_omega_factor_options = '.print_r($temp_omega_factor_options, true));
 
 // Collect any fields unlocked via other means
@@ -93,20 +94,22 @@ $temp_boss_stars_total = !empty($temp_boss_stars_available) ? count($temp_boss_s
 
 // Collect the omega factors that we should be printing links for
 $temp_omega_factors_unlocked = array();
-if ($unlocked_factor_one_robots){ $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $this_omega_factors_one); }
-if ($unlocked_factor_two_robots){ $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $this_omega_factors_two); }
-if ($unlocked_factor_four_robots){ $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $this_omega_factors_four); }
-if ($unlocked_factor_three_robots){ $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $this_omega_factors_three); }
+foreach ($omega_game_index AS $game_token => $factor_varname){
+    if (!empty($unlocked_factor_robots[$game_token])){
+        $temp_omega_factors_unlocked = array_merge($temp_omega_factors_unlocked, $$factor_varname);
+    }
+}
 $temp_omega_factors_unlocked_total = count($temp_omega_factors_unlocked);
 //error_log('$temp_omega_factors_unlocked = '.print_r($temp_omega_factors_unlocked, true));
 //error_log('$temp_omega_factors_unlocked_total = '.print_r($temp_omega_factors_unlocked_total, true));
 
 // Collect the omega groups that we should be printing links for
 $temp_omega_groups_unlocked = array();
-if ($unlocked_factor_one_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM1', 'omega' => $this_omega_factors_one); }
-if ($unlocked_factor_two_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM2', 'omega' => $this_omega_factors_two); }
-if ($unlocked_factor_four_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM4', 'omega' => $this_omega_factors_four); }
-if ($unlocked_factor_three_robots){ $temp_omega_groups_unlocked[] = array('token' => 'MM3', 'omega' => $this_omega_factors_three); }
+foreach ($omega_game_index AS $game_token => $factor_varname){
+    if (!empty($unlocked_factor_robots[$game_token])){
+        $temp_omega_groups_unlocked[] = array('token' => $game_token, 'omega' => $$factor_varname);
+    }
+}
 //error_log('$temp_omega_groups_unlocked = '.print_r($temp_omega_groups_unlocked, true));
 
 // Define a function for printing robots in the boss stars list
@@ -271,12 +274,13 @@ function print_starchart_omega_field($info, $key, $kind){
     $field = $info['field'];
     $robot = $info['robot'];
     $type = $info['type'];
-    if (in_array($robot, $rpg_robots_encountered)){
+    if (empty($robot)
+        || in_array($robot, $rpg_robots_encountered)){
 
         $field_info = $rpg_fields_index[$field];
         $field_name = $field_info['field_name'];
-        $robot_info = $rpg_robots_index[$robot];
-        $robot_name = $robot_info['robot_name'];
+        $robot_info = !empty($robot) ? $rpg_robots_index[$robot] : false;
+        $robot_name = $robot_info ? $robot_info['robot_name'] : '???';
         $size = 100;
         if (!empty($field)){ list($field_one, $field_two) = explode('-', $field); }
         else { $field_one = ''; $field_two = ''; }

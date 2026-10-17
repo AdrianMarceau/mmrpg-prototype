@@ -383,7 +383,7 @@ function refreshStarchart(){
 
     // Remove the visible class from all star containers
     var starSprites = $('.sprite_star', thisStarchart);
-    starSprites.removeClass('visible');
+    starSprites.removeClass('visible first_in_row');
     starSprites.each(function(){
 
         var thisStar = $(this);
@@ -391,6 +391,12 @@ function refreshStarchart(){
         var thisStarSideKey = parseInt(thisStar.attr('data-side-key'));
         var thisStarVisible = visibleTopKeys.indexOf(thisStarTopKey) != -1 && visibleSideKeys.indexOf(thisStarSideKey) != -1 ? true : false;
         if (thisStarVisible){ thisStar.addClass('visible'); }
+        if (thisStarVisible){
+            thisStar.addClass('visible');
+            if (thisStarTopKey === visibleTopKeys[0]){
+                thisStar.addClass('first_in_row');
+                }
+            }
 
         });
 
