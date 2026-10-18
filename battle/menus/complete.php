@@ -71,8 +71,14 @@ ob_start();
                     }
 
                     // Collect the first and second field type if applicable so we know which buttons to show
-                    $star_type_one = !empty($this_battle->battle_field_base['field_type']) ? $this_battle->battle_field_base['field_type'] : false;
-                    $star_type_two = !empty($this_battle->battle_field_base['field_type2']) ? $this_battle->battle_field_base['field_type2'] : false;
+                    if (!empty($this_battle->battle_field_base['values']['origin_field_types'])){
+                        $origin_types = $this_battle->battle_field_base['values']['origin_field_types'];
+                        $star_type_one = !empty($origin_types[0]) ? $origin_types[0] : false;
+                        $star_type_two = !empty($origin_types[1]) ? $origin_types[1] : false;
+                    } else {
+                        $star_type_one = !empty($this_battle->battle_field_base['field_type']) ? $this_battle->battle_field_base['field_type'] : false;
+                        $star_type_two = !empty($this_battle->battle_field_base['field_type2']) ? $this_battle->battle_field_base['field_type2'] : false;
+                    }
                     if (empty($temp_remaining_stars_types[$star_type_one])){ $star_type_one = false; }
                     if (empty($temp_remaining_stars_types[$star_type_two])){ $star_type_two = false; }
                     $next_action = !empty($star_type_one) || !empty($star_type_two) ? 'next_same-star' : 'next_any-star';

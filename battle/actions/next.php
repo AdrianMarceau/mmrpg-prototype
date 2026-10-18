@@ -113,13 +113,21 @@ if (!empty($this_battle->flags['starfield_mission'])
         $possible_types = array();
         // If the user has requested the same star type, pick one at random from the remaining
         if ($next_star_type === 'same'){
-            if (!empty($this_battle->battle_field_base['field_type'])
-                && !empty($temp_allowed_star_types[$this_battle->battle_field_base['field_type']])){
-                $possible_types[] = $this_battle->battle_field_base['field_type'];
+            if (!empty($this_battle->battle_field_base['values']['origin_field_types'])){
+                $origin_types = $this_battle->battle_field_base['values']['origin_field_types'];
+                $check_type_one = !empty($origin_types[0]) ? $origin_types[0] : false;
+                $check_type_two = !empty($origin_types[1]) ? $origin_types[1] : false;
+            } else {
+                $check_type_one = !empty($this_battle->battle_field_base['field_type']) ? $this_battle->battle_field_base['field_type'] : false;
+                $check_type_two = !empty($this_battle->battle_field_base['field_type2']) ? $this_battle->battle_field_base['field_type2'] : false;
             }
-            if (!empty($this_battle->battle_field_base['field_type2'])
-                && !empty($temp_allowed_star_types[$this_battle->battle_field_base['field_type2']])){
-                $possible_types[] = $this_battle->battle_field_base['field_type2'];
+            if (!empty($check_type_one)
+                && !empty($temp_allowed_star_types[$check_type_one])){
+                $possible_types[] = $check_type_one;
+            }
+            if (!empty($check_type_two)
+                && !empty($temp_allowed_star_types[$check_type_two])){
+                $possible_types[] = $check_type_two;
             }
             //error_log('next//same//$possible_types: '.print_r($possible_types, true));
         }
@@ -167,7 +175,8 @@ if (!empty($this_battle->flags['starfield_mission'])
     $info2 = $next_star_info['info2'];
     $field_info = $mmrpg_index_fields[$info['field']];
     $field_info2 = !empty($info2) ? $mmrpg_index_fields[$info2['field']] : $field_info;
-    $next_star_level = $this_battle->battle_level + 1;
+    $base_star_level = !empty($this_battle->battle_field_base['values']['origin_battle_level']) ? $this_battle->battle_field_base['values']['origin_battle_level'] : $this_battle->battle_level;
+    $next_star_level = $base_star_level + 1;
     if ($next_star_level > 100){ $next_star_level = 100; }
 
     // Generate the pseudo prototype data needed for generating next battle

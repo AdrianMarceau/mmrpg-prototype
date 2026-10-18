@@ -3437,6 +3437,9 @@ function mmrpg_prototype_get_stardroid_encounter_data(&$this_prototype_data, &$t
     // Collect the field types we're currently using and then check if either are a trigger
     $field_type_1 = !empty($field_info['field_type']) ? $field_info['field_type'] : '';
     $field_type_2 = !empty($field_info2['field_type']) ? $field_info2['field_type'] : '';
+    $origin_field_types = array();
+    if (!empty($field_type_1)){ $origin_field_types[] = $field_type_1; }
+    if (!empty($field_type_2) && !in_array($field_type_2, $origin_field_types)){ $origin_field_types[] = $field_type_2; }
     //if (empty($field_type_1)){ //error_log('$field_type_1 is empty || $field_info = '.print_r($field_info, true)); }
     //if (empty($field_type_2)){ //error_log('$field_type_2 is empty || $field_info2 = '.print_r($field_info2, true)); }
     //error_log('check if in_array($field_type_1:'.$field_type_1.', '.print_r($selected_stardroid_triggers, true).')');
@@ -3497,8 +3500,13 @@ function mmrpg_prototype_get_stardroid_encounter_data(&$this_prototype_data, &$t
             'field_mechas' => array($temp_battle_mecha),
             'field_music' => 'sega-remix/wily-machine-8-mm8',
             'field_type' => 'space',
+            'field_type2' => '',
             'field_multipliers' => $temp_battle_multipliers,
-            'values' => array('hazards' => $temp_battle_hazards),
+            'values' => array(
+                'hazards' => $temp_battle_hazards,
+                'origin_field_types' => $origin_field_types,
+                'origin_battle_level' => $temp_battle_omega['battle_level']
+                ),
             ));
 
         $temp_battle_player = array(
