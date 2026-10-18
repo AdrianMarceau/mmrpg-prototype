@@ -2016,9 +2016,37 @@ function mmrpg_prototype_unlocked_field_tokens($include_all = false){
     $unlocked_field_tokens = array();
 
     // Add the base fields given throughout the campaign
-    global $this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four;
+    global
+        $this_omega_factors_one,
+        $this_omega_factors_two,
+        $this_omega_factors_three,
+        $this_omega_factors_four,
+        $this_omega_factors_five,
+        $this_omega_factors_six,
+        $this_omega_factors_seven,
+        $this_omega_factors_eight,
+        $this_omega_factors_eight_two,
+        $this_omega_factors_nine,
+        $this_omega_factors_ten,
+        $this_omega_factors_eleven,
+        $this_omega_factors_twelve
+        ;
     if (empty($this_omega_factors_one)){ require(MMRPG_CONFIG_ROOTDIR.'prototype/omega.php'); }
-    $base_omega_fields = array_merge($this_omega_factors_one, $this_omega_factors_two, $this_omega_factors_three, $this_omega_factors_four);
+    $base_omega_fields = array_merge(
+        $this_omega_factors_one,
+        $this_omega_factors_two,
+        $this_omega_factors_three,
+        $this_omega_factors_four,
+        $this_omega_factors_five,
+        $this_omega_factors_six,
+        $this_omega_factors_seven,
+        $this_omega_factors_eight,
+        $this_omega_factors_eight_two,
+        $this_omega_factors_nine,
+        $this_omega_factors_ten,
+        $this_omega_factors_eleven,
+        $this_omega_factors_twelve
+        );
     $session_robot_database = !empty($_SESSION[$session_token]['values']['robot_database']) ? $_SESSION[$session_token]['values']['robot_database'] : array();
     foreach ($base_omega_fields AS $key => $omega){
         if ($include_all
@@ -2030,6 +2058,7 @@ function mmrpg_prototype_unlocked_field_tokens($include_all = false){
 
     // Remove any duplicates that made their way through
     $unlocked_field_tokens = array_unique($unlocked_field_tokens);
+    //error_log('$unlocked_field_tokens = '.print_r($unlocked_field_tokens, true));
 
     // Return the unlocked field tokens
     return $unlocked_field_tokens;
