@@ -1598,7 +1598,7 @@ class rpg_world {
         //$robot_level = mt_rand(ceil($map_level * 1.2), ceil($map_level * 1.4));
         $levels_matrix = array(
             'mecha' => array('min' => ceil($map_level * 0.6), 'max' => ceil($map_level * 0.8)),
-            'master' => array('min' => ceil($map_level * 0.9), 'max' => ceil($map_level * 1.1)),
+            'master' => array('min' => ceil($map_level * 1.0), 'max' => ceil($map_level * 1.0)),
             'boss' => array('min' => ceil($map_level * 1.2), 'max' => ceil($map_level * 1.4))
             );
 
