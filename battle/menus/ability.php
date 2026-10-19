@@ -76,7 +76,8 @@ ob_start();
 
 
     // Collect the abilities for this actual unlocked user robot, by whatever means
-    if ($this_robot->robot_class === 'master'){
+    if ($this_robot->robot_class === 'master'
+        || !empty($this_battle->flags['world_battle'])){
 
         $this_robot_settings = rpg_game::robot_settings($this_player->player_token, $this_robot->robot_token);
 
@@ -112,10 +113,8 @@ ob_start();
         $current_robot_abilities = array();
         foreach ($this_robot->robot_abilities AS $token){
             $current_robot_abilities[$token] = array('ability_token' => $token);
+            if (count($current_robot_abilities)){ break; }
         }
-
-        // Set the robot item to nothing
-        //$current_robot_item = '';
 
     }
 
