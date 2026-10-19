@@ -795,6 +795,7 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
             if ($key === 0){ $mecha_battle_rewards_array['robot_abilities'][$ability_token] = array('ability_token' => $ability_token); }
             $mecha_battle_settings_array['robot_abilities'][$ability_token] = array('ability_token' => $ability_token);
             mmrpg_game_unlock_ability($this_player_token, $this_mecha_info, array('ability_token' => $ability_token), false);
+            if (count($mecha_battle_settings_array['robot_abilities']) >= 8){ break; }
         }
         // Append this new recruit to the end of the player's current lineup before we redirect
         $old_last_robots = $WORLD_PLAYER_SESSION['last_robots'];
