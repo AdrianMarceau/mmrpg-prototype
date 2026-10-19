@@ -869,12 +869,17 @@ if (!empty($bribe_from_battle) && rpg_battle::has_index_info($bribe_from_battle)
             // Collect info about the target mecha including best stat
             $mecha_token = $battle_data[1];
             $mecha_info = $mmrpg_index_robots[$mecha_token];
+            $mecha_level = !empty($battle_target_robot['robot_level']) ? $battle_target_robot['robot_level'] : 1;
             $mecha_best_stat = rpg_robot::get_best_stat($mecha_info, true);
             $bribe_item_stat = strstr($bribe_item_token, '-') ? explode('-', $bribe_item_token)[0] : $bribe_item_token;
             $is_perfect_item = $bribe_item_stat === $mecha_best_stat;
             // Define the item and generate a unique pickup token using the coordinates
-            if ($is_perfect_item){ $drop_item_token = 'large-screw'; $drop_pickup_label = 'Large Screw'; }
-            else { $drop_item_token = 'small-screw'; $drop_pickup_label = 'Small Screw'; }
+            if ($is_perfect_item){
+                $drop_item_token = 'mecha-whistle'; $drop_pickup_label = 'Mecha Whistle';
+            } else {
+                if ($mecha_level >= 50){ $drop_item_token = 'large-screw'; $drop_pickup_label = 'Large Screw'; }
+                else { $drop_item_token = 'small-screw'; $drop_pickup_label = 'Small Screw'; }
+            }
             $drop_pickup_token = 'bribe-drop-item_'.str_replace('-', '_', $battle_position);
             // Append the new pickup to the map's pickups array
             $world_map_pickups[] = json_encode(array('item', $drop_item_token, $battle_position, $drop_pickup_token, $drop_pickup_label));
