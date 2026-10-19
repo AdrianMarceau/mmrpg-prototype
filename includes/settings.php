@@ -100,7 +100,7 @@ define('MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX', 8); // The maximum number 
 // Define the global variables for the total number of robots allower per player
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of robots required for battle per side
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of robots allowed for battle per side
-define('MMRPG_SETTINGS_BATTLEROBOTS_PERPLAYER_MAX', 99); // The maximum number of robots allowed per player character
+define('MMRPG_SETTINGS_BATTLEROBOTS_STORAGE_MAX', 99); // The maximum number of robots allowed per player character
 
 // Define the global multiplier for battle points per level
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0', 2500); // The point rate per fortress boss level for normal battles

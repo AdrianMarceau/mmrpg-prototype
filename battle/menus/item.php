@@ -287,7 +287,7 @@ ob_start();
                 if ($temp_item_quantity < $temp_item_cost){ $temp_button_enabled = false; }
 
                 // If this is a Mecha Whistle, make sure we don't allow if storage too full
-                $max_robot_storage = MMRPG_SETTINGS_BATTLEROBOTS_PERPLAYER_MAX;
+                $max_robot_storage = MMRPG_SETTINGS_BATTLEROBOTS_STORAGE_MAX;
                 if ($item_token === 'mecha-whistle' && $current_player_robots_count >= $max_robot_storage){ $temp_button_enabled = false; }
 
                 // All items appear in YELLOW
