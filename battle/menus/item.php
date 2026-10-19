@@ -2,6 +2,8 @@
 
 // Define all the available player items in a handy index array
 $current_player_items = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
+$current_player_robots = mmrpg_prototype_robots_unlocked($this_player->player_token, true, true);
+//error_log('$current_player_robots = '.print_r($current_player_robots, true));
 
 // Require the item database page for sorting purposes
 //require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
@@ -23,6 +25,9 @@ $allow_inventory_access = $this_battle->allow_inventory_access();
 // Count the number of items the player has and determine pages
 $current_player_items_count = count($current_player_items);
 $current_player_items_pages = ceil($current_player_items_count / 8);
+
+// Count the number of robots the player has in case we need it
+$current_player_robots_count = count($current_player_robots);
 
 // Generate the markup for the action item panel
 ob_start();
@@ -110,7 +115,7 @@ ob_start();
             // Define special sorting rules for the in-game item select menu
             $sticky_item_order = array(
                 'energy-pellet', 'energy-capsule', 'energy-tank', 'extra-life',
-                'weapon-pellet', 'weapon-capsule', 'weapon-tank', 'yashichi'
+                'weapon-pellet', 'weapon-capsule', 'weapon-tank', 'mecha-whistle'
                 );
             $item_token_list = array_merge($sticky_item_order, $item_token_list);
             $item_token_list = array_unique($item_token_list);
@@ -280,9 +285,10 @@ ob_start();
 
                 // Define whether or not this item button should be enabled
                 if ($temp_item_quantity < $temp_item_cost){ $temp_button_enabled = false; }
-                //$temp_button_enabled = $temp_item_quantity >= $temp_item_cost ? true : false;
-                // If this button is enabled, add it to the global item options array
-                //if ($temp_button_enabled){ $temp_player_item_actions[] = $temp_item->item_token; }
+
+                // If this is a Mecha Whistle, make sure we don't allow if storage too full
+                $max_robot_storage = MMRPG_SETTINGS_BATTLEROBOTS_PERPLAYER_MAX;
+                if ($item_token === 'mecha-whistle' && $current_player_robots_count >= $max_robot_storage){ $temp_button_enabled = false; }
 
                 // All items appear in YELLOW
                 //$temp_item_type_backup = $temp_item->item_type;
