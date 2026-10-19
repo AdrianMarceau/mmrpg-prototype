@@ -2483,7 +2483,7 @@ function getRobotDetailsForOverview(robotToken){
     //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<b>' : '') + 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? '</b>' : '');
     //robotDetailsObject.levelHTML = (robotDetailsObject.level >= 100 ? '<i class="fas fa-star"></i> Lv. ' : 'Level ') + robotDetailsObject.level;}
     robotDetailsObject.levelHTML = 'Level ' + robotDetailsObject.level + (robotDetailsObject.level >= 100 ? ' <i class="fa fas fa-star color level"></i>' : '');
-    robotDetailsObject.experienceHTML = (robotDetailsObject.level >= 100 ? '<i>&#8734;</i>' : robotDetailsObject.experience) + ' / 1000 Exp';
+    robotDetailsObject.experienceHTML = (robotDetailsObject.level >= 100 ? '<i>&#8734;</i>' : (baseRobotKind === 'mecha' ? '<i>-</i>' : robotDetailsObject.experience)) + ' / 1000 Exp';
     robotDetailsObject.classIconHTML = '' + (robotDetailsObject.classIcon ? ('<i class="fa fas fa-' + robotDetailsObject.classIcon + '"></i>') : '');
     robotDetailsObject.infolinesHTML = '';
     for (let i = 0; i < robotDetailsObject.infoLines.length; i++){
