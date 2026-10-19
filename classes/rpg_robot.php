@@ -7132,6 +7132,8 @@ class rpg_robot extends rpg_object {
     public function consume_held_item(){
 
         // First, set this robot's current item to an empty string
+        $itoken = $this->robot_item;
+        $itoken_equipped = $item.'__equipped';
         $this->set_item('');
 
         // Also remove this robot's item from the session, we're done with it, if human character and appropriate to do so
@@ -7143,11 +7145,26 @@ class rpg_robot extends rpg_object {
             $rid = $this->robot_base_id;
             $rtoken = $this->robot_token;
             $rstring = $rid.'_'.$rtoken;
-            if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'])){
-                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'] = '';
-            } elseif (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
-                $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+            // count the number owned versus equipped to find the real remaining
+            $current_equipped = !empty($_SESSION[$session_token]['values']['battle_items'][$itoken_equipped]) ? $_SESSION[$session_token]['values']['battle_items'][$itoken_equipped] : 0;
+            $current_owned = !empty($_SESSION[$session_token]['values']['battle_items'][$itoken]) ? $_SESSION[$session_token]['values']['battle_items'][$itoken] : 0;
+            // either way we reduce the real count of the item by one because it's gone
+            $new_owned = $current_owned - 1; if ($new_owned < 0){ $new_owned = 0; } elseif ($new_owned > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $new_owned = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
+            $_SESSION[$session_token]['values']['battle_items'][$itoken] = $new_owned;
+            $current_effective = $new_owned - $current_equipped; if ($current_effective < 0){ $current_effective = 0; }
+            // if there are no more of this item remaining, we need to completely unequip from the robot
+            if (empty($current_effective)){
+                // unequip the item from the robot in the session settings
+                if (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'])){
+                    $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rstring]['robot_item'] = '';
+                } elseif (isset($_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'])){
+                    $_SESSION[$session_token]['values']['battle_settings'][$ptoken]['player_robots'][$rtoken]['robot_item'] = '';
+                }
+                // reduce the equipped count of the item as we just removed it
+                $new_equipped = $current_equipped - 1; if ($new_equipped < 0){ $new_equipped = 0; } elseif ($new_equipped > MMRPG_SETTINGS_ITEMS_MAXQUANTITY){ $new_equipped = MMRPG_SETTINGS_ITEMS_MAXQUANTITY; }
+                $_SESSION[$session_token]['values']['battle_items'][$itoken_equipped] = $new_equipped;
             }
+
         }
 
     }
