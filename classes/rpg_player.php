@@ -3711,9 +3711,11 @@ class rpg_player extends rpg_object {
                                 <td  class="right">
                                     <label style="display: block; float: left;">Full Name :</label>
                                     <span class="player_name player_type player_type_none"><?
-                                        if ($player_info['player_token'] === 'dr-light'){ echo 'Dr. Thomas X. Light'; } // Xavier? [fanon or confirmed?]
-                                        elseif ($player_info['player_token'] === 'dr-wily'){ echo 'Dr. Albert W. Wily'; } // William? [fanon]
-                                        elseif ($player_info['player_token'] === 'dr-cossack'){ echo 'Dr. Mikhail S. Cossack'; } // Sergeyevich [confirmed]
+                                        if (!empty($player_info['player_name_full'])){ echo $player_info['player_name_full']; }
+                                        //elseif ($player_info['player_token'] === 'dr-light'){ echo 'Dr. Thomas X. Light'; } // Xavier? [fanon or confirmed?]
+                                        //elseif ($player_info['player_token'] === 'dr-wily'){ echo 'Dr. Albert W. Wily'; } // William? [fanon]
+                                        //elseif ($player_info['player_token'] === 'dr-cossack'){ echo 'Dr. Mikhail S. Cossack'; } // Sergeyevich [confirmed]
+                                        //elseif ($player_info['player_token'] === 'dr-lalinde'){ echo 'Dr. Noele H. LaLinde'; } // Holly [fanon]
                                         else { echo $player_info['player_name']; }
                                     ?></span>
                                 </td>
