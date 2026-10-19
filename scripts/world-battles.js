@@ -199,10 +199,11 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                     }
                 }
             else if (showWhistleButton && typeof _worldPlayer.items['mecha-whistle'] !== 'undefined'){
+                let numPlayerRobots = Object.keys(_config.playerRobotsIndex).length;
                 let mechaWhistleQuantity = _self.getItemQuantity('mecha-whistle');
                 let mechaWhistleSpriteMarkup = _self.getItemSpriteMarkup('mecha-whistle');
                 let mechaWhistleSpanLabel = '<sup>Use</sup> Mecha Whistle <sub>&times; ' + mechaWhistleQuantity + '</sub>';
-                if (playerHasTeamSlot && mechaWhistleQuantity > 0){
+                if (playerHasTeamSlot && mechaWhistleQuantity > 0 && numPlayerRobots < _config.maxStoragePerPlayer){
                     actionData.sideButtonsMarkup += '<a class="button big-button type shield" data-action="use-mecha-whistle" data-target="' + mechaTarget + '" data-is-rescue="false">';
                     actionData.sideButtonsMarkup += '<span class="has-sprite">' + mechaWhistleSpanLabel + mechaWhistleSpriteMarkup + '</span>';
                     actionData.sideButtonsMarkup += '</a>';

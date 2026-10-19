@@ -93,6 +93,7 @@ gameSettings.worldConfig = {
     allowWorldEvents: false, // default until user interaction
     maxRobotsPerPlayer: 8, // match the battle system b/c duh
     maxAbilitiesPerRobot: 8, // match the battle system b/c duh
+    maxStoragePerPlayer: 99, // do not allow recruiting more than this
     robotStorageSlotsVisible: 8, // probably wont change as it's what fits
     itemStorageSlotsVisible: 24, // probably wont change as it's what fits
     abilityStorageSlotsVisible: 24, // probably wont change as it's what fits
