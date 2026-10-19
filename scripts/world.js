@@ -3840,7 +3840,12 @@ class mmrpgWorldMap {
                 let saveWorldState = false;
                 if (_worldPlayerTeam.indexOf(robotString) === -1){
                     let teamRobotString = robotString;
+                    // Capture the held item before releasing so we can update the UI
+                    let robotData = _self.getTeamRobot(teamRobotString);
+                    let heldItemToken = robotData && robotData.item ? robotData.item : false;
                     _self.releaseTeamRobot(teamRobotString);
+                    // Update the item quantity UI if an item was returned
+                    if (heldItemToken){ updateItemQuantityInStorage(heldItemToken); }
                     $robotDetailsDiv.find('.button[data-action="add-robot"], .button[data-action="release-robot"], .button[data-action="robot-info"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
                     saveWorldState = true;
                     }

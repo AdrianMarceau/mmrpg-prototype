@@ -334,6 +334,8 @@ function releaseTeamRobot(robotString, playSound, playAnimation, showMessage){
     let robotData = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('releaseTeamRobot() could not find robot info for robot ' + robotToken + '!'); return false; }
     if (!robotData){ console.error('releaseTeamRobot() could not find robot info for robot ' + robotData + '!'); return false; }
+    // If the robot is holding an item, unequip and return it to inventory before releasing
+    if (robotData.item && robotData.item.length){ _self.takeRobotItem(robotString, false, false); }
     // Release this robot's string from the team array if present
     if (robotKey !== -1){
         delete _worldPlayerTeam[robotKey];
@@ -1423,7 +1425,7 @@ function takeRobotItem(robotString, playSound, playAnimation){
         return filteredAbilities;
         })(robotInfo.abilities, robotInfo);
     _worldPlayerRobots[robotString] = robotInfo;
-    // Add this item to the player's equipped items list
+    // Remove this item from the player's equipped items list
     if (typeof _worldPlayerItems[itemToken + '__equipped'] === 'undefined'){ _worldPlayerItems[itemToken + '__equipped'] = 1; }
     else if (_worldPlayerItems[itemToken + '__equipped'] < 1){ _worldPlayerItems[itemToken + '__equipped'] = 1; }
     _worldPlayerItems[itemToken + '__equipped'] -= 1;
