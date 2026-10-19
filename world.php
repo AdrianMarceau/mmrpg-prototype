@@ -1185,6 +1185,9 @@ $_SESSION[$session_token]['EVENTS'][] = array(
     _worldConfig.playerMobility = <?= json_encode($this_prototype_data['this_player_mobility'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerZenny = <?= json_encode($this_prototype_data['this_player_zenny'], JSON_NUMERIC_CHECK) ?>;
     _worldConfig.playerHistory = <?= json_encode($world_player_session_history, JSON_NUMERIC_CHECK) ?>;
+    _worldConfig.maxRobotsPerPlayer = <?= MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX ?>;
+    _worldConfig.maxStoragePerPlayer = <?= MMRPG_SETTINGS_BATTLEROBOTS_STORAGE_MAX ?>;
+    _worldConfig.maxAbilitiesPerRobot = <?= MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX ?>;
     _worldConfig.backButtonURL = 'prototype.php';
     _worldConfig.homeButtonURL = 'world.php?world=<?= $home_world_token ?>&map=<?= $home_map_token ?>&position=spawn';
     _worldConfig.resetButtonURL = 'world.php?reset=world';
