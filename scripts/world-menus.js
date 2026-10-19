@@ -653,7 +653,7 @@ function initMenuRobotsOverview($thisWorld, $robotsOverview){
             let actionModalConfig = {onComplete: function(){ $actionButton.removeClass('clicked'); }};
             if (actionToken === 'add-robot'){ autoClickAction(); _self.showAddRobotModal(robotToken, actionModalConfig); }
             else if (actionToken === 'remove-robot'){ autoClickAction(); _self.showRemoveRobotModal(robotToken, actionModalConfig); }
-            else if (actionToken === 'release-robot'){ confirmClickAction('Release Robot', 'Are you sure?', function(){ autoClickAction(); _self.showReleaseRobotModal(robotToken, actionModalConfig); }); }
+            else if (actionToken === 'release-robot'){ confirmClickAction('Release Robot', 'Are you sure you want to release this robot?', function(){ autoClickAction(); _self.showReleaseRobotModal(robotToken, actionModalConfig); }); }
             else if (actionToken === 'robot-info'){ _self.toggleRobotDetailsInOverview(robotToken, $detailsDiv); _self.playSoundEffect('icon-click'); }
             else { console.warn('-> undefined robot action "', actionToken, '", ignoring input'); return false; }
             // Return true on success

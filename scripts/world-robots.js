@@ -323,11 +323,6 @@ function releaseTeamRobot(robotString, playSound, playAnimation, showMessage){
     let _worldPlayerRobots = _worldPlayer.robots;
     let _worldCallbacks = _world.callbacks;
     let robotsOverviewAPI = _self.robotsOverviewAPI || {};
-    // If this robot isn't actually on the team, return now
-    if (_worldPlayerTeam.indexOf(robotString) === -1){
-        console.warn('releaseTeamRobot() called but robot ' + robotString + ' is not on the team!');
-        return false;
-        }
     // Break the robot string into ID and token and collect its info
     let _indexes = _self.indexes;
     let _mmrpgRobotsIndex = _indexes.robots;
@@ -336,25 +331,19 @@ function releaseTeamRobot(robotString, playSound, playAnimation, showMessage){
     let robotId = parseInt(robotString.split('_')[0]) || false;
     let robotToken = robotString.split('_')[1] || false;
     let robotInfo = _mmrpgRobotsIndex[robotToken] || false;
-    let robotData = _worldPlayerRobots[robotString] || false;
+    let robotData = _self.getTeamRobot(robotString) || false;
     if (!robotInfo){ console.error('releaseTeamRobot() could not find robot info for robot ' + robotToken + '!'); return false; }
     if (!robotData){ console.error('releaseTeamRobot() could not find robot info for robot ' + robotData + '!'); return false; }
-    //console.log('-> robotString =', robotString);
-    //console.log('-> robotKey =', robotKey, '-> robotId =', robotId, '-> robotToken =', robotToken);
-    //console.log('-> robotInfo =', robotInfo);
-    //console.log('-> robotData =', robotData);
-    // Release this robot's string from the team array first
-    //console.log('-> old _worldPlayerTeam =', _worldPlayerTeam.join(', '));
-    delete _worldPlayerTeam[robotKey];
-    _worldPlayerTeam = Object.values(_worldPlayerTeam);
-    //console.log('-> new _worldPlayerTeam =', _worldPlayerTeam.join(', '));
-    _worldPlayer.team = _worldPlayerTeam;
-    //console.log('-> _worldPlayer.team =', _worldPlayer.team);
+    // Release this robot's string from the team array if present
+    if (robotKey !== -1){
+        delete _worldPlayerTeam[robotKey];
+        _worldPlayerTeam = Object.values(_worldPlayerTeam);
+        _worldPlayer.team = _worldPlayerTeam;
+        }
     // Collect a reference to this robot's element in the overview panel
     let $robotsOverview = _elements.robotsOverview;
     let $teamRobotsDiv = $robotsOverview.find('.team-robots');
     let $selectedTeamRobot = $teamRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
-    if (!$selectedTeamRobot || !$selectedTeamRobot.length){ console.warn('releaseTeamRobot() could not find team robot div for ' + robotString + '!'); return false; }
     let $storageRobotsDiv = $robotsOverview.find('.storage-robots');
     let $selectedStorageRobot = $storageRobotsDiv.find('.team-robot[data-robot="' + robotString + '"]');
     if (!$selectedStorageRobot || !$selectedStorageRobot.length){ console.warn('releaseTeamRobot() could not find storage robot div for ' + robotString + '!'); return false; }
@@ -2475,16 +2464,16 @@ function getRobotDetailsForOverview(robotToken){
     robotDetailsObject.actions = [];
     let showStorageButtons = (currentScreen === 'robots-overview' && currentSubScreen === 'robots') ? true : false;
     let showTeamAddButton = showStorageButtons && !robotIsCurrent ? true : false;
-    let showTeamRemoveButton = baseRobotKind === 'master' && showStorageButtons && robotIsCurrent ? true : false;
-    let showTeamReleaseButton = baseRobotKind === 'mecha' && showStorageButtons && robotIsCurrent ? true : false;
+    let showTeamRemoveButton = showStorageButtons && robotIsCurrent ? true : false;
+    let showTeamReleaseButton = baseRobotKind === 'mecha' && showStorageButtons && !robotIsCurrent ? true : false;
     let allowTeamAddButton = showTeamAddButton, allowTeamRemoveButton = showTeamRemoveButton, allowTeamReleaseButton = showTeamReleaseButton;
-    if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; allowTeamReleaseButton = false; }
+    if (playerRobotsCurrent.length === 1){ allowTeamRemoveButton = false; }
     else if (playerRobotsCurrent.length >= _config.playerRobotsLimit && baseRobotKind !== 'mecha'){ allowTeamAddButton = false; }
     else if (playerRobotsCurrent.length >= _config.maxRobotsPerPlayer){ allowTeamAddButton = false; }
     robotDetailsObject.actions.push({ action: 'robot-info', text: yButtonIcon + ' Details', button: 'Y', robot: robotString, disabled: false, hidden: !showStorageButtons });
     robotDetailsObject.actions.push({ action: 'add-robot', text: xButtonIcon + ' Summon', button: 'X', robot: robotString, disabled: !allowTeamAddButton, hidden: !showStorageButtons || !showTeamAddButton });
     robotDetailsObject.actions.push({ action: 'remove-robot', text: xButtonIcon + ' Dismiss', button: 'X', robot: robotString, disabled: !allowTeamRemoveButton, hidden: !showStorageButtons || !showTeamRemoveButton });
-    robotDetailsObject.actions.push({ action: 'release-robot', text: xButtonIcon + ' Release', button: 'X', robot: robotString, disabled: !allowTeamReleaseButton, hidden: !showStorageButtons || !showTeamReleaseButton });
+    robotDetailsObject.actions.push({ action: 'release-robot', text: 'Release', button: false, robot: robotString, disabled: !allowTeamReleaseButton, hidden: !showStorageButtons || !showTeamReleaseButton });
 
     // TODO (!!!) Add an "swap-in" option to storage robots when the player only has one robot and it's disabled
 

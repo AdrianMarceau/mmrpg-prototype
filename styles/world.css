@@ -4121,6 +4121,17 @@ html, body {
 #robots-overview .storage-details[data-robot] .actions .button[data-action="release-robot"] {
     background-color: #542525;
     border-color: #b13435;
+    display: block;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    left: 0;
+    font-size: 11px;
+    padding: 9px 6px 6px;
+    transition: top 0.3s;
+}
+#robots-overview .storage-details[data-robot] .actions .button[data-action="release-robot"]:hover {
+    top: 35px;
 }
 
 #robots-overview .storage-robots .bullets {

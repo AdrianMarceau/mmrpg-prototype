@@ -3809,15 +3809,12 @@ class mmrpgWorldMap {
             // If this is an ADD ROBOT request, we can add the robot to the player's team array and update
             if (actionToken === 'add-robot'){
                 modalDetails.show = false;
-                //console.log('--> preparing to ADD ROBOT (', robotString, ') to team (', _worldPlayerTeam.join(','), ') ...');
                 let saveWorldState = false;
                 if (_worldPlayerTeam.indexOf(robotString) === -1){
                     let teamRobotString = robotString;
-                    //console.log('-> adding teamRobotString =', teamRobotString);
                     _self.addTeamRobot(teamRobotString);
-                    $robotDetailsDiv.find('.button[data-action="add-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
-                    if (robotInfo.class === 'master'){ $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled'); }
-                    else if (robotInfo.class === 'mecha'){ $robotDetailsDiv.find('.button[data-action="release-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled'); }
+                    $robotDetailsDiv.find('.button[data-action="add-robot"], .button[data-action="release-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="remove-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
                     saveWorldState = true;
                     }
                 if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
@@ -3825,14 +3822,13 @@ class mmrpgWorldMap {
             // Else if this is a REMOVE ROBOT request, we should remove the robot from the player's team array and update
             else if (actionToken === 'remove-robot'){
                 modalDetails.show = false;
-                //console.log('--> preparing to REMOVE ROBOT (', robotString, ') from team (', _worldPlayerTeam.join(','), ') ...');
                 let saveWorldState = false;
                 if (_worldPlayerTeam.indexOf(robotString) !== -1){
                     let teamRobotString = robotString;
-                    //console.log('-> removing teamRobotString =', teamRobotString);
                     _self.removeTeamRobot(teamRobotString);
                     $robotDetailsDiv.find('.button[data-action="remove-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
                     $robotDetailsDiv.find('.button[data-action="add-robot"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
+                    if (robotInfo.class === 'mecha'){ $robotDetailsDiv.find('.button[data-action="release-robot"]').removeClass('disabled hidden').removeAttr('disabled'); }
                     saveWorldState = true;
                     }
                 if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
@@ -3840,14 +3836,11 @@ class mmrpgWorldMap {
             // Else if this is a RELEASE ROBOT request, we should release the robot back into the wild and update
             else if (actionToken === 'release-robot'){
                 modalDetails.show = false;
-                //console.log('--> preparing to RELEASE ROBOT (', robotString, ') from team (', _worldPlayerTeam.join(','), ') ...');
                 let saveWorldState = false;
-                if (_worldPlayerTeam.indexOf(robotString) !== -1){
+                if (_worldPlayerTeam.indexOf(robotString) === -1){
                     let teamRobotString = robotString;
-                    //console.log('-> releasing teamRobotString =', teamRobotString);
                     _self.releaseTeamRobot(teamRobotString);
-                    $robotDetailsDiv.find('.button[data-action="release-robot"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
-                    $robotDetailsDiv.find('.button[data-action="robot-info"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $robotDetailsDiv.find('.button[data-action="add-robot"], .button[data-action="release-robot"], .button[data-action="robot-info"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
                     saveWorldState = true;
                     }
                 if (saveWorldState){ _self.saveWorldState(function(){ _self.playSoundEffect('link-click-action'); }); }
