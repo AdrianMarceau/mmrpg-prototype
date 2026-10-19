@@ -538,6 +538,28 @@ function mmrpg_save_game_session($force_db_save = false){
                     if (substr($token, 0, 13) !== 'world-battle_'){ unset($world_battles[$token]); continue; }
                     $world_battles[$token] = json_decode($battle, true);
                     }
+                // Decode 1-level compressed world arrays (world_maps) before saving
+                if (!empty($world_maps) && is_array($world_maps)){
+                    foreach ($world_maps AS $map_token => $map_data){
+                        if (is_string($map_data)){
+                            $world_maps[$map_token] = json_decode($map_data, true);
+                        }
+                    }
+                }
+                // Decode 2-level compressed world arrays (world_encounters, world_pickups) before saving
+                $compressed_2d_arrays = array(&$world_encounters, &$world_pickups);
+                foreach ($compressed_2d_arrays AS &$world_array){
+                    if (empty($world_array) || !is_array($world_array)){ continue; }
+                    foreach ($world_array AS $map_token => $map_list){
+                        if (empty($map_list) || !is_array($map_list)){ continue; }
+                        foreach ($map_list AS $key => $item_data){
+                            if (is_string($item_data)){
+                                $world_array[$map_token][$key] = json_decode($item_data, true);
+                            }
+                        }
+                    }
+                }
+                unset($world_array);
                 //error_log('$world_maps = '.print_r($world_maps, true));
                 //error_log('$world_buttons = '.print_r($world_buttons, true));
                 //error_log('$world_switches = '.print_r($world_switches, true));

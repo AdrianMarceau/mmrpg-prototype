@@ -247,11 +247,39 @@ function mmrpg_load_game_session(){
         foreach ($this_database_world AS $key => $value){
             if (empty($value) || !isset($_SESSION[$world_session_token][$key])){ continue; }
             if (!is_numeric($value)
-                && (substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}')
-                || (substr($value, 0, 1) === '[' && substr($value, -1, 1) === ']')){
-                $value = json_decode($value, true);
+                && ((substr($value, 0, 1) === '{' && substr($value, -1, 1) === '}')
+                || (substr($value, 0, 1) === '[' && substr($value, -1, 1) === ']'))){
+                $decoded = json_decode($value, true);
+                // Fallback to recover previously double-escaped strings in the DB
+                if ($decoded === null && strpos($value, '\"') !== false){
+                    $decoded = json_decode(stripslashes($value), true);
+                    }
+                $value = $decoded !== null ? $decoded : array();
                 }
             $_SESSION[$world_session_token][$key] = $value;
+        }
+
+        // Re-encode 1-level compressed world arrays (world_maps) into JSON strings
+        if (!empty($_SESSION[$world_session_token]['world_maps']) && is_array($_SESSION[$world_session_token]['world_maps'])){
+            foreach ($_SESSION[$world_session_token]['world_maps'] AS $map_token => $map_data){
+                if (is_array($map_data)){
+                    $_SESSION[$world_session_token]['world_maps'][$map_token] = json_encode($map_data, JSON_NUMERIC_CHECK);
+                }
+            }
+        }
+
+        // Re-encode 2-level compressed world arrays (world_encounters, world_pickups) into JSON strings
+        $compressed_2d_keys = array('world_encounters', 'world_pickups');
+        foreach ($compressed_2d_keys AS $wkey){
+            if (empty($_SESSION[$world_session_token][$wkey]) || !is_array($_SESSION[$world_session_token][$wkey])){ continue; }
+            foreach ($_SESSION[$world_session_token][$wkey] AS $map_token => $map_list){
+                if (empty($map_list) || !is_array($map_list)){ continue; }
+                foreach ($map_list AS $key => $item_data){
+                    if (is_array($item_data)){
+                        $_SESSION[$world_session_token][$wkey][$map_token][$key] = json_encode($item_data, JSON_NUMERIC_CHECK);
+                    }
+                }
+            }
         }
 
         // Push world battles into the game data battle index

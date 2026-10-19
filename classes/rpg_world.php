@@ -121,6 +121,7 @@ class rpg_world {
         if (!isset($WORLD_SESSION['last_player_token'])){ $WORLD_SESSION['last_player_token'] = ''; }
         if (!isset($WORLD_SESSION['player_sessions'])){ $WORLD_SESSION['player_sessions'] = array(); }
         if (!isset($WORLD_SESSION['robot_sessions'])){ $WORLD_SESSION['robot_sessions'] = array(); }
+        if (!isset($WORLD_SESSION['world_version'])){ $WORLD_SESSION['world_version'] = ''; }
         if (!isset($WORLD_SESSION['world_maps'])){ $WORLD_SESSION['world_maps'] = array(); }
         if (!isset($WORLD_SESSION['world_buttons'])){ $WORLD_SESSION['world_buttons'] = array(); }
         if (!isset($WORLD_SESSION['world_switches'])){ $WORLD_SESSION['world_switches'] = array(); }
@@ -4435,6 +4436,7 @@ class rpg_world {
                 if (empty($item_data[0]) || !is_string($item_data[0]) || !preg_match('/^\d+-\d+$/', $item_data[0])){ continue; } // skip if no position
                 if (empty($item_data[1]) || !is_string($item_data[1])){ continue; } // skip if no token
                 $claimed = !empty($world_map_items[$item_namekey]) ? $world_map_items[$item_namekey] : 0; // unix-timestamp
+                $is_bribe = strstr($item_namekey, 'bribe-drop-item_') ? true : false;
                 //error_log('Looking for "'.$item_namekey.'" in $world_map_items: '.print_r($world_map_items, true));
                 if (!$claimed && strstr($item_data[1], '-star') && !empty($item_data[2])){
                     $star = $item_data[1]; $owner = $item_data[2];
@@ -4520,8 +4522,8 @@ class rpg_world {
                 $label = $info['item_name'];
                 $class = $token.($animated  ? ' animate' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 if ($subclass === 'event'){ $class .= ' always-zoom'; }
-                elseif (in_array($token, $always_zoom_items)){ $class .= ' always-zoom'; }
-                elseif (preg_match($always_zoom_regex, $token)){ $class .= ' always-zoom'; }
+                elseif (!$is_bribe && in_array($token, $always_zoom_items)){ $class .= ' always-zoom'; }
+                elseif (!$is_bribe && preg_match($always_zoom_regex, $token)){ $class .= ' always-zoom'; }
                 elseif (strstr($token, '-core') && $anchored){ $class .= ' always-zoom'; }
                 if (strstr($token, '-star')){ $z_index -= 2; }
                 $colour = !empty($subtypes) ? implode(' ', array_filter($subtypes)) : '';
