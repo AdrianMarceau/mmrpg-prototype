@@ -1810,7 +1810,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             // If the player has a doctor unlocked without also having their heart, unlock it now
             foreach ($unlock_limit_hearts AS $heart_num => $heart_token){
                 if (mmrpg_prototype_item_unlocked($heart_token)){ continue; }
-                error_log('unlocking '.$heart_token.' for '.$player_token.' apparently ');
+                //error_log('unlocking '.$heart_token.' for '.$player_token.' apparently ');
                 $print_options = array('player_token' => $player_token);
                 if ($heart_num === 1){ $print_options = false; }
                 else { $print_options['event_text'] = 'Another {item} was unlocked!'; }
