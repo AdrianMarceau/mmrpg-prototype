@@ -3771,7 +3771,7 @@ class mmrpgWorldMap {
         let updateItemQuantityInStorage = function(itemToken){
             //console.log('%c' + '~mmrpgWorldMap.showActionModal.updateItemQuantityInStorage(itemToken: ' + itemToken + ')', 'color: magenta;');
             let $storageItem = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
-            let $storageItemDetails = $itemStorageBox.find('> .storage-details[data-item="' + itemToken + '"]');
+            let $storageItemDetails = $robotsOverview.find('.storage-details[data-item="' + itemToken + '"]');
             let totalItemQuantity = _worldPlayerItems[itemToken] || 0;
             let equippedItemQuantity = _worldPlayerItems[itemToken + '__equipped'] || 0;
             let availableQuantity = totalItemQuantity - equippedItemQuantity;
@@ -3862,7 +3862,7 @@ class mmrpgWorldMap {
             //console.log('--> itemToken =', itemToken);
             //console.log('--> itemInfo =', itemInfo);
             let $itemInStorage = $itemStorageBox.find('.team-item[data-item="' + itemToken + '"]');
-            let $itemInStorageDetails = $itemStorageBox.find('> .storage-details[data-item="' + itemToken + '"]');
+            let $itemInStorageDetails = $robotsOverview.find('.storage-details[data-item="' + itemToken + '"]');
             // If this is a USE ITEM request, we can apply the item to the selected robot directly
             if (actionToken === 'use-item'){
                 modalDetails.show = false;
@@ -4022,10 +4022,9 @@ class mmrpgWorldMap {
                     }
                 if (typeof _worldPlayerItems[itemToken] !== 'undefined'){
                     let newItemToken = itemToken;
-                    //console.log('-> equipping newItemToken =', newItemToken);
                     _self.giveRobotItem(targetRobotToken, newItemToken);
-                    $itemInStorageDetails.find('.button[data-action="give-item"]').addClass('disabled').attr('disabled', 'disabled');
-                    $itemInStorageDetails.find('.button[data-action="take-item"]').removeClass('disabled').removeAttr('disabled');
+                    $itemInStorageDetails.find('.button[data-action="give-item"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $itemInStorageDetails.find('.button[data-action="take-item"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
                     updateItemQuantityInStorage(newItemToken);
                     saveWorldState = true;
                     }
@@ -4037,11 +4036,11 @@ class mmrpgWorldMap {
                 //console.log('--> preparing to TAKE ITEM from robot (', targetRobotToken, ') ...');
                 let saveWorldState = false;
                 if (playerRobotInfo.item){
-                    let existingItemToken = playerRobotInfo.item;
                     //console.log('-> removing existingItemToken =', existingItemToken);
+                    let existingItemToken = playerRobotInfo.item;
                     _self.takeRobotItem(targetRobotToken);
-                    $itemInStorageDetails.find('.button[data-action="take-item"]').addClass('disabled').attr('disabled', 'disabled');
-                    $itemInStorageDetails.find('.button[data-action="give-item"]').removeClass('disabled').removeAttr('disabled');
+                    $itemInStorageDetails.find('.button[data-action="take-item"]').addClass('disabled hidden').removeClass('hovered').attr('disabled', 'disabled');
+                    $itemInStorageDetails.find('.button[data-action="give-item"]').removeClass('disabled hidden').addClass('hovered').removeAttr('disabled');
                     updateItemQuantityInStorage(existingItemToken);
                     saveWorldState = true;
                     }

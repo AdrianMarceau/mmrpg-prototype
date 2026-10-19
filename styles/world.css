@@ -2939,7 +2939,7 @@ html, body {
 #robots-overview .storage-details .button.active,
 #robots-overview .storage-details .button:not(.disabled).hovered {
     border-color: #cfcfcf;
-    background-color: rgba(0, 0, 0, 0.7);
+    /*background-color: rgba(0, 0, 0, 0.7);*/
 }
 #robots-overview .storage-box .button.active,
 #robots-overview .storage-details .button.active {
