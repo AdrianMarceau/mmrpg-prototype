@@ -4130,7 +4130,8 @@ html, body {
     padding: 9px 6px 6px;
     transition: top 0.3s;
 }
-#robots-overview .storage-details[data-robot] .actions .button[data-action="release-robot"]:hover {
+#robots-overview .storage-details[data-robot] .actions .button[data-action="release-robot"]:hover,
+#robots-overview .storage-details[data-robot] .actions .button[data-action="release-robot"].hovered {
     top: 35px;
 }
 
