@@ -28,6 +28,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
     let firstBattleEvent = eventsAtPosition[0];
     let firstBattleInfo = _mapBattlesIndex[firstBattleEvent.token] || null;
     let firstBattleRobot = _mmrpgRobotsIndex[firstBattleInfo.token] || null;
+    //console.log('firstBattleEvent =', firstBattleEvent);
 
     let dataLabels = [], dataBattles = [];
     for (var i = 0; i < eventsAtPosition.length; i++){
@@ -135,7 +136,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
             playerActiveRobots++;
             }
 
-        let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' ? true : false;
+        let isSoloMechaBattle = dataBattles.length === 1 && firstBattleRobot.class === 'mecha' && firstBattleEvent.kind2 !== 'boss' ? true : false;
         let isSoloMechaRescue = isSoloMechaBattle && firstBattleEvent.kind2 === 'rescue' ? true : false;
 
         let showBattleButton = true;
