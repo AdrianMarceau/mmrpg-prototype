@@ -21,6 +21,10 @@ User-agent: UptimeRobot/1.0
 User-agent: UptimeRobot/2.0
 User-agent: MMRPG-Local-Backup
 User-agent: MMRPG-Local-Backup/1.0
+User-agent: Sogou web spider
+User-agent: Sogou inst spider
+User-agent: Sogou spider2
+User-agent: Reflectionbot
 Disallow: /
 
 # General Access

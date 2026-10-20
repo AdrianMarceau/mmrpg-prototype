@@ -12,6 +12,8 @@ BrowserMatchNoCase "UptimeRobot/1.0" bad_bot
 BrowserMatchNoCase "UptimeRobot/2.0" bad_bot
 BrowserMatchNoCase "PerplexityBot" bad_bot
 BrowserMatchNoCase "PetalBot" bad_bot
+BrowserMatchNoCase "Sogou" bad_bot
+BrowserMatchNoCase "Reflectionbot" bad_bot
 Order Deny,Allow
 Deny from env=bad_bot
 
@@ -63,7 +65,7 @@ RewriteEngine On
 
 # Block bad bots, AI scrapers, and rogue clones
 # [NC] makes it case-insensitive, so "ClaudeBot" catches "claudebot" and "ClaudeBot/1.0"
-RewriteCond %{HTTP_USER_AGENT} (Semrush|AhrefsBot|ClaudeBot|anthropic-ai|PerplexityBot|PetalBot|BLEXBot|CCBot|ChatGPT|Elisabot|GPTBot|UptimeRobot|MJ12Bot|DotBot|MMRPG-Local-Backup) [NC]
+RewriteCond %{HTTP_USER_AGENT} (Semrush|AhrefsBot|ClaudeBot|anthropic-ai|PerplexityBot|PetalBot|BLEXBot|CCBot|ChatGPT|Elisabot|GPTBot|UptimeRobot|MJ12Bot|DotBot|MMRPG-Local-Backup|Sogou|Reflectionbot) [NC]
 RewriteRule ^ - [F,L]
 </IfModule>
 
