@@ -77,6 +77,10 @@ gameSettings.worldConfig = {
     mapItemsIndex: {},
     mapAbilitySymbols: {},
     mapAbilitiesIndex: {},
+    mapStartPosition: '1-1',
+    mapStartDirection: 'right',
+    mapHasEncounters: false,
+    mapHasPickups: false,
     minimapWorldTileSize: 14,
     minimapAreaTileSize: 6,
     windowWidth: 1024, // default only
@@ -468,6 +472,8 @@ class mmrpgWorldMap {
         //let portalsIndex = mapData.portals_index || {};
         let startPosition = mapData.start_position || false;
         let startDirection = mapData.start_direction || false;
+        let hasEncounters = mapData.has_encounters || false;
+        let hasPickups = mapData.has_pickups || false;
         if (!mapToken || !mapImage || !mapSize || !tileSize){ console.error('initWorldMap() missing required properties!', {mapToken, mapImage, mapSize, tileSize}); return false; }
         if (!tilesIndex  || !spritesIndex){ console.error('initWorldMap() missing required indexes!', {tilesIndex, spritesIndex}); return false; }
         if (!Array.isArray(mapSize) || mapSize.length < 2){ console.error('initWorldMap() mapSize must be an array of at least two values!'); return false; }
@@ -505,6 +511,8 @@ class mmrpgWorldMap {
         _config.mapSpritesIndex = spritesIndex || {};
         _config.mapStartPosition = startPosition;
         _config.mapStartDirection = startDirection;
+        _config.mapHasEncounters = hasEncounters;
+        _config.mapHasPickups = hasPickups;
         _config.windowWidth = $(window).width();
         _config.windowHeight = $(window).height();
         _config.mmrpgWidth = _elements.mmrpg.outerWidth();

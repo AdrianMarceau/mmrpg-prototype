@@ -1033,6 +1033,8 @@ $_SESSION[$session_token]['EVENTS'][] = array(
                 $data['groups_index'] = $map_data_parsed['groups'];
                 $data['start_position'] = $this_prototype_data['this_current_position'];
                 $data['start_direction'] = $this_prototype_data['this_current_direction'];
+                $data['has_encounters'] = !empty($map_data_parsed['encounters']);
+                $data['has_pickups'] = !empty($map_data_parsed['pickups']);
                 $data_json = json_encode($data, JSON_NUMERIC_CHECK);
                 echo('<script data-json="mapData" type="application/json">'.$data_json.'</script>'.PHP_EOL);
 

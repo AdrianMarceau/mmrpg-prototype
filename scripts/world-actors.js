@@ -58,14 +58,14 @@ function prepareActorEventOptions(firstEvent, options){
                 if (!label || !token){ continue; }
 
                 if (token === 'reset-world-pickups'){
-                    let allItemSymbols = Object.values(_config.mapItemSymbols).join(',');
-                    let hasRandomItems = allItemSymbols.indexOf('random-') !== -1;
-                    if (!hasRandomItems){ continue; }
+                    //console.log('checking if reset-world-pickups allowed ...');
+                    //console.log('_config.mapHasPickups =', _config.mapHasPickups);
+                    if (!_config.mapHasPickups){ continue; }
                     }
                 else if (token === 'reset-world-encounters'){
-                    let allBattleSymbols = Object.values(_config.mapBattleSymbols).join(',');
-                    let hasRandomBattles = allBattleSymbols.indexOf('random-') !== -1;
-                    if (!hasRandomBattles){ continue; }
+                    //console.log('checking if reset-world-encounters allowed ...');
+                    //console.log('_config.mapHasEncounters =', _config.mapHasEncounters);
+                    if (!_config.mapHasEncounters){ continue; }
                     }
 
                 let enabled = true;
