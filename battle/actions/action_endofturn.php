@@ -136,8 +136,11 @@ if ($this_battle->battle_status != 'complete'){
                 if (!empty($attachments)){
                     foreach ($attachments AS $key2 => $attachment){
                         if (isset($attachment['attachment_duration'])){ $attachment['attachment_duration'] -= 1; }
-                        if ($attachment['attachment_duration'] > 0){ $this_battle->battle_attachments[$static_key][$key2] = $attachment; }
-                        else { unset($this_battle->battle_attachments[$static_key][$key2]); }
+                        if (!isset($attachment['attachment_duration']) || $attachment['attachment_duration'] > 0){
+                            $this_battle->battle_attachments[$static_key][$key2] = $attachment;
+                        } else {
+                            unset($this_battle->battle_attachments[$static_key][$key2]);
+                        }
                         $battle_has_updated = true;
                     }
                 }

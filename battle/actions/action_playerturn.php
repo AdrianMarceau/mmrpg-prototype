@@ -63,8 +63,9 @@ if ($this_action == 'item'){
     $temp_thisplayer_transport_robots = $this_player->get_value('transport_robots');
     if (!empty($temp_thisplayer_transport_robots)){
         $update_transports = function() use ($this_battle, $this_player, $temp_thisplayer_transport_robots, $this_action_token){
+            $action_robot_id = explode('_', $this_action_token)[0];
             foreach ($temp_thisplayer_transport_robots AS $transport_id){
-                if (strstr($this_action_token, $transport_id)){ continue; }
+                if ($action_robot_id == $transport_id){ continue; }
                 $transport_robot = rpg_game::get_robot($this_battle, $this_player, array('robot_id' => $transport_id));
                 $transport_robot->set_frame('slide');
                 $transport_robot->set_frame_offset(array('x' => 40, 'y' => 0, 'z' => 0));
@@ -336,10 +337,13 @@ if ($temp_targetability_abilitytarget == 'select_target'){
             $temp_target_id = array_shift($possible_targets);
             $temp_targetability_targetinfo = array('robot_id' => $temp_target_id);
         } else {
-            shuffle($temp_activerobots);
-            while (empty($temp_targetability_targetinfo)
-                || $temp_targetability_targetinfo['robot_id'] == $this_robot->robot_id){
-                $temp_targetability_targetinfo = array_shift($temp_activerobots);
+            $benched_robots = array_filter($temp_activerobots, function($r) use ($this_robot){
+                return $r['robot_id'] != $this_robot->robot_id;
+                });
+            if (!empty($benched_robots)){
+                $temp_targetability_targetinfo = $benched_robots[array_rand($benched_robots)];
+            } else {
+                $temp_targetability_targetinfo = $this_robot->export_array(); // Fallback
             }
         }
         $temp_targetability_targetplayer = $this_player;
@@ -570,9 +574,10 @@ $queue_target_ability_post_switch = false;
 if ($target_action == 'switch' && !$target_robot_was_disabled){
     $temp_targetplayer_transport_robots = $target_player->get_value('transport_robots');
     if (!empty($temp_targetplayer_transport_robots)){
-        $update_transports = function() use ($this_battle, $target_player, $temp_targetplayer_transport_robots, $this_action_token){
+        $update_transports = function() use ($this_battle, $target_player, $temp_targetplayer_transport_robots, $target_action_token){
+            $action_robot_id = explode('_', $target_action_token)[0];
             foreach ($temp_targetplayer_transport_robots AS $transport_id){
-                if (strstr($this_action_token, $transport_id)){ continue; }
+                if ($action_robot_id == $transport_id){ continue; }
                 $transport_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $transport_id));
                 $transport_robot->set_frame('slide');
                 $transport_robot->set_frame_offset(array('x' => 40, 'y' => 0, 'z' => 0));
@@ -646,6 +651,7 @@ if ($queue_target_ability_post_switch){
         || $temp_target_ability_info['ability_target'] == 'select_this_disabled'){
         $temp_target_ability_target_player = $target_player;
         $temp_target_ability_target_robots_active = $target_player->get_value('robots_active');
+        $temp_target_ability_target_robots_disabled = $target_player->get_value('robots_disabled');
         if (count($temp_target_ability_target_robots_active) === 1){
             $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $temp_target_ability_target_robots_active[0]);
         } elseif ($temp_target_ability_info['ability_target'] == 'select_this'){
@@ -658,7 +664,7 @@ if ($queue_target_ability_post_switch){
                 break;
             }
         } elseif ($temp_target_ability_info['ability_target'] == 'select_this_disabled'){
-            foreach ($temp_target_ability_target_robots_active AS $key => $info){
+            foreach ($temp_target_ability_target_robots_disabled AS $key => $info){
                 if ($info['robot_status'] !== 'disabled'){ continue; }
                 $temp_target_ability_target_robot = rpg_game::get_robot($this_battle, $target_player, $info);
                 break;
