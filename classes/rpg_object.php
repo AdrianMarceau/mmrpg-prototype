@@ -45,7 +45,10 @@ class rpg_object {
         $session_id = $this->session_id;
         // Now load the object data from the session or index
         $load_function = $this->class.'_load';
-        $this->{$load_function}($this->{$this->session_id}, $this->{$this->session_token});
+        $this->{$load_function}(array(
+            $this->session_id => $this->{$this->session_id},
+            $this->session_token => $this->{$this->session_token}
+            ));
         // Update the session variable
         $this->update_session();
     }
@@ -662,7 +665,7 @@ class rpg_object {
             unset($key_array[$key2]);
             unset($_SESSION[$session_key][$this->$session_id][$key][$key2]);
         } else {
-            unset($key_array);
+            unset($this->$key);
             unset($_SESSION[$session_key][$this->$session_id][$key]);
         }
     }
@@ -765,7 +768,7 @@ class rpg_object {
         $this_objectinfo = isset($args[3]) ? $args[3] : array('object_id' => 0, 'object_token' => 'object');
 
         if (!is_array($this_objectinfo)){
-            die('!is_array($this_objectinfo){ '.print_r($this_objectinfo, true)).' }';
+            die('!is_array($this_objectinfo){ '.print_r($this_objectinfo, true).' }');
         }
 
         // Now load the object data from the session or index
@@ -807,7 +810,10 @@ class rpg_object {
         // Collect current object data from the session if available
         $this_objectinfo_backup = $this_objectinfo;
         if (isset($_SESSION['OBJECTS'][$this_objectinfo['object_id']])){
-            $this_objectinfo = $_SESSION['OBJECTS'][$this_objectinfo['object_id']];
+            $this_objectinfo = array_replace(
+                $this_objectinfo_backup,
+                $_SESSION['OBJECTS'][$this_objectinfo['object_id']]
+            );
         }
 
         // Define the internal object values using the provided array
