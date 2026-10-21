@@ -679,19 +679,6 @@ class rpg_ability_damage extends rpg_damage {
 
             }
 
-            // Only apply omega modifiers if allowed to
-            if ($trigger_options['apply_omega_modifiers'] != false){
-
-                // If target robot has omega boost for the ability (based on type)
-                if ($this_ability->ability_results['flag_omegaboost']){
-                    foreach ($ability_omegaboost_multipliers AS $temp_multiplier){
-                        $this_ability->ability_results['this_amount'] = ceil($this_ability->ability_results['this_amount'] * $temp_multiplier);
-                        $this_battle->events_debug(__FILE__, __LINE__, $this_ability->ability_token.' | apply_omega_modifiers | x '.$temp_multiplier.' = '.$this_ability->ability_results['this_amount'].'');
-                    }
-                }
-
-            }
-
             // If we're not dealing with a percentage-based amount, apply stat mods
             if ($trigger_options['apply_stat_modifiers'] != false && !$this_ability->damage_options['damage_percent']){
 

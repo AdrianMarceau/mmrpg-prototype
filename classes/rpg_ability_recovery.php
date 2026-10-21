@@ -427,7 +427,7 @@ class rpg_ability_recovery extends rpg_recovery {
             }
 
             // Loop through all the other type multipliers one by one if this ability has a type
-            $skip_types = array('recovery', 'recovery', 'experience');
+            $skip_types = array('recovery', 'damage', 'experience');
             foreach ($field_multipliers AS $temp_type => $temp_multiplier){
                 // Skip non-type and special fields for this calculation
                 if (in_array($temp_type, $skip_types)){ continue; }

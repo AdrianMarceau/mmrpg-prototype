@@ -37,7 +37,7 @@ class rpg_ability extends rpg_object {
         $this_abilityinfo = isset($args[3]) ? $args[3] : array('ability_id' => 0, 'ability_token' => 'ability');
 
         if (!is_array($this_abilityinfo)){
-            die('!is_array($this_abilityinfo){ '.print_r($this_abilityinfo, true)).' }';
+            die('!is_array($this_abilityinfo){ '.print_r($this_abilityinfo, true).' }');
         }
 
         // Now load the ability data from the session or index
@@ -402,7 +402,7 @@ class rpg_ability extends rpg_object {
     public function get_target_options(){ return $this->get_info('target_options'); }
     public function set_target_options($value){ $this->set_info('target_options', $value); }
 
-    public function get_damage_options(){ return $this->get_info('ddamage_options'); }
+    public function get_damage_options(){ return $this->get_info('damage_options'); }
     public function set_damage_options($value){ $this->set_info('damage_options', $value); }
 
     public function get_recovery_options(){ return $this->get_info('recovery_options'); }
@@ -682,7 +682,7 @@ class rpg_ability extends rpg_object {
             $this->target_options['ability_failure_frame_offset']['y'] = $target_options['failure'][2];
             $this->target_options['ability_failure_frame_offset']['z'] = $target_options['failure'][3];
             $this->target_options['target_failure_text'] = $target_options['failure'][4];
-            $this->target_options['ability_failure_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
+            $this->target_options['ability_failure_frame_span'] = isset($target_options['failure'][5]) ? $target_options['failure'][5] : 1;
         }
         // Return the new array
         return $this->target_options;
@@ -3038,11 +3038,11 @@ class rpg_ability extends rpg_object {
                 $recovery_options['ability_success_text']
                 ),
             'failure' => array(
-                $damage_options['ability_failure_frame'],
-                $damage_options['ability_failure_offset'][0],
-                $damage_options['ability_failure_offset'][1],
-                $damage_options['ability_failure_offset'][2],
-                $damage_options['ability_failure_text']
+                $recovery_options['ability_failure_frame'],
+                $recovery_options['ability_failure_offset'][0],
+                $recovery_options['ability_failure_offset'][1],
+                $recovery_options['ability_failure_offset'][2],
+                $recovery_options['ability_failure_text']
                 )
             ));
 
