@@ -19,7 +19,7 @@ class rpg_field extends rpg_object {
         $args = func_get_args();
 
         // Define the internal battle pointer
-        $this->battle = isset($args[0]) ? $args[0] : array();
+        $this->battle = isset($args[0]) ? $args[0] : $GLOBALS['this_battle'];
         $this->battle_id = $this->battle->battle_id;
         $this->battle_token = $this->battle->battle_token;
 
@@ -1274,7 +1274,7 @@ class rpg_field extends rpg_object {
                                         // Loop through and display support mecha links
                                         if (!in_array($field_info['field_token'], $temp_special_stages) && !empty($robot_mecha_info_array)){
                                             foreach ($robot_mecha_info_array AS $key => $robot_mecha_info){
-                                                 if ($robot_mecha_info['robot_class'] == 'mecha' && preg_match('/-[0-9]+$/', $robot_mecha_info['robot_token'])){ $robot_mecha_info['robot_name'] = (preg_replace('/^(.*?)-([0-9]+)$/', '$2', $robot_mecha_info['robot_token'])); }
+                                                 if ($robot_mecha_info['robot_class'] == 'mecha' && preg_match('/-[0-9]+$/', $robot_mecha_info['robot_token'])){ $robot_mecha_info['robot_name'] .= (preg_replace('/^(.*?)-([0-9]+)$/', '$2', $robot_mecha_info['robot_token'])); }
                                                  ?>
                                                      <a href="database/mechas/<?= $robot_mecha_info['robot_token'] ?>/" class="robot_type robot_type_<?= (!empty($robot_mecha_info['robot_core']) ? $robot_mecha_info['robot_core'] : 'none').(!empty($robot_mecha_info['robot_type2']) ? '_'.$robot_mecha_info['robot_type2'] : '') ?>"><?= $robot_mecha_info['robot_name'] ?></a>
                                                  <?
@@ -1367,6 +1367,7 @@ class rpg_field extends rpg_object {
                         <?
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
+                        $temp_editor_titles = array();
                         $temp_final_divider = '<span class="pipe"> | </span>';
                         $editor_ids = array();
                         if (!empty($field_info['field_image_editor'])){ $editor_ids[] = $field_info['field_image_editor']; }
@@ -1398,7 +1399,7 @@ class rpg_field extends rpg_object {
                         if ($temp_is_capcom){
                             echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
                         } else {
-                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Item by <strong>Adrian Marceau</strong></p>'."\n";
+                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Field by <strong>Adrian Marceau</strong></p>'."\n";
                         }
                         ?>
                     </div>
@@ -1518,10 +1519,6 @@ class rpg_field extends rpg_object {
         $temp_field_option = $field_info['field_name'];
         if (!empty($temp_field_type)){ $temp_field_option .= ' | '.$temp_field_type['type_name']; }
         if (!empty($temp_field_type2)){ $temp_field_option .= ' / '.$temp_field_type2['type_name']; }
-        //if (!empty($field_info['field_damage'])){ $temp_field_option .= ' | D:'.$field_info['field_damage']; }
-        //if (!empty($field_info['field_recovery'])){ $temp_field_option .= ' | R:'.$field_info['field_recovery']; }
-        //if (!empty($field_info['field_accuracy'])){ $temp_field_option .= ' | A:'.$field_info['field_accuracy']; }
-        if (!empty($temp_field_energy)){ $temp_field_option .= ' | E:'.$temp_field_energy; }
         // Return the generated option markup
         $this_option_markup = '<option value="'.$temp_field_token.'" data-label="'.$temp_field_label.'" data-type="'.(!empty($temp_field_type) ? $temp_field_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_field_type2) ? $temp_field_type2['type_token'] : '').'" title="'.$temp_field_title_plain.'" data-tooltip="'.$temp_field_title_tooltip.'">'.$temp_field_option.'</option>';
 
