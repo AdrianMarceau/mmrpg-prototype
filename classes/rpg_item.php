@@ -37,7 +37,7 @@ class rpg_item extends rpg_object {
         $this_iteminfo = isset($args[3]) ? $args[3] : array('item_id' => 0, 'item_token' => 'item');
 
         if (!is_array($this_iteminfo)){
-            die('!is_array($this_iteminfo){ '.print_r($this_iteminfo, true)).' }';
+            die('!is_array($this_iteminfo){ '.print_r($this_iteminfo, true).' }');
         }
 
         // Now load the item data from the session or index
@@ -108,7 +108,7 @@ class rpg_item extends rpg_object {
         $this->values = isset($this_iteminfo['values']) ? $this_iteminfo['values'] : array();
         $this->history = isset($this_iteminfo['history']) ? $this_iteminfo['history'] : array();
         $this->item_id = isset($this_iteminfo['item_id']) ? $this_iteminfo['item_id'] : 0;
-        $this->item_name = isset($this_iteminfo['item_name']) ? $this_iteminfo['item_name'] : 'Ability';
+        $this->item_name = isset($this_iteminfo['item_name']) ? $this_iteminfo['item_name'] : 'Item';
         $this->item_token = isset($this_iteminfo['item_token']) ? $this_iteminfo['item_token'] : 'item';
         $this->item_class = isset($this_iteminfo['item_class']) ? $this_iteminfo['item_class'] : 'master';
         $this->item_quantity = isset($this_iteminfo['item_quantity']) ? $this_iteminfo['item_quantity'] : 1;
@@ -389,7 +389,7 @@ class rpg_item extends rpg_object {
     public function get_target_options(){ return $this->get_info('target_options'); }
     public function set_target_options($value){ $this->set_info('target_options', $value); }
 
-    public function get_damage_options(){ return $this->get_info('ddamage_options'); }
+    public function get_damage_options(){ return $this->get_info('damage_options'); }
     public function set_damage_options($value){ $this->set_info('damage_options', $value); }
 
     public function get_recovery_options(){ return $this->get_info('recovery_options'); }
@@ -621,7 +621,7 @@ class rpg_item extends rpg_object {
             $this->target_options['item_failure_frame_offset']['y'] = $target_options['failure'][2];
             $this->target_options['item_failure_frame_offset']['z'] = $target_options['failure'][3];
             $this->target_options['target_text'] = $target_options['failure'][4];
-            $this->target_options['item_failure_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
+            $this->target_options['item_failure_frame_span'] = isset($target_options['failure'][5]) ? $target_options['failure'][5] : 1;
         }
         // Return the new array
         return $this->target_options;
