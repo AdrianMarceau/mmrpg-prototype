@@ -907,6 +907,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
         if (actionData.actionAreaMarkup) actionAreaMarkup += actionData.actionAreaMarkup;
         if (actionData.sideButtonsMarkup) sideButtonsMarkup += actionData.sideButtonsMarkup;
         if (actionData.showActionAreaType) showActionAreaType = actionData.showActionAreaType;
+        if (actionData.showActionAreaSound) showActionAreaSound = actionData.showActionAreaSound;
         if (actionData.zoomTimeoutDuration) zoomTimeoutDuration = actionData.zoomTimeoutDuration;
         if (typeof actionData.triggerEffect !== 'undefined') triggerEffect = actionData.triggerEffect;
         if (typeof actionData.readyTeamSprites !== 'undefined') readyTeamSprites = actionData.readyTeamSprites;
