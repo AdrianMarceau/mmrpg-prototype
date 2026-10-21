@@ -43,6 +43,7 @@ ob_start();
  */
 
 // Collect the global battle variables
+$flag_wap = isset($_REQUEST['wap']) ? $_REQUEST['wap'] : false; // deprecated but including to prevent errors
 $this_battle_id = isset($_REQUEST['this_battle_id']) ? $_REQUEST['this_battle_id'] : 1;
 $this_battle_token = isset($_REQUEST['this_battle_token']) ? $_REQUEST['this_battle_token'] : 'battle';
 $this_field_id = isset($_REQUEST['this_field_id']) ? $_REQUEST['this_field_id'] : 1;
