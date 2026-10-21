@@ -145,7 +145,7 @@ $this_fieldinfo = array('field_id' => $this_field_id, 'field_token' => $this_fie
 
 // Define the battle object using the loaded battle data and update session
 $this_battle = rpg_game::get_battle($this_battleinfo);
-$this_battle->flags['wap'] = $flag_wap ? true : false;
+$this_battle->flags['wap'] = !empty($flag_wap) ? true : false;
 $this_battle->update_session();
 
 // Define the current field object using the loaded field data and update session
@@ -611,36 +611,13 @@ elseif ($this_action == 'ability'
     require_once('battle/actions/action_playerturn.php');
 
 }
-/*
-// Else if the player's robot is using an ability
-elseif ($this_action == 'ability'){
-
-    // Require the ability action file
-    require_once('battle/actions/ability.php');
-
-}
-// Else if the player's robot is using an item
-elseif ($this_action == 'item'){
-
-    // Require the ability-item action file (player uses item, target uses ability)
-    require_once('battle/actions/ability_item.php');
-
-}
-// Else if the player is switching robots, they go first
-elseif ($this_action == 'switch'){
-
-    // Require the ability-switch action file (player uses switch, target uses ability)
-    require_once('battle/actions/ability_switch.php');
-
-}
-*/
 
 // Re-collect this robot if different from the "current" one in this player's values
 $this_player->player_reload();
 if (!empty($this_player->values['current_robot'])){
     //$this_battle->events_create(false, false, 'debug', 'battle-loop on line '.__LINE__.' our $this_player->values[\'current_robot\'] = '.$this_player->values['current_robot']);
     list($id, $token) = explode('_', $this_player->values['current_robot']);
-    if ($this_robot->robot_id !== $id){
+    if ($this_robot->robot_id != $id){
         unset($this_robot);
         $this_robot = rpg_game::get_robot($this_battle, $this_player, array(
             'robot_id' => $id,
@@ -654,7 +631,7 @@ $target_player->player_reload();
 if (!empty($target_player->values['current_robot'])){
     //$this_battle->events_create(false, false, 'debug', 'battle-loop on line '.__LINE__.' our $target_player->values[\'current_robot\'] = '.$target_player->values['current_robot']);
     list($id, $token) = explode('_', $target_player->values['current_robot']);
-    if ($target_robot->robot_id !== $id){
+    if ($target_robot->robot_id != $id){
         unset($target_robot);
         $target_robot = rpg_game::get_robot($this_battle, $target_player, array(
             'robot_id' => $id,
@@ -990,6 +967,7 @@ if (!empty($this_battle->flags['challenge_battle'])
             $db_common_fields['challenge_zenny_earned'] = $temp_zenny_earned;
 
             // Calculate the earned points and rank for this run based on used turns and robots vs goal
+            $new_percent = 0; $new_rank = '';
             $new_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, array(
                 'challenge_turns_used' => $temp_player_turns_used,
                 'challenge_turn_limit' => $temp_target_turn_limit,
@@ -1012,6 +990,7 @@ if (!empty($this_battle->flags['challenge_battle'])
             if (!empty($existing_db_row)){
 
                 // Calculate the earned points and rank for the previous run so we can compare to current
+                $old_percent = 0; $old_rank = '';
                 $old_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, array(
                     'challenge_turns_used' => $existing_db_row['challenge_turns_used'],
                     'challenge_turn_limit' => $temp_target_turn_limit,
@@ -1291,7 +1270,7 @@ unset($db);
 // DEBUG
 // If output buffer content was created, alert the webmaster of its content
 if (!empty($output_buffer_contents) && (!MMRPG_CONFIG_IS_LIVE && MMRPG_CONFIG_ADMIN_MODE)){
-    $output_buffer_contents = str_replace("\\", '\\', $output_buffer_contents);
+    $output_buffer_contents = str_replace('\\', '\\\\', $output_buffer_contents);
     $output_buffer_contents = str_replace("\n", '\n', $output_buffer_contents);
     $output_buffer_contents = preg_replace('/\s+/', ' ', $output_buffer_contents);
     $output_buffer_contents = str_replace("'", "\'", $output_buffer_contents);
