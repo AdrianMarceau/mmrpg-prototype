@@ -19,7 +19,7 @@ class rpg_player extends rpg_object {
         $args = func_get_args();
 
         // Define the internal battle pointer
-        $this->battle = isset($args[0]) ? $args[0] : array();
+        $this->battle = isset($args[0]) ? $args[0] : $GLOBALS['this_battle'];
         $this->battle_id = $this->battle->battle_id;
         $this->battle_token = $this->battle->battle_token;
 
@@ -242,7 +242,7 @@ class rpg_player extends rpg_object {
 
     }
 
-    // Define a function for re-loreading the current player from session
+    // Define a function for re-loading the current player from session
     public function player_reload(){
         $this->player_load(array(
             'player_id' => $this->player_id,
@@ -1661,6 +1661,7 @@ class rpg_player extends rpg_object {
         //$info1['robot_key'] = $info1['robot_key'] < 8 ? $info1['robot_key'] + 1 : 1;
         //$info2['robot_key'] = $info2['robot_key'] < 8 ? $info2['robot_key'] + 1 : 1;
         if ($info1['robot_position'] == 'active'){ return -1; }
+        elseif ($info2['robot_position'] == 'active'){ return 1; }
         elseif ($info1['robot_key'] < $info2['robot_key']){ return -1; }
         elseif ($info1['robot_key'] > $info2['robot_key']){ return 1; }
         else { return 0; }
@@ -1693,34 +1694,6 @@ class rpg_player extends rpg_object {
         if ($field_one['field_token'] > $field_two['field_token']){ return 1; }
         elseif ($field_one['field_token'] < $field_two['field_token']){ return -1; }
         else { return 0; }
-    }
-
-    // Define a static function for printing out the robot's editor markup
-    public static function items_sort_for_editor($item_one, $item_two){
-
-        $item_token_one = $item_one['item_token'];
-        $item_token_two = $item_two['item_token'];
-        list($x, $kind_one, $size_one) = explode('-', $item_token_one);
-        list($x, $kind_two, $size_two) = explode('-', $item_token_two);
-
-        if ($kind_one == 'energy' && $kind_two != 'energy'){ return -1; }
-        elseif ($kind_one != 'energy' && $kind_two == 'energy'){ return 1; }
-        elseif ($kind_one == 'weapon' && $kind_two != 'weapon'){ return -1; }
-        elseif ($kind_one != 'weapon' && $kind_two == 'weapon'){ return 1; }
-        elseif ($kind_one == 'core' && $kind_two != 'core'){ return -1; }
-        elseif ($kind_one != 'core' && $kind_two == 'core'){ return 1; }
-
-        elseif ($size_one == 'pellet' && $size_two != 'pellet'){ return -1; }
-        elseif ($size_one != 'pellet' && $size_two == 'pellet'){ return 1; }
-        elseif ($size_one == 'capsule' && $size_two != 'capsule'){ return -1; }
-        elseif ($size_one != 'capsule' && $size_two == 'capsule'){ return 1; }
-        elseif ($size_one == 'tank' && $size_two != 'tank'){ return -1; }
-        elseif ($size_one != 'tank' && $size_two == 'tank'){ return 1; }
-
-        elseif ($item_one['item_token'] > $item_two['item_token']){ return 1; }
-        elseif ($item_one['item_token'] < $item_two['item_token']){ return -1; }
-        else { return 0; }
-
     }
 
     // Define a function to trigger when a given robot finds an item (in this context, "target" is the player and robot getting the item)
@@ -1945,7 +1918,7 @@ class rpg_player extends rpg_object {
             $event_options['event_flag_sound_effects'] = array(
                 array('name' => 'get-big-item', 'volume' => 1.0)
                 );
-            $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
+            $target_player->set_frame((($item_reward_key + 1) % 3 == 0 ? 'taunt' : 'victory'));
             $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
             $temp_core->set_frame('base');
             $temp_core->set_frame_offset(array('x' => 50, 'y' => 0, 'z' => 10));
@@ -2198,7 +2171,7 @@ class rpg_player extends rpg_object {
             $event_options['event_flag_sound_effects'] = array(
                 array('name' => 'get-big-item', 'volume' => 1.0)
                 );
-            $target_player->set_frame(($item_reward_key + 1 % 3 == 0 ? 'taunt' : 'victory'));
+            $target_player->set_frame((($item_reward_key + 1) % 3 == 0 ? 'taunt' : 'victory'));
             $target_robot->set_frame($item_reward_key % 2 == 0 ? 'base' : 'taunt');
             $temp_core->set_frame('base');
             $temp_core->set_frame_offset(array('x' => 50, 'y' => 0, 'z' => 10));
@@ -4000,10 +3973,10 @@ class rpg_player extends rpg_object {
                                                 $temp_challenge_type_class1 = 'field_type_'.(!empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none');
                                                 //$temp_challenge_type_class2 = 'field_type_'.(!empty($this_field_info2['field_type']) ? $this_field_info2['field_type'] : 'none');
                                                 $temp_challenge_type_class3 = 'field_type_'.(!empty($this_field_info1['field_type']) ? $this_field_info1['field_type'] : 'none').((!empty($this_field_info2['field_type']) && $this_field_info2['field_type'] != 'none' && $this_field_info2['field_type'] != $this_field_info1['field_type']) ? '_'.$this_field_info2['field_type'] : '');
-                                                if ($global_allow_editing && $temp_allow_challenge_switch){ $this_challenge_title_html = '<label class="field_type  '.$temp_challenge_type_class3.'" style="">'.$this_challenge_title_html.'</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
+                                                if ($global_allow_editing && $temp_allow_challenge_switch){ $this_challenge_title_html = '<label class="field_type  '.$temp_challenge_type_class3.'" style="">'.$this_challenge_title_html.'</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
                                                 elseif (!$global_allow_editing && $temp_allow_challenge_switch){ $this_challenge_title_html = '<label class="field_type  '.$temp_challenge_type_class3.'" style="cursor: default !important;">'.$this_challenge_title_html.'</label>'; }
                                                 else { $this_challenge_title_html = '<label class="field_type '.$temp_challenge_type_class3.'" style="cursor: default !important;">'.$this_challenge_title_html.'</label>'; }
-                                                $temp_string[] = '<a class="challenge_name challenge_battle field_type '.$temp_challenge_type_class1.'" style="background-image: url(images/fields/'.$this_field_info1['field_token'].'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.') !important; '.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_challenge_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_challenge_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="'.$this_challenge_id.'" data-tooltip="'.$this_challenge_title_tooltip.'" data-tooltip-type="field_type '.$temp_challenge_type_class3.'">'.$this_challenge_title_html.'</a>';
+                                                $temp_string[] = '<a class="challenge_name challenge_battle field_type '.$temp_challenge_type_class1.'" style="background-image: url(images/fields/'.$this_field_info1['field_token'].'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.') !important; '.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_challenge_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_challenge_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-challenge="'.$this_challenge_id.'" data-tooltip="'.$this_challenge_title_tooltip.'" data-tooltip-type="field_type '.$temp_challenge_type_class3.'">'.$this_challenge_title_html.'</a>';
                                                 $challenge_key++;
                                             }
 
@@ -4013,8 +3986,8 @@ class rpg_player extends rpg_object {
                                                     if ($empty_challenge_counter >= 2){ $empty_challenge_disable = true; }
                                                     else { $empty_challenge_disable = false; }
                                                     $temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $challenge_rewards_options);
-                                                    $this_challenge_title_html = '<label>-</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
-                                                    $temp_string[] = '<a class="challenge_name challenge_battle " style="'.(($challenge_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
+                                                    $this_challenge_title_html = '<label>-</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
+                                                    $temp_string[] = '<a class="challenge_name challenge_battle " style="'.(($challenge_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
                                                 }
                                             }
 
@@ -4026,8 +3999,8 @@ class rpg_player extends rpg_object {
                                                 if ($empty_challenge_counter >= 2){ $empty_challenge_disable = true; }
                                                 else { $empty_challenge_disable = false; }
                                                 $temp_select_options = str_replace('value=""', 'value="" selected="selected"', $challenge_rewards_options);
-                                                $this_challenge_title_html = '<label>-</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
-                                                $temp_string[] = '<a class="challenge_name challenge_battle " style="'.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
+                                                $this_challenge_title_html = '<label>-</label><select class="challenge_name" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" '.($empty_challenge_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
+                                                $temp_string[] = '<a class="challenge_name challenge_battle " style="'.(($challenge_key + 1) % 3 == 0 ? 'margin-right: 0; ' : '').($empty_challenge_disable ? 'opacity:0.25; ' : '').'" data-key="'.$challenge_key.'" data-player="'.$player_info['player_token'].'" data-challenge="" title="">'.$this_challenge_title_html.'</a>';
                                             }
 
                                         }
@@ -4124,7 +4097,6 @@ class rpg_player extends rpg_object {
 
                                             // DEBUG
                                             //echo 'player-field:';
-                                            $player_info['player_fields_current'] = $player_info['player_fields_current']; //array_reverse($player_info['player_fields_current']);
                                             foreach ($player_info['player_fields_current'] AS $player_field){
 
                                                 if ($player_field['field_token'] == '*'){ continue; }
@@ -4152,10 +4124,10 @@ class rpg_player extends rpg_object {
                                                 $this_field_title_html = str_replace(' ', '&nbsp;', $this_field_name);
                                                 $temp_select_options = str_replace('value="'.$this_field_token.'"', 'value="'.$this_field_token.'" selected="selected" disabled="disabled"', $field_rewards_options);
                                                 $temp_field_type_class = 'field_type_'.(!empty($this_field['field_type']) ? $this_field['field_type'] : 'none').(!empty($this_field['field_type2']) ? '_'.$this_field['field_type2'] : '');
-                                                if ($global_allow_editing && $temp_allow_field_switch){ $this_field_title_html = '<label class="field_type  '.$temp_field_type_class.'" style="">'.$this_field_title_html.'</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
+                                                if ($global_allow_editing && $temp_allow_field_switch){ $this_field_title_html = '<label class="field_type  '.$temp_field_type_class.'" style="">'.$this_field_title_html.'</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'">'.$temp_select_options.'</select>'; }
                                                 elseif (!$global_allow_editing && $temp_allow_field_switch){ $this_field_title_html = '<label class="field_type  '.$temp_field_type_class.'" style="cursor: default !important;">'.$this_field_title_html.'</label>'; }
                                                 else { $this_field_title_html = '<label class="field_type '.$temp_field_type_class.'" style="cursor: default !important;">'.$this_field_title_html.'</label>'; }
-                                                $temp_string[] = '<a class="field_name field_type '.$temp_field_type_class.'" style="background-image: url(images/fields/'.$this_field_token.'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_field_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_field_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-field="'.$this_field_token.'" data-tooltip="'.$this_field_title_tooltip.'">'.$this_field_title_html.'</a>';
+                                                $temp_string[] = '<a class="field_name field_type '.$temp_field_type_class.'" style="background-image: url(images/fields/'.$this_field_token.'/battle-field_preview.png?'.MMRPG_CONFIG_CACHE_DATE.'); '.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').(!$temp_allow_field_switch || !$global_allow_editing ? 'cursor: default !important; ' : '').(!$temp_allow_field_switch ? 'opacity: 0.50; filter: alpha(opacity=50); ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-field="'.$this_field_token.'" data-tooltip="'.$this_field_title_tooltip.'">'.$this_field_title_html.'</a>';
                                                 $field_key++;
                                             }
 
@@ -4165,8 +4137,8 @@ class rpg_player extends rpg_object {
                                                     if ($empty_field_counter >= 2){ $empty_field_disable = true; }
                                                     else { $empty_field_disable = false; }
                                                     $temp_select_options = str_replace('value=""', 'value="" selected="selected" disabled="disabled"', $field_rewards_options);
-                                                    $this_field_title_html = '<label>-</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_field_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
-                                                    $temp_string[] = '<a class="field_name " style="'.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_field_disable ? 'opacity:0.25; ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-field="" title="">'.$this_field_title_html.'</a>';
+                                                    $this_field_title_html = '<label>-</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" '.($empty_field_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
+                                                    $temp_string[] = '<a class="field_name " style="'.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_field_disable ? 'opacity:0.25; ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-field="" title="">'.$this_field_title_html.'</a>';
                                                 }
                                             }
 
@@ -4178,8 +4150,8 @@ class rpg_player extends rpg_object {
                                                 if ($empty_field_counter >= 2){ $empty_field_disable = true; }
                                                 else { $empty_field_disable = false; }
                                                 $temp_select_options = str_replace('value=""', 'value="" selected="selected"', $field_rewards_options);
-                                                $this_field_title_html = '<label>-</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" '.($empty_field_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
-                                                $temp_string[] = '<a class="field_name " style="'.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_field_disable ? 'opacity:0.25; ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-player="'.$player_info['player_token'].'" data-field="" title="">'.$this_field_title_html.'</a>';
+                                                $this_field_title_html = '<label>-</label><select class="field_name" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" '.($empty_field_disable ? 'disabled="disabled" ' : '').'>'.$temp_select_options.'</select>';
+                                                $temp_string[] = '<a class="field_name " style="'.(($field_key + 1) % 4 == 0 ? 'margin-right: 0; ' : '').($empty_field_disable ? 'opacity:0.25; ' : '').'" data-key="'.$field_key.'" data-player="'.$player_info['player_token'].'" data-field="" title="">'.$this_field_title_html.'</a>';
                                             }
 
                                         }
@@ -4241,7 +4213,7 @@ class rpg_player extends rpg_object {
         // Collect the types index for reference
         $mmrpg_types = rpg_type::get_index(true);
 
-        // Generta the basic player fields for display
+        // Generate the basic player fields for display
         $temp_player_title = '';
         $temp_player_token = $player_info['player_token'];
         $temp_player_name = $player_info['player_name'];
