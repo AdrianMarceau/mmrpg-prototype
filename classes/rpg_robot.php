@@ -25,8 +25,8 @@ class rpg_robot extends rpg_object {
 
         // Define the internal battle pointer
         $this->field = isset($this->battle->field) ? $this->battle->field : $GLOBALS['this_field'];
-        $this->field_id = $this->battle->battle_id;
-        $this->field_token = $this->battle->battle_token;
+        $this->field_id = $this->field->field_id;
+        $this->field_token = $this->field->field_token;
 
         // Define the internal player values using the provided array
         $this->player = isset($args[1]) ? $args[1] : $GLOBALS['this_player'];
@@ -830,7 +830,7 @@ class rpg_robot extends rpg_object {
         if ($weapons < 0){ $weapons = 0; }
         $this->set_info('robot_base_weapons', $weapons);
     }
-    public function reset_weapons($value){
+    public function reset_weapons(){
         $this->set_info('robot_weapons', $this->get_info('robot_base_weapons'));
     }
 
@@ -1900,7 +1900,7 @@ class rpg_robot extends rpg_object {
         $support_multiplier = 1;
         if (in_array($this_robot->robot_token, array('roll', 'disco', 'rhythm'))){ $support_multiplier += 1; }
 
-        // Define the freency of the default buster ability if set
+        // Define the frequency of the default buster ability if set
         if ($this_robot->has_ability('buster-shot')){
             $options[] = 'buster-shot';
             $weights[] = $this_robot->robot_token == 'met' ? 90 : 1;
@@ -1915,7 +1915,7 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0;  }
         }
 
-        // Define the freency of the default buster ability if set
+        // Define the frequency of the default buster ability if set
         if ($this_robot->has_ability('buster-relay')){
             $options[] = 'buster-relay';
             $temp_weight = 0;
@@ -2074,31 +2074,31 @@ class rpg_robot extends rpg_object {
             else { $weights[] = 0; }
         }
 
-        // Define the freency of the omega pulse ability if set
+        // Define the frequency of the omega pulse ability if set
         if ($this_robot->has_ability('omega-pulse')){
             $options[] = 'omega-pulse';
             $weights[] = 24 * $support_multiplier;
         }
 
-        // Define the freency of the omega wave ability if set
+        // Define the frequency of the omega wave ability if set
         if ($this_robot->has_ability('omega-wave')){
             $options[] = 'omega-wave';
             $weights[] = 12 * $support_multiplier;
         }
 
-        // Define the freency of the copy shot ability if set
+        // Define the frequency of the copy shot ability if set
         if ($this_robot->has_ability('copy-shot')){
             $options[] = 'copy-shot';
             $weights[] = 4;
         }
 
-        // Define the freency of the copy soul ability if set
+        // Define the frequency of the copy soul ability if set
         if ($this_robot->has_ability('copy-soul')){
             $options[] = 'copy-soul';
             $weights[] = 2;
         }
 
-        // Define the freency of the copy style ability if set
+        // Define the frequency of the copy style ability if set
         if ($this_robot->has_ability('copy-style')){
             $options[] = 'copy-style';
             $weights[] = 0;
@@ -2115,8 +2115,8 @@ class rpg_robot extends rpg_object {
 
         // If the user has any of the element overdrives loop through and check 'em
         // (decreased frequency if not taken significant damage yet)
-        $existin_robot_ability_tokens = $this_robot->robot_abilities;
-        foreach ($existin_robot_ability_tokens AS $key => $ability){
+        $existing_robot_ability_tokens = $this_robot->robot_abilities;
+        foreach ($existing_robot_ability_tokens AS $key => $ability){
             if (strstr($ability, '-overdrive')
                 && $this_robot->has_ability($ability)){
                 $options[] = $ability;
@@ -2398,7 +2398,7 @@ class rpg_robot extends rpg_object {
                         unset($this->battle->battle_attachments[$static_attachment_key][$attachment_token]);
                         $this->update_session();
                         $this->battle->update_session();
-                        $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : $attachment_info['attachment_destroy'];
+                        $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : (isset($attachment_info['attachment_destroy']) ? $attachment_info['attachment_destroy'] : false);
                         if ($attachment_destroy_info !== false){
                             $temp_ability = $temp_attachments_index[$attachment_info['ability_token']];
                             $attachment_info = array_merge($temp_ability, $attachment_info);
@@ -2551,7 +2551,7 @@ class rpg_robot extends rpg_object {
                         unset($this->battle->battle_attachments[$static_attachment_key][$attachment_token]);
                         $this->update_session();
                         $this->battle->update_session();
-                        $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : $attachment_info['attachment_destroy'];
+                        $attachment_destroy_info = isset($attachment_info['attachment_destroy_via_weaknesses']) ? $attachment_info['attachment_destroy_via_weaknesses'] : (isset($attachment_info['attachment_destroy']) ? $attachment_info['attachment_destroy'] : false);
                         if ($attachment_destroy_info !== false){
                             $temp_item = $temp_attachments_index[$attachment_info['item_token']];
                             $attachment_info = array_merge($temp_item, $attachment_info);
@@ -3727,7 +3727,7 @@ class rpg_robot extends rpg_object {
                         } elseif ($kind === 'weakness'){
                             if (in_array($type, $this->robot_weaknesses)){ unset($this->robot_weaknesses[array_search($type, $this->robot_weaknesses)]); }
                         } elseif ($kind === 'resistance'){
-                            if (in_array($type, $this->robot_resistances)){ unset($this->robot_affinities[array_search($type, $this->robot_resistances)]); }
+                            if (in_array($type, $this->robot_resistances)){ unset($this->robot_resistances[array_search($type, $this->robot_resistances)]); }
                         } elseif ($kind === 'immunity'){
                             if (in_array($type, $this->robot_immunities)){ unset($this->robot_immunities[array_search($type, $this->robot_immunities)]); }
                         }
