@@ -443,6 +443,22 @@ else {
 $this_battle_data['battle_complete'] = mmrpg_prototype_battle_complete($this_player_token, $this_battle_token);
 $this_battle_data['battle_failure'] = mmrpg_prototype_battle_failure($this_player_token, $this_battle_token);
 
+// If in the world context, check target robots for masters or bosses to swap the field music
+if ($this_is_world_battle && !empty($target_player_data['player_robots'])){
+    foreach ($target_player_data['player_robots'] AS $target_robot){
+        // Retrieve full index data to check the class
+        $target_robot_index = rpg_robot::get_index_info($target_robot['robot_token']);
+        // If a master or boss is found, fetch their theme and overwrite the field music
+        if (!empty($target_robot_index['robot_class']) && in_array($target_robot_index['robot_class'], array('master', 'boss'))){
+            $dynamic_boss_music = mmrpg_prototype_get_robot_boss_music($target_robot['robot_token']);
+            if (!empty($dynamic_boss_music)){
+                $this_field_data['field_music'] = $dynamic_boss_music;
+                break; // Stop at the first valid master/boss theme we find
+            }
+        }
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html>

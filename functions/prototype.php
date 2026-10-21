@@ -4720,7 +4720,7 @@ function mmrpg_prototype_leaderboard_targets_sort($player1, $player2){
 
 
 
-// Define a function for determining a player's battle music
+// Define a function for counting the number of unlocked robots per game per doctor for the purpose of music selection
 function mmrpg_prototype_get_player_game_counters($player_token, $include = 'all', $session_token = 'GAME'){
 
     global $db;
@@ -4781,7 +4781,7 @@ function mmrpg_prototype_get_player_game_counters($player_token, $include = 'all
         //error_log('<pre>$temp_robots_parsed = '.print_r($temp_robots_parsed, true).'</pre>');
 
         // Define player game prefs for backup purposes
-        static $player_base_games = array('dr-light' => 'mm1', 'dr-wily' => 'mm2', 'dr-cossack' => 'mm4' );
+        static $player_base_games = array('dr-light' => 'mm1', 'dr-wily' => 'mm2', 'dr-cossack' => 'mm4', 'dr-lalinde' => 'mm3' );
         $this_player_game = !empty($player_base_games[$player_token]) ? $player_base_games[$player_token] : 'mm1';
 
         // If the game counters were somehow empty, populate with default
@@ -4875,7 +4875,7 @@ function mmrpg_prototype_get_chapter_music($player_token, $data_chapter, $sessio
     return $chapter_music;
 }
 
-// Define a function for determining a player's boss music
+// Define a function for determining a player's boss music given unlocked robots
 function mmrpg_prototype_get_player_boss_music($player_token, $session_token = 'GAME'){
     $game_counters = mmrpg_prototype_get_player_game_counters($player_token, 'fields', $session_token);
     //error_log(PHP_EOL.'---------'.PHP_EOL.'get_player_boss_music('.$player_token.') w/ '.print_r($game_counters, true));
@@ -4885,6 +4885,17 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
             return $music_path;
         }
     }
+    return 'sega-remix/boss-theme-mm1';
+}
+
+// Define a function for determining a robot's boss music given its source game
+function mmrpg_prototype_get_robot_boss_music($robot_token){
+    if (empty($robot_token) || !is_string($robot_token)){ return false; }
+    $robot_info = rpg_robot::get_index_info($robot_token);
+    if (empty($robot_info)){ return false; }
+    $robot_game = !empty($robot_info['robot_game']) ? strtolower($robot_info['robot_game']) : 'mm1';
+    $music_path = 'sega-remix/boss-theme-'.$robot_game;
+    if (rpg_game::sound_exists('sounds/'.$music_path)){ return $music_path; }
     return 'sega-remix/boss-theme-mm1';
 }
 
