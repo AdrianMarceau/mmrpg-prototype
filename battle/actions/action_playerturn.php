@@ -469,8 +469,7 @@ if ($this_action == 'ability') {
         $new_target_robot = false;
 
         // If this is a special SELECT THIS or SELECT THIS ALLY target ability
-        if ($temp_ability_info['ability_target'] == 'select_this'
-            || $temp_ability_info['ability_target'] == 'select_this_ally'){
+        if (!empty($temp_ability_info) && ($temp_ability_info['ability_target'] == 'select_this' || $temp_ability_info['ability_target'] == 'select_this_ally')){
 
             if ($this_robot->robot_id == $backup_target_robot_id){
                 $new_target_robot = $this_robot;
@@ -484,7 +483,7 @@ if ($this_action == 'ability') {
 
         }
         // If this is a special SELECT TARGET ability
-        elseif ($temp_ability_info['ability_target'] == 'select_target'){
+        elseif (!empty($temp_ability_info) && $temp_ability_info['ability_target'] == 'select_target'){
             $new_target_robot = rpg_game::get_robot($this_battle, $target_player, array('robot_id' => $backup_target_robot_id, 'robot_token' => $backup_target_robot_token));
             $new_target_robot->update_session();
             $this_battle->actions_append($this_player, $this_robot, $target_player, $new_target_robot, $this_action, $this_action_token);
