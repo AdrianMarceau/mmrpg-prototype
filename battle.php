@@ -78,6 +78,22 @@ if (!empty($this_battle_token)){
         }
         $this_battle_data['battle_target_player']['player_robots'] = $clean_target_robots;
     }
+    // Pre-emptively remove any lingering "guest" rewards from previous multi-battle sessions
+    if (!empty($this_battle_data['battle_rewards'])){
+        $clean_battle_rewards = array();
+        foreach ($this_battle_data['battle_rewards'] AS $kind => $rewards){
+            $clean_kind_rewards = array();
+            foreach ($rewards AS $reward_data){
+                if (empty($reward_data['flags']['guest'])){
+                    $clean_kind_rewards[] = $reward_data;
+                }
+            }
+            if (!empty($clean_kind_rewards)){
+                $clean_battle_rewards[$kind] = $clean_kind_rewards;
+            }
+        }
+        $this_battle_data['battle_rewards'] = $clean_battle_rewards;
+    }
 
     // MULTI-BATTLE-TOKEN-POST-CHECK
     // If multiple battle tokens were provided, loop through them and merge-in target robots, rewards, etc.
@@ -114,7 +130,16 @@ if (!empty($this_battle_token)){
                 //error_log('merging in $temp_battle_rewards = '.print_r($temp_battle_rewards, true));
                 foreach ($temp_battle_rewards AS $kind => $rewards){
                     if (!isset($new_battle_rewards[$kind])){ $new_battle_rewards[$kind] = array(); }
-                    $new_battle_rewards[$kind] = array_merge($new_battle_rewards[$kind], $rewards);
+                    foreach ($rewards AS $reward_data){
+                        // Skip if this reward is somehow already tagged as a guest
+                        if (!empty($reward_data['flags']['guest'])){ continue; }
+                        // If this is a merged-in battle, tag the reward as a guest
+                        elseif ($multi_key > 0){
+                            if (!isset($reward_data['flags'])){ $reward_data['flags'] = array(); }
+                            $reward_data['flags']['guest'] = true;
+                        }
+                        $new_battle_rewards[$kind][] = $reward_data;
+                    }
                 }
             }
             if (!empty($temp_target_robots)){
