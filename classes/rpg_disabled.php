@@ -363,7 +363,7 @@ class rpg_disabled {
                                 if ($temp_stat_session_boost < 1){ $temp_stat_session_boost = 1; }
                                 $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] += $temp_stat_session_boost;
                                 $new_bonus_amount = $_SESSION['GAME']['values']['battle_rewards'][$target_player->player_token]['player_robots'][$target_robot->robot_token][$prop_stat] >= $temp_robot_stats[$stat]['bonus_max'] ? true : false;
-                                $stat_is_maxed = $target_robot->robot_level >= 100 && $new_bonus_amount >= $temp_robot_stats[$stat]['bonus_max'] ? true : false;
+                                $stat_is_maxed = $target_robot->robot_level >= 100 && $new_bonus_amount ? true : false;
                             }
 
                             // Display an event showing the recovery increase
@@ -1217,7 +1217,7 @@ class rpg_disabled {
                                 // Display the robot reward message markup
                                 if (!mmrpg_prototype_ability_unlocked('', $temp_robot_token, $ability_reward_info['token'])){
                                     $event_header = $ability_info['ability_name'].' Unlocked';
-                                    $event_body = '<span class="robot_name">'.$temp_info['robot_name'].'</span> unlocked a new ability!<br />';
+                                    $event_body = '<span class="robot_name">'.$temp_target_robot->robot_name.'</span> unlocked a new ability!<br />';
                                     $event_body .= $temp_ability->print_name().' can now be used in battle!';
                                     $event_options = array();
                                     $event_options['console_show_target'] = false;
@@ -1432,7 +1432,7 @@ class rpg_disabled {
                     $this_robot_token = $robot_reward_info['token'];
                     $this_robot_level = !empty($robot_reward_info['level']) ? $robot_reward_info['level'] : 1;
                     $this_robot_experience = !empty($robot_reward_info['experience']) ? $robot_reward_info['experience'] : 0;
-                    $this_robot_rewards = !empty($robot_info['robot_rewards']) ? $robot_info['robot_rewards'] : array();
+                    $this_robot_rewards = !empty($robot_reward_index['robot_rewards']) ? $robot_reward_index['robot_rewards'] : array();
 
                     // If the provided level was "auto", then it will be the average of whomever fought it
                     if (empty($this_robot_level)
