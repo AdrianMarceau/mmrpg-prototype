@@ -306,6 +306,7 @@ $_SESSION['PLAYERS'] = array();
 $_SESSION['ROBOTS'] = array();
 $_SESSION['ABILITIES'] = array();
 $_SESSION['ITEMS'] = array();
+$_SESSION['SKILLS'] = array();
 
 // Generate the URL for the next mission with provided token
 $next_battle_id = $this_battle->battle_id + 1;
