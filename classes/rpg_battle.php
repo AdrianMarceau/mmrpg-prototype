@@ -522,6 +522,7 @@ class rpg_battle extends rpg_object {
             }
 
             // Based on the action type, trigger the appropriate battle function
+            $battle_action = false;
             switch ($current_action['this_action']){
                 // If the battle start action was called
                 case 'start': {
@@ -1987,7 +1988,7 @@ class rpg_battle extends rpg_object {
 
                     // Create an event for this robot teleporting in
                     if ($this_player->counters['robots_active'] == 1
-                        || $this_robot->robot_position = 'active'){
+                        || $this_robot->robot_position == 'active'){
                         $event_options = array();
                         $event_options['event_flag_camera_action'] = true;
                         $event_options['event_flag_camera_side'] = $this_robot->player->player_side;
@@ -2097,7 +2098,7 @@ class rpg_battle extends rpg_object {
                         'target_player' => $target_player,
                         'target_robot' => $target_robot
                         ));
-                    $temp_id = $this->index['abilities'][$temp_token]['ability_id'];//array_search($temp_token, $this_robot->robot_abilities);
+                    $temp_id = $temp_actions_index[$temp_token]['ability_id'];
                     $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
                     //$this_token = array('ability_id' => $temp_id, 'ability_token' => $temp_token);
                     $this_token = $temp_actions_index[$temp_token];
@@ -2255,7 +2256,7 @@ class rpg_battle extends rpg_object {
                         'target_player' => $target_player,
                         'target_robot' => $target_robot
                         ));
-                    $temp_id = $this->index['items'][$temp_token]['item_id'];//array_search($temp_token, $this_robot->robot_items);
+                    $temp_id = $temp_actions_index[$temp_token]['item_id'];
                     $temp_id = $this_robot->robot_id.str_pad($temp_id, '3', '0', STR_PAD_LEFT);
                     //$this_token = array('item_id' => $temp_id, 'item_token' => $temp_token);
                     $this_token = $temp_actions_index[$temp_token];
@@ -2376,13 +2377,18 @@ class rpg_battle extends rpg_object {
                         $this_last_switch = !empty($this_recent_switches) ? array_slice($this_recent_switches, -1, 1, false) : array('');
                         $this_last_switch = $this_last_switch[0];
                         $this_current_token = $this_robot->robot_id.'_'.$this_robot->robot_token;
-                        do {
-                            $new_robotinfo = $non_rescue_targets[mt_rand(0, ($non_rescue_targets_count - 1))];
-                            if ($new_robotinfo['robot_id'] == $this_robot->robot_id){ continue; }
-                            elseif ($new_robotinfo['robot_token'] == 'robot'){ continue; }
+                        // (Filter out the current robot BEFORE randomly picking to guarantee a safe pool)
+                        $valid_switch_targets = array_values(array_filter($non_rescue_targets, function($robot) use ($this_robot){
+                            return ($robot['robot_id'] != $this_robot->robot_id && $robot['robot_token'] != 'robot');
+                            }));
+                        $valid_switch_count = count($valid_switch_targets);
+                        if ($valid_switch_count > 0){
+                            $new_robotinfo = $valid_switch_targets[mt_rand(0, ($valid_switch_count - 1))];
                             $this_temp_token = $new_robotinfo['robot_id'].'_'.$new_robotinfo['robot_token'];
-                            //$this->events_create(false, false, 'DEBUG', '!empty('.$this_last_switch.') && '.$this_temp_token.' == '.$this_last_switch);
-                        } while(empty($this_temp_token));
+                        } else {
+                            $new_robotinfo = array('robot_id' => 0, 'robot_token' => 'robot');
+                            return false;
+                        }
                     } else {
                         $new_robotinfo = array('robot_id' => 0, 'robot_token' => 'robot');
                         return false;
@@ -2798,6 +2804,7 @@ class rpg_battle extends rpg_object {
                                 <? if ($options->show_abilities || MMRPG_CONFIG_DEBUG_MODE){ ?>
                                     <?
                                     $temp_target_robot_abilities = $temp_target_robot->print_abilities(false);
+                                    if (!is_array($temp_target_robot_abilities)){ $temp_target_robot_abilities = array(); }
                                     while (count($temp_target_robot_abilities) < 8){ $temp_target_robot_abilities[] = '<span class="ability_name type type_empty">&nbsp;</span>'; }
                                     $temp_target_robot_abilities = '<div class="ability_cell">'.implode('</div><div class="ability_cell">', $temp_target_robot_abilities).'</div>';
                                     ?>
