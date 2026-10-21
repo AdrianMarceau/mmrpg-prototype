@@ -1162,6 +1162,22 @@ class rpg_ability_recovery extends rpg_recovery {
 
             }
 
+            // Check to see if affection values play into this at all (being healed builds infatuation in the robot)
+            if ($this_robot->robot_id != $target_robot->robot_id){
+                //error_log('this robot ('.$this_robot->robot_string.') is being healed by the target robot ('.$target_robot->robot_string.')');
+
+                // (does this robot like the target robot? THEY DO NOW!)
+                $old_affection_value = !empty($this_robot->counters['affection'][$target_robot->robot_token]) ? $this_robot->counters['affection'][$target_robot->robot_token] : 0;
+                //error_log('$old_affection_value = '.$old_affection_value);
+
+                // this robot is being healed by the target, which increases the affection value toward them
+                $new_affection_value = $old_affection_value + $this_ability->ability_results['this_amount'];
+                //error_log('$new_affection_value = '.$new_affection_value);
+
+                $this_robot->counters['affection'][$target_robot->robot_token] = $new_affection_value;
+                //error_log('affection '.($old_affection_value == 0 ? 'created' : 'increased'));
+            }
+
             // Define the print variables to return
             $this_ability->ability_results['print_strikes'] = '<span class="recovery_strikes">'.(!empty($this_ability->ability_results['total_strikes']) ? $this_ability->ability_results['total_strikes'] : 0).'</span>';
             $this_ability->ability_results['print_misses'] = '<span class="recovery_misses">'.(!empty($this_ability->ability_results['total_misses']) ? $this_ability->ability_results['total_misses'] : 0).'</span>';
