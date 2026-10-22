@@ -62,7 +62,7 @@ if ($this_page_subaction === 'get-lines'){
     if (!empty($since_last_line) && $since_last_line <= $error_log_size){
         // Update the content type to simple json
         ob_clean();
-        header('Content-type: text/json; charset=utf-8');
+        header('Content-type: application/json; charset=utf-8');
         // If there were new lines since the last update, return them, else return empty array
         $return_array = array();
         if ($since_last_line < $error_log_size){

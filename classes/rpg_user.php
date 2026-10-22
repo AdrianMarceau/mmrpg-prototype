@@ -431,6 +431,17 @@ class rpg_user {
 
     }
 
+    /**
+     * Define a function for getting the current USER ip-address if available, empty if not
+     * @return string
+     */
+    public static function get_current_userip(){
+        $remote_address = !empty($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '';
+        $remote_address = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $remote_address;
+        $remote_address = !empty($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : $remote_address;
+        return $remote_address;
+    }
+
 
     // -- USER PERMISSIONS FUNCTIONS -- //
 
@@ -736,7 +747,8 @@ class rpg_user {
         $existing_item_records = $db->get_array_list("SELECT
             `unlocked`.`item_token`, `unlocked`.`item_quantity`
             FROM `{$record_table_name}` AS `unlocked`
-            LEFT JOIN `mmrpg_index_items` AS `index` ON `index`.`item_token` = `unlocked`.`item_token`
+            LEFT JOIN `mmrpg_index_items` AS `index`
+                ON `index`.`item_token` = SUBSTRING_INDEX(`unlocked`.`item_token`, '__', 1)
             WHERE `unlocked`.`user_id` = {$user_id} AND `index`.`item_flag_published` = 1 AND `index`.`item_flag_complete` = 1
             ORDER BY `unlocked`.`record_id` ASC
             ;", 'item_token');

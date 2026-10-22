@@ -7,3 +7,6 @@
 [submodule ".libs/codemirror"]
 	path = .libs/codemirror
 	url = https://github.com/codemirror/CodeMirror.git
+[submodule ".libs/pdf-merger"]
+	path = .libs/pdf-merger
+	url = https://github.com/myokyawhtun/PDFMerger.git

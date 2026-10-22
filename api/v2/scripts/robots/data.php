@@ -5,6 +5,8 @@ $api_request_path = 'robots/index/{token}';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for robots and then parse necessary data
+define('FORCE_INCLUDE_HIDDEN_ROBOTS', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_ROBOTS', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 if (empty($mmrpg_database_robots)){ print_error_and_quit('The robot database could not be loaded'); }

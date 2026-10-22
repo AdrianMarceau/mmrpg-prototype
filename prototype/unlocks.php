@@ -221,16 +221,16 @@ function generate_prototype_postgame_message($player_token){
 
     // Generate the markup for bonus chapters unlocks
     $temp_bonus_chapter_markup = array();
-    $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter lets you to refight past foes in unlikey pairings. These missions are perfect for trying out new strategies or grinding for cores!</p>';
-    if (mmrpg_prototype_item_unlocked('light-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
-    if (mmrpg_prototype_item_unlocked('cossack-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
-    if (mmrpg_prototype_item_unlocked('wily-program')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique missions designed by the MMRPG staff. These are hard but have great rewards! <span style="font-size: 70%;position: relative;bottom: 4px;left: 2px;">(Try the Endless Attack Mode!)</span></p>'; }
+    if (mmrpg_prototype_item_unlocked('random-bypass')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_speed">Mission Randomizer</strong> chapter lets you to refight past foes in unlikely pairings. These missions are perfect for trying out new strategies or grinding for cores!</p>'; }
+    if (mmrpg_prototype_item_unlocked('player-tracker')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_attack">Player Battles</strong> chapter contains missions against the ghost-data of other users from the leaderboard. These missions are great for grinding lots of zenny!</p>'; }
+    if (mmrpg_prototype_item_unlocked('challenge-permit')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_defense">Star Fields</strong> chapter locates and displays any Field Star or Fusion Star missions that you\'ve yet to complete.  Collecting stars helps your robots grow stronger!</p>'; }
+    if (mmrpg_prototype_item_unlocked('stellar-beacon')){ $temp_bonus_chapter_markup[] = '<p>The <strong class="ability_type ability_type_energy">Challenge Mode</strong> chapter offers a collection of unique missions designed by the MMRPG staff. These are hard but have great rewards! <span style="font-size: 70%;position: relative;bottom: 4px;left: 2px;">(Try the Endless Attack Mode!)</span></p>'; }
 
     // Generate the canvas markup with the player standing with and their team of robots
     $temp_console_markup = '';
     $temp_console_markup .= '<p>';
         $temp_console_markup .= '<strong>'.$player_info['player_name'].'</strong>\'s story has come to an end, but there\'s still more to do and discover!<br /> ';
-        $temp_console_markup .= 'As thanks for playing, <strong>'.count($temp_bonus_chapter_markup).' new bonus chapters</strong> have been unlocked in his campaign! ';
+        $temp_console_markup .= 'As thanks for playing, <strong>'.count($temp_bonus_chapter_markup).' new bonus chapter'.(count($temp_bonus_chapter_markup) !== 1 ? 's' : '').'</strong> have been unlocked in his campaign! ';
     $temp_console_markup .= '</p>';
     $temp_console_markup .= '<div style="padding: 10px; margin: 5px auto; border-top: 1px solid #212121; border-bottom: 1px solid #090909;">';
         $temp_console_markup .= implode('', $temp_bonus_chapter_markup);
@@ -255,6 +255,18 @@ function generate_prototype_postgame_message($player_token){
 /*
  * DR. LIGHT UNLOCKS
  */
+
+// UNLOCK PLAYER : DR. LIGHT
+
+// If the Light Program has been found, we can unlock Dr. Light
+if (!$unlock_flag_light && mmrpg_prototype_item_unlocked('light-program')){
+
+    // Unlock Dr. Light as a playable character
+    $unlock_player_info = $mmrpg_index_players['dr-light'];
+    mmrpg_game_unlock_player($unlock_player_info, false, true);
+    $_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_points'] = 0;
+
+}
 
 /*
 
@@ -292,20 +304,21 @@ if ($battle_complete_counter_light >= 1 && $battle_complete_counter_light < 2){
 
 */
 
+/*
+// UNLOCK ROBOT : MEGA MAN
 
-// UNLOCK ROBOT : ROLL
-
-// If the player has failured at least one battle, unlock Roll as a playable character
-if ($battle_failure_counter_light >= 1 && !mmrpg_prototype_robot_unlocked(false, 'roll')){
+// If the player has somehow not already got one, unlock Mega Man as a playable character
+if (!mmrpg_prototype_robot_unlocked(false, 'mega-man')){
 
     // Unlock Roll as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-light'];
-    $unlock_robot_info = rpg_robot::get_index_info('roll');
+    $unlock_robot_info = rpg_robot::get_index_info('mega-man');
     $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL;
     $unlock_robot_info['robot_experience'] = 999;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
+    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
 
 }
+*/
 
 // UNLOCK EVENT : PHASE TWO CHAPTERS (WILY)
 
@@ -358,8 +371,8 @@ if ($battle_complete_counter_light >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 // UNLOCK PLAYER : DR. WILY
 
-// If Dr. Light has completed phase1 of his battles, unlock Dr. Wily
-if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
+// If the Wily Program has been found, we can unlock Dr. Wily
+if (!$unlock_flag_wily && mmrpg_prototype_item_unlocked('wily-program')){
 
     // Unlock Dr. Wily as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-wily'];
@@ -404,21 +417,6 @@ if (!$unlock_flag_wily && mmrpg_prototype_complete('dr-light')){
     unset($_SESSION[$session_token]['battle_settings']['this_player_token']);
     header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
     exit();
-
-}
-
-
-// UNLOCK ROBOT : DISCO
-
-// If the player has failed at least two battles, unlock Disco as a playable character
-if ($battle_failure_counter_wily >= 2 && !mmrpg_prototype_robot_unlocked(false, 'disco')){
-
-    // Unlock Disco as a playable character
-    $unlock_player_info = $mmrpg_index_players['dr-wily'];
-    $unlock_robot_info = rpg_robot::get_index_info('disco');
-    $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY2_STARTLEVEL;
-    $unlock_robot_info['robot_experience'] = 999;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
 
@@ -472,8 +470,8 @@ if ($battle_complete_counter_wily >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
 
 // UNLOCK PLAYER : DR. COSSACK
 
-// If Dr. Light has completed phase1 of his battles, unlock Dr. Cossack
-if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
+// If the Cossack Program has been found, we can unlock Dr. Cossack
+if (!$unlock_flag_cossack && mmrpg_prototype_item_unlocked('cossack-program')){
 
     // Unlock Dr. Cossack as a playable character
     $unlock_player_info = $mmrpg_index_players['dr-cossack'];
@@ -518,20 +516,6 @@ if (!$unlock_flag_cossack && mmrpg_prototype_complete('dr-wily')){
     unset($_SESSION[$session_token]['battle_settings']['this_player_token']);
     header('Location: prototype.php?wap='.($flag_wap ? 'true' : 'false'));
     exit();
-
-}
-
-// UNLOCK ROBOT : RHYTHM
-
-// If the player has failed at least three battles, unlock Rhythm as a playable character
-if ($battle_failure_counter_cossack >= 3 && !mmrpg_prototype_robot_unlocked(false, 'rhythm')){
-
-    // Unlock Rhythm as a playable character
-    $unlock_player_info = $mmrpg_index_players['dr-cossack'];
-    $unlock_robot_info = rpg_robot::get_index_info('rhythm');
-    $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY3_STARTLEVEL;
-    $unlock_robot_info['robot_experience'] = 999;
-    mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
 
 }
 
@@ -597,10 +581,11 @@ if ($battle_complete_counter_cossack >= MMRPG_SETTINGS_CHAPTER5_MISSIONCOUNT){
  * DR. LIGHT EVENT ITEMS
  */
 
-// Unlock the AUTO LINK after Dr. Light has completed all of Chapter One
+// Unlock the AUTO LINK after Dr. Light has found one of his codes
 if (!mmrpg_prototype_item_unlocked('auto-link')
-    && $chapters_unlocked_light['1']
-    ){
+    && (mmrpg_prototype_item_unlocked('item-codes')
+        || mmrpg_prototype_item_unlocked('equip-codes')
+    )){
 
     // Unlock the Auto Link and generate the required event details
     mmrpg_game_unlock_item('auto-link', array(
@@ -616,6 +601,7 @@ if (!mmrpg_prototype_item_unlocked('auto-link')
     rpg_prototype::mark_robot_as_pending_entrance_animation('auto');
 
 }
+/*
 // Unlock the ITEM CODES immediately after the Auto Link has been unlocked
 if (mmrpg_prototype_item_unlocked('auto-link')
     && !mmrpg_prototype_item_unlocked('item-codes')){
@@ -649,15 +635,16 @@ if (!mmrpg_prototype_item_unlocked('equip-codes')
         ));
 
 }
+*/
 
-// Unlock the LIGHT/SHARE PROGRAM after Dr. Light has finished their campaign (when we unlock Dr. Wily)
+// Unlock the PLAYER TRACKER after Dr. Light has finished their campaign
 if (mmrpg_prototype_complete('dr-light')
-    && !mmrpg_prototype_item_unlocked('light-program')
+    && !mmrpg_prototype_item_unlocked('player-tracker')
     ){
 
-    // Unlock the Light Program and generate the required event details
-    mmrpg_game_unlock_item('light-program', array(
-        'event_text' => '{player} discovered how to share! <br /> The {item} has been activated!',
+    // Unlock the Player Tracker and generate the required event details
+    mmrpg_game_unlock_item('player-tracker', array(
+        'event_text' => '{player} developed a new item! <br /> The {item} has been activated!',
         'player_token' => 'dr-light',
         'show_images' => array('player'),
         'field_background' => 'light-laboratory',
@@ -671,10 +658,11 @@ if (mmrpg_prototype_complete('dr-light')
  * DR. WILY EVENT ITEMS
  */
 
-// Unlock the REGGAE LINK after Dr. Wily has completed all of Chapter One
+// Unlock the REGGAE LINK after Dr. Wily has found one of its codes
 if (!mmrpg_prototype_item_unlocked('reggae-link')
-    && $chapters_unlocked_wily['1']
-    ){
+    && (mmrpg_prototype_item_unlocked('ability-codes')
+        || mmrpg_prototype_item_unlocked('weapon-codes')
+    )){
 
     // Unlock the Reggae Link and generate the required event details
     mmrpg_game_unlock_item('reggae-link', array(
@@ -690,6 +678,7 @@ if (!mmrpg_prototype_item_unlocked('reggae-link')
     rpg_prototype::mark_robot_as_pending_entrance_animation('reggae');
 
 }
+/*
 // Unlock the ABILITY CODES immediately after the Reggae Link has been unlocked
 if (mmrpg_prototype_item_unlocked('reggae-link')
     && !mmrpg_prototype_item_unlocked('ability-codes')){
@@ -723,15 +712,16 @@ if (!mmrpg_prototype_item_unlocked('weapon-codes')
         ));
 
 }
+*/
 
-// Unlock the WILY/TRANSFER PROGRAM after Dr. Wily has finished their campaign (when we unlock Dr. Cossack)
+// Unlock the CHALLENGE PASS after Dr. Wily has finished their campaign
 if (mmrpg_prototype_complete('dr-wily')
-    && !mmrpg_prototype_item_unlocked('wily-program')
+    && !mmrpg_prototype_item_unlocked('challenge-permit')
     ){
 
-    // Unlock the Wily Program and generate the required event details
-    mmrpg_game_unlock_item('wily-program', array(
-        'event_text' => '{player} discovered how to transfer! <br /> The {item} has been activated!',
+    // Unlock the Challenge Pass and generate the required event details
+    mmrpg_game_unlock_item('challenge-permit', array(
+        'event_text' => '{player} developed a new item! <br /> The {item} can now be used!',
         'player_token' => 'dr-wily',
         'show_images' => array('player'),
         'field_background' => 'wily-castle',
@@ -745,10 +735,11 @@ if (mmrpg_prototype_complete('dr-wily')
  * DR. COSSACK EVENT ITEMS
  */
 
-// Unlock the KALINKA LINK after Dr. Cossack has completed at least half of Chapter Two
+// Unlock the KALINKA LINK after Dr. Cossack has found one of her codes
 if (!mmrpg_prototype_item_unlocked('kalinka-link')
-    && $chapters_unlocked_cossack['1']
-    ){
+    && (mmrpg_prototype_item_unlocked('master-codes')
+        || mmrpg_prototype_item_unlocked('dress-codes')
+    )){
 
     // Unlock the Kalinka Link and generate the required event details
     mmrpg_game_unlock_item('kalinka-link', array(
@@ -764,6 +755,7 @@ if (!mmrpg_prototype_item_unlocked('kalinka-link')
     rpg_prototype::mark_player_as_pending_entrance_animation('kalinka');
 
 }
+/*
 // Unlock the MASTER CODES immediately after the Kalinka Link has been unlocked
 if (mmrpg_prototype_item_unlocked('kalinka-link')
     && !mmrpg_prototype_item_unlocked('master-codes')){
@@ -797,15 +789,16 @@ if (!mmrpg_prototype_item_unlocked('dress-codes')
         ));
 
 }
+*/
 
-// Unlock the COSSACK/SEARCH PROGRAM after Dr. Cossack has finished their campaign
+// Unlock the STELLAR BEACON after Dr. Cossack has finished their campaign
 if (mmrpg_prototype_complete('dr-cossack')
-    && !mmrpg_prototype_item_unlocked('cossack-program')
+    && !mmrpg_prototype_item_unlocked('stellar-beacon')
     ){
 
-    // Unlock the Cossack Program and generate the required event details
-    mmrpg_game_unlock_item('cossack-program', array(
-        'event_text' => '{player} discovered how to search! <br /> The {item} has been activated!',
+    // Unlock the Stellar Beacon and generate the required event details
+    mmrpg_game_unlock_item('stellar-beacon', array(
+        'event_text' => '{player} developed a new item! <br /> The {item} was sent into orbit!',
         'player_token' => 'dr-cossack',
         'show_images' => array('player'),
         'field_background' => 'cossack-citadel',
@@ -819,124 +812,52 @@ if (mmrpg_prototype_complete('dr-cossack')
  * MULTI DR. EVENT ITEMS
  */
 
-// Define the index of chapter-relavant players and their chapter details
-$chapter_unlock_players = array('dr-light', 'dr-wily', 'dr-cossack');
-$chapter_unlock_players_config = array(
-    'dr-light' => array(
-        'welcome' => 'Welcome to the Prototype!',
-        'letsgo_robot' => array('token' => 'mega-man', 'name' => 'Mega Man'),
-        'letsgo_template' => 'Let\'s go {ROBOT}!<br /> I\'m right here beside you!'
-        ),
-    'dr-wily' => array(
-        'welcome' => 'Rivals of the Prototype!',
-        'letsgo_robot' => array('token' => 'bass', 'name' => 'Bass'),
-        'letsgo_template' => 'It\'s time, {ROBOT}!<br /> Show them your power!'
-        ),
-    'dr-cossack' => array(
-        'welcome' => 'Hacking the Prototype!',
-        'letsgo_robot' => array('token' => 'proto-man', 'name' => 'Proto Man'),
-        'letsgo_template' => 'Alright {ROBOT}!<br /> There\'s work to be done!'
-        )
-    );
-$chapter_unlock_popup_index = array();
+/*
+// If Light was unlocked, but the player has not yet seen the unlock event, display it
+if ($unlock_flag_light){
 
-// Unlock the LIGHT BUSTER / WILY BUSTER / COSSACK BUSTER if the player has unlocked at least three robots (hero + support + robot master)
-foreach ($chapter_unlock_players AS $player_token){
-    // If the player has a doctor unlocked without also having their buster, unlock it now
-    $buster_token = str_replace('dr-', '', $player_token).'-buster';
-    if (mmrpg_prototype_player_unlocked($player_token)
-        && !mmrpg_prototype_ability_unlocked($player_token, '', $buster_token)
-        && mmrpg_prototype_robots_unlocked($player_token) >= 3){
-        //error_log('unlocking '.$buster_token.' for '.$player_token.' apparently ');
-        $unlock_player_info = $mmrpg_index_players[$player_token];
-        mmrpg_game_unlock_ability($unlock_player_info, '', array('ability_token' => $buster_token), true);
+    // Display the first level-up event showing Mega Man and the Mega Buster
+    $temp_event_flag = 'dr-light-event-00_player-unlocked';
+    if (empty($temp_game_flags['events'][$temp_event_flag])){
+        $temp_game_flags['events'][$temp_event_flag] = true;
+        $temp_canvas_markup = '';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_background_base.gif?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -50px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto; filter: blur(1px) brightness(0.8);"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80" style="background-image: url(images/fields/gentle-countryside/battle-field_foreground_base.png?'.MMRPG_CONFIG_CACHE_DATE.'); background-position: center -45px; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_01" style="background-image: url(images/players/dr-light/sprite_left_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 20px; left: calc(50% - 20px); transform: scale(1.5) translate(-50%, 0); transform-origin: bottom right;"></div>';
+        $temp_canvas_markup .= '<div class="sprite sprite_80x80 sprite_80x80_taunt" style="background-image: url(images/robots/mega-man/sprite_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE.'); bottom: 40px; left: calc(50% + 20px); transform: scale(1) translate(-50%, 0); transform-origin: bottom left; filter: brightness(0.9);"></div>';
+        $temp_console_markup = '';
+        $temp_console_markup .= '<p class="ability_type ability_type_defense" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('defense', 'Dr. Light').' has been unlocked as a player character!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Light</strong> and <strong>Mega Man</strong> to experience the story from their perspective. This beginner-level campaign teaches you the basics while you fight through an army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_defense">Dr. Light</strong> from the player select menu to play through his campaign at any time.</p>';
+        array_push($_SESSION[$session_token]['EVENTS'], array(
+            'canvas_markup' => $temp_canvas_markup,
+            'console_markup' => $temp_console_markup,
+            'player_token' => 'dr-light',
+            'event_type' => 'new-player'
+            ));
+        $clear_seen_frame_token = 'edit_players';
+        rpg_prototype::mark_menu_frame_as_unseen($clear_seen_frame_token);
     }
-}
 
-// Main-Game Chapters
-$chapter_unlock_popup_index[] = array('chapter_key' => '0', 'chapter_token' => 'chapter-1', 'chapter_name' => 'Chapter 1', 'chapter_subname' => 'Chapter One : An Unexpected Attack');
-$chapter_unlock_popup_index[] = array('chapter_key' => '1', 'chapter_token' => 'chapter-2', 'chapter_name' => 'Chapter 2', 'chapter_subname' => 'Chapter Two : Robot Master Revival');
-$chapter_unlock_popup_index[] = array('chapter_key' => '2', 'chapter_token' => 'chapter-3', 'chapter_name' => 'Chapter 3', 'chapter_subname' => 'Chapter Three : The Rival Challengers');
-$chapter_unlock_popup_index[] = array('chapter_key' => '3', 'chapter_token' => 'chapter-4', 'chapter_name' => 'Chapter 4', 'chapter_subname' => 'Chapter Four : Battle Field Fusions');
-$chapter_unlock_popup_index[] = array('chapter_key' => '4a', 'chapter_token' => 'chapter-5', 'chapter_name' => 'Chapter 5', 'chapter_subname' => 'Chapter Five : The Final Battles', 'chapter_is_endgame' => true);
-
-// Post-Game Chapters
-$chapter_unlock_popup_index[] = array('chapter_key' => '6', 'chapter_token' => 'chapter-random', 'chapter_name' => 'Random', 'chapter_subname' => 'Bonus Chapter : Mission Randomizer', 'chapter_is_bonus' => true);
-$chapter_unlock_popup_index[] = array('chapter_key' => '7', 'chapter_token' => 'chapter-stars', 'chapter_name' => 'Stars', 'chapter_subname' => 'Bonus Chapter : Star Fields', 'chapter_is_bonus' => true);
-$chapter_unlock_popup_index[] = array('chapter_key' => '5', 'chapter_token' => 'chapter-players', 'chapter_name' => 'Players', 'chapter_subname' => 'Bonus Chapter : Player Battles', 'chapter_is_bonus' => true);
-$chapter_unlock_popup_index[] = array('chapter_key' => '8', 'chapter_token' => 'chapter-challenges', 'chapter_name' => 'Challenges', 'chapter_subname' => 'Bonus Chapter : Challenge Mode', 'chapter_is_bonus' => true);
-
-// Loop through each unlocked player and get ready to process their chapters
-foreach ($chapter_unlock_players AS $player_key => $player_token){
-    if (!mmrpg_prototype_player_unlocked($player_token)){ continue; } // continue if player not unlocked yet
-
-    // Now loop through and display chapter unlock messages where relevant
-    foreach ($chapter_unlock_popup_index AS $key => $chapter_info){
-        $chapter_key = $chapter_info['chapter_key'];
-        $chapter_token = $chapter_info['chapter_token'];
-        $chapter_name = $chapter_info['chapter_name'];
-        $chapter_subname = $chapter_info['chapter_subname'];
-        $chapter_is_intro = $chapter_key === '0' ? true : false;
-        $chapter_is_endgame = !empty($chapter_info['chapter_is_endgame']) ? true : false;
-        $chapter_is_bonus = !empty($chapter_info['chapter_is_bonus']) ? true : false;
-        $chapter_unlock_text = $chapter_is_intro ? 'starts' : 'unlocked';
-        $next_chapter_info = isset($chapter_unlock_popup_index[$key + 1]) ? $chapter_unlock_popup_index[$key + 1] : false;
-        $next_chapter_key = isset($next_chapter_info['chapter_key']) ? $next_chapter_info['chapter_key'] : false;
-        if (!$chapters_unlocked_index[$player_token][$chapter_key]){ continue; } // continue if chapter not unlocked yet
-        $temp_event_flag = $player_token.'_'.$chapter_token.'-unlocked';
-        if (empty($temp_game_flags['events'][$temp_event_flag])){
-            $temp_game_flags['events'][$temp_event_flag] = true;
-            if (!$chapter_is_bonus && $next_chapter_key !== false && $chapters_unlocked_index[$player_token][$next_chapter_key]){ continue; } // continue if already unlocked next and not bonus
-            elseif ($chapter_is_endgame && mmrpg_prototype_complete($player_token)){ continue; } // continue if final chapter but player has already completed prototype
-            $chapter_unlock_config = $chapter_unlock_players_config[$player_token];
-            $player_info = $mmrpg_index_players[$player_token];
-            $player_name = $player_info['player_name'];
-            $player_type = $player_info['player_type'];
-            $banner_image_path = 'images/events/event-banner_'.$chapter_token.'-unlocked_'.$player_token.'.png?'.MMRPG_CONFIG_CACHE_DATE;
-            $headline_text = $chapter_is_intro ? $chapter_unlock_config['welcome'] : 'Congratulations!';
-            $temp_canvas_markup = '';
-            $temp_canvas_markup .= '<div class="sprite event_banner sprite_80x80 smooth-scaling" style="background-image: url('.$banner_image_path.'); background-size: cover; background-position: center top; top: 0; right: 0; bottom: 0; left: 0; width: auto; height: auto;"></div>';
-            $temp_console_markup = '';
-            $temp_console_markup .= '<p class="headline ability_type ability_type_'.$player_type.'"><strong>'.$headline_text.'</strong></p>';
-            $temp_console_markup .= '<div class="inset_panel">';
-                $temp_console_markup .= '<p class="bigtext centertext"><strong class="ability_type ability_type_'.$player_type.'">'.$player_name.'</strong> '.$chapter_unlock_text.' a new chapter!</p>';
-                $temp_console_markup .= '<p class="bigtext centertext">&quot;<strong>'.$chapter_subname.'</strong>&quot;'.(!$chapter_is_intro ? '<br /> is now available!' : '').'</p>';
-            $temp_console_markup .= '</div>';
-            if (!$chapter_is_bonus){
-                if (!$chapter_is_intro){
-                    $temp_limit_hearts = mmrpg_prototype_limit_hearts_earned($player_token);
-                    $temp_limit_hearts_icons = trim(str_repeat('<i class="fa fa-heart"></i> ', $temp_limit_hearts));
-                    $temp_console_markup .= '<div class="inset_panel compact">';
-                        $temp_console_markup .= '<p class="smalltext centertext">The doctor also earned a '.rpg_type::print_span('copy', '<i class="fa fas fa-heart"></i> Limit Heart').' for his progress!</p>';
-                        $temp_console_markup .= '<p class="smalltext centertext">He feels strong enough to bring <strong>'.$temp_limit_hearts.' robots '.$temp_limit_hearts_icons.'</strong> into battle now!</p>';
-                    $temp_console_markup .= '</div>';
-                } else {
-                    $letsgo_template_text = $chapter_unlock_config['letsgo_template'];
-                    $letsgo_robot_token = $chapter_unlock_config['letsgo_robot']['token'];
-                    $letsgo_robot_name = $chapter_unlock_config['letsgo_robot']['name'];
-                    $letsgo_text = str_replace('{ROBOT}', ' '.rpg_type::print_span('copy', $letsgo_robot_name).' ', $letsgo_template_text);
-                    $temp_console_markup .= '<div class="inset_panel compact">';
-                        $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_taunt float_left" style="background-image: url(images/players/'.$player_token.'/sprite_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                        $temp_console_markup .= '<p class="smalltext centertext">'.$letsgo_text.'</p>';
-                        $temp_console_markup .= '<span class="sprite sprite_40x40 sprite_40x40_defend float_right" style="background-image: url(images/robots/'.$letsgo_robot_token.'/sprite_left_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
-                    $temp_console_markup .= '</div>';
-                }
-            }
-            array_push($_SESSION[$session_token]['EVENTS'], array(
-                'canvas_markup' => $temp_canvas_markup,
-                'console_markup' => $temp_console_markup,
-                'player_token' => $player_token,
-                'event_type' => 'new-chapter'
-                ));
-        }
+    // If Light has been unlocked but somehow Mega Man was not
+    if (!mmrpg_prototype_robot_unlocked(false, 'mega-man')){
+        // Unlock Bass as a playable character
+        $unlock_player_info = $mmrpg_index_players['dr-light'];
+        $unlock_robot_info = rpg_robot::get_index_info('mega-man');
+        $unlock_robot_info['robot_level'] = MMRPG_SETTINGS_GAMESTORY1_STARTLEVEL;
+        $unlock_robot_info['robot_experience'] = 999;
+        mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, true);
     }
 
 }
+*/
 
+/*
 // If Wily was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_wily){
 
-    // Display the first level-up event showing Bass and the Proto Buster
+    // Display the first level-up event showing Bass and the Bass Buster
     $temp_event_flag = 'dr-wily-event-00_player-unlocked';
     if (empty($temp_game_flags['events'][$temp_event_flag])){
         $temp_game_flags['events'][$temp_event_flag] = true;
@@ -948,7 +869,7 @@ if ($unlock_flag_wily){
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_attack" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('attack', 'Dr. Wily').' has been unlocked as a player character!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Wily</strong> and <strong>Bass</strong> to continue the story from their perspective. This intermediate-level campaign offers a bit more challenge and expects you to already-know the basics of battle!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_attack">Dr. Wily</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> missions at any time.</p>';
         array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
@@ -971,7 +892,9 @@ if ($unlock_flag_wily){
     }
 
 }
+*/
 
+/*
 // If Cossack was unlocked, but the player has not yet seen the unlock event, display it
 if ($unlock_flag_cossack){
 
@@ -987,7 +910,7 @@ if ($unlock_flag_cossack){
         $temp_console_markup = '';
         $temp_console_markup .= '<p class="ability_type ability_type_speed" style="margin: 5px auto 10px; text-align: center;">Congratulations!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">'.rpg_type::print_span('speed', 'Dr. Cossack').' has been unlocked as a player character!</p>';
-        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to continue the story from their perspective.  Unlock even more new robots, abilities, and items as you continue your fight against the prototype\'s army of powered up opponents!</p>';
+        $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center;">Play through the game as <strong>Dr. Cossack</strong> and <strong>Proto Man</strong> to continue the story from their perspective. This advanced-level campaign packs the hardest punch of all and acts as the final player-story before the end-game!</p>';
         $temp_console_markup .= '<p style="margin: 5px auto 10px; text-align: center; font-size: 90%; line-height: 1.6; color: #d6d6d6;">Select <strong class="ability_type ability_type_speed">Dr. Cossack</strong> from the player select menu to continue the campaign.<br />  You can also go back to replay <strong class="ability_type ability_type_defense">Dr. Light</strong> or <strong class="ability_type ability_type_attack">Dr. Wily</strong> missions at any time.</p>';
         array_push($_SESSION[$session_token]['EVENTS'], array(
             'canvas_markup' => $temp_canvas_markup,
@@ -1010,6 +933,7 @@ if ($unlock_flag_cossack){
     }
 
 }
+*/
 
 // Unlock the OMEGA SEED after all three Drs. have completed the prototype
 if (!mmrpg_prototype_item_unlocked('omega-seed')

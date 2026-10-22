@@ -1,0 +1,64 @@
+#---------------------------#
+# MMRPG OVERWORLD 2k25 SHEET
+@token    = mmrpg-overworld-2k25
+@name     = MMRPG Overworld (2k25)
+@image    = mmrpg-overworld-2k25_terrain-tiles.png
+@size     = 80 x 80
+#---------------------------#
+@tiles[]    = void(00, 40, 700, not-walkable)
+@tiles[]    = dotted(80, 280, 520, not-walkable)
+@tiles[]    = water(99, 440, 40, not-walkable)
+@tiles[]    = darkness(88, 200, 40)
+@tiles[]    = darkness-2(89, 280, 40)
+#---------------------------#
+@tiles[]    = plain(01, 40, 200)
+@tiles[]    = plain-top(02, 40, 120)
+@tiles[]    = plain-bottom(03, 40, 280)
+@tiles[]    = plain-single(09, 40, 360)
+#---------------------------#
+@tiles[]    = grass(10, 200, 200)
+@tiles[]    = grass-top(11, 200, 120)
+@tiles[]    = grass-bottom(12, 200, 280)
+@tiles[]    = grass-top-left(13, 520, 200)
+@tiles[]    = grass-top-right(14, 520, 120)
+@tiles[]    = grass-bottom-left(15, 520, 280)
+@tiles[]    = grass-bottom-right(16, 520, 360)
+#---------------------------#
+@tiles[]    = ground(20, 280, 200)
+@tiles[]    = ground-top(21, 280, 120)
+@tiles[]    = ground-bottom(22, 280, 280)
+#---------------------------#
+@tiles[]    = desert(30, 440, 200)
+@tiles[]    = desert-top(31, 440, 120)
+@tiles[]    = desert-bottom(32, 440, 280)
+#---------------------------#
+@tiles[]    = beach(40, 440, 200)
+@tiles[]    = beach-top(41, 440, 120)
+@tiles[]    = beach-bottom(42, 440, 280)
+#---------------------------#
+@tiles[]    = tundra(50, 360, 200)
+@tiles[]    = tundra-top(51, 360, 120)
+@tiles[]    = tundra-bottom(52, 360, 280)
+@tiles[]    = tundra-top-left(53, 600, 200)
+@tiles[]    = tundra-top-right(54, 600, 120)
+@tiles[]    = tundra-bottom-left(55, 600, 280)
+@tiles[]    = tundra-bottom-right(56, 600, 360)
+#---------------------------#
+@tiles[]    = subspace(90, 120, 200)
+@tiles[]    = subspace-top(91, 120, 120)
+@tiles[]    = subspace-bottom(92, 120, 280)
+#---------------------------#
+@sprites[]  = grid(40, 520)
+@sprites[]  = hover(40, 520)
+@sprites[]  = outline(280, 520)
+@sprites[]  = focus(680, 520)
+@sprites[]  = active(200, 520)
+@sprites[]  = active-up(40, 600)
+@sprites[]  = active-up-right(120, 600)
+@sprites[]  = active-right(200, 600)
+@sprites[]  = active-down-right(280, 600)
+@sprites[]  = active-down(360, 600)
+@sprites[]  = active-down-left(440, 600)
+@sprites[]  = active-left(520, 600)
+@sprites[]  = active-up-left(600, 600)
+#---------------------------#

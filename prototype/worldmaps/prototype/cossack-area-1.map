@@ -1,0 +1,94 @@
+#---------------------------#
+# COSSACK Area 1 (COPY)
+#---------------------------#
+@token      = cossack-area-1
+@name       = COSSACK Area 1
+@type       = copy
+@level      = 60
+@size       = 15 x 15
+@sheet      = mmrpg-overworld-2k25-v6
+#---------------------------#
+@field      = cossack-citadel
+#---------------------------#
+@aliases[]  = 10:plain
+@aliases[]  = 20:type-copy
+@aliases[]  = 30:cossack-citadel
+#---------------------------#
+@portals[]  = spawn(8-8)
+#---------------------------#
+@portals[]  = north-exit(8-1, cossack-area-1n__south-exit, up-only)
+@portals[]  = west-exit(1-8, star-gate-70sw__east-exit, left-only)
+@portals[]  = east-exit(15-8, cossack-area-1e__west-exit, right-only)
+#---------------------------#
+@events[]   = cossack-platform-left(7-6, cossackpad-left, any, drop-zone, item:cossack-program, activate-player-platform)
+@events[]   = cossack-platform-middle(8-6, cossackpad-middle, any, drop-zone, item:cossack-heart, activate-player-platform)
+@events[]   = cossack-platform-right(9-6, cossackpad-right, any, drop-zone, item:cossack-core, activate-player-platform)
+@events[]   = auto-heal(5-5, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
+@events[]   = auto-reset(11-5, resetpad, any, trigger-effects, reset-team-attack, reset-team-defense, reset-team-speed)
+#---------------------------#
+@portals[]  = exit-portal-void(8-11, prototype-area-0__spawn, void-alt, confirm)
+#---------------------------#
+@mechas[]   = cossack-guard-west(3-8, crystal-joe, 1)
+@mechas[]   = cossack-guard-east(13-8, crystal-joe, 2)
+@mechas[]   = cossack-guard-north(8-3, crystal-joe, 3)
+#---------------------------#
+@items[]    = cossack-init-program(7-9, cossack-program, anchored)
+@items[]    = cossack-init-heart(5-7, cossack-heart, anchored)
+@items[]    = cossack-init-core(11-7, cossack-core, anchored)
+#---------------------------#
+@groups[]   = encounter-zone_main-area(5-5...11-11)
+@groups[]   = no-encounters_spawn-buffer(8-8...8-8)
+@groups[]   = no-encounters_north-exit-buffer(7-1...9-2)
+@groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
+@groups[]   = no-encounters_east-exit-buffer(14-7...15-9)
+@groups[]   = no-encounters_player-platform-left-buffer(6-5...8-7)
+@groups[]   = no-encounters_player-platform-middle-buffer(7-5...9-7)
+@groups[]   = no-encounters_player-platform-right-buffer(8-5...10-7)
+@groups[]   = no-encounters_player-healpad-buffer(4-4...6-6)
+@groups[]   = no-encounters_player-resetpad-buffer(10-4...12-6)
+@groups[]   = no-encounters_player-exit-portal-buffer(7-10...9-12)
+@groups[]   = no-encounters_star-gazer-kalinka-buffer(4-10...6-12)
+#---------------------------#
+@encounters = met(1)
+#---------------------------#
+@rescues[]  = rescue-robo-1(11-8, heal-bot)
+#---------------------------#
+@actors[]   = star-gazer-kalinka(5-11, player, kalinka, -, default)
+#---------------------------#
+@layer = 0
+#---------------------------#
+[__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30],[30]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+#---------------------------#
+@layer = -1
+#---------------------------#
+[20],[20],[20],[20],[20],[20],[20],[__],[20],[20],[20],[20],[20],[20],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[20]
+[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20],[20]
+#---------------------------#
+#---------------------------#

@@ -39,6 +39,7 @@ function refresh_editor_arrays( &$allowed_edit_players, &$allowed_edit_robots, &
     // Now to actually loop through and update the allowed players, robots, and abilities arrays
     foreach ($temp_player_array AS $player_token => $player_info){
         if (empty($player_token) || !isset($temp_player_index[$player_token])){ continue; }
+        elseif (mmrpg_prototype_limit_hearts_earned($player_token) < 1){ continue; }
         $player_index_info = $temp_player_index[$player_token];
 
         // Merge the player and index info then append the token and info

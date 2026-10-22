@@ -1118,6 +1118,7 @@
                 $levelup_compatible = false;
                 if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
                 elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
+                elseif ($ability_info['ability_class'] === 'master' && $robot_data['robot_class'] == 'mecha'){ $levelup_compatible = true; }
                 elseif (in_array($ability_token, $global_ability_tokens)){ $levelup_compatible = true; }
                 elseif (in_array($ability_token, $global_buster_tokens)){ $levelup_compatible = true; }
                 if ($levelup_compatible){

@@ -1,14 +1,30 @@
 
 # Block Aggressive Bots
 User-agent: Semrush
-Disallow: /
 User-agent: SemrushBot
-Disallow: /
 User-agent: Semrushbot-SA
-Disallow: /
 User-agent: Semrushbot-SI
-Disallow: /
 User-agent: AhrefsBot
+User-Agent: Claudebot
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: PetalBot
+User-agent: BLEXBot/1.0
+User-agent: CCBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: ClaudeBot/1.0
+User-agent: Elisabot
+User-agent: GPTBot
+User-agent: UptimeRobot
+User-agent: UptimeRobot/1.0
+User-agent: UptimeRobot/2.0
+User-agent: MMRPG-Local-Backup
+User-agent: MMRPG-Local-Backup/1.0
+User-agent: Sogou web spider
+User-agent: Sogou inst spider
+User-agent: Sogou spider2
+User-agent: Reflectionbot
 Disallow: /
 
 # General Access

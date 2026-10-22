@@ -71,8 +71,14 @@ ob_start();
                     }
 
                     // Collect the first and second field type if applicable so we know which buttons to show
-                    $star_type_one = !empty($this_battle->battle_field_base['field_type']) ? $this_battle->battle_field_base['field_type'] : false;
-                    $star_type_two = !empty($this_battle->battle_field_base['field_type2']) ? $this_battle->battle_field_base['field_type2'] : false;
+                    if (!empty($this_battle->battle_field_base['values']['origin_field_types'])){
+                        $origin_types = $this_battle->battle_field_base['values']['origin_field_types'];
+                        $star_type_one = !empty($origin_types[0]) ? $origin_types[0] : false;
+                        $star_type_two = !empty($origin_types[1]) ? $origin_types[1] : false;
+                    } else {
+                        $star_type_one = !empty($this_battle->battle_field_base['field_type']) ? $this_battle->battle_field_base['field_type'] : false;
+                        $star_type_two = !empty($this_battle->battle_field_base['field_type2']) ? $this_battle->battle_field_base['field_type2'] : false;
+                    }
                     if (empty($temp_remaining_stars_types[$star_type_one])){ $star_type_one = false; }
                     if (empty($temp_remaining_stars_types[$star_type_two])){ $star_type_two = false; }
                     $next_action = !empty($star_type_one) || !empty($star_type_two) ? 'next_same-star' : 'next_any-star';
@@ -85,6 +91,12 @@ ob_start();
                 elseif (!empty($this_battle->flags['challenge_battle']) && !empty($this_battle->flags['endless_battle'])){
 
                     ?><a class="button action_ability" data-action="prototype" type="button" data-order="1"><label><i class="fa fas fa-infinity"></i> Continue<i class="fas fa-chevron-circle-right"></i></label></a><?
+
+                }
+                // Else if this is a WORLD BATTLE, display a return to world map button
+                elseif (!empty($this_battle->flags['world_battle'])){
+
+                    ?><a class="button action_ability" data-action="world" type="button" data-order="1"><label><i class="fa fas fa-map"></i> Mission Complete!</label></a><?
 
                 }
                 // Else if this is any other mission type, display standard return to home button
@@ -121,18 +133,25 @@ ob_start();
 
                     // Check to see if this mission has an alpha battle to go back to
                     $battle_index = !empty($_SESSION['GAME']['values']['battle_index']) ? $_SESSION['GAME']['values']['battle_index'] : array();
+                    $exit_action = !empty($this_battle->flags['world_battle']) ? 'world' : 'prototype';
                     $alpha_battle_token = $this_battle->battle_token.'-alpha';
                     if (isset($battle_index[$alpha_battle_token])){
 
                         // Collect information about the alpha battle so we can display both options
-                        ?><a class="button action_scan" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+                        ?><a class="button action_scan" data-action="<?= $exit_action ?>" type="button" data-order="2"><label>Exit Mission</label></a><?
                         ?><a class="button action_option colspan2" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
                         ?><a class="button action_switch" data-action="restart_whole-mission" type="button" data-order="4"><label>Restart Mission</label></a><?
+
+                    } elseif (!empty($this_battle->flags['world_battle'])){
+
+                        // This is the only battle in its set so just display normal options
+                        ?><a class="button action_scan colspan2 button_disabled" type="button">&nbsp;</a><?
+                        ?><a class="button action_option colspan2 button_disabled" type="button">&nbsp;</a><?
 
                     } else {
 
                         // This is the only battle in its set so just display normal options
-                        ?><a class="button action_scan colspan2" data-action="prototype" type="button" data-order="2"><label>Exit Mission</label></a><?
+                        ?><a class="button action_scan colspan2" data-action="<?= $exit_action ?>" type="button" data-order="2"><label>Exit Mission</label></a><?
                         ?><a class="button action_option colspan2" data-action="restart" type="button" data-order="3"><label>Restart Battle</label></a><?
 
                     }
@@ -171,13 +190,14 @@ ob_start();
         }
         // Otherwise if this is any other kind of battle, we can display the default end screen
         else {
+            $exit_action = !empty($this_battle->flags['world_battle']) ? 'world' : 'prototype';
             // Display available main actions
             ?><div class="main_actions"><?
             ?><a class="button action_ability button_disabled" type="button"><label><i class="fa fas fa-skull"></i> Mission Failure&hellip;</label></a><?
             ?></div><?
             // Display the available sub options
             ?><div class="sub_actions"><?
-            ?><a class="button action_scan colspan2" data-action="prototype" type="button" data-order="1"><label>Exit Mission</label></a><?
+            ?><a class="button action_scan colspan2" data-action="<?= $exit_action ?>" type="button" data-order="1"><label>Exit Mission</label></a><?
             ?><a class="button action_item colspan2" data-action="restart" type="button" data-order="2"><label>Retry Battle</label></a><?
             ?></div><?
         }

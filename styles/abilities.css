@@ -288,6 +288,7 @@ body.windowFlag_landscapeMode #prototype {
     overflow: hidden;
     position: relative;
     padding-right: 9px;
+    padding-top: 4px;
 }
 #mmrpg[data-mode="editor"] #ability #console .event .scroll_wrapper {
     max-height: calc(100vh - 190px);
@@ -296,6 +297,27 @@ body.windowFlag_landscapeMode #prototype {
 #ability #console .event .ability_cell,
 #ability #console .event .ability_confirm {
 
+}
+#ability #console .event .ability_cell:hover,
+#ability #console .event .ability_cell_confirm:hover,
+#ability #console .event .ability_cell.hovered,
+#ability #console .event .ability_cell_confirm.hovered {
+    position: relative;
+}
+#ability #console .event .ability_cell:hover:after,
+#ability #console .event .ability_cell_confirm:hover:after,
+#ability #console .event .ability_cell.hovered:after,
+#ability #console .event .ability_cell_confirm.hovered:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - -1px);
+    outline: 1px solid white;
+    border-radius: 6px;
+    pointer-events: none;
 }
 #ability #console .event .ability_cell[data-count="0"] {
     opacity: 0.55;
@@ -341,6 +363,7 @@ body.windowFlag_landscapeMode #prototype {
     margin-top: 0;
     margin-left: 0;
     background-position: 0 0;
+    image-rendering: pixelated;
 }
 #ability #console .event .this_sprite .sprite_40x40 {
     margin-top: -4px;
@@ -352,11 +375,13 @@ body.windowFlag_landscapeMode #prototype {
 }
 
 #ability #console .event .this_sprite:hover .sprite_40x40,
-#ability #console .event .this_sprite .sprite_40x40:hover {
+#ability #console .event .this_sprite .sprite_40x40:hover,
+#ability #console .event .this_sprite.hovered .sprite_40x40 {
     background-position: -40px 0;
 }
 #ability #console .event .this_sprite:hover .sprite_80x80,
-#ability #console .event .this_sprite .sprite_80x80:hover {
+#ability #console .event .this_sprite .sprite_80x80:hover,
+#ability #console .event .this_sprite.hovered .sprite_80x80 {
     background-position: -80px 0;
 }
 
@@ -401,6 +426,9 @@ body.windowFlag_landscapeMode #prototype {
     color: #FFFFFF;
     text-decoration: none;
     cursor: default;
+}
+#ability #console .event .ability_name br {
+    display: none;
 }
 #ability #console .event .ability_name[data-click-tooltip],
 #ability #console .event .item_name[data-click-tooltip],
@@ -523,6 +551,7 @@ body.windowFlag_landscapeMode #prototype {
     position: relative;
     left: -17px;
     top: -9px;
+    image-rendering: pixelated;
 }
 
 #ability #console .event .ability_button_header,
@@ -592,24 +621,124 @@ body.windowFlag_landscapeMode #prototype {
     background-color: #969696;
 }
 
+/* -- WIDESCREEN 2k26 STYLES -- */
 
-/*
- * MOBILE OVERRIDE STYLES
- */
+@media (min-width: 1120px){
 
-/* -- Landscape Mode -- */
-@media (min-width: 1024px){
-
-    #mmrpg,
-    #mmrpg #prototype {
-        width: 1024px;
+    #ability #console .event .ability_quote {
+        font-size: 12px;
+        line-height: 1.8;
     }
-    #prototype {
-        width: auto;
+    #ability #console .event .this_sprite {
+        transform-origin: top left;
+        transform: scale(4);
     }
-    #prototype .header,
-    #prototype .option {
+    #ability #console .event .header,
+    #ability #console .event .body {
+        margin: 0 0 0 175px;
         width: 100%;
     }
-
+    #ability #console .event table,
+    #ability #console .event tbody,
+    #ability #console .event tbody tr,
+    #ability #console .event tbody td {
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+    }
+    #ability #console .event tbody:after,
+    #ability #console .event tbody tr:after,
+    #ability #console .event tbody td:after {
+        content: "";
+        display: block;
+        margin: 0 auto;
+        clear: both;
+    }
+    #ability #console .event tbody {
+        width: calc(100vw - 220px);
+    }
+    #ability #console .event tbody tr,
+    #ability #console .event tbody td {
+        float: left;
+        clear: none;
+    }
+    #ability #console .event tbody tr {
+        width: 50%;
+        margin: 0 auto 2px 0;
+    }
+    #ability #console .event tbody td,
+    #ability #console .event tbody td.left,
+    #ability #console .event tbody td.right {
+        width: calc(50% - 6px);
+        padding-left: 65px;
+        min-height: 73px;
+        border: 1px solid #1e1e1e;
+        background-color: #1f1f1f;
+        border-radius: 9px;
+        margin: 0 6px 3px 0;
+        box-shadow: inset 2px 2px 4px rgb(0 0 0 / 20%);
+    }
+    #console .event table tr:nth-child(odd),
+    #console .event table tr:nth-child(even) {
+        background-color: transparent;
+    }
+    #ability #console .event .ability_number,
+    #ability #console .event .ability_name {
+        display: block;
+        width: auto;
+        max-width: none;
+        float: left;
+        clear: both;
+        z-index: 1;
+    }
+    #ability #console .event .ability_number {
+        top: 4px;
+        width: calc(100% + 12px);
+        background-image: none;
+        border-color: transparent !important;
+        background-color: #363636 !important;
+    }
+    #ability #console .event .ability_quantity {
+        position: absolute;
+        z-index: 5;
+        top: 4px;
+        right: 12px;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    #ability #console .event .ability_name {
+        padding: 3px 6px;
+        font-size: 12px;
+        line-height: 15px;
+        white-space: break-spaces;
+        width: calc(100% - -12px);
+        border-radius: 0 0 9px 3px;
+        min-height: 38px;
+        box-sizing: border-box;
+    }
+    #ability #console .event .ability_name br {
+        display: block;
+        clear: both;
+    }
+    #ability #console .event .ability_name[data-click-tooltip]:hover,
+    #ability #console .event .item_name[data-click-tooltip]:hover,
+    #ability #console .event .field_name[data-click-tooltip]:hover {
+        transform: scale(1);
+        border-color: ;
+    }
+    #ability #console .event .ability_sprite {
+        position: absolute;
+        top: 22px;
+        left: 16px;
+        z-index: 2;
+        width: 60px;
+        height: 70px;
+        background-image: none;
+        border-color: transparent !important;
+        background-color: transparent !important;
+    }
+    #ability #console .event .ability_sprite .sprite {
+        transform-origin: center;
+        transform: scale(2);
+    }
 }

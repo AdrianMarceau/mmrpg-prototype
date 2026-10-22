@@ -67,6 +67,13 @@ if ($form_action === 'edit_groups'){
     $form_messages[] = array('success', ucfirst(strtolower($object_group_editor_name)).' updated successfully');
     exit_group_edit_action();
 
+    // Update cache timestamp if changes were successful
+    if ($form_success){
+        list($date, $time) = explode('-', date('Ymd-Hi'));
+        $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
+        $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+    }
+
 }
 
 ?>

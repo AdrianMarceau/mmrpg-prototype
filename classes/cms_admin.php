@@ -65,9 +65,14 @@ class cms_admin {
         error_log('$output = '.print_r($output, true));
         error_log('$return = '.print_r($return, true));
         */
-        $command = "php -l {$file_name}";
+        //$command = "php -l {$file_name}";
+        //$command = "php -l ".escapeshellarg($file_name)." 2>&1";
+        $command = MMRPG_CONFIG_PHP_DIR." -l ".escapeshellarg($file_name)." 2>&1";
         exec($command, $output, $return);
+        // If syntax is invalid, log the exact error so it's not a mystery
         $output = trim(implode(PHP_EOL, $output));
+        if ($return !== 0){ error_log("cms_admin::is_valid_php_syntax() syntax validation failed: " . $output); }
+        //else { error_log("cms_admin::is_valid_php_syntax() validation success: " . $output); }
         //error_log('$command = '.print_r($command, true));
         //error_log('$output = '.print_r($output, true));
         //error_log('$return = '.print_r($return, true));
@@ -1007,7 +1012,7 @@ class cms_admin {
                 && $search_data[$flag_name] !== ''){
                 foreach ($search_results AS $key => $data){
                     if ($object_kind === 'star' || $object_kind === 'challenge'){ $search_token = self::git_get_id_token($object_kind, $data[$object_kind.'_id']); }
-                    elseif ($object_kind === 'page'){ $search_token = git_get_url_token($object_kind, $data[$object_kind.'_url']); }
+                    elseif ($object_kind === 'page'){ $search_token = self::git_get_url_token($object_kind, $data[$object_kind.'_url']); }
                     else { $search_token = $data[$object_kind.'_token']; }
                     if ($search_data[$flag_name] && !in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
                     elseif (!$search_data[$flag_name] && in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }

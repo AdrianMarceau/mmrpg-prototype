@@ -195,7 +195,7 @@ class cms_image {
     public function color_hex2rgb($src_value){
         if (!is_string($src_value)) { $this->message("[[cms_image::color_hex2rgb]] : Source value is not a string.", CMS_IMAGE_ERROR); return false; }
         $src_value = str_replace('#','', trim($src_value));
-        if (!eregi("^[0-9ABCDEFabcdef]+$", $src_value)) { $this->message("[[cms_image::color_hex2rgb]] : Source value is not in HEX format as it contains illegal characters <<{$src_value}>>.", CMS_IMAGE_ERROR); return false; }
+        if (!preg_match("/^[0-9ABCDEFabcdef]+$/", $src_value)) { $this->message("[[cms_image::color_hex2rgb]] : Source value is not in HEX format as it contains illegal characters <<{$src_value}>>.", CMS_IMAGE_ERROR); return false; }
         if (strlen($src_value) == 3) { $groups = 1; }
         elseif (strlen($src_value) == 6) { $groups = 2; }
         else { $this->message("[[cms_image::color_hex2rgb]] : Source value is not in HEX format as it contains an invalid number of digits <<{$src_value}>>.", CMS_IMAGE_ERROR); return false; }

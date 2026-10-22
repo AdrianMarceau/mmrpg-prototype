@@ -19,7 +19,7 @@ class rpg_field extends rpg_object {
         $args = func_get_args();
 
         // Define the internal battle pointer
-        $this->battle = isset($args[0]) ? $args[0] : array();
+        $this->battle = isset($args[0]) ? $args[0] : $GLOBALS['this_battle'];
         $this->battle_id = $this->battle->battle_id;
         $this->battle_token = $this->battle->battle_token;
 
@@ -80,6 +80,11 @@ class rpg_field extends rpg_object {
         $this->field_background_variant = isset($this_fieldinfo['field_background_variant']) ? $this_fieldinfo['field_background_variant'] : '';
         $this->field_foreground_variant = isset($this_fieldinfo['field_foreground_variant']) ? $this_fieldinfo['field_foreground_variant'] : '';
         $this->field_music = isset($this_fieldinfo['field_music']) ? $this_fieldinfo['field_music'] : 'field';
+
+        // If the battle itself has any extra field multipliers, apply them to the current field
+        if (!empty($this->battle->values['extra_field_multipliers'])){
+            $this->field_multipliers = array_merge($this->field_multipliers, $this->battle->values['extra_field_multipliers']);
+        }
 
         // Define the internal field base values using the fields index array
         $this->field_base_name = isset($this_fieldinfo['field_base_name']) ? $this_fieldinfo['field_base_name'] : $this->field_name;
@@ -346,6 +351,18 @@ class rpg_field extends rpg_object {
             }
         }
         return $index;
+    }
+
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $field_index_byid = false;
+        if ($field_index_byid === false){
+            $field_index_byid = array();
+            $field_index = self::get_index(true, true);
+            if (empty($field_index)){ $field_index = array(); }
+            foreach ($field_index AS $token => $field){ $field_index_byid[$field['field_id']] = $token; }
+        }
+        return $field_index_byid;
     }
 
     // Define a public function for collecting index data from the database
@@ -1257,7 +1274,7 @@ class rpg_field extends rpg_object {
                                         // Loop through and display support mecha links
                                         if (!in_array($field_info['field_token'], $temp_special_stages) && !empty($robot_mecha_info_array)){
                                             foreach ($robot_mecha_info_array AS $key => $robot_mecha_info){
-                                                 if ($robot_mecha_info['robot_class'] == 'mecha' && preg_match('/-[0-9]+$/', $robot_mecha_info['robot_token'])){ $robot_mecha_info['robot_name'] = (preg_replace('/^(.*?)-([0-9]+)$/', '$2', $robot_mecha_info['robot_token'])); }
+                                                 if ($robot_mecha_info['robot_class'] == 'mecha' && preg_match('/-[0-9]+$/', $robot_mecha_info['robot_token'])){ $robot_mecha_info['robot_name'] .= (preg_replace('/^(.*?)-([0-9]+)$/', '$2', $robot_mecha_info['robot_token'])); }
                                                  ?>
                                                      <a href="database/mechas/<?= $robot_mecha_info['robot_token'] ?>/" class="robot_type robot_type_<?= (!empty($robot_mecha_info['robot_core']) ? $robot_mecha_info['robot_core'] : 'none').(!empty($robot_mecha_info['robot_type2']) ? '_'.$robot_mecha_info['robot_type2'] : '') ?>"><?= $robot_mecha_info['robot_name'] ?></a>
                                                  <?
@@ -1350,6 +1367,7 @@ class rpg_field extends rpg_object {
                         <?
                         // Define the editor title based on ID
                         $temp_editor_title = 'Undefined';
+                        $temp_editor_titles = array();
                         $temp_final_divider = '<span class="pipe"> | </span>';
                         $editor_ids = array();
                         if (!empty($field_info['field_image_editor'])){ $editor_ids[] = $field_info['field_image_editor']; }
@@ -1381,7 +1399,7 @@ class rpg_field extends rpg_object {
                         if ($temp_is_capcom){
                             echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Artwork by <strong>Capcom</strong></p>'."\n";
                         } else {
-                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Item by <strong>Adrian Marceau</strong></p>'."\n";
+                            echo '<p class="text text_editor">Sprite Editing by '.$temp_editor_title.' '.$temp_final_divider.' Original Field by <strong>Adrian Marceau</strong></p>'."\n";
                         }
                         ?>
                     </div>
@@ -1457,6 +1475,7 @@ class rpg_field extends rpg_object {
         $temp_field_master = !empty($field_info['field_master']) ? $mmrpg_database_robots[$field_info['field_master']] : false;
         $temp_field_mechas = !empty($field_info['field_mechas']) ? $field_info['field_mechas'] : array();
         foreach ($temp_field_mechas AS $key => $token){
+            if (!isset($mmrpg_database_robots[$token])){ continue; }
             $temp_mecha = $mmrpg_database_robots[$token];
             if (!empty($temp_mecha)){ $temp_field_mechas[$key] = $temp_mecha['robot_name'];  }
             else { unset($temp_field_mechas[$key]); }
@@ -1500,10 +1519,6 @@ class rpg_field extends rpg_object {
         $temp_field_option = $field_info['field_name'];
         if (!empty($temp_field_type)){ $temp_field_option .= ' | '.$temp_field_type['type_name']; }
         if (!empty($temp_field_type2)){ $temp_field_option .= ' / '.$temp_field_type2['type_name']; }
-        //if (!empty($field_info['field_damage'])){ $temp_field_option .= ' | D:'.$field_info['field_damage']; }
-        //if (!empty($field_info['field_recovery'])){ $temp_field_option .= ' | R:'.$field_info['field_recovery']; }
-        //if (!empty($field_info['field_accuracy'])){ $temp_field_option .= ' | A:'.$field_info['field_accuracy']; }
-        if (!empty($temp_field_energy)){ $temp_field_option .= ' | E:'.$temp_field_energy; }
         // Return the generated option markup
         $this_option_markup = '<option value="'.$temp_field_token.'" data-label="'.$temp_field_label.'" data-type="'.(!empty($temp_field_type) ? $temp_field_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_field_type2) ? $temp_field_type2['type_token'] : '').'" title="'.$temp_field_title_plain.'" data-tooltip="'.$temp_field_title_tooltip.'">'.$temp_field_option.'</option>';
 

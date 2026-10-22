@@ -8,6 +8,33 @@
 #shop .header {
     width: 100%;
 }
+#prototype .header .count .progress {
+    position: absolute;
+    right: 6px;
+    color: #ffffff;
+    font-weight: bold;
+}
+#prototype .header #zenny_counter {
+    display: inline-block;
+    color: #ffffff;
+    transform: scale(1.0);
+    transform-origin: right;
+    transition: color 0.6s, transform 0.6s;
+    transition-timing-function: ease-in-out;
+}
+#prototype .header #zenny_counter:after {
+    content: "\0001b6";
+    padding-left: 1px;
+}
+#prototype .header #zenny_counter.increased {
+    color: #8CEB80;
+    transform: scale(1.1);
+}
+#prototype .header #zenny_counter.decreased {
+    color: #eb8080;
+    transform: scale(0.9);
+
+}
 #shop #canvas {
     display: block;
     float: none;
@@ -27,7 +54,7 @@
     width: auto;
     max-width: 58px;
     padding: 4px;
-    margin: 0 0 4px;
+    margin: 2px 2px 6px;
     top: auto;
     bottom: auto;
     left: auto;
@@ -37,13 +64,18 @@
     cursor: pointer;
     _cursor: hand;
 }
-#shop #canvas .wrapper:hover {
+#shop #canvas .wrapper:hover,
+#shop #canvas .wrapper.hovered {
     opacity: 0.90;
     filter: alpha(opacity=90);
+    outline: 1px solid white;
 }
-#shop #canvas .wrapper_active {
+#shop #canvas .wrapper_active,
+#shop #canvas .wrapper_active:hover,
+#shop #canvas .wrapper_active.hovered {
     opacity: 1.00;
     filter: alpha(opacity=100);
+    outline: 1px solid white;
 }
 #shop #canvas .wrapper_header {
     display: block;
@@ -401,15 +433,44 @@
     overflow: hidden;
     position: relative;
     padding-right: 9px;
+    padding-top: 2px;
 }
 
 #shop #console .event .item_cell,
 #shop #console .event .item_confirm {
 
 }
+#shop #console .event .item_cell.hovered,
+#shop #console .event .item_cell_confirm.hovered {
+    position: relative;
+}
+#shop #console .event .item_cell.hovered:after,
+#shop #console .event .item_cell_confirm.hovered:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - -1px);
+    outline: 1px solid white;
+    border-radius: 6px;
+    pointer-events: none;
+}
+#shop #console .event .item_cell_confirm.hovered:after {
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+}
 #shop #console .event .item_cell_disabled {
+    /*
     opacity: 0.15;
     filter: alpha(opacity=15);
+    */
+}
+#shop #console .event .item_cell_disabled > a,
+#shop #console .event .item_cell_disabled > span,
+#shop #console .event .item_cell_disabled > label,
+#shop #console .event .item_cell_disabled > div {
+    filter: opacity(0.15);
 }
 #shop #console .event .item_cell_disabled[data-unlocked="coming-soon"] {
 
@@ -420,6 +481,14 @@
 #shop #console .event .item_cell_disabled .buy_button,
 #shop #console .event .item_cell_disabled .sell_button {
     cursor: default;
+    pointer-events: none;
+}
+
+#shop #console .event .item_cell_blocked {
+
+}
+#shop #console .event .item_cell_blocked .item_name .icon_sprite {
+    filter: brightness(0) opacity(0.5);
 }
 #shop #console .event .item_cell_confirm {
     padding: 6px;
@@ -452,6 +521,13 @@
     margin-top: -4px;
     margin-left: -2px;
     background-position: 0 0;
+    image-rendering: pixelated;
+}
+#shop #console .event .this_sprite .sprite.facing_right {
+    display: block;
+}
+#shop #console .event .this_sprite .sprite.facing_left {
+    display: none;
 }
 #shop #console .event .this_sprite .sprite_40x40 {
     margin-top: -4px;
@@ -585,6 +661,7 @@
     position: relative;
     left: -14px;
     top: -10px;
+    /* image-rendering: pixelated;  */
 }
 #shop #console .event .item_name .icon_sprite .sprite_40x40 {
     left: -14px;
@@ -685,6 +762,10 @@
     float: left;
     transition: opacity 0.3s;
 }
+#shop #console .event .item_quantity_mods a:hover,
+#shop #console .event .item_quantity_mods a.hovered {
+    outline: 1px solid white;
+}
 #shop #console .event .item_quantity_mods a i {
     display: inline-block;
     direction: ltr;
@@ -702,7 +783,8 @@
     background-size: auto;
     transition: top 0.2s;
 }
-#shop #console .event .item_quantity_mods a:hover i {
+#shop #console .event .item_quantity_mods a:hover i,
+#shop #console .event .item_quantity_mods a.hovered i {
     top: -4px;
 }
 #shop #console .event .item_quantity_mods a[data-dec="10"] i {
@@ -959,21 +1041,77 @@
 }
 
 
-/*
- * MOBILE OVERRIDE STYLES
- */
+#shop.is_world_iframe > .header {
+    display: none;
+}
+#shop.is_world_iframe table.formatter colgroup col:first-child,
+#shop.is_world_iframe table.formatter tr td.canvas {
+    display: none;
+}
 
-/* -- Landscape Mode -- */
-@media (min-width: 1024px){
+
+/* -- WIDESCREEN 2k26 STYLES -- */
+
+@media (min-width: 1120px){
 
     #mmrpg,
-    #mmrpg #prototype {
-        width: 768;
+    #prototype {
+        width: 1120px;
     }
-    #prototype #canvas {
-        width: 100% !important;
+    #shop #console .header,
+    #console .event .body_left {
+        margin: 0 auto 0 0;
+        width: calc(100% - 190px);
     }
-
-
+    #console .event .body_left {
+        margin: 0 auto 0 0;
+        width: calc(100% - 195px);
+    }
+    #shop #console .event .shop_quote {
+        font-size: 12px;
+        line-height: 1.8;
+    }
+    #shop #console .event .this_sprite {
+        top: 8px;
+        right: 10px;
+        left: auto;
+        transform-origin: top right;
+        transform: scale(4);
+        background-size: auto 120%;
+    }
+    #shop #console .event .this_sprite .sprite.facing_left {
+        display: block;
+    }
+    #shop #console .event .this_sprite .sprite.facing_right {
+        display: none;
+}
+    #shop #console .gauge.cores {
+        top: 190px;
+        right: 13px;
+        left: auto;
+        width: 160px;
+    }
+    #shop #console .gauge.cores .element {
+        float: left;
+        width: calc((100% / 4) - 5px);
+        margin: 0 4px 4px 0;
+        height: 16px;
+        font-size: 16px;
+        line-height: 1;
+    }
+    #shop #console .gauge.cores .element:nth-child(4n) {
+        margin-right: 0;
+    }
+    #shop #console .gauge.cores .element .sprite_core {
+        height: 12px;
+    }
+    #shop #console .gauge.cores .element .sprite_core .sprite {
+        top: -12px;
+    }
+    #shop #console .gauge.cores .element .count {
+        font-size: 10px;
+        line-height: 1;
+        margin: 2px auto 0 4px;
+    }
 
 }

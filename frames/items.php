@@ -18,7 +18,7 @@ require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 require(MMRPG_CONFIG_ROOTDIR.'database/robots.php');
 //require(MMRPG_CONFIG_ROOTDIR.'database/items.php');
-//require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
+require(MMRPG_CONFIG_ROOTDIR.'includes/starforce.php');
 $mmrpg_database_items = rpg_item::get_index(true);
 
 // Collect the editor flag if set
@@ -57,9 +57,21 @@ $mmrpg_database_items = array_filter($mmrpg_database_items, function($item_info)
     return true;
     });
 $global_battle_items = array_filter($global_battle_items, function($item_token) use ($mmrpg_database_items){
+    if (strstr($item_token, '__')){ list($item_token, $num_in_set) = explode('__', $item_token); }
     if (!isset($mmrpg_database_items[$item_token])){ return false; }
     return true;
     }, ARRAY_FILTER_USE_KEY);
+
+// Collapse the global battle items so that quantities look normal (necessary for those in sets like limit hearts)
+//error_log('$global_battle_items (before) = '.print_r($global_battle_items, true));
+$collapsed_items = array();
+foreach ($global_battle_items as $key => $value){
+    $base_key = explode('__', $key, 2)[0];
+    $collapsed_items[$base_key] = ($collapsed_items[$base_key] ?? 0) + $value;
+}
+if (!empty($collapsed_items)){ $global_battle_items = $collapsed_items; }
+//error_log('$global_battle_items (after) = '.print_r($global_battle_items, true));
+
 
 // Pre-loop through and check to see what the max item is that is NOT hidden or at least unlocked
 $tmp_counter = 0;
@@ -124,7 +136,7 @@ if (true){
 
         // Collect and print the editor markup for this player
         ?>
-        <div class="event event_double event_visible">
+        <div class="event event_double event_visible" data-token="items">
 
             <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/prototype-complete/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">
                 <div class="<?= $category_image_class ?>" style="background-image: url(<?= $category_image_path ?>); "></div>
@@ -255,27 +267,24 @@ if (true){
                                                 $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
 
                                             }
-                                            /*
-                                            // Otherwise if this is a Field Star, use the total number as quantity
-                                            elseif ($item_token == 'field-star' && !empty($this_battle_stars_field_count)){
-
-                                                // Collect the items details and current quantity
-                                                $item_info_quantity = !empty($this_battle_stars_field_count) ? $this_battle_stars_field_count : 0;
-                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
-                                                $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-
+                                            // Else if this is an elemental star, let's use the starforce counts for quantities
+                                            else if (preg_match('/\-star$/i', $item_token)){
+                                                $star_type = preg_replace('/\-star$/i', '', $item_token);
+                                                $star_quantity = isset($this_star_force_strict[$star_type]) ? $this_star_force_strict[$star_type] : 0;
+                                                if ($star_quantity > 0){
+                                                    $item_info_quantity = $star_quantity;
+                                                    $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
+                                                    $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
+                                                } else {
+                                                    // Define placeholder, mysterious details for the user
+                                                    $item_info_name = preg_replace('/[-_a-z0-9]/i', '?', $item_info['item_name']);
+                                                    $item_info_type = 'empty';
+                                                    $item_info_quantity = 0;
+                                                    $temp_info_tooltip = '';
+                                                    $temp_is_disabled = true;
+                                                    $temp_is_comingsoon = true;
+                                                }
                                             }
-                                            // Otherwise if this is a Fusion Star, use the total number as quantity
-                                            elseif ($item_token == 'fusion-star' && !empty($this_battle_stars_fusion_count)){
-
-                                                // Collect the items details and current quantity
-                                                $item_info_quantity = !empty($this_battle_stars_fusion_count) ? $this_battle_stars_fusion_count : 0;
-                                                if (!empty($this_battle_stars_perfect_fusion_count)){ $item_info_quantity += $this_battle_stars_perfect_fusion_count; }
-                                                $temp_info_tooltip = rpg_item::print_editor_title_markup($robot_info, $item_info, $item_print_options);
-                                                $temp_info_tooltip = htmlentities($temp_info_tooltip, ENT_QUOTES, 'UTF-8', true);
-
-                                            }
-                                            */
                                             // Otherwise this item slot is mysterious
                                             else {
 
@@ -290,9 +299,15 @@ if (true){
                                             }
 
                                             ?>
-                                            <td class="<?= $item_cell_float ?> item_cell <?= $temp_is_disabled ? 'item_cell_disabled' : '' ?>" data-kind="item" data-action="use-item" data-token="<?= !$temp_is_comingsoon ? $item_info_token : 'comingsoon' ?>" data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>" data-count="<?= $item_info_quantity ?>">
+                                            <td class="<?= $item_cell_float ?> item_cell <?= $temp_is_disabled ? 'item_cell_disabled' : '' ?>"
+                                                data-kind="item" data-action="use-item" data-token="<?= !$temp_is_comingsoon ? $item_info_token : 'comingsoon' ?>"
+                                                data-unlocked="<?= $temp_is_comingsoon ? 'coming-soon' : 'true' ?>" data-count="<?= $item_info_quantity ?>"
+                                                <?= !empty($temp_info_tooltip) ?
+                                                    'data-click-tooltip="'.$temp_info_tooltip.'" '.
+                                                    'data-tooltip-type="type_'.$item_info_type.'"'
+                                                    : '' ?>>
                                                 <span class="item_number item_type item_type_empty"><span>No. <?= str_replace(' ', '&nbsp;', str_pad($item_counter, 2, ' ', STR_PAD_LEFT)); ?></span><?= ($temp_is_new ? '<i class="new type electric"></i>' : '') ?></span>
-                                                <span class="item_name item_type item_type_<?= $item_info_type ?>" <?= !empty($temp_info_tooltip) ? 'data-click-tooltip="'.$temp_info_tooltip.'"' : '' ?>><?= $item_info_name ?></span>
+                                                <span class="item_name item_type item_type_<?= $item_info_type ?>"><?= str_replace(' ', ' <br />', $item_info_name) ?></span>
                                                 <? /* <a class="use_button item_type item_type_none" href="#">Use</a> */ ?>
                                                 <? if (!$temp_is_comingsoon): ?>
                                                     <span class="item_sprite item_type item_type_empty"><span class="sprite sprite_40x40 sprite_40x40_00" style="background-image: url(images/items/<?= $item_sprite_image ?>/icon_right_40x40.png?<?= MMRPG_CONFIG_CACHE_DATE?>);"></span></span>
@@ -407,6 +422,7 @@ if (true){
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/items.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -420,15 +436,11 @@ if (true){
             <?= $this_item_markup ?>
         </div>
     </div>
-    <script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-    <script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-    <script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-    <script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
     <script type="text/javascript" src="scripts/items.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
     <script type="text/javascript">
     // Update game settings for this page
-    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-    gameSettings.autoScrollTop = false;
     gameSettings.allowShopping = true;
     // Define the global arrays to hold the item console markup
     var itemConsoleMarkup = '<?= str_replace("'", "\'", $item_console_markup) ?>';

@@ -28,6 +28,8 @@
             "event-sound": "get-beat_mmv-gb",
             "tooltip-open": "refill_mmii-gb",
             "tooltip-text": "atomic-fire-charge-b_mmi-gb",
+            "inventory-open": "shutter_mmv-gb",
+            "inventory-close": "shutter_mmv-gb",
             "shop-success": "selected_mmv-gb",
             "zenny-spent": "refill_mmv-gb",
             "glass-klink": "dink_mmii-gb"
@@ -51,8 +53,10 @@
             "victory-result": "enker-absorb_mmi-gb",
             "failure-result": "dark-moon-stomp_mmv-gb",
             "exit-mission": "beam-out_mmii-gb",
+            "confirm-sound": "enker-absorb_mmi-gb",
             "battle-victory-sound": "stage-clear_mm6-nes",
             "battle-defeat-sound": "game-over_mm4-nes",
+            "pickup-sound": "beam-out_mmii-gb",
             "get-item": "one-up_mmv-gb",
             "get-big-item": "get-beat_mmv-gb",
             "get-weird-item": "weapon-get_mmii-gb",
@@ -66,9 +70,10 @@
             "marker-destroyed": "dark-moon-stomp_mmv-gb",
             "field-boost": "wily-escape-iv-a_mmv-gb",
             "field-break": "wily-escape-iii-b_mmv-gb",
-            "scan-start": "shutter_mmii-gb",
+            "scan-start": "wily-escape-iv-b-crop-2_mmv-gb",
             "scan-success": "ring-boomerang_mmv-gb",
             "scan-success-new": "enker-absorb_mmi-gb",
+            "old-scan-start": "shutter_mmii-gb",
             "defend-sound": "dink_mmi-gb",
             "battle-start-sound": "megaman_ready_mm8-psx",
             "master-taunt-sound": "sound-95_mmxi-gb",
@@ -120,6 +125,9 @@
             "master-destroyed-sound": "dead_mmi-gb",
             "mecha-destroyed-sound": "dead_mmv-gb",
             "boss-destroyed-sound": "dead_mmii-gb",
+            "gate-destroyed-sound": "shutter_mmv-gb",
+            "block-destroyed-sound": "dark-moon-stomp_mmv-gb",
+            "hazard-destroyed-sound": "dark-moon-stomp_mmv-gb",
             "super-boss-destroyed-sound": "biggest-boom_mmv-gb",
             "overloading-sound": "buzzsaw-mod-1_mmi-gb",
             "master-overloading-sound": "buzzsaw-mod-1_mmi-gb",
@@ -250,7 +258,10 @@
             "vector-sound": "grab-buster_mmv-gb",
             "ambush-sound": "shadow-man-attack_mmv-gb",
             "shining-sound": "selected-mod-1_mmv-gb",
-            "blade-sound": "ring-boomerang_mmv-gb"
+            "blade-sound": "ring-boomerang_mmv-gb",
+            "lock-opening-sound": "wily-fortress-appear_mmv-gb",
+            "lock-destroyed-sound": "punk-dig_mmv-gb",
+            "lock-activated-sound": "wpn-get-iii_mmv-gb"
         }
     },
 

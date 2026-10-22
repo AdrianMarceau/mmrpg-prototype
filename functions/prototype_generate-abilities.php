@@ -2,6 +2,10 @@
 // Define a function for generating an ability set for a given robot
 function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $ability_num = 1, $robot_item = ''){
     global $db;
+    //error_log('mmrpg_prototype_generate_abilities() called for "'.$robot_info['robot_token'].'" ... ');
+    //error_log('&/ $robot_info = '.print_r(json_encode($robot_info, JSON_NUMERIC_CHECK), true));
+    //error_log('w/ $robot_level = '.print_r($robot_level, true).' | $ability_num = '.print_r($ability_num, true));
+    //error_log('&/ $robot_item = '.print_r($robot_item, true));
 
     // Define the static variables for the ability lists
     static $mmrpg_prototype_core_abilities;
@@ -10,7 +14,9 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     static $mmrpg_prototype_darkness_abilities;
 
     // Collect the ability index for calculation purposes
+    static $this_type_index;
     static $this_ability_index;
+    if (empty($this_type_index)){ $this_type_index = rpg_type::get_index(true); }
     if (empty($this_ability_index)){ $this_ability_index = rpg_ability::get_index(true); }
 
     // Define all the core and support abilities to be used in generating
@@ -78,6 +84,11 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
     // Check to see if this robot has any ability generation flags
     $flags = !empty($robot_info['flags']) ? $robot_info['flags'] : array();
+    if (!empty($flags) && !isset($flags[0])){ $flags = array_keys(array_filter($flags)); }
+    //error_log('&/ $flags = '.print_r($flags, true));
+    $image = !empty($robot_info['robot_image']) ? $robot_info['robot_image'] : $robot_info['robot_token'];
+    $image_alt = ''; if (strstr($image, '_')){ $image_alt = explode('_', $image)[1]; $image = explode('_', $image)[0]; }
+    //error_log('$image = '.$image.' | $image_alt = '.$image_alt);
     $skip_neutral_abilities = in_array('skip_neutral_abilities_on_generate', $flags) ? true : false;
     $skip_boost_abilities = in_array('skip_boost_abilities_on_generate', $flags) ? true : false;
     $skip_break_abilities = in_array('skip_break_abilities_on_generate', $flags) ? true : false;
@@ -92,9 +103,15 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     // Define the array for holding all of this robot's abilities
     $this_robot_abilities = array();
 
-    // Loop through this robot's level-up abilities looking for one
+    // Assume this is index info but pull the compatible abilities array if not provided
     $robot_index_info = $robot_info;
     if (!is_array($robot_index_info['robot_abilities'])){ $robot_index_info['robot_abilities'] = array(); }
+    if (empty($robot_index_info['robot_abilities'])){
+        $real_info = rpg_robot::get_index_info($robot_index_info['robot_token']);
+        $robot_index_info['robot_abilities'] = $real_info['robot_abilities'];
+    }
+
+    // Loop through this robot's level-up abilities looking for one
     if (!empty($robot_index_info['robot_rewards']['abilities'])){
         foreach ($robot_index_info['robot_rewards']['abilities'] AS $info){
             // If this is the buster shot or too high of a level, continue
@@ -113,6 +130,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
             $this_robot_abilities[] = $info['token'];
         }
     }
+
+    // Collect the robot cores so we can reference (or tweak) them later
+    $robot_core_type = !empty($robot_index_info['robot_core']) ? $robot_index_info['robot_core'] : '';
+    $robot_core2_type = !empty($robot_index_info['robot_core2']) ? $robot_index_info['robot_core2'] : '';
 
     // Define a new array to hold all the addon abilities
     $this_robot_abilities_addons = array('base' => $this_robot_abilities, 'weapons' => array(), 'support' => array());
@@ -140,8 +161,8 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         $remaining_abilities = $ability_num - count($this_robot_abilities);
 
         // Check to see if this robot is a copy core or should be treated like one
-        $robot_is_copy_core = !empty($robot_index_info['robot_core']) && $robot_index_info['robot_core'] == 'copy' ? true : false;
-        if (!empty($robot_index_info['robot_core2']) && $robot_index_info['robot_core2'] == 'copy'){ $robot_is_copy_core = true; }
+        $robot_is_copy_core = !empty($robot_core_type) && $robot_core_type == 'copy' ? true : false;
+        if (!empty($robot_core2_type) && $robot_core2_type == 'copy'){ $robot_is_copy_core = true; }
 
         // Check if this robot is holding a core
         $robot_item_core = !empty($robot_item) && preg_match('/-core$/i', $robot_item) ? preg_replace('/-core$/i', '', $robot_item) : '';
@@ -150,8 +171,15 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         $robot_skill = !empty($robot_index_info['robot_skill']) ? $robot_index_info['robot_skill'] : '';
         $robot_skill_core = !empty($robot_skill) && preg_match('/-subcore$/i', $robot_skill) ? preg_replace('/-subcore$/i', '', $robot_skill) : '';
 
+        // If this is a copy core robot that has been forced into an alt, pretend it's that type
+        if ($robot_is_copy_core && !empty($image_alt) && !empty($this_type_index[$image_alt])){
+            $robot_core_type = $image_alt;
+            $robot_core2_type = '';
+            $robot_is_copy_core = false;
+        }
+
         // Define the number of core and support abilities for the robot
-        if ($robot_index_info['robot_class'] == 'master' || $robot_index_info['robot_class'] == 'boss'){
+        if ($robot_level > 1 && $ability_num > 1){ // $robot_index_info['robot_class'] == 'master' || $robot_index_info['robot_class'] == 'boss'
             foreach ($mmrpg_prototype_core_abilities AS $group_key => $group_abilities){
                 if (!empty($this_robot_abilities) && floor($robot_level / 10) < ($group_key + 1)){ continue; }
                 foreach ($group_abilities AS $ability_key => $ability_token){
@@ -164,10 +192,12 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                     if (!$is_compatible && in_array($ability_token, $robot_index_info['robot_abilities'])){
                         $is_compatible = true;
                     }
-                    if (!$is_compatible && !empty($robot_index_info['robot_core'])){
+                    if (!$is_compatible && !empty($robot_core_type)){
                         if ($robot_is_copy_core && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
-                        elseif (!empty($ability_info['ability_type']) && $robot_index_info['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
-                        elseif (!empty($ability_info['ability_type2']) && $robot_index_info['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type']) && $robot_core_type == $ability_info['ability_type']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type2']) && $robot_core_type == $ability_info['ability_type2']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type']) && $robot_core2_type == $ability_info['ability_type']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type2']) && $robot_core2_type == $ability_info['ability_type2']){ $is_compatible = true; }
                     }
                     if (!$is_compatible && !empty($robot_item_core)){
                         if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
@@ -186,7 +216,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         }
 
         // Ensure this is not an empty robot as their mechanics are different
-        if ($robot_index_info['robot_core'] != 'empty'){
+        if ($robot_core_type != 'empty'){
 
             // Collect a list of global abilities to reference
             $temp_global_abilities = rpg_ability::get_global_abilities();
@@ -214,10 +244,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                             $is_compatible = true;
                         }
                         if (!$is_compatible
-                            && !empty($robot_index_info['robot_core'])){
-                            if ($robot_index_info['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
-                            elseif (!empty($ability_info['ability_type']) && $robot_index_info['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
-                            elseif (!empty($ability_info['ability_type2']) && $robot_index_info['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+                            && !empty($robot_core_type)){
+                            if ($robot_core_type == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type']) && $robot_core_type == $ability_info['ability_type']){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type2']) && $robot_core_type == $ability_info['ability_type2']){ $is_compatible = true; }
                         }
                         if (!$is_compatible
                             && !empty($robot_item_core)){
@@ -258,9 +288,9 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                             $is_compatible = true;
                         }
                         if (!$is_compatible && !empty($ability_info['ability_type'])){
-                            if ($robot_index_info['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
-                            elseif (!empty($ability_info['ability_type']) && $robot_index_info['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
-                            elseif (!empty($ability_info['ability_type2']) && $robot_index_info['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+                            if ($robot_core_type == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type']) && $robot_core_type == $ability_info['ability_type']){ $is_compatible = true; }
+                            elseif (!empty($ability_info['ability_type2']) && $robot_core_type == $ability_info['ability_type2']){ $is_compatible = true; }
                         }
                         if (!$is_compatible && !empty($robot_item_core)){
                             if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
@@ -282,7 +312,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         }
 
         // Define the number of darkness abilities for the robot
-        if ($robot_index_info['robot_core'] == 'empty'){
+        if ($robot_core_type == 'empty'){
             foreach ($mmrpg_prototype_darkness_abilities AS $group_key => $group_abilities){
                 if (!empty($this_robot_abilities) && floor($robot_level / 10) < ($group_key + 1)){ continue; }
                 foreach ($group_abilities AS $ability_key => $ability_token){
@@ -292,10 +322,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                     if (!$is_compatible && in_array($ability_token, $robot_index_info['robot_abilities'])){
                         $is_compatible = true;
                     }
-                    if (!$is_compatible && !empty($robot_index_info['robot_core'])){
-                        if ($robot_index_info['robot_core'] == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
-                        elseif (!empty($ability_info['ability_type']) && $robot_index_info['robot_core'] == $ability_info['ability_type']){ $is_compatible = true; }
-                        elseif (!empty($ability_info['ability_type2']) && $robot_index_info['robot_core'] == $ability_info['ability_type2']){ $is_compatible = true; }
+                    if (!$is_compatible && !empty($robot_core_type)){
+                        if ($robot_core_type == 'copy' && $ability_info['ability_type'] != 'empty'){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type']) && $robot_core_type == $ability_info['ability_type']){ $is_compatible = true; }
+                        elseif (!empty($ability_info['ability_type2']) && $robot_core_type == $ability_info['ability_type2']){ $is_compatible = true; }
                     }
                     if (!$is_compatible && !empty($robot_item_core)){
                         if ($robot_item_core == 'copy' && $ability_info['ability_type'] == 'copy'){ $is_compatible = true; }
@@ -328,6 +358,7 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         }
         */
 
+        /*
         // Define the last addon array which will have alternating values
         $temp_addons_final = array();
         $temp_count_weapons_added = 0;
@@ -341,6 +372,21 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
                 break;
             }
         }
+        */
+
+        // Merge alternating values properly
+        $temp_addons_final = array();
+        $weapons_count = count($this_robot_abilities_addons['weapons']);
+        $support_count = count($this_robot_abilities_addons['support']);
+        $max_count = max($weapons_count, $support_count);
+        for ($i = 0; $i < $max_count; $i++) {
+            if (isset($this_robot_abilities_addons['support'][$i])) {
+                $temp_addons_final[] = $this_robot_abilities_addons['support'][$i];
+            }
+            if (isset($this_robot_abilities_addons['weapons'][$i])) {
+                $temp_addons_final[] = $this_robot_abilities_addons['weapons'][$i];
+            }
+        }
 
         // Combine the two arrays into one again
         //$this_robot_abilities = array_merge($this_robot_abilities_addons['base'], $this_robot_abilities_addons['weapons'], $this_robot_abilities_addons['support']);
@@ -351,9 +397,10 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
     }
 
     // If this robot truly has no abilities (which is bad), give them the buster shot
-    if (empty($this_robot_abilities)){ $this_robot_abilities[] = 'buster-shot'; }
+    if (empty($this_robot_abilities)){ $this_robot_abilities[] = 'buster-shot'; error_log('-> no abilities! compensating w/ buster-shot'); }
 
     // Return the ability array, whatever it was
+    //error_log('-> '.$image.($image_alt ? '_'.$image_alt : '').' abilities >> '.implode(', ', $this_robot_abilities));
     return $this_robot_abilities;
 }
 

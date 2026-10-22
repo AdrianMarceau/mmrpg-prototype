@@ -63,6 +63,12 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                     $this_html_class .= ' unsorted';
                 }
 
+                // If this is the unsorted group, adjust the settings appropriately
+                if ($group_token === 'Hidden'
+                    || $group_token === 'Unlisted'){
+                    $this_html_class .= ' unlisted';
+                }
+
                 // If this is the template group, adjust the settings appropriately
                 if ($group_token === 'Template'){
                     $readonly = true;
@@ -102,15 +108,18 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                         foreach ($group_child_tokens AS $group_child_token){
                             $group_child_name = $group_child_token;
                             $group_child_number = '';
+                            $group_child_game = '';
                             if (isset($object_index[$group_child_token])){
                                 $group_child_info = $object_index[$group_child_token];
                                 if (isset($group_child_info[$object_group_kind.'_name'])){ $group_child_name = $group_child_info[$object_group_kind.'_name']; }
                                 if (isset($group_child_info[$object_group_kind.'_number'])){ $group_child_number = $group_child_info[$object_group_kind.'_number']; }
+                                if (isset($group_child_info[$object_group_kind.'_game'])){ $group_child_game = $group_child_info[$object_group_kind.'_game']; }
                                 if (!empty($group_child_info[$object_group_kind.'_flag_hidden'])){ $group_child_visibility = '<i class="fas fa-eye-slash" title="Hidden"></i>'; }
                             }
                             echo('<li class="child group_child_token">'.PHP_EOL);
                                 echo('<strong class="token">'.$group_child_name.'</strong>'.PHP_EOL);
                                 if (!empty($group_child_number)){ echo('<em class="number">'.$group_child_number.'</em>'.PHP_EOL); }
+                                if (!empty($group_child_game)){ echo('<em class="number">'.$group_child_game.'</em>'.PHP_EOL); }
                                 if (!empty($group_child_visibility)){ echo('<em class="visibility">'.$group_child_visibility.'</em>'.PHP_EOL); }
                                 $input_attrs = '';
                                 $input_attrs .= 'class="hidden" ';
@@ -126,6 +135,8 @@ $object_index = call_user_func(array('rpg_'.$object_group_kind, 'get_index'), tr
                     // Print out two move buttons for going up and/or down in the list
                     echo('<a class="move-handle" data-direction="up" title="Move Up"><i class="fa fas fa-arrow-alt-circle-up"></i></a>'.PHP_EOL);
                     echo('<a class="move-handle" data-direction="down" title="Move Down"><i class="fa fas fa-arrow-alt-circle-down"></i></a>'.PHP_EOL);
+                    echo('<a class="move-handle" data-direction="top" title="Move To Top"><i class="fa fas fa-angle-double-up"></i></a>'.PHP_EOL);
+                    echo('<a class="move-handle" data-direction="bottom" title="Move To Bottom"><i class="fa fas fa-angle-double-down"></i></a>'.PHP_EOL);
 
                 // Print out the closing list item tag for this group
                 echo('</div>'.PHP_EOL);

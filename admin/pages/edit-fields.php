@@ -388,7 +388,7 @@
             if (empty($form_data['field_token']) || (!$field_data_is_new && empty($old_field_token))){ $form_messages[] = array('error', 'Field Token was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['field_name'])){ $form_messages[] = array('error', 'Field Name was not provided or was invalid'); $form_success = false; }
             if (empty($form_data['field_class'])){ $form_messages[] = array('error', 'Field Kind was not provided or was invalid'); $form_success = false; }
-            if ($form_data['field_class'] === 'master' && empty($form_data['field_master'])){ $form_messages[] = array('error', 'Field Master was not provided or was invalid'); $form_success = false; }
+            if ($field_data_is_new && $form_data['field_class'] === 'master' && empty($form_data['field_master'])){ $form_messages[] = array('warning', 'Field Master was not provided or was invalid'); }
             if (!isset($_POST['field_type'])){ $form_messages[] = array('warning', 'Field Type was not provided or were invalid'); $form_success = false; }
             if (!$form_success){ exit_field_edit_action($form_data['field_id']); }
 
@@ -1290,6 +1290,22 @@
                                             'name' => 'battle-field_avatar.png',
                                             'width' => 100,
                                             'height' => 100
+                                            );
+                                        $field_files_required[] = array(
+                                            'label' => 'block image',
+                                            'help' => 'image used overworld and battle super blocks',
+                                            'path' => $field_file_path,
+                                            'name' => 'battle-field_block.png',
+                                            'width' => 80,
+                                            'height' => 80
+                                            );
+                                        $field_files_required[] = array(
+                                            'label' => 'terrain image',
+                                            'help' => 'bitmask image with all required terrain tiles',
+                                            'path' => $field_file_path,
+                                            'name' => 'battle-field_terrain.png',
+                                            'width' => 320,
+                                            'height' => 320
                                             );
 
                                         // Loop through required files and display filebars for them

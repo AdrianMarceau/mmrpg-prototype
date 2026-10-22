@@ -37,7 +37,7 @@ class rpg_item extends rpg_object {
         $this_iteminfo = isset($args[3]) ? $args[3] : array('item_id' => 0, 'item_token' => 'item');
 
         if (!is_array($this_iteminfo)){
-            die('!is_array($this_iteminfo){ '.print_r($this_iteminfo, true)).' }';
+            die('!is_array($this_iteminfo){ '.print_r($this_iteminfo, true).' }');
         }
 
         // Now load the item data from the session or index
@@ -108,7 +108,7 @@ class rpg_item extends rpg_object {
         $this->values = isset($this_iteminfo['values']) ? $this_iteminfo['values'] : array();
         $this->history = isset($this_iteminfo['history']) ? $this_iteminfo['history'] : array();
         $this->item_id = isset($this_iteminfo['item_id']) ? $this_iteminfo['item_id'] : 0;
-        $this->item_name = isset($this_iteminfo['item_name']) ? $this_iteminfo['item_name'] : 'Ability';
+        $this->item_name = isset($this_iteminfo['item_name']) ? $this_iteminfo['item_name'] : 'Item';
         $this->item_token = isset($this_iteminfo['item_token']) ? $this_iteminfo['item_token'] : 'item';
         $this->item_class = isset($this_iteminfo['item_class']) ? $this_iteminfo['item_class'] : 'master';
         $this->item_quantity = isset($this_iteminfo['item_quantity']) ? $this_iteminfo['item_quantity'] : 1;
@@ -389,7 +389,7 @@ class rpg_item extends rpg_object {
     public function get_target_options(){ return $this->get_info('target_options'); }
     public function set_target_options($value){ $this->set_info('target_options', $value); }
 
-    public function get_damage_options(){ return $this->get_info('ddamage_options'); }
+    public function get_damage_options(){ return $this->get_info('damage_options'); }
     public function set_damage_options($value){ $this->set_info('damage_options', $value); }
 
     public function get_recovery_options(){ return $this->get_info('recovery_options'); }
@@ -621,7 +621,7 @@ class rpg_item extends rpg_object {
             $this->target_options['item_failure_frame_offset']['y'] = $target_options['failure'][2];
             $this->target_options['item_failure_frame_offset']['z'] = $target_options['failure'][3];
             $this->target_options['target_text'] = $target_options['failure'][4];
-            $this->target_options['item_failure_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
+            $this->target_options['item_failure_frame_span'] = isset($target_options['failure'][5]) ? $target_options['failure'][5] : 1;
         }
         // Return the new array
         return $this->target_options;
@@ -1103,6 +1103,18 @@ class rpg_item extends rpg_object {
         return $index;
     }
 
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $item_index_byid = false;
+        if ($item_index_byid === false){
+            $item_index_byid = array();
+            $item_index = self::get_index(true, true);
+            if (empty($item_index)){ $item_index = array(); }
+            foreach ($item_index AS $token => $item){ $item_index_byid[$item['item_id']] = $token; }
+        }
+        return $item_index_byid;
+    }
+
     // Define a public function for collecting index data from the database
     public static function get_index_info($item_token){
 
@@ -1205,8 +1217,8 @@ class rpg_item extends rpg_object {
         $temp_item_recovery2 = !empty($item_info['item_recovery2']) ? $item_info['item_recovery2'] : 0;
         $temp_item_target = !empty($item_info['item_target']) ? $item_info['item_target'] : 'auto';
         $temp_item_title = $item_info['item_name'];
-        if (!empty($temp_item_type)){ $temp_item_title .= ' ('.$temp_item_type['type_name'].' Type)'; }
-        if (!empty($temp_item_type2)){ $temp_item_title = str_replace('Type', '/ '.$temp_item_type2['type_name'].' Type', $temp_item_title); }
+        //if (!empty($temp_item_type)){ $temp_item_title .= ' ('.$temp_item_type['type_name'].' Type)'; }
+        //if (!empty($temp_item_type2)){ $temp_item_title = str_replace('Type', '/ '.$temp_item_type2['type_name'].' Type', $temp_item_title); }
 
         if ($item_info['item_class'] != 'item'){
             if (!empty($item_info['item_damage']) || !empty($item_info['item_recovery'])){ $temp_item_title .= '  // '; }
@@ -1225,8 +1237,12 @@ class rpg_item extends rpg_object {
 
             $temp_item_title .= '  | ';
             if ($item_info['item_class'] != 'item' && !empty($item_info['item_accuracy'])){ $temp_item_title .= ' '.$item_info['item_accuracy'].'% Accuracy'; }
-            elseif ($item_info['item_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token])){ $temp_item_title .= ' '.($_SESSION[$session_token]['values']['battle_items'][$temp_item_token] == 1 ? '1 Unit' : $_SESSION[$session_token]['values']['battle_items'][$temp_item_token].' Units'); }
-            elseif ($item_info['item_class'] == 'item' ){ $temp_item_title .= ' 0 Units'; }
+            elseif ($item_info['item_class'] == 'item'){
+                $inventory_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token]) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token] : 0;
+                $equipped_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped']) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped'] : 0;
+                $available_count = max(0, $inventory_count - $equipped_count);
+                $temp_item_title .= ' '.($available_count == 1 ? '1 Unit' : $available_count.' Units');
+            }
 
         }
 
@@ -1274,12 +1290,17 @@ class rpg_item extends rpg_object {
         if (!empty($item_info['item_damage'])){ $temp_item_option .= ' | D:'.$item_info['item_damage']; }
         if (!empty($item_info['item_recovery'])){ $temp_item_option .= ' | R:'.$item_info['item_recovery']; }
         if ($item_info['item_class'] != 'item' && !empty($item_info['item_accuracy'])){ $temp_item_option .= ' | A:'.$item_info['item_accuracy']; }
-        elseif ($item_info['item_class'] == 'item' && !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token])){ $temp_item_option .= ' | U:'.$_SESSION[$session_token]['values']['battle_items'][$temp_item_token]; }
-        elseif ($item_info['item_class'] == 'item'){ $temp_item_option .= ' | U:0'; }
+        elseif ($item_info['item_class'] == 'item'){
+            $inventory_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token]) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token] : 0;
+            $equipped_count = !empty($_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped']) ? $_SESSION[$session_token]['values']['battle_items'][$temp_item_token.'__equipped'] : 0;
+            $available_count = max(0, $inventory_count - $equipped_count);
+            $temp_item_option .= ' | U:'.$available_count;
+        }
         if (!empty($temp_item_energy)){ $temp_item_option .= ' | E:'.$temp_item_energy; }
 
         // Return the generated option markup
-        $this_option_markup = '<option value="'.$temp_item_token.'" data-label="'.$temp_item_label.'" data-type="'.(!empty($temp_item_type) ? $temp_item_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_item_type2) ? $temp_item_type2['type_token'] : '').'" title="'.$temp_item_title_plain.'" data-tooltip="'.$temp_item_title_tooltip.'">'.$temp_item_option.'</option>';
+        $disabled_attr = (isset($available_count) && $available_count <= 0) ? ' disabled="disabled"' : '';
+        $this_option_markup = '<option value="'.$temp_item_token.'" data-label="'.$temp_item_label.'" data-type="'.(!empty($temp_item_type) ? $temp_item_type['type_token'] : 'none').'" data-type2="'.(!empty($temp_item_type2) ? $temp_item_type2['type_token'] : '').'" title="'.$temp_item_title_plain.'" data-tooltip="'.$temp_item_title_tooltip.'"'.$disabled_attr.'>'.$temp_item_option.'</option>';
 
         // Return the generated option markup
         return $this_option_markup;
@@ -1358,7 +1379,9 @@ class rpg_item extends rpg_object {
 
         $item_info_id = $item_info['item_id'];
         $item_info_token = $item_info['item_token'];
-        $item_info_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token]) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token] : 0;
+        $inventory_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token]) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token] : 0;
+        $equipped_count = !empty($_SESSION[$session_token]['values']['battle_items'][$item_info_token.'__equipped']) ? $_SESSION[$session_token]['values']['battle_items'][$item_info_token.'__equipped'] : 0;
+        $item_info_count = max(0, $inventory_count - $equipped_count);
         $item_info_name = $item_info['item_name'];
         $item_info_type = !empty($item_info['item_type']) ? $item_info['item_type'] : false;
         $item_info_type2 = !empty($item_info['item_type2']) ? $item_info['item_type2'] : false;
@@ -1637,7 +1660,7 @@ class rpg_item extends rpg_object {
                                 <div class="icon item_type <?= $item_header_types ?>" style="font-size: 9px; line-height: 11px; text-align: center; margin-bottom: 2px; padding: 0 0 1px !important;"><?= 'No.'.$item_info['item_key'] ?></div>
                             <? endif; ?>
                             <? if ($item_image_token != 'item'){ ?>
-                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>);" class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"><?= $item_info['item_name']?>'s Icon</div></div>
+                                <div class="icon item_type <?= $item_header_types ?>"><div style="background-image: url(images/items/<?= $item_image_token ?>/icon_right_<?= $item_image_size_text ?>.png?<?= MMRPG_CONFIG_CACHE_DATE?>);" class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon"></div></div>
                             <? } else { ?>
                                 <div class="icon item_type <?= $item_header_types ?>"><div class="sprite sprite_item sprite_40x40 sprite_40x40_icon sprite_size_<?= $item_image_size_text ?> sprite_size_<?= $item_image_size_text ?>_icon">No Image</div></div>
                             <? } ?>
@@ -1654,6 +1677,7 @@ class rpg_item extends rpg_object {
                         <? else: ?>
                             <?= $item_info['item_name'] ?>
                         <? endif; ?>
+                            &nbsp;
                         <? if (!empty($item_info['item_type_special'])){ ?>
                             <div class="header_core item_type"><?= ucfirst($item_info['item_type_special']) ?> Type</div>
                         <? } elseif (!empty($item_info['item_type']) && !empty($item_info['item_type2'])){ ?>
@@ -1671,13 +1695,13 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Name :</label>
+                                        <label style="display: block; float: left;">Name :&nbsp;</label>
                                         <span class="item_type item_type_"><?= $item_info['item_name'] ?></span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Kind :</label>
+                                        <label style="display: block; float: left;">Kind :&nbsp;</label>
                                         <span class="item_type item_type_"><?= ucfirst($item_info['item_subclass']) ?></span>
                                     </td>
                                 </tr>
@@ -1688,7 +1712,7 @@ class rpg_item extends rpg_object {
                             <tbody>
                                 <tr>
                                     <td  class="right">
-                                        <label style="display: block; float: left;">Power :</label>
+                                        <label style="display: block; float: left;">Power :&nbsp;</label>
                                         <? if(!empty($item_info['item_damage']) || !empty($item_info['item_recovery'])): ?>
                                             <? if(!empty($item_info['item_damage'])){ ?><span class="item_stat"><?= number_format($item_info['item_damage'], 0, '.', ',').(!empty($item_info['item_damage_percent']) ? '%' : '') ?> Damage</span><? } ?>
                                             <? if(!empty($item_info['item_recovery'])){ ?><span class="item_stat"><?= number_format($item_info['item_recovery'], 0, '.', ',').(!empty($item_info['item_recovery_percent']) ? '%' : '') ?> Recovery</span><? } ?>
@@ -1702,7 +1726,7 @@ class rpg_item extends rpg_object {
                                 </tr>
                                 <tr>
                                     <td class="right">
-                                        <label style="display: block; float: left;">Value :</label>
+                                        <label style="display: block; float: left;">Value :&nbsp;</label>
                                         <?
                                         // Collect this item's price and/or BP value where applicable
                                         $value_rows = array();
@@ -2141,6 +2165,86 @@ class rpg_item extends rpg_object {
                 'skip_canvas_header' => true
                 ));
 
+        }
+
+        // Return true on success
+        return true;
+
+    }
+
+    // Define a static function to use as the common action for all stat resetting items
+    public static function item_function_stat_resetter($objects){
+
+        // Extract all objects into the current scope
+        extract($objects);
+
+        // If this player is visible, we can show them as having used the item
+        $this_battle->queue_sound_effect('use-recovery-item');
+        if ($this_player->player_visible){
+
+            // Target this robot's self and print item use text
+            $this_item->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, 40, -2, 99,
+                    $this_player->print_name().' uses an item from the inventory&hellip; <br />'.
+                    $this_robot->print_name().' is given the '.$this_item->print_name().'!'
+                    )
+                ));
+            $this_robot->trigger_target($this_robot, $this_item);
+
+        }
+        // Otherwise, we should display it as the robot using the item themselves
+        else {
+
+            // Target this robot's self and print item use text
+            $this_item->target_options_update(array(
+                'frame' => 'summon',
+                'success' => array(0, 40, -2, 99,
+                    $this_robot->print_name().' uses the '.$this_item->print_name().'!'
+                    )
+                ));
+            $this_robot->trigger_target($this_robot, $this_item);
+
+        }
+
+        // Define the stat(s) this item will reset
+        $stat_reset_tokens = array();
+        if (strstr($this_item->item_token, 'resetchi')){
+            $stat_reset_tokens = array('attack', 'defense', 'speed');
+        } else {
+            // Fallback for single-stat resetters if you ever add them
+            $stat_reset_tokens[] = $this_item->item_type;
+        }
+
+        // Loop through each stat reset token and apply the reset
+        $stats_reset = 0;
+        foreach ($stat_reset_tokens AS $stat_token){
+            if (!empty($this_robot->counters[$stat_token.'_mods'])){
+
+                // Call the global stat reset function with customized options
+                rpg_ability::ability_function_stat_reset($this_robot, $stat_token, $this_item, array(
+                    'is_fixed_amount' => true,
+                    'skip_canvas_header' => true
+                ));
+
+                // Clear the applied history counters so the robot's slate is entirely clean
+                if (isset($this_robot->counters[$stat_token.'_breaks_applied'])){ unset($this_robot->counters[$stat_token.'_breaks_applied']); }
+                if (isset($this_robot->counters[$stat_token.'_boosts_applied'])){ unset($this_robot->counters[$stat_token.'_boosts_applied']); }
+
+                $stats_reset++;
+            }
+        }
+
+        // If no stats were altered, display a failure/no-effect message
+        if ($stats_reset === 0){
+            $this_item->target_options_update(array(
+                'frame' => 'defend',
+                'success' => array(9, 40, -2, 99,
+                    $this_robot->print_name().'\'s stats are already normal! <br />'.
+                    'The item had no effect&hellip;'
+                    )
+                ));
+            $this_robot->trigger_target($this_robot, $this_item);
         }
 
         // Return true on success

@@ -8,6 +8,7 @@ var gameConsole = false;
 var gameActions = false;
 var gameMusic = false;
 var gameSettings = {};
+
 // Initialize browser detection variables
 var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
 var isFirefox = typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
@@ -21,14 +22,15 @@ gameSettings.baseHref = 'http://localhost/'; // the base href where this game is
 gameSettings.wapFlag = false; // whether or not this game is running in mobile mode
 gameSettings.wapFlagIphone = false; // whether or not this game is running in mobile iphone mode
 gameSettings.wapFlagIpad = false; // whether or not this game is running in mobile iphone mode
-gameSettings.eventTimeout = 800; // default animation frame base internal
-gameSettings.eventTimeoutDefault = 800; // default animation frame base internal
+gameSettings.eventTimeout = 600; // default animation frame base internal
+gameSettings.eventTimeoutDefault = 600; // default animation frame base internal
 gameSettings.eventTimeoutThreshold = 250; // timeout theshold for when frames stop cross-fading
 gameSettings.eventAutoPlay = true; // whether or not to automatically advance events
 gameSettings.eventCrossFade = true; // whether or not to canvas events have crossfade animation
 gameSettings.eventCameraShift = true; // whether or not to canvas events have camera shifts
 gameSettings.eventSoundEffects = true; // whether or not to use sound effects for battle events
 gameSettings.eventHooks = []; // default to empty but may be filled at runtime and used later
+gameSettings.gameHasLoaded = false; // default to false so we can only set to true when ready
 gameSettings.gameHasStarted = false; // default to false so we can only set to true when ready
 gameSettings.idleAnimation = true; // default to allow idle animations
 gameSettings.indexLoaded = false; // default to false until the index is loaded
@@ -39,7 +41,12 @@ gameSettings.autoResizeWidth = true; // allow auto reszing of the game window wi
 gameSettings.autoResizeHeight = true; // allow auto reszing of the game window height
 gameSettings.currentBodyWidth = 0; // collect the current window width and update when necessary
 gameSettings.currentBodyHeight = 0; // collect the current window width and update when necessary
-gameSettings.allowEditing = true; // default to true to allow all editing unless otherwise stated
+gameSettings.allowEditing = false; // default to false to deny all editing unless otherwise stated
+gameSettings.baseWindowWidth = 768; // default to the legacy build's size of 4:3-ish ratio
+gameSettings.baseWindowHeight = 622; // default to the legacy build's size of 4:3-ish ratio
+gameSettings.wideWindowWidth = 1120; // default to the new 2k25 build's size of 16:9 ratio
+gameSettings.wideWindowHeight = 630; // default to the new 2k25 build's size of 16:9 ratio
+gameSettings.wideModeActive = false; // default to false and then let the browser toggle later
 gameSettings.audioBaseHref = ''; // the base href where audio comes from (empty if same as baseHref)
 gameSettings.onGameStart = []; // define an array to hold  events that have to wait until game start
 gameSettings.customValues = {}; // define an object to hold miscelaneous custom values during runtime
@@ -57,22 +64,26 @@ gameSettings.musicVolume = 0.4; // music volume for the game, relative to master
 gameSettings.effectVolume = 0.6; // effect volume for the game, relative to master, slightly higher than e
 gameSettings.menuEffectVolume = 0.6; // menu effect volume modifier, relative effect volume, may be unique later
 gameSettings.musicVolumeEnabled = true; // default to true to allow music unless otherwise stated
+gameSettings.musicTrackSpeed = 1.0; // the speed at which music tracks should be played (1.0 = normal)
 gameSettings.effectVolumeEnabled = true; // default to true to allow music unless otherwise stated
 gameSettings.audioBalanceConfig = {}; // default to empty but can hold custom overrides for above
-gameSettings.spriteRenderMode = 'default'; // the render mode we should be using for sprites
 gameSettings.battleButtonMode = 'default'; // the button mode we should be using for missions
 gameSettings.enableGameMusic = true; // default to true to turn off on unsupported devices
 gameSettings.enableSoundEffects = true; // default to true to turn off on unsupported devices
-
-// Define an object to hold change events for settings when/if they happen
-var gameSettingsChangeEvents = {};
+gameSettings.playVictorySound = true; // default to true to play the victory sound at the end of battles
+gameSettings.playVictoryMusic = true; // default to true to play the victory music at the end of battles
+gameSettings.playDefeatSound = true; // default to true to play the defeat sound at the end of battles
+gameSettings.playDefeatMusic = true; // default to true to play the defeat music at the end of battles
 
 // Define the perfect scrollbar settings
-var thisScrollbarSettings = {
+gameSettings.scrollbarSettings = {
     wheelSpeed: 0.3,
     useBothWheelAxes: false,
     suppressScrollX: true
     };
+
+// Define an object to hold change events for settings when/if they happen
+let gameSettingsChangeEvents = {};
 
 // Create the game engine submit timer
 var gameEngineSubmitTimeout = false;
@@ -126,6 +137,12 @@ $(document).ready(function(){
     // If we're on either iPhone or iPad, we can't handle both music and sfx
     if (gameSettings.wapFlagiOS){ gameSettings.enableSoundEffects = false; }
 
+    // If this window is we need to clear the localStorage for a fresh start
+    if (window.self === window.top){
+        //console.log('clearing localStorage for a fresh start');
+        resetPendingEventsCount();
+        }
+
     // If this window is not running as top, we need to overwrite some variables and functions
     if (window.self !== window.top){
 
@@ -147,6 +164,9 @@ $(document).ready(function(){
      */
 
     if (mmrpgBody.length){
+
+        // Start off with a loading class attached for css
+        $('#mmrpg').addClass('loading');
 
         // Update the tooltip reference dimensions
         //console.log('Update the tooltip reference dimensions');
@@ -170,27 +190,45 @@ $(document).ready(function(){
         if (true){
             //console.log('deciding to attach tooltips');
 
-            var tooltipDelay = 1200; //600;
-            var tooltipTimeout = false;
-            var tooltipShowing = false;
-            var tooltipInitiator = false;
+            let tooltipDelay = 1200; //600;
+            let tooltipTimeout = false;
+            let tooltipShowing = false;
+            let tooltipInitiator = false;
 
             // Define the function for showing the tooltip
-            var showTooltipFunction = function(e){
-                var thisElement = $(this);
-                $('.tooltip', mmrpgBody).empty();
-                var thisDate = new Date();
-                var thisTime = thisDate.getTime();
+            let $lastTooltipElement = false;
+            let showTooltipFunction = function(element, event){
+                //console.log('showTooltipFunction() w/ element:', element, ' and event:', event);
+                let $thisElement = $(element);
+                let $tooltip = $('#mmrpg-tooltip', mmrpgBody);
+                //console.log('-> checking $tooltip:', $tooltip);
+                //console.log('-> comparing $thisElement:', $thisElement, ' to $lastTooltipElement:', $lastTooltipElement);
+                if ($tooltip && $tooltip.length && $thisElement[0] === $lastTooltipElement[0]){
+                    //console.log('same element, closing existing tooltip');
+                    $lastTooltipElement = false;
+                    $tooltip.removeClass('active');
+                    $tooltip.empty();
+                    return;
+                    } else {
+                    //console.log('different element, continuing to show new tooltip');
+                    $lastTooltipElement = $thisElement;
+                    }
+                //var thisDate = new Date();
+                //var thisTime = thisDate.getTime();
                 //console.log('starting the tooltip at '+thisTime);
-                var thisClassList = thisElement.attr('class') != undefined ? thisElement.attr('class').split(/\s+/) : '';
-                var thisTitle = thisElement.attr('data-backup-title') != undefined ? thisElement.attr('data-backup-title') : (thisElement.attr('title') != undefined ? thisElement.attr('title') : '');
-                var thisTooltip = thisElement.attr('data-tooltip') != undefined ? thisElement.attr('data-tooltip') : '';
-                if (!thisTooltip.length && thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = thisElement.attr('data-click-tooltip'); }
+                var thisClassList = $thisElement.attr('class') != undefined ? $thisElement.attr('class').split(/\s+/) : '';
+                var thisTitle = $thisElement.attr('data-backup-title') != undefined ? $thisElement.attr('data-backup-title') : ($thisElement.attr('title') != undefined ? $thisElement.attr('title') : '');
+                var thisTooltip = $thisElement.attr('data-tooltip') != undefined ? $thisElement.attr('data-tooltip') : '';
+                if (!thisTooltip.length && $thisElement.attr('data-click-tooltip') != undefined){ thisTooltip = $thisElement.attr('data-click-tooltip'); }
                 if (!thisTitle.length && !thisTooltip.length){ return false; }
                 else if (thisTitle.length && !thisTooltip.length){ thisTooltip = thisTitle; }
-                thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\|/g, '<span class="pipe">|</span>').replace(/\s?\/\/\s?/g, '<br />').replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
-                var thisTooltipAlign = thisElement.attr('data-tooltip-align') != undefined ? thisElement.attr('data-tooltip-align') : 'left';
-                var thisTooltipType = thisElement.attr('data-tooltip-type') != undefined ? thisElement.attr('data-tooltip-type') : '';
+                thisTooltip = thisTooltip.replace(/\n/g, '<br />').replace(/\|\|/g, '<br />').replace(/\s?\/\/\s?/g, '<br />');
+                thisTooltip = thisTooltip.replace(/\|/g, '<span class="pipe">|</span>');
+                thisTooltip = thisTooltip.replace(/\*\*([^\[\]]+)\*\*/ig, '<strong>$1</strong>');
+                thisTooltip = thisTooltip.replace(/\[\[([^\[\]]+)\]\]/ig, '<span class="subtext">$1</span>');
+                var thisTooltipAlign = $thisElement.attr('data-tooltip-align') != undefined ? $thisElement.attr('data-tooltip-align') : 'left';
+                var thisTooltipType = $thisElement.attr('data-tooltip-type') != undefined ? $thisElement.attr('data-tooltip-type') : '';
+                var thisTooltipClass = $thisElement.attr('data-tooltip-class') != undefined ? $thisElement.attr('data-tooltip-class') : '';
                 if (!thisTooltipType.length){
                     for (i in thisClassList){
                         var tempClass = thisClassList[i] != undefined ? thisClassList[i].toString() : '';
@@ -205,66 +243,90 @@ $(document).ready(function(){
                 if (!thisTooltipType.length){
                     thisTooltipType = 'type none';
                     }
+                thisTooltipClass += ' '+thisTooltipType;
                 //console.log('thisTitle : '+thisTitle);
                 //console.log('append and trigger animation at '+thisTime);
-                thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
-                if (!$('.tooltip', mmrpgBody).length){ $('<p class="tooltip '+thisTooltipType+'"></p>').html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').appendTo(mmrpgBody).fadeIn('fast'); }
-                else { $('.tooltip', mmrpgBody).removeClass().addClass('tooltip').addClass(thisTooltipType).html('<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>').fadeIn('fast'); }
-                //$('.tooltip', mmrpgBody).css({width:''});
-                //var toolwidth = $('.tooltip', mmrpgBody).outerWidth();
-                //$('.tooltip', mmrpgBody).css({width:toolwidth+'px'});
-                alignTooltipFunction.call(this, e);
+                $thisElement.attr('data-backup-title', thisTitle).removeAttr('title');
+                let messageMarkup = '<span class="message" style="text-align:'+thisTooltipAlign+';">'+thisTooltip+'</span>';
+                if (!$tooltip.length){
+                    $('<div id="mmrpg-tooltip" class="tooltip '+thisTooltipClass+'">' + messageMarkup + '</div>').appendTo(mmrpgBody);
+                    $tooltip = $('#mmrpg-tooltip', mmrpgBody);
+                    } else {
+                    $tooltip.removeClass().addClass('tooltip '+thisTooltipClass).empty().html(messageMarkup);
+                    }
+                $tooltip.addClass('active').fadeIn('fast');
+                // collect the position of the button that spawned the tooltip in the first place
+                let spawnPosition = $thisElement.offset();
+                //console.log('spawnPosition =', spawnPosition);
+                alignTooltipFunction.call(this, event);
                 tooltipShowing = true;
                 if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
                     top.mmrpg_play_sound_effect('tooltip-text');
                     }
                 };
+            window.mmrpgShowTooltipFunction = showTooltipFunction;
 
-            // Define the function for positioning the tooltip
-            var alignTooltipFunction = function(e){
-                //console.log('alignTooltipFunction()');
-                //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
-                //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
-
-
-                var mouseX = e.pageX;
-                var mouseY = e.pageY;
-
-                $('.tooltip', mmrpgBody).css({left:0,top:0,right:'auto',bottom:'auto'});
-                var toolWidth = $('.tooltip', mmrpgBody).outerWidth() + 20;
-                var toolHeight = $('.tooltip', mmrpgBody).outerHeight() + 10;
-
-                var invertX = mouseX >= (gameSettings.currentBodyWidth / 2) ? true : false;
-                var invertY = mouseY >= (gameSettings.currentBodyHeight / 2) ? true : false;
-
-                var newPosX = mouseX + (invertX ? ((toolWidth + 5) * -1) : 5);
-                var newPosY = mouseY + (invertY ? ((toolHeight + 5) * -1) : 5);
-
-                $('.tooltip', mmrpgBody).css({left:newPosX,top:newPosY});
-
+            // Define the function for positioning the tooltip (v2)
+            let alignTooltipFunction = function(event){
+                //console.log('alignTooltipFunction() w/ event:', event);
+                let $tooltip = $('#mmrpg-tooltip', mmrpgBody);
+                let targetX, targetY;
+                if (typeof event.pageX !== 'undefined'
+                    && typeof event.pageY !== 'undefined'){
+                    //console.log('aligning to mouse position');
+                    targetX = event.pageX;
+                    targetY = event.pageY;
+                    } else if (typeof $lastTooltipElement !== 'undefined'
+                    && $lastTooltipElement.length){
+                    //console.log('aligning to last element position', $lastTooltipElement);
+                    let targetOffset = $lastTooltipElement.offset();
+                    targetX = targetOffset.left + ($lastTooltipElement.outerWidth() / 2);
+                    targetY = targetOffset.top + ($lastTooltipElement.outerHeight() / 2);
+                    //let $target = $lastTooltipElement;
+                    //targetX = $target.offsetLeft + ($target.offsetWidth / 2);
+                    //targetY = $target.offsetTop + ($target.offsetHeight / 2);
+                    } else {
+                    //console.log('aligning to center of screen');
+                    targetX = Math.floor(gameSettings.currentBodyWidth / 2);
+                    targetY = Math.floor(gameSettings.currentBodyHeight / 2);
+                    }
+                return mmrpg_align_element_to_target($tooltip, targetX, targetY);
                 };
+            window.mmrpgAlignTooltipFunction = alignTooltipFunction;
+
+            // Define the function for closing the tooltip
+            let closeTooltipFunction = function(event){
+                $('#mmrpg-tooltip', mmrpgBody).empty();
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = false;
+                tooltipShowing = false;
+                };
+            window.mmrpgCloseTooltipFunction = closeTooltipFunction;
+
+            // Create a variable to hold the tooltip selector
+            let tooltipSelector;
 
             // If we're on the main website, we can use the standard hover events
             if (mmrpgBody.is('.index')){
                 //console.log('we are on the website');
 
                 // Define the live MOUSEENTER events for any elements with a title tag (which should be many)
-                var tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
-                $(tooltipSelector, mmrpgBody).live('mouseenter', function(e){
-                    e.preventDefault();
+                tooltipSelector = '*[title],*[data-backup-title]:not([data-click-tooltip]),*[data-tooltip]';
+                $(tooltipSelector, mmrpgBody).live('mouseenter', function(event){
+                    event.preventDefault();
                     if (tooltipTimeout == false){
-                        var thisObject = this;
-                        tooltipInitiator = thisObject;
+                        var element = this;
+                        tooltipInitiator = element;
                         requestAnimationFrame(function(){
                             tooltipTimeout = setTimeout(function(){
                                 tooltipShowing = true;
-                                showTooltipFunction.call(thisObject, e);
+                                showTooltipFunction(element, event);
                                 }, tooltipDelay);
                             });
-                        var thisElement = $(this);
-                        if (thisElement.attr('title')){
-                            thisElement.attr('data-backup-title', thisElement.attr('title'));
-                            thisElement.removeAttr('title');
+                        var $thisElement = $(this);
+                        if ($thisElement.attr('title')){
+                            $thisElement.attr('data-backup-title', $thisElement.attr('title'));
+                            $thisElement.removeAttr('title');
                             }
                         }
                     });
@@ -275,29 +337,24 @@ $(document).ready(function(){
                 //console.log('we are in the game somewhere');
 
                 // Define the live CLICK events for any elements with a click-title tag (which should be a few)
-                var tooltipSelector = '*[data-click-tooltip]';
-                $(tooltipSelector, mmrpgBody).live('click', function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (tooltipShowing){
-                        $('.tooltip', mmrpgBody).empty();
-                        clearTimeout(tooltipTimeout);
-                        tooltipTimeout = false;
-                        tooltipShowing = false;
-                        } else {
-                        if (tooltipTimeout == false){
-                            var thisObject = this;
-                            tooltipInitiator = thisObject;
-                            requestAnimationFrame(function(){
-                                tooltipShowing = true;
-                                showTooltipFunction.call(thisObject, e);
-                                if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-                                    top.mmrpg_play_sound_effect('tooltip-open');
-                                    }
-                                });
+                tooltipSelector = '*[data-click-tooltip]';
+                $(tooltipSelector, mmrpgBody).live('click', function(event){
+                    //console.log('tooltip click event!');
+                    event.preventDefault();
+                    event.stopPropagation();
+                    var element = this;
+                    requestAnimationFrame(function(){
+                        showTooltipFunction(element, event);
+                        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+                            top.mmrpg_play_sound_effect('tooltip-open');
                             }
-                        }
+                        });
                     });
+
+                // If any extra input is detected, dismiss the tooltip immediately
+                //document.addEventListener('keydown', hideTooltip);
+                //document.addEventListener('mousewheel', hideTooltip);
+                //document.addEventListener('gamepadinput', hideTooltip);
 
             }
 
@@ -310,108 +367,126 @@ $(document).ready(function(){
             // Define the live MOUSELEAVE events for any elements with a title tag (which should be many)
             $(tooltipSelector, mmrpgBody).live('mouseleave', function(e){
                 e.preventDefault();
-                $('.tooltip', mmrpgBody).empty();
+                closeTooltipFunction.call(this, e);
+                /*
+                $('#mmrpg-tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
+                */
                 });
 
             // If the user clicks somewhere in the body, immediately remove the tooltip
             $('*', mmrpgBody).click(function(e){
                 if (e.target === tooltipInitiator){ return; }
-                $('.tooltip', mmrpgBody).empty();
+                closeTooltipFunction.call(this, e);
+                /*
+                $('#mmrpg-tooltip', mmrpgBody).empty();
                 clearTimeout(tooltipTimeout);
                 tooltipTimeout = false;
                 tooltipShowing = false;
+                */
                 });
 
             }
 
+        // Now that everything is set up, wait for all images before we actually display
+        $('#mmrpg').waitForImages(function(){
+        $   ('#mmrpg').removeClass('loading');
+            });
+
     }
+
+    // -- GAME AUDIO SETUP -- //
+
+    // Only run audio setup on the top-most layer of windows
+    if (window.top === window.self){
+        //console.log('%c' + 'Loading Game Audio ... ', 'color: magenta;');
+
+        // Require interaction from the user before allowing other clicks/hovers
+        /* (function(){
+            let $mmrpg = $('#mmrpg');
+            let userHasClicked = false, updateUserHasClicked = function(e){
+                //console.log('...click detected...');
+                if (typeof e.originalEvent === 'undefined'){ return; }
+                //console.log('User has clicked!');
+                $mmrpg.unbind('click', updateUserHasClicked);
+                $mmrpg.removeClass('first-focus-required');
+                userHasClicked = true;
+                };
+            $mmrpg.addClass('first-focus-required');
+            $mmrpg.bind('click', updateUserHasClicked);
+            })(); */
+
+        // Autmatically load the music index in json format via ajax into memory for later if not there
+        if (typeof gameSettings.customIndex.musicIndex === 'undefined'
+            || !Object.keys(gameSettings.customIndex.musicIndex).length){
+            gameSettings.customIndex.musicIndex = {};
+            //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
+            if (!Object.keys(gameSettings.customIndex.musicIndex).length){
+                //console.log('loading the music index!');
+                $.ajax({
+                    url: 'api/v2/music/index',
+                    dataType: 'json',
+                    success: function(response){
+                        //console.log('api/v2/music/index returned ', response);
+                        if (typeof response.data !== 'undefined'
+                            && typeof response.data.music !== 'undefined'){
+                            gameSettings.customIndex.musicIndex = response.data.music;
+                            //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
+                            }
+                        }
+                    });
+                }
+            }
+
+        // Automatically define the sounds index to we don't get errors if it hasn't been defined
+        if (typeof gameSettings.customIndex.soundsIndex === 'undefined'
+            || !Object.keys(gameSettings.customIndex.soundsIndex).length){
+            gameSettings.customIndex.soundsIndex = {};
+            }
+
+        // If a sounds index exists, use it to populate the internal effect sources and sprites index
+        //console.log('gameSettings.customIndex.soundsIndex =', gameSettings.customIndex.soundsIndex);
+        if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+            && Object.keys(gameSettings.customIndex.soundsIndex).length){
+            var soundsIndexIndex = gameSettings.customIndex.soundsIndex;
+            var rawSoundSources = soundsIndexIndex.src;
+            var soundSources = [];
+            for (var i = 0; i < rawSoundSources.length; i++){
+                var sourcePath = 'sounds/'+rawSoundSources[i];
+                var sourcePathFull = gameSettings.audioBaseHref+sourcePath;
+                soundSources.push(sourcePathFull);
+                }
+            var rawSoundSprites = soundsIndexIndex.sprite;
+            var soundSprites = {};
+            var soundSpritesTokens = [];
+            soundSpritesTokens = Object.keys(rawSoundSprites);
+            for (var i = 0; i < soundSpritesTokens.length; i++){
+                var spriteToken = soundSpritesTokens[i];
+                var spriteData = rawSoundSprites[spriteToken];
+                soundSprites[spriteToken] = [spriteData['start'], spriteData['duration'], spriteData['loop']];
+                }
+            gameSettings.soundEffectSources = soundSources;
+            gameSettings.soundEffectSprites = soundSprites;
+            //console.log('rawSoundSources = ', rawSoundSources);
+            //console.log('rawSoundSprites = ', rawSoundSprites);
+            //console.log('soundSources = ', soundSources);
+            //console.log('soundSprites = ', soundSprites);
+            //console.log('gameSettings.soundEffectSources = ', gameSettings.soundEffectSources);
+            //console.log('gameSettings.soundEffectSprites = ', gameSettings.soundEffectSprites);
+            }
+
+        }
 
     // Ensure this is the battle document
     if (gameWindow.length){
-
-        // Add click-events to the debug panel links
-        $('a.battle', gamePrototype).live('click', function(e){
-            var windowFrame = $('iframe', gameWindow);
-            var thisLink = $(this).attr('href');
-            if (windowFrame.attr('src') != 'about:blank'){
-                e.preventDefault();
-                var thisConfirm = 'Are you sure you want to switch battles?  Progress will be lost and all robots will be reset.';
-                if (confirm(thisConfirm)){
-                //if (true){
-                    windowFrame.attr('src', thisLink);
-                    return true;
-                    }
-                } else {
-                windowFrame.attr('src', thisLink);
-                return false;
-                }
-            });
+        //console.log('gameWindow exists!');
 
         // -- GAME MUSIC & AUDIO FUNCTIONS -- //
 
         // Set up the game music options
         if (gameMusic.length){
-
-            // Autmatically load the music index in json format via ajax into memory for later if not there
-            if (typeof gameSettings.customIndex.musicIndex === 'undefined'
-                || !Object.keys(gameSettings.customIndex.musicIndex).length){
-                gameSettings.customIndex.musicIndex = {};
-                //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
-                if (!Object.keys(gameSettings.customIndex.musicIndex).length){
-                    //console.log('loading the music index!');
-                    $.ajax({
-                        url: 'api/v2/music/index',
-                        dataType: 'json',
-                        success: function(response){
-                            //console.log('api/v2/music/index returned ', response);
-                            if (typeof response.data !== 'undefined'
-                                && typeof response.data.music !== 'undefined'){
-                                gameSettings.customIndex.musicIndex = response.data.music;
-                                //console.log('gameSettings.customIndex.musicIndex =', gameSettings.customIndex.musicIndex);
-                                }
-                            }
-                        });
-                    }
-                }
-
-            // Automatically define the sounds index to we don't get errors if it hasn't been defined
-            if (typeof gameSettings.customIndex.soundsIndex === 'undefined'
-                || !Object.keys(gameSettings.customIndex.soundsIndex).length){
-                gameSettings.customIndex.soundsIndex = {};
-                }
-
-            // If a sounds index exists, use it to populate the internal effect sources and sprites index
-            //console.log('gameSettings.customIndex.soundsIndex =', gameSettings.customIndex.soundsIndex);
-            if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
-                && Object.keys(gameSettings.customIndex.soundsIndex).length){
-                var soundsIndexIndex = gameSettings.customIndex.soundsIndex;
-                var rawSoundSources = soundsIndexIndex.src;
-                var soundSources = [];
-                for (var i = 0; i < rawSoundSources.length; i++){
-                    var sourcePath = 'sounds/'+rawSoundSources[i];
-                    var sourcePathFull = gameSettings.audioBaseHref+sourcePath;
-                    soundSources.push(sourcePathFull);
-                    }
-                var rawSoundSprites = soundsIndexIndex.sprite;
-                var soundSprites = {};
-                var soundSpritesTokens = [];
-                soundSpritesTokens = Object.keys(rawSoundSprites);
-                for (var i = 0; i < soundSpritesTokens.length; i++){
-                    var spriteToken = soundSpritesTokens[i];
-                    var spriteData = rawSoundSprites[spriteToken];
-                    soundSprites[spriteToken] = [spriteData['start'], spriteData['duration'], spriteData['loop']];
-                    }
-                gameSettings.soundEffectSources = soundSources;
-                gameSettings.soundEffectSprites = soundSprites;
-                //console.log('rawSoundSources = ', rawSoundSources);
-                //console.log('rawSoundSprites = ', rawSoundSprites);
-                //console.log('soundSources = ', soundSources);
-                //console.log('soundSprites = ', soundSprites);
-                }
-
 
             // Automatically load the title screen music
             mmrpg_music_load('misc/player-select', true, false);
@@ -426,8 +501,10 @@ $(document).ready(function(){
                         gameMusic.removeClass('onload');
                         gameMusic.find('.start').remove();
                         mmrpg_music_toggle();
-                        gameSettings.gameHasStarted = true;
-                        mmrpg_play_sound_effect('game-start');
+                        setTimeout(function(){ top.mmrpg_play_sound_effect('game-start'); }, 100);
+                        setTimeout(function(){ gameSettings.gameHasStarted = true; }, 200);
+                        let gameIframe = document.querySelector('#mmrpg iframe:not(.blank)');
+                        if (gameIframe){ gameIframe.focus(); if (gameIframe.contentWindow){ gameIframe.contentWindow.focus(); } }
                         if (gameSettings.onGameStart.length){
                             //console.log('gameSettings.onGameStart =', gameSettings.onGameStart);
                             while (gameSettings.onGameStart.length){
@@ -449,55 +526,12 @@ $(document).ready(function(){
 
     }
 
-
-    /*
-     * RENDER MODE TRIGGERS
-     */
-
-
-
-
     /*
      * BATTLE EVENTS
      */
 
     // Ensure this is the battle document
     if (gameEngine.length){
-
-        // Define a list of valid render modes we can use
-        //var allowedRenderModes = ['default', 'auto', 'smooth', 'pixelated', 'high-quality', 'crisp-edges'];
-        var allowedRenderModes = ['default', 'pixelated', 'crisp-edges'];
-
-        // Update the body to use the requested sprite rendering mode
-        //console.log('setting data-render-mode to ', gameSettings['spriteRenderMode']);
-        mmrpgBody.attr('data-render-mode', gameSettings['spriteRenderMode']);
-
-        // If a localStorage value has been set, load that instead
-        if (typeof window.localStorage !== 'undefined'){
-            var spriteRenderMode = window.localStorage.getItem('spriteRenderMode');
-            if (typeof spriteRenderMode !== 'undefined' && allowedRenderModes.indexOf(spriteRenderMode) !== -1){
-                gameSettings['spriteRenderMode'] = spriteRenderMode;
-            }
-        }
-
-        // Define a change event for whenever this game setting is altered
-        gameSettingsChangeEvents['spriteRenderMode'] = function(newValue){
-            //console.log('setting data-render-mode to ', newValue);
-            mmrpgBody.attr('data-render-mode', newValue);
-            if (typeof window.localStorage !== 'undefined'){
-                window.localStorage.setItem('spriteRenderMode', newValue);
-                }
-            var $actionButton = $('.button.action_option[data-panel="settings_spriteRenderMode"]', gameActions);
-            if ($actionButton.length){
-                var newValueTitle = newValue.replace('/\-/g', ' ').replace(/\b\w/g, function(l){ return l.toUpperCase() });
-                if (typeof gameSettings.customIndex.renderModes !== 'undefined'){
-                    var renderModesIndex = gameSettings.customIndex.renderModes;
-                    newValueTitle = renderModesIndex[newValue]['name'];
-                    }
-                $actionButton.find('.value').html(newValueTitle);
-                }
-            };
-        gameSettingsChangeEvents['spriteRenderMode'](gameSettings.spriteRenderMode);
 
         // Define a change event for whenever this game setting is altered
         gameSettingsChangeEvents['eventTimeout'] = function(newValue){
@@ -551,7 +585,7 @@ $(document).ready(function(){
         gameSettingsChangeEvents['eventCameraShift'](gameSettings.eventCameraShift);
 
         // Auto-highlight settings buttons that are "active"
-        var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade', 'spriteRenderMode'];
+        var settingsWithActiveStates = ['eventTimeout', 'eventCrossFade'];
         for (var i = 0; i < settingsWithActiveStates.length; i++){
             var settingsKey = settingsWithActiveStates[i];
             var settingsValue = gameSettings[settingsKey];
@@ -845,10 +879,10 @@ function windowResizeUpdate(updateType){
         } else {
         // Collect the parent window's width and height
         var windowType = 'child';
-        var windowWidth = $(parent.window).width();
-        var windowHeight = $(parent.window).height();
-        var gameWidth = parent.gameWindow.width();
-        var gameHeight = parent.gameWindow.height();
+        var windowWidth = $(top.window).width();
+        var windowHeight = $(top.window).height();
+        var gameWidth = top.gameWindow.width();
+        var gameHeight = top.gameWindow.height();
         }
 
     var bodyInnerHeight = mmrpgBody.innerHeight();
@@ -869,6 +903,14 @@ function windowResizeUpdate(updateType){
     //console.log('mmrpgBody.outerHeight() =', mmrpgBody.outerHeight());
     //console.log('gameSettings.currentBodyWidth =', gameSettings.currentBodyWidth);
     //console.log('gameSettings.currentBodyHeight =', gameSettings.currentBodyHeight);
+
+    if (gameSettings.currentBodyWidth >= 1120){
+        //console.log('wide mode is now active');
+        gameSettings.wideModeActive = true;
+    } else {
+        //console.log('wide mode is now disabled');
+        gameSettings.wideModeActive = false;
+    }
 
     //console.log({windowWidth:windowWidth,windowHeight:windowHeight,gameWidth:gameWidth,gameHeight:gameHeight,gameSettings:gameSettings});
 
@@ -900,7 +942,7 @@ function windowResizeUpdate(updateType){
         var gameConsoleWrapper = gameConsole.find('.wrapper');
         //gameConsoleWrapper.css({overflow:'scroll',width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 18)+'px'});
         gameConsoleWrapper.css({width:(gameConsole.width() + 18)+'px',height:(gameConsole.height() + 0)+'px'});
-        gameConsoleWrapper.perfectScrollbar(thisScrollbarSettings);
+        if (typeof $.fn.perfectScrollbar !== 'undefined'){ gameConsoleWrapper.perfectScrollbar(gameSettings.scrollbarSettings); }
         }
 
     // If height reszing is allowed, update the window height
@@ -914,7 +956,7 @@ function windowResizeUpdate(updateType){
     if (gameSettings.autoScrollTop === true && updateType != 'onscroll'){
         //console.log('gameSettings.autoScrollTop == true;\nwindow.scrollTo(0, 1);');
         window.scrollTo(0, 1);
-        if (window !== window.top){ parent.window.scrollTo(0, 1); }
+        if (window !== window.top){ top.window.scrollTo(0, 1); }
         }
 
 
@@ -929,557 +971,17 @@ function localFunction(myMessage){
     alert(myMessage);
 }
 
-// Define a function for randomly animating canvas robots (idle animation, background animation, more)
-var backgroundDirection = 'left';
-var canvasAnimationTimeout = false;
-var canvasAnimationCameraShift = false;
-var canvasAnimationCameraLastShift = false;
-var canvasAnimationCameraTimer = 0;
-var canvasAnimationCameraDelay = 5;
-function mmrpg_canvas_animate(){
-    //console.log('mmrpg_canvas_animate();');
-    //console.log('gameSettings.idleAnimation:', gameSettings.idleAnimation);
-    //console.log('canvasAnimationCameraTimer:', canvasAnimationCameraTimer, 'canvasAnimationCameraDelay:', canvasAnimationCameraDelay);
-    //clearTimeout(canvasAnimationTimeout);
-    clearInterval(canvasAnimationTimeout);
-    if (!gameSettings.idleAnimation){  return false; }
-
-    // Collect the current battle status and result
-    var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
-    var battleResult = $('input[name=this_battle_result]', gameEngine).val();
-
-
-    // Check to see if we should skip camera animations for any reason
-    var skipCameraShift = false;
-    var currentGameState = gameSettings.currentGameState;
-    var currentAction = currentGameState['this_action'];
-    var currentActionPanel = gameSettings.currentActionPanel;
-    //console.log({eventCameraShift:gameSettings.eventCameraShift,currentActionPanel:gameSettings.currentActionPanel,mmrpgEventsLength:mmrpgEvents.length});
-    //console.log('currentGameState:', currentGameState);
-    //console.log('currentAction:', currentAction);
-    //console.log('currentActionPanel:', currentActionPanel);
-    if (currentActionPanel === 'loading' && currentAction === 'start'){ skipCameraShift = true; }
-    //console.log('skipCameraShift:', skipCameraShift);
-
-    // If the camera is not yet shifted, checked to see if we randomly should
-    if (!skipCameraShift
-        && gameSettings.eventCameraShift
-        && !mmrpgEvents.length){
-
-        // Increment the camera shift timer and, when ready, trigger some motion
-        //console.log('canvasAnimationCameraTimer = ', canvasAnimationCameraTimer);
-        var canvasAnimationCameraTimerMax = canvasAnimationCameraDelay;
-        if (battleStatus == 'complete'){ canvasAnimationCameraTimerMax = Math.ceil(canvasAnimationCameraTimerMax / 2); }
-        if (!canvasAnimationCameraShift
-            && canvasAnimationCameraTimer >= canvasAnimationCameraTimerMax){
-            var shiftRandom = Math.floor(Math.random() * 100);
-            if (shiftRandom <= 33){
-                var lastShift = canvasAnimationCameraLastShift;
-                if (typeof lastShift.shift !== 'undefined'){ var shiftDirection = lastShift.shift !== 'left' ? 'left' : 'right'; }
-                else { var shiftDirection = (shiftRandom % 2 === 0 ? 'left' : 'right'); }
-                var focusRandom = Math.floor(Math.random() * 100);
-                var depthRandom = Math.floor(Math.random() * 100);
-                canvasAnimationCameraShift = {
-                    shift: shiftDirection,
-                    focus: (focusRandom % 3 === 0 ? 'bench' : 'active'),
-                    depth: (depthRandom % 2 === 0 ? 0 : 8),
-                    depthInc: (depthRandom % 2 === 0 ? 1 : -1),
-                    offset: 0,
-                    };
-                if (battleStatus == 'complete'){
-                    if (battleResult == 'victory'){ canvasAnimationCameraShift.shift = 'left'; }
-                    else if (battleResult == 'defeat'){ canvasAnimationCameraShift.shift = 'right'; }
-                    }
-                canvasAnimationCameraTimer = 0;
-                canvasAnimationCameraLastShift = canvasAnimationCameraShift;
-                //console.log('canvasAnimationCameraShift:', canvasAnimationCameraShift);
-                }
-            }
-
-        // If the camera is currently being shifted, we need to animate that
-        if (canvasAnimationCameraShift){
-            canvasAnimationCameraShift.depth += canvasAnimationCameraShift.depthInc;
-            if (canvasAnimationCameraShift.depth > 8
-                || canvasAnimationCameraShift.depth < 1){
-                canvasAnimationCameraShift = false;
-                updateCameraShiftTransitionTiming();
-                updateCameraShiftTransitionDuration();
-                mmrpg_canvas_camera_shift();
-                } else {
-                mmrpg_canvas_camera_shift(
-                    canvasAnimationCameraShift.shift,
-                    canvasAnimationCameraShift.focus,
-                    canvasAnimationCameraShift.depth,
-                    canvasAnimationCameraShift.offset
-                    );
-                updateCameraShiftTransitionTiming('linear');
-                updateCameraShiftTransitionDuration(1);
-                }
-            } else {
-            canvasAnimationCameraTimer++;
-            }
-
-        } else {
-
-        // We should not be animating now
-        canvasAnimationCameraShift = false;
-
-        }
-
-    // Loop through all field layers on the canvas
-    $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
-        // Trigger an animation frame change for this field
-        var thisField = $(this);
-        mmrpg_canvas_field_frame(thisField, '');
-        });
-
-    // Loop through all field sprites on the canvas
-    $('.sprite[data-animate]', gameCanvas).each(function(){
-        // Trigger an animation frame change for this field
-        var thisSprite = $(this);
-        var thisType = thisSprite.attr('data-type');
-        // Call the animation function based on sprite type
-        if (thisType == 'attachment'){
-            if (thisSprite.attr('data-status') != 'disabled' || thisSprite.attr('data-direction') == 'right'){
-                mmrpg_canvas_attachment_frame(thisSprite, '');
-            } else {
-            //alert('sprite is disabled');
-            // Fade this sprite off-screen
-            //thisSprite.animate({opacity:0},1000,'linear',function(){ $(this).remove(); });
-            var spriteKind = thisSprite.attr('data-type');
-            var spriteID = thisSprite.attr('data-'+spriteKind+'id');
-            //alert('sprite kind is '+spriteKind+' and its ID is '+spriteID);
-            var shadowSprite = $('.sprite[data-shadowid='+spriteID+']', gameCanvas);
-            //var detailsSprite = $('.sprite[data-detailsid='+spriteID+']', gameCanvas);
-            //var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
-            //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                //console.log('normal animation');
-                // We're at a normal speed, so we can animate normally
-                thisSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){
-                    $(this).remove();
-                    if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},Math.ceil(gameSettings.eventTimeout / 2),'linear',function(){ $(this).remove(); }); }
-                    });
-                } else {
-                //console.log('speedy animation');
-                // We're at a super-fast speed, so we should NOT cross-fade
-                thisSprite.stop(true, true).remove();
-                if (shadowSprite.length){ shadowSprite.stop(true, true).remove(); }
-                }
-            }
-        }
-
-        });
-
-
-    // Loop through all players on the field
-    $('.sprite[data-type="player"]', gameCanvas).each(function(){
-
-        // Collect a reference to the current player
-        var thisPlayer = $(this);
-        // Generate a random number
-        var thisRandom = Math.floor(Math.random() * 100);
-        // Default the new frame to base
-        var newFrame = 'base';
-        var extraStyles = {};
-        // Define the relative battle result
-        var relativeResult = 'pending';
-        if (battleStatus == 'complete'){
-            relativeResult = thisPlayer.attr('data-direction') == 'right' ? (battleResult) : (battleResult == 'victory' ? 'defeat' : 'victory');
-            }
-        // If the there are no more events to display
-        if (!mmrpgEvents.length){
-            // If the player has been defeated, only show one frame, otherwise randomize
-            if (relativeResult == 'defeat'){
-                // Defeault to the defeat frame
-                newFrame = 'defeat';
-                } else {
-                // Higher animation freqency if not active
-                if (thisPlayer.attr('data-position') != 'active'){
-                    if (battleStatus == 'complete' && thisRandom >= 50){
-                        newFrame = relativeResult;
-                        } else if (thisRandom >= 80){
-                        newFrame = 'taunt';
-                        } else if (thisRandom >= 60){
-                        newFrame = 'base2';
-                        }
-                    } else {
-                    if (battleStatus == 'complete' && thisRandom >= 50){
-                        newFrame = relativeResult;
-                        } else if (thisRandom >= 80){
-                        newFrame = 'taunt';
-                        } else if (thisRandom >= 60){
-                        newFrame = 'base2';
-                        }
-                    }
-                }
-            // Check to see if we should be applying any extra styles
-            //console.log('gameSettings.currentActionPanel =', gameSettings.currentActionPanel);
-            if (typeof gameSettings.customFlags.isSwitching === 'undefined'){
-                gameSettings.customFlags.isSwitching = false;
-                }
-            if (gameSettings.currentActionPanel === 'switch'){
-                gameSettings.customFlags.isSwitching = true;
-                extraStyles = {transform: 'scaleX(-1) translateX(-10%)'};
-                }
-            else if (gameSettings.customFlags.isSwitching === true) {
-                gameSettings.customFlags.isSwitching = false;
-                extraStyles = {transform: ''};
-                }
-            else {
-                if (newFrame !== 'base' && thisRandom % 11 === 0){ extraStyles = {transform: 'scaleX(-1) translateX(-10%)'}; }
-                else if (thisRandom % 3 === 0){ extraStyles = {transform: ''}; }
-                }
-            }
-
-        // Trigger the player frame advancement
-        //console.log('thisRandom:', thisRandom, 'newFrame:', newFrame, 'extraStyles:', extraStyles);
-        mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles);
-
-        });
-
-
-    // Loop through all robots on the field
-    $('.sprite[data-type="robot"]', gameCanvas).each(function(){
-
-        // Collect a reference to the current robot
-        var thisRobot = $(this);
-        // Ensure the robot has not been disabled
-        if (thisRobot.attr('data-status') != 'disabled'){
-            // Generate a random number
-            var shiftChance = Math.floor(Math.random() * 100);
-            var thisRandom = Math.floor(Math.random() * 100);
-            //console.log('shiftChance =', shiftChance);
-            // Default the new frame to base
-            var newFrame = 'base';
-            var currentFrame = thisRobot.attr('data-frame');
-            // Define the relative battle result
-            var relativeResult = 'pending';
-            if (battleStatus == 'complete'){
-                relativeResult = thisRobot.attr('data-direction') == 'right' ? (battleResult) : (battleResult == 'victory' ? 'defeat' : 'victory');
-                }
-            // If the there are no more events to display
-            if (!mmrpgEvents.length){
-                // If the player has been defeated, only show one frame, otherwise randomize
-                if (relativeResult == 'defeat'){
-                    // Defeault to the defeat frame
-                    newFrame = 'defeat';
-                    } else {
-                    // Only change to an action frame if currently base
-                    if (currentFrame == 'base'){
-                        // Animation freqency based on position
-                        if (thisRobot.attr('data-position') != 'active'){
-                            // Higher animation freqency if not active (BENCH)
-                            if (battleStatus == 'complete' && shiftChance >= 90){
-                                newFrame = relativeResult;
-                                } else if (thisRandom >= 80){
-                                newFrame = 'base2';
-                                } else if (thisRandom >= 50){
-                                newFrame = 'taunt';
-                                } else if (thisRandom >= 40){
-                                newFrame = 'defend';
-                                }
-                            } else {
-                            // Lower animation freqency if active (ACTIVE)
-                            if (battleStatus == 'complete' && shiftChance >= 80){
-                                newFrame = relativeResult;
-                                } else if (thisRandom >= 90){
-                                newFrame = 'base2';
-                                } else if (thisRandom >= 30){
-                                newFrame = 'defend';
-                                } else if (thisRandom >= 20){
-                                newFrame = 'taunt';
-                                }
-                            }
-                        }
-                    }
-                }
-            // Trigger the robot frame advancement
-            mmrpg_canvas_robot_frame(thisRobot, newFrame);
-            var spriteKind = thisRobot.attr('data-type');
-            var spriteID = thisRobot.attr('data-'+spriteKind+'id');
-            var shadowSprite = $('.sprite[data-shadowid='+spriteID+']', gameCanvas);
-            if (shadowSprite.length){ mmrpg_canvas_robot_frame(shadowSprite, newFrame);  }
-
-            }
-        else if (thisRobot.attr('data-status') == 'disabled' && thisRobot.attr('data-direction') == 'right'){
-
-            // Default the new frame to base
-            //var newFrame = 'base';
-            // Trigger the robot frame advancement
-            //mmrpg_canvas_robot_frame(thisRobot, newFrame);
-
-            }
-        else {
-
-            //alert('robot is disabled');
-            // Fade this robot off-screen
-            var spriteKind = thisRobot.attr('data-type');
-            var spriteID = thisRobot.attr('data-'+spriteKind+'id');
-            //alert('sprite kind is '+spriteKind+' and its ID is '+spriteID);
-            var shadowSprite = $('.sprite[data-shadowid='+spriteID+']', gameCanvas);
-            var detailsSprite = $('.sprite[data-detailsid='+spriteID+']', gameCanvas);
-            var mugshotSprite = $('.sprite[data-mugshotid='+spriteID+']', gameCanvas);
-            //alert('Shadowsprite '+(shadowSprite.length ? 'exists' : 'does not exist')+'!');
-            thisRobot.stop(true, true).animate({opacity:0},1000,'linear',function(){
-                $(this).remove();
-                if (shadowSprite.length){ shadowSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-                if (detailsSprite.length){ detailsSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-                if (mugshotSprite.length){ mugshotSprite.stop(true, true).animate({opacity:0},1000,'linear',function(){ $(this).remove(); }); }
-                });
-
-            }
-
-        });
-
-    // Reset the timeout event for another animation round
-    if (canvasAnimationTimeout != false){ window.clearTimeout(canvasAnimationTimeout); }
-    if (!canvasAnimationTimeout.length){
-        requestAnimationFrame(function(){
-            canvasAnimationTimeout = window.setTimeout(function(){
-                //console.log('mmrpg_canvas_animate');
-                mmrpg_canvas_animate(); // DEBUG PAUSE
-                }, gameSettings.eventTimeout);
-            });
-        }
-    // Return true for good measure
-    return true;
-}
-
-// Define a function for updating a fields's frame with animation
-function mmrpg_canvas_field_frame(thisField, newFrame){
-    // Generate a new frame if one was not provided
-    if (newFrame == ''){
-        // Collect a reference to the current field data
-        var thisFieldFrame = thisField.attr('data-frame');
-        var thisAnimateFrame = thisField.attr('data-animate').split(',');
-        var thisAnimateFrameCount = thisAnimateFrame.length;
-        // Default the new frame to base
-        if (thisAnimateFrameCount > 1){
-            var thisIndex = thisAnimateFrame.indexOf(thisFieldFrame);
-            if ((thisIndex + 1) < thisAnimateFrameCount){
-                var newFrame = thisAnimateFrame[thisIndex + 1];
-                } else {
-                var newFrame = thisAnimateFrame[0];
-                }
-        } else {
-            var newFrame = thisAnimateFrame[0];
-        }
-    }
-    // Collect this field's data fields (hehe)
-    var thisFrame = thisField.attr('data-frame');
-    // If the new frame is the same as the current, return
-    if (thisFrame == newFrame || thisField.is(':animated')){ return false; }
-    // Define the current class (based on data) and the new class
-    var fieldLayer = thisField.hasClass('background') ? 'background' : 'foreground';
-    var currentClass = fieldLayer+'_'+thisFrame;
-    var newClass = fieldLayer+'_'+newFrame;
-    // Check to make sure event crossfade is enabled
-    if (gameSettings.eventCrossFade == true){
-        // Create a clone object with the new class and crossfade it into view
-        var cloneField = thisField.clone().css('z-index', '10').appendTo(thisField.parent());
-        thisField.stop(true, true).css({opacity:0}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-        thisField.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout * 0.5),easing:'swing',queue:false});
-        cloneField.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout * 0.5),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
-        } else {
-        // Update the existing sprite's frame without crossfade by swapping the classsa
-        thisField.attr('data-frame', newFrame).stop(true, true).removeClass(currentClass).addClass(newClass);
-        }
-    // Return true on success
-    return true;
-}
-
-// Define the sprite frame index
-var spriteFrameIndex = {};
-
-// Define a function for updating a robot's frame with animation
-spriteFrameIndex.robots = ['base','taunt','victory','defeat','shoot','throw','summon','slide','defend','damage','base2'];
-function mmrpg_canvas_robot_frame(thisRobot, newFrame){
-    // Collect this robot's data fields
-    var thisSize = thisRobot.attr('data-size');
-    var thisPosition = thisRobot.attr('data-position');
-    var thisDirection = thisRobot.attr('data-direction');
-    var thisStatus = thisRobot.attr('data-status');
-    var thisKey = parseInt(thisRobot.attr('data-key'));
-    var thisFrame = thisRobot.attr('data-frame');
-    var isShadow = thisRobot.attr('data-shadowid') != undefined ? true : false;
-    var newFramePosition = spriteFrameIndex.robots.indexOf(newFrame) || 0;
-    // If the new frame is the same as the current, return
-    if (thisFrame == newFrame){ return false; }
-    // If this robot is disabled, do not animate
-    if (thisStatus == 'disabled'){
-        //thisRobot.animate({opacity:0},1000,'swing',function(){ $(this).remove(); });
-        return false;
-        }
-    // Define the current class (based on data) and the new class
-    var currentClass = 'sprite_'+thisSize+'x'+thisSize+'_'+thisFrame;
-    var newClass = 'sprite_'+thisSize+'x'+thisSize+'_'+newFrame;
-    // Define the new background offset for the frame
-    var backgroundOffset = -1 * Math.ceil(newFramePosition * thisSize);
-    //alert('backgroundOffset = '+backgroundOffset);
-    // Stop this robot from animating further
-    thisRobot.stop(true, true);
-    // Check to make sure event crossfade is enabled
-    if (gameSettings.eventCrossFade == true){
-        // Create a clone object with the new class and crossfade it into view
-        var cloneRobot = thisRobot.clone().css('z-index', '-=1').appendTo(thisRobot.parent());
-        thisRobot.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-        thisRobot.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
-        cloneRobot.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
-        /*
-        // Maybe play a sound effect if allowed and frame is correct?
-        // No I hate it now, this can't work until everyone's movements
-        // are independent of the event timer and more organic sounding
-        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
-            if (newFrame === 'defend' || newFrame === 'taunt'){
-                if (thisPosition === 'bench'){
-                    var delay = 100 + (thisKey + 50);
-                    setTimeout(function(){ top.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}, false); }, delay);
-                    } else {
-                    top.mmrpg_play_sound_effect('defend-sound', {volume: 0.1}, false);
-                    }
-                }
-            }
-        */
-        } else {
-        // Update the existing sprite's frame without crossfade by swapping the classsa
-        thisRobot.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-        }
-    // Return true on success
-    return true;
-}
-// DEBUG
-//function mmrpg_canvas_robot_frame_
-
-// Define a function for updating a player's frame with animation
-spriteFrameIndex.players = ['base','taunt','victory','defeat','command','damage','base2'];
-function mmrpg_canvas_player_frame(thisPlayer, newFrame, extraStyles){
-    // Collect this player's data fields
-    var thisSize = thisPlayer.attr('data-size');
-    var thisPosition = thisPlayer.attr('data-position');
-    var thisDirection = thisPlayer.attr('data-direction');
-    var thisStatus = thisPlayer.attr('data-status');
-    var thisFrame = thisPlayer.attr('data-frame');
-    var newFramePosition = spriteFrameIndex.players.indexOf(newFrame) || 0;
-    if (typeof extraStyles !== 'object' || !extraStyles){ extraStyles = false; }
-    //if (true){ alert(newFrame+' : '+newFramePosition); }
-    // If the new frame is the same as the current, return
-    if (thisFrame == newFrame){ return false; }
-    // If this player is disabled, do not animate
-    if (thisStatus == 'disabled'){ return false; }
-    // Define the current class (based on data) and the new class
-    var currentClass = 'sprite_'+thisSize+'x'+thisSize+'_'+thisFrame;
-    var newClass = 'sprite_'+thisSize+'x'+thisSize+'_'+newFrame;
-    // Define the new background offset for the frame
-    var backgroundOffset = -1 * Math.ceil(newFramePosition * thisSize);
-    //if (backgroundOffset > 0){ alert('newFrame : '+newFrame+', newFramePosition : '+newFramePosition+', backgroundOffset : '+backgroundOffset+''); }
-    // Check to make sure event crossfade is enabled
-    if (gameSettings.eventCrossFade == true){
-        // Create a clone object with the new class and crossfade it into view
-        var clonePlayer = thisPlayer.clone().css('z-index', '-=1').appendTo(thisPlayer.parent());
-        thisPlayer.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-        if (extraStyles){ thisPlayer.css(extraStyles); }
-        thisPlayer.stop(true, true).animate({opacity:1}, {duration:400,easing:'swing',queue:false});
-        clonePlayer.stop(true, true).animate({opacity:0}, {duration:400,easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
-        } else {
-        // Update the existing sprite's frame without crossfade by swapping the classsa
-        thisPlayer.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).removeClass(currentClass).addClass(newClass);
-        if (extraStyles){ thisPlayer.css(extraStyles); }
-        }
-    // Return true on success
-    return true;
-}
-
-// Define a function for updating an attachment's frame with animation
-spriteFrameIndex.attachments = ['00','01','02','03','04','05','06','07','08','09', '10'];
-function mmrpg_canvas_attachment_frame(thisAttachment, newFrame){
-    // If the newFrame or newIndex are empty
-    if (newFrame === ''){
-        // Collect a reference to the current attachment properties
-        var thisAttachmentFloat = thisAttachment.attr('data-direction') == 'left' ? 'right' : 'left';
-        var thisAttachmentFrame = thisAttachment.attr('data-frame');
-        var thisAnimateFrame = thisAttachment.attr('data-animate').split(',');
-        var thisAnimateFrameShift = thisAttachment.attr('data-animate-shift') != undefined ? thisAttachment.attr('data-animate-shift').split('|') : false;
-        var thisAnimateFrameIndex = thisAttachment.attr('data-animate-index') != undefined ? parseInt(thisAttachment.attr('data-animate-index')) : 0;
-        var thisAnimateFrameCount = thisAnimateFrame.length;
-        // Default the new frame to base
-        var newIndex = 0;
-        var newFrame = thisAnimateFrame[newIndex];
-        if (thisAnimateFrameCount > 1 && (thisAnimateFrameIndex + 1) < thisAnimateFrameCount){
-            newIndex = thisAnimateFrameIndex + 1;
-            newFrame = thisAnimateFrame[newIndex];
-            }
-        var newFrameShift = thisAnimateFrameShift.length ? thisAnimateFrameShift[newIndex] : thisAttachment.css(thisAttachmentFloat)+','+thisAttachment.css('bottom');
-        newFrameShift = newFrameShift.split(',');
-        var newFrameShiftX = newFrameShift[0]+'px';
-        var newFrameShiftY = newFrameShift[1]+'px';
-        }
-
-    // DEBUG
-    // If there was a frame shift defined
-    if (false && thisAnimateFrameShift){
-        // DEBUG
-        //console.log('ID = '+thisAttachment.attr('data-id'));
-        //console.log('newIndex = '+newIndex);
-        //console.log('newFrame = '+newFrame);
-        //console.log('newFrameShiftX = '+newFrameShiftX);
-        //console.log('newFrameShiftY = '+newFrameShiftY);
-        }
-
-
-    // Collect this robot's data fields
-    var thisSize = thisAttachment.attr('data-size');
-    //var thisPosition = thisAttachment.attr('data-position');
-    var thisDirection = thisAttachment.attr('data-direction');
-    var thisFloat = thisDirection == 'left' ? 'right' : 'left';
-    var thisFrame = thisAttachment.attr('data-frame');
-    var thisPosition = thisAttachment.attr('data-position');
-    var thisIndex = thisAttachment.attr('data-animate-index');
-    //console.log('checkpoint1');
-    // If the new frame is the same as the current, return
-    if (thisFrame == newFrame && thisIndex == newIndex && !thisAnimateFrameShift){ return false; }
-    // Define the new frame position in the index
-    var newFramePosition = spriteFrameIndex.attachments.indexOf(newFrame) || 0;
-    // Define the new background offset for the frame
-    var backgroundOffset = -1 * Math.ceil(newFramePosition * thisSize);
-    // Define the current class (based on data) and the new class
-    var currentClass = 'sprite_'+thisSize+'x'+thisSize+'_'+thisFrame;
-    var newClass = 'sprite_'+thisSize+'x'+thisSize+'_'+newFrame;
-    //console.log('checkpoint2');
-    // If the frame has changed, animate to the next image, otherwise just update properties
-    if (thisFrame != newFrame || thisAnimateFrameShift){
-        //console.log('checkpoint3');
-        // Check to make sure event crossfade is enabled
-        if ((thisPosition != 'background' && thisPosition != 'foreground') && gameSettings.eventCrossFade == true){
-            // Create a clone object with the new class and crossfade it into view
-            var cloneAttachment = thisAttachment.clone().css('z-index', '-=1').appendTo(thisAttachment.parent());
-            thisAttachment.stop(true, true).css({opacity:0,backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).attr('data-animate-index', newIndex).removeClass(currentClass).addClass(newClass);
-            // If the frame's offsets have changed, update the css offsets
-            if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
-            // Fade this attachment back into view and fade the cloned attachment in the old frame out
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                // We're at a normal speed, so we can animate normally
-                thisAttachment.stop(true, true).animate({opacity:1}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false});
-                cloneAttachment.stop(true, true).animate({opacity:0}, {duration:Math.ceil(gameSettings.eventTimeout / 2),easing:'swing',queue:false,complete:function(){ $(this).remove(); }});
-                } else {
-                // We're at a super-fast speed, so we should NOT cross-fade
-                thisAttachment.stop(true, true).css({opacity:1});
-                cloneAttachment.stop(true, true).remove();
-                }
-            } else {
-            // If the frame's offsets have changed, update the css offsets
-            if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
-            // Update the existing sprite's frame without crossfade by swapping the classsa
-            thisAttachment.stop(true, true).css({backgroundPosition:backgroundOffset+'px 0'}).attr('data-frame', newFrame).attr('data-animate-index', newIndex).removeClass(currentClass).addClass(newClass);
-            }
-    }  else {
-        // If the frame's offsets have changed, update the css offsets
-        if (thisAnimateFrameShift){ thisAttachment.stop(true, true).css(thisFloat, newFrameShiftX).css('bottom', newFrameShiftY); }
-        // Simply update the parameters on this sprite frame
-        thisAttachment.attr('data-animate-index', newIndex);
-    }
-    // Return true on success
-    return true;
+// Define a function for quickly checking if cross-fade is currently enabled by the user
+function mmrpg_cross_fade_enabled(){
+    let eventCrossFadeEnabled = gameSettings.eventCrossFade === true ? true : false;
+    let eventTimeoutAboveThreshold = gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold ? true : false;
+    if (!eventTimeoutAboveThreshold){ eventCrossFadeEnabled = false; }
+    //console.log('gameSettings.eventCrossFade = ', gameSettings.eventCrossFade);
+    //console.log('gameSettings.eventTimeout = ', gameSettings.eventTimeout);
+    //console.log('gameSettings.eventTimeoutThreshold = ', gameSettings.eventTimeoutThreshold);
+    //console.log('eventTimeoutAboveThreshold = ', eventTimeoutAboveThreshold);
+    //console.log('eventCrossFadeEnabled = ', eventCrossFadeEnabled);
+    return eventCrossFadeEnabled;
 }
 
 // Define a function for triggering an action submit
@@ -1756,578 +1258,6 @@ function mmrpg_preload_misc_image(thisImageURL, includeCacheTime){
     }
 }
 
-// Define a function for updating the engine form
-function mmrpg_engine_update(newValues){
-    if (gameEngine.length){
-        // Loop through the game engine values and update them
-        for (var thisName in newValues){
-            var thisValue = newValues[thisName];
-            // Update the value in the global settings object
-            gameSettings.currentGameState[thisName] = thisValue;
-            // And then also update it in the DOM for form submission
-            if ($('input[name='+thisName+']', gameEngine).length){
-                $('input[name='+thisName+']', gameEngine).val(thisValue);
-                } else {
-                gameEngine.append('<input type="hidden" class="hidden" name="'+thisName+'" value="'+thisValue+'" />');
-                }
-            }
-        }
-}
-
-// Define a function for switching to a different action panel
-function mmrpg_action_panel(thisPanel, currentPanel){
-
-    // Update the current panel in the game settings for reference
-    gameSettings.currentActionPanel = thisPanel;
-
-    // Switch to the event actions panel
-    $('.wrapper', gameActions).css({display:'none'});
-    var newWrapper = $('#actions_'+thisPanel, gameActions);
-    if (currentPanel != undefined){
-        newWrapper.find('.action_back').attr('data-panel', currentPanel);
-        var newWrapperTitle = newWrapper.find('.main_actions_title');
-        if (newWrapperTitle.length){ newWrapperTitle.html(newWrapperTitle.html().replace('{thisPanel}', currentPanel)); }
-        //alert('thisPanel = '+thisPanel+'; currentPanel = '+currentPanel);
-        }
-
-    // Unhide the new wrapper
-    newWrapper.css({display:''});
-
-    // If the new action panel has numbered links in the title
-    var mainActionsTitle = $('.main_actions_title', newWrapper);
-    var floatLinkContainer = $('.float_links', mainActionsTitle);
-    if (floatLinkContainer.length){
-
-        // Collect the parent wraper ID and generate the option class name
-        var parentActionsWrapper = floatLinkContainer.closest('#actions > .wrapper');
-        var actionWrapperID = parentActionsWrapper.attr('id');
-        var optionClass = actionWrapperID.replace(/^actions_/, 'action_');
-
-        // Assign events to any of the page links here
-        $('.num[href]', floatLinkContainer).click(function(e){
-            e.preventDefault();
-
-            // Collect references to this link and number
-            var thisLink = $(this);
-            var thisNum = parseInt(thisLink.attr('href').replace(/^#/, ''));
-
-            // If this this panel is disabled, prevent clicking but only the first link
-            //if (thisNum > 1 && mainActionsTitle.hasClass('main_actions_title_disabled')){ return false; }
-            //console.log('num link '+thisNum+' clicked!');
-
-            // Remove the active class from other links and add to this one
-            $('.num', floatLinkContainer).removeClass('active');
-            thisLink.addClass('active');
-
-            // Define the key of the first and last element to be shown
-            var lastElementKey = thisNum * 8;
-            var firstElementKey = lastElementKey - 8;
-            //console.log('first key should be '+firstElementKey+' and last should be '+lastElementKey+'!');
-
-            // Hide all item buttons in the current view and then show only relevant
-            $('.'+optionClass, newWrapper).css({display:'none'});
-            var activeButtons = $('.'+optionClass, newWrapper).slice(firstElementKey, lastElementKey);
-            //console.log('we have selected a total of '+activeButtons.length+' elements');
-            activeButtons.css({display:'block'});
-
-            // Loop through the active buttons and update their order values
-            var tempOrder = 1;
-            activeButtons.each(function(){ $(this).attr('data-order', tempOrder); tempOrder++; });
-            $('.action_back', newWrapper).attr('data-order', tempOrder);
-
-            // Update the session with the last page click
-            //var thisRequestType = 'session';
-            //var thisRequestData = 'battle_settings,'+optionClass+'_page_num,'+thisNum;
-            //$.post('scripts/script.php',{requestType:thisRequestType,requestData:thisRequestData});
-            //(disabled for now)
-
-            // Return true on success
-            return true;
-
-            });
-
-        var activeLink = $('.active', floatLinkContainer);
-        var firstLink = $('.num', floatLinkContainer).first();
-        if (activeLink.length){ activeLink.trigger('click'); }
-        else if (firstLink.length){ firstLink.trigger('click'); }
-
-        }
-
-    // If there are buttons in the new wrapper
-    var hoverButton = $('.button_hover', newWrapper);
-    var currentButtons = $('.button:not(.button_disabled)', newWrapper).not('.main_actions_title .button');
-    var currentButtonCount = currentButtons.length;
-    if (currentButtonCount > 0 && !hoverButton.length){
-        var firstButton = currentButtons.first();
-        var firstButtonOrder = firstButton.attr('data-order') != undefined ? parseInt(firstButton.attr('data-order')) : 0;
-        if (firstButton.length){ firstButton.addClass('button_hover'); }
-    }
-
-}
-
-// Define an extension of the string prototype to handle replace all
-String.prototype.replaceAll = function(search, replace) {
-        if (replace === undefined) { return this.toString(); }
-        return this.replace(new RegExp(search, 'g'), replace);
-        //return this.split(search).join(replace);
-}
-
-// Define a function for updating an action panel's markup
-var actionPanelCache = [];
-function mmrpg_action_panel_update(thisPanel, thisMarkup){
-    // Update the requested panel with the supplied markup
-    //console.log('mmrpg_action_panel_update('+thisPanel+', [thisMarkup])');
-    var thisActionPanel = $('#actions_'+thisPanel, gameActions);
-    thisActionPanel.empty().html(thisMarkup);
-    // Search for any sprites in this panel's markup
-    $('.sprite', thisActionPanel).each(function(){
-        var thisBackground = $(this).css('background-image').replace(/^url\("?(.*?)"?\)$/i, '$1');
-        if (thisBackground != 'none'){
-            var cacheImage = document.createElement('img');
-            cacheImage.src = thisBackground;
-            actionPanelCache.push(cacheImage)
-            }
-        });
-}
-
-// Define a global variable for holding events
-var mmrpgEvents = [];
-// Define a function for queueing up an event
-function mmrpg_event(flagsMarkup, dataMarkup, canvasMarkup, consoleMarkup){
-    if (flagsMarkup.length){ flagsMarkup = $.parseJSON(flagsMarkup); }
-    else { flagsMarkup = {}; }
-    if (dataMarkup.length){ dataMarkup = $.parseJSON(dataMarkup); }
-    else { dataMarkup = {}; }
-    mmrpgEvents.push({
-        'event_functions' : function(eventFlags){
-            if (dataMarkup.length){
-                //dataMarkup = $.parseJSON(dataMarkup);
-                /*
-                mmrpg_canvas_update(
-                    dataMarkup.this_battle,
-                    dataMarkup.this_field,
-                    dataMarkup.this_player,
-                    dataMarkup.this_robot,
-                    dataMarkup.target_player,
-                    dataMarkup.target_robot
-                    );
-                */
-                }
-            if (canvasMarkup.length){
-                mmrpg_canvas_event(canvasMarkup, eventFlags); //, flagsMarkup
-                }
-            if (consoleMarkup.length){
-                mmrpg_console_event(consoleMarkup, eventFlags);  //, flagsMarkup
-                }
-            },
-        'event_flags' : flagsMarkup //$.parseJSON(flagsMarkup)
-            });
-    //console.log('mmrpgEvents.push() w/ new size', mmrpgEvents.length);
-}
-// Define a function for playing the events
-var eventAlreadyQueued = false;
-var battleResultsDisplayed = false;
-function mmrpg_events(){
-
-    if (eventAlreadyQueued){ return; }
-
-    //console.log('mmrpg_events()');
-    //clearTimeout(canvasAnimationTimeout);
-    clearInterval(canvasAnimationTimeout);
-    canvasAnimationCameraTimer = 0;
-    updateCameraShiftTransitionTiming();
-    updateCameraShiftTransitionDuration();
-
-    var thisEvent = false;
-    if (mmrpgEvents.length){
-        //console.log('mmrpgEvents.length =', mmrpgEvents.length);
-        // Switch to the events panel
-        mmrpg_action_panel('event');
-        // Collect the topmost event and execute it
-        thisEvent = mmrpgEvents.shift();
-        thisEvent.event_functions(thisEvent.event_flags);
-        // Loop through eventhooks functions if there are any in gameSettings.eventHooks and process them with this event
-        if (gameSettings.eventHooks.length){
-            $.each(gameSettings.eventHooks, function(){
-                var thisEventHook = this;
-                if (typeof thisEventHook == 'function'){ thisEventHook(thisEvent.event_flags); }
-                });
-            }
-        }
-
-    if (mmrpgEvents.length < 1){
-        // Assuming we're allowed to use camera stuff, reset the camera if it's not already
-        if (gameSettings.eventCameraShift){
-            //console.log('events are done, reset the camera');
-            mmrpg_canvas_camera_shift();
-        }
-        // Switch to the specified "next" action
-        var nextAction = $('input[name=next_action]', gameEngine).val();
-        if (nextAction.length){ mmrpg_action_panel(nextAction); }
-        // Add the idle class to the robot details on-screen
-        //console.log('adding robot details class....1');
-        //$('.robot_details', gameCanvas).css('opacity', 0.9).addClass('robot_details_idle');
-        // Start animating the canvas randomly
-        mmrpg_canvas_animate();
-        } else if (mmrpgEvents.length >= 1){
-            var autoClickTimer = false;
-            if (gameSettings.eventAutoPlay && thisEvent.event_flags.autoplay != false){
-                //console.log('queue next event');
-                eventAlreadyQueued = true;
-                clearTimeout(autoClickTimer);
-                autoClickTimer = setTimeout(function(){
-                    requestAnimationFrame(function(){
-                        //console.log('fire next event');
-                        eventAlreadyQueued = false;
-                        mmrpg_events();
-                        });
-                    }, parseInt(gameSettings.eventTimeout));
-                $('a[data-action="continue"]').addClass('button_disabled');
-                } else {
-                $('a[data-action="continue"]').removeClass('button_disabled');
-                }
-            $('a[data-action="continue"]').click(function(){
-                if (autoClickTimer !== false){
-                    clearTimeout(autoClickTimer);
-                    autoClickTimer = false;
-                    }
-                });
-        }
-
-    // Collect the current battle status and result
-    var battleStatus = $('input[name=this_battle_status]', gameEngine).val();
-    var battleResult = $('input[name=this_battle_result]', gameEngine).val();
-
-    // Check for specific value triggers and execute events
-    if (battleStatus == 'complete'
-        && battleResultsDisplayed === false){
-        //console.log('checkpoint | battleStatus='+battleStatus+' battleResult='+battleResult);
-        //console.log('thisEvent.event_flags =', thisEvent.event_flags);
-
-        // Based on the battle result, play the victory or defeat music
-        if (battleResult == 'victory'
-            && typeof thisEvent.event_flags.victory !== 'undefined'
-            && thisEvent.event_flags.victory === true){
-            // Play the victory music
-            //console.log('mmrpg_events() / Play the victory music');
-            parent.mmrpg_music_volume(0, false);
-            parent.mmrpg_play_sound_effect('battle-victory-sound');
-            setTimeout(function(){
-                parent.mmrpg_music_load('misc/leader-board', true, false);
-                //parent.mmrpg_reset_music_volume();
-                }, 1000);
-            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
-            battleResultsDisplayed = true;
-            }
-        if (battleResult == 'defeat'
-            && typeof thisEvent.event_flags.defeat !== 'undefined'
-            && thisEvent.event_flags.defeat === true){
-            // Play the failure music
-            //console.log('mmrpg_events() / Play the failure music');
-            parent.mmrpg_music_volume(0, false);
-            parent.mmrpg_play_sound_effect('battle-defeat-sound');
-            setTimeout(function(){
-                parent.mmrpg_music_load('misc/leader-board', true, false);
-                //parent.mmrpg_reset_music_volume();
-                }, 2500);
-            if (mmrpgEvents.length < canvasAnimationCameraDelay){ canvasAnimationCameraTimer = canvasAnimationCameraDelay - mmrpgEvents.length; }
-            battleResultsDisplayed = true;
-            }
-
-        }
-
-
-}
-
-// Define a function for creating a new layer on the canvas
-function mmrpg_canvas_event(thisMarkup, eventFlags){ //, flagsMarkup
-    var thisContext = $('.wrapper', gameCanvas);
-    if (thisContext.length){
-        //console.log('mmrpg_canvas_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
-        //console.log('gameSettings.eventTimeout =', gameSettings.eventTimeout, 'gameSettings.eventTimeoutThreshold =', gameSettings.eventTimeoutThreshold);
-        // Drop all the z-indexes to a single amount
-        $('.event:not(.sticky)', thisContext).css({zIndex:500});
-        // Calculate the top offset based on previous event height
-        var eventTop = $('.event:not(.sticky):first-child', thisContext).outerHeight();
-        // Prepend the event to the current stack but bring it to the front
-        var thisEvent = $('<div class="event event_frame clearback">'+thisMarkup+'</div>');
-        thisEvent.css({opacity:0.0,zIndex:600});
-        thisContext.prepend(thisEvent);
-
-        // Wait for all the event's assets to finish loading
-        thisEvent.waitForImages(function(){
-
-            // Find all the details in this event markup and move them to the sticky
-            $(this).find('.details').addClass('hidden').css({opacity:0}).appendTo('.event_details', gameCanvas);
-
-            // If camera shift settings are enabled, we can process them
-            if (gameSettings.eventCameraShift){
-                // If this event has any camera action going on, make sure we update the canvas
-                var currentShift = thisContext.attr('data-camera-shift') || '';
-                var currentFocus = thisContext.attr('data-camera-focus') || '';
-                var currentDepth = thisContext.attr('data-camera-depth') || '';
-                var currentOffset = thisContext.attr('data-camera-offset') || '';
-                var newCameraShift = '';
-                var newCameraFocus = '';
-                var newCameraDepth = 0;
-                var newCameraOffset = 0;
-                // Check to see if camera shift settings were provided in the frame
-                if (typeof eventFlags.camera !== 'undefined'
-                    && eventFlags.camera !== false){
-                    //console.log('we have camera action!', eventFlags.camera);
-                    newCameraShift = eventFlags.camera.side;
-                    newCameraFocus = eventFlags.camera.focus;
-                    newCameraDepth = eventFlags.camera.depth;
-                    newCameraOffset = eventFlags.camera.offset;
-                }
-                // If any of the shift values have changed, we need to update everything
-                if (currentShift !== newCameraShift
-                    || currentFocus !== newCameraFocus
-                    || currentDepth !== newCameraDepth
-                    || newCameraOffset !== newCameraOffset){
-                    mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
-                }
-            }
-
-            // If found effect settings are enabled, we can process them
-            if (gameSettings.eventSoundEffects
-                && typeof top.mmrpg_play_sound_effect !== 'undefined'){
-                //console.log('we can react to sound effects!');
-                //console.log('eventFlags =', eventFlags);
-                // Check to see if camera shift settings were provided in the frame
-                if (typeof eventFlags.sounds !== 'undefined'
-                    && eventFlags.sounds !== false){
-                    //console.log('we have sound effect(s)!', eventFlags.sounds);
-                    for (var i = 0; i < eventFlags.sounds.length; i++){
-                        var effectConfig = eventFlags.sounds[i];
-                        var effectName = effectConfig.name;
-                        //console.log('effectName =', effectName);
-                        //console.log('effectConfig =', effectConfig);
-                        if (typeof effectConfig.delay === 'number'){
-                            setTimeout(function(){
-                                top.mmrpg_play_sound_effect(effectName, effectConfig, false);
-                                }, effectConfig.delay);
-                            } else {
-                            top.mmrpg_play_sound_effect(effectName, effectConfig, false);
-                            }
-                    }
-                }
-            }
-
-            // If we're allowed to cross-fade transition the normal way, otherwise straight-up replace the event
-            if (gameSettings.eventCrossFade === true){
-
-                // Animate a fade out of the other events
-                if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                    // We're at a normal speed, so we can animate normally
-                    $('.event:not(.sticky):gt(0)', thisContext).animate({opacity:0},{
-                        duration: Math.ceil(gameSettings.eventTimeout / 2),
-                        easing: 'linear',
-                        queue: false
-                        });
-                    } else {
-                    // We're at a super-fast speed, so we should NOT cross-fade
-                    $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
-                    }
-
-                // Animate a fade in, and the remove the old images
-                if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                    // We're at a normal speed, so we can animate normally
-                    $(this).animate({opacity:1.0}, {
-                        duration: Math.ceil(gameSettings.eventTimeout / 2),
-                        easing: 'linear',
-                        complete: function(){
-                            $('.details:not(.hidden)', thisContext).remove();
-                            $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                            $('.event:not(.sticky):gt(0)', thisContext).remove();
-                            $(this).css({zIndex:500});
-                            },
-                        queue: false
-                        });
-                    } else {
-                    // We're at a super-fast speed, so we should NOT cross-fade
-                    $(this).css({opacity:1.0});
-                    $('.details:not(.hidden)', thisContext).remove();
-                    $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                    $('.event:not(.sticky):gt(0)', thisContext).remove();
-                    $(this).css({zIndex:500});
-                    }
-
-            }
-            else {
-
-                    // Make sure the new event is visible then remove the old ones
-                    $(this).css({opacity:1.0,zIndex:500});
-                    $('.event:not(.sticky):gt(0)', thisContext).css({opacity:0});
-                    $('.details:not(.hidden)', thisContext).remove();
-                    $('.details', thisContext).css({opacity:1}).removeClass('hidden');
-                    $('.event:not(.sticky):gt(0)', thisContext).remove();
-
-            }
-
-            // Loop through all field layers on the canvas and trigger animations
-            $('.background[data-animate],.foreground[data-animate]', gameCanvas).each(function(){
-                // Trigger an animation frame change for this field
-                var thisField = $(this);
-                mmrpg_canvas_field_frame(thisField, '');
-                });
-
-            // Loop through all field layers on the canvas and trigger animations
-            $('.sprite[data-type=attachment][data-animate]', gameCanvas).each(function(){
-                // Trigger an animation frame change for this field
-                var thisAttachment = $(this);
-                var thisPosition = thisAttachment.attr('data-position');
-                if (thisPosition == 'background' || thisPosition == 'foreground'){
-                    //console.log('mmrpg_canvas_attachment_frame('+thisAttachment.attr('data-id')+')');
-                    mmrpg_canvas_attachment_frame(thisAttachment, '');
-                    }
-                });
-
-            });
-        }
-}
-
-
-// Define a function for updating the graphics on the canvas
-function mmrpg_canvas_update(thisBattle, thisPlayer, thisRobot, targetPlayer, targetRobot){
-    // Preload all this robot's sprite image files if not already
-    if (thisPlayer.player_side && thisRobot.robot_token){
-        var thisRobotToken = thisRobot.robot_token;
-        var thisRobotDirection = thisPlayer.player_side == 'right' ? 'left' : 'right';
-        mmrpg_preload_robot_sprites(thisRobotToken, thisRobotDirection);
-        }
-    // Preload all the target robot's sprite image files if not already
-    if (targetPlayer.player_side && targetRobot.robot_token){
-        var targetRobotToken = targetRobot.robot_token;
-        var targetRobotDirection = targetPlayer.player_side == 'right' ? 'left' : 'right';
-        mmrpg_preload_robot_sprites(targetRobotToken, targetRobotDirection);
-        }
-}
-
-
-// Define a change event for whenever this game setting is altered
-gameSettings.currentCameraShift = {shift:'',focus:'',depth:'',offset:''};
-function mmrpg_canvas_camera_shift(newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset){
-    //console.log('mmrpg_canvas_camera_shift() w/ ', newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
-
-    if (typeof newCameraShift === 'undefined' || !newCameraShift){ newCameraShift = ''; }
-    if (typeof newCameraFocus === 'undefined' || !newCameraFocus){ newCameraFocus = ''; }
-    if (typeof newCameraDepth === 'undefined' || !newCameraDepth){ newCameraDepth = 0; }
-    if (typeof newCameraOffset === 'undefined' || !newCameraOffset){ newCameraOffset = 0; }
-    //console.log('mmrpg_canvas_camera_shift() w/ ', newCameraShift, newCameraFocus, newCameraDepth, newCameraOffset);
-
-    // Collect the canvas context and immediately return false if not exists
-    var thisContext = $('.wrapper', gameCanvas);
-    if (!thisContext.length){ return false; }
-
-    // Collect current shift values for reference and updating
-    var currentCameraShift = gameSettings.currentCameraShift;
-    //console.log('currentCameraShift:', currentCameraShift);
-
-    // If the values haven't changed at all, we should just return
-    if (currentCameraShift.shift === newCameraShift
-        && currentCameraShift.focus === newCameraFocus
-        && currentCameraShift.depth === newCameraDepth
-        && currentCameraShift.offset === newCameraOffset){
-        return;
-    }
-
-    // Update the data attributes on the canvas wrapper
-    currentCameraShift.shift = newCameraShift;
-    currentCameraShift.focus = newCameraFocus;
-    currentCameraShift.depth = newCameraDepth;
-    currentCameraShift.offset = newCameraOffset;
-    thisContext.attr('data-camera-shift', newCameraShift);
-    thisContext.attr('data-camera-focus', newCameraFocus);
-    thisContext.attr('data-camera-depth', newCameraDepth);
-    thisContext.attr('data-camera-offset', newCameraOffset);
-    var offsetCameraDepth = newCameraDepth + newCameraOffset;
-    if (offsetCameraDepth < -8){ offsetCameraDepth - -8; }
-    else if (offsetCameraDepth > 8){ offsetCameraDepth = 8; }
-
-    // This first value is used for camera shifts on the bench
-    if (offsetCameraDepth !== 0){
-        var diffValue = ((Math.abs(offsetCameraDepth) - 1) * 0.1);
-        var depthModValue = 1 - diffValue;
-        if (offsetCameraDepth < 0){ depthModValue = depthModValue * -1; }
-        updateCameraShiftVariable('depth-mod', depthModValue);
-    } else {
-        updateCameraShiftVariable('depth-mod', 1);
-    }
-
-    // This second value is used for camera shifts in the foreground
-    if (offsetCameraDepth !== 0){
-        var diffValue = ((Math.abs(offsetCameraDepth) - 1) * 0.1);
-        var depthMod2Value = 1.8 - diffValue;
-        if (offsetCameraDepth < 0){ depthMod2Value = depthMod2Value * -1; }
-        updateCameraShiftVariable('depth-mod2', depthMod2Value);
-    } else {
-        updateCameraShiftVariable('depth-mod2', 1.8);
-    }
-
-}
-
-// Define a function for easily updating camera-related CSS variables on the canvas
-function updateCameraShiftVariable(varName, varValue){
-    //console.log('updateCameraShiftVariable((varName:', varName, ', varValue:', varValue, ')');
-    var cssVarName = '--camera-shift-'+varName;
-    var cssVarValue = varValue;
-    //console.log('setting '+cssVarName+' to:', cssVarValue);
-    document.documentElement.style.setProperty(cssVarName, cssVarValue);
-}
-
-// Define a quick function for updating the camera shift transition timing variable
-function updateCameraShiftTransitionTiming(newValue){
-    //console.log('updateCameraShiftTransitionTiming(', newValue, ')');
-    if (typeof newValue !== 'string' || !newValue){ newValue = 'ease'; }
-    var transitionTimingValue = newValue;
-    updateCameraShiftVariable('transition-timing', transitionTimingValue);
-};
-
-// Define a quick function for updating the camera shift transition duration variable
-function updateCameraShiftTransitionDuration(newValue){
-    //console.log('updateCameraShiftTransitionDuration(', typeof newValue, newValue, ')');
-    if (typeof newValue !== 'number'){ newValue = 0.5; }
-    var transitionDurationValue = (function(modValue){
-        //console.log('transitionDurationValue(', modValue, ')');
-        if (typeof modValue !== 'number'){ modValue = 1; }
-        var duration = Math.ceil(gameSettings.eventTimeout * modValue);
-        if (!gameSettings.eventCrossFade){ duration = 0; }
-        else if (!gameSettings.eventCameraShift){ duration = 0; }
-        else if (gameSettings.eventTimeout <= gameSettings.eventTimeoutThreshold){ duration = 0; }
-        var cssValue = duration > 0 ? (duration / 1000)+'s' : 'none';
-        //console.log('duration:', duration, 'cssValue:', cssValue);
-        return cssValue;
-        })(newValue);
-    updateCameraShiftVariable('transition-duration', transitionDurationValue);
-};
-
-// Define a function for appending a event to the console window
-function mmrpg_console_event(thisMarkup, eventFlags){ //, flagsMarkup
-    var thisContext = $('.wrapper', gameConsole);
-    if (thisContext.length){
-        //console.log('mmrpg_console_event(thisMarkup, eventFlags) | eventFlags =', eventFlags);
-        // Append the event to the current stack
-        //thisContext.prepend('<div class="event" style="top: -100px;">'+thisMarkup+'</div>');
-        thisContext.prepend(thisMarkup);
-        gameConsole.find('.wrapper').scrollTop(0);
-        $('.event:first-child', thisContext).css({top:-100});
-            if (gameSettings.eventTimeout > gameSettings.eventTimeoutThreshold){
-                // We're at a normal speed, so we can animate normally
-                $('.event:first-child', thisContext).animate({top:0}, 400, 'swing');
-                } else {
-                // We're at a super-fast speed, so we should NOT cross-fade
-                $('.event:first-child', thisContext).css({top:0});
-                }
-        // Hide any leftover boxes from previous events over the limit
-        $('.event:gt(50)', thisContext).appendTo('#event_console_backup');
-        // Remove any leftover boxes from previous events
-        //$('.event:gt(10)', thisContext).remove();
-        }
-}
-
-
-
 // Define a function for toggling the canvas animation
 gameSettings.screenshotMode = false;
 function mmrpg_toggle_screenshot_mode(screenshotMode, element){
@@ -2367,33 +1297,11 @@ function mmrpg_toggle_screenshot_mode(screenshotMode, element){
     }
 }
 
-// Define a function for toggling the canvas animation
-function mmrpg_toggle_animation(){
-    if (gameSettings.idleAnimation != false){ return mmrpg_stop_animation(); }
-    else { return mmrpg_start_animation(); }
-}
-
-// Define a function for starting the canvas animation
-function mmrpg_start_animation(){
-    var animateToggle = $('a.toggle', gameAnimate);
-    animateToggle.removeClass('paused').addClass('playing');
-    animateToggle.html('<i class="fas fa-play"></i>');
-    gameSettings.idleAnimation = true;
-    gameSettings.eventAutoPlay = true;
-    mmrpg_canvas_animate();
-    if (mmrpgEvents.length){ mmrpg_events(); }
-    return gameSettings.idleAnimation;
-}
-
-// Define a function for stopping the canvas animation
-function mmrpg_stop_animation(){
-    var animateToggle = $('a.toggle', gameAnimate);
-    animateToggle.removeClass('playing').addClass('paused');
-    animateToggle.html('<i class="fas fa-pause"></i>');
-    gameSettings.idleAnimation = false;
-    gameSettings.eventAutoPlay = false;
-    mmrpg_canvas_animate();
-    return gameSettings.idleAnimation;
+// Define an extension of the string prototype to handle replace all
+String.prototype.replaceAll = function(search, replace) {
+        if (replace === undefined) { return this.toString(); }
+        return this.replace(new RegExp(search, 'g'), replace);
+        //return this.split(search).join(replace);
 }
 
 
@@ -2404,14 +1312,25 @@ if (typeof window.Howl === 'undefined'){
     var no = function(){ return false; };
     Howl = function(){
         return {
+            error: 'window.Howl not loaded',
             play: no,
             playing: no,
             stop: no,
             pause: no,
             volume: no,
-            fade: no
+            state: no,
+            once: no,
+            fade: no,
             }
         };
+    let scripts = [], sources = [], loaded = 0;
+    sources.push('.libs/howler-js/howler.core.min.js', '.libs/howler-js/howler.min.js');
+    let onLoadComplete = function(){ };
+    for (var i = 0; i < sources.length; i++){
+        let source = sources[i], script = document.createElement('script');
+        script.onload = function(){ loaded++; if (loaded >= sources.length){ onLoadComplete(); } };;
+        script.src = source; document.head.appendChild(script);
+        }
 }
 
 // Define required music objects to handle audio playback and set up some defaults
@@ -2621,7 +1540,11 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
     var onendFunction = typeof onendFunction === 'function' ? onendFunction : mmrpgMusicEndedDefault;
     if (newTrack == 'last-track'){
         var lastTrack = musicStream.attr('data-last-track');
-        if (lastTrack.length){ newTrack = lastTrack; }
+        if (lastTrack && lastTrack.length){ newTrack = lastTrack; }
+        }
+    else if (newTrack == 'current-track'){
+        let currentTrack = musicStream.attr('data-track');
+        if (currentTrack && currentTrack.length){ newTrack = currentTrack; }
         }
     if (isRestart == false && newTrack == thisTrack){
         return false;
@@ -2638,7 +1561,8 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         volume: musicBaseVolume,
         loop: isPlayOnce ? false : true,
         onplay: onplayFunction,
-        onend: onendFunction
+        onend: onendFunction,
+        html5: false,
         };
     //console.log('musicMeta =', musicMeta);
     if (musicMeta !== false
@@ -2657,6 +1581,10 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
             loop: [loopStart, loopDuration, true]
             };
         }
+    if (gameSettings.musicTrackSpeed){
+        //console.log('gameSettings.musicTrackSpeed =', gameSettings.musicTrackSpeed);
+        audioConfig.rate = gameSettings.musicTrackSpeed;
+        }
     if (waitTime > 0){ audioConfig.autoplay = false; }
     //console.log('audioConfig =', audioConfig);
     mmrpg_music_volume(0, false);
@@ -2673,63 +1601,17 @@ function mmrpg_music_load(newTrack, resartTrack, playOnce, onendFunction){
         }
 }
 
-// Define a function for playing a specific fanfare track
-function mmrpg_fanfare_load(newTrack, resartTrack, playOnce, fadeMusic, onendFunction){
-    //console.log('mmrpg_fanfare_load(', newTrack, resartTrack, playOnce, ')');
-    var fanfareStream = $('.audio-stream.fanfare', gameMusic);
-    //console.log('fanfareStream =', fanfareStream.length, fanfareStream);
-    var thisTrack = fanfareStream.attr('data-track');
-    var isRestart = typeof resartTrack === 'boolean' ? resartTrack : true;
-    var isPlayOnce = typeof playOnce === 'boolean' ? playOnce : true;
-    var fadeMusic = typeof fadeMusic === 'boolean' ? fadeMusic : true;
-    var onendFunction = typeof onendFunction === 'function' ? onendFunction : mmrpgFanfareEndedDefault;
-    if (newTrack == 'last-track'){
-        var lastTrack = fanfareStream.attr('data-last-track');
-        if (lastTrack.length){ newTrack = lastTrack; }
-        }
-    if (isRestart == false && newTrack == thisTrack){
-        return false;
-        }
-    if (mmrpgFanfareSound !== false
-        && mmrpgFanfareSound.playing()){
-        mmrpgFanfareSound.stop();
-        }
-    fanfareStream.attr('data-track', newTrack);
-    fanfareStream.attr('data-last-track', thisTrack);
-    // Create a new Howl object and load the new track
+// Define a function for adjusting the speed of the currently playing music track
+function mmrpg_music_speed(newSpeed, fadeMusic){
+    //console.log('mmrpg_music_speed(newSpeed:', newSpeed, ', fadeMusic:', fadeMusic, ')');
+    if (typeof newSpeed !== 'number' || newSpeed < 0.1){ newSpeed = 1; }
+    if (typeof fadeMusic !== 'boolean'){ fadeMusic = true; }
+    gameSettings.musicTrackSpeed = newSpeed;
+    if (!mmrpgMusicSound || !mmrpgMusicSound.playing()){ return false; }
+    //console.log('newSpeed =', newSpeed);
     if (fadeMusic){ mmrpg_music_volume(0, false, 300); }
-    var fanfareVolume = gameSettings.musicVolume * gameSettings.masterVolume;
-    if (!gameSettings.musicVolumeEnabled){ musicBaseVolume = 0; }
-    if (mmrpgFanfareSound === false){
-
-        mmrpgFanfareSound = new Howl({
-            src: [gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.mp3?'+gameSettings.cacheTime,
-                  gameSettings.audioBaseHref+'sounds/'+newTrack+'/audio.ogg?'+gameSettings.cacheTime],
-            autoplay: false,
-            volume: fanfareVolume,
-            loop: isPlayOnce ? false : true,
-            onend: function(){
-                if (fadeMusic){ mmrpg_reset_music_volume(); }
-                onendFunction();
-                },
-            onload: function(){
-                this.volume(fanfareVolume);
-                }
-            });
-        mmrpgFanfareSound.once('load', function(){
-            this.stop();
-            this.volume(fanfareVolume);
-            this.play();
-            });
-
-        } else {
-
-        mmrpgFanfareSound.stop();
-        mmrpgFanfareSound.volume(fanfareVolume);
-        mmrpgFanfareSound.play();
-
-        }
-
+    mmrpgMusicSound.rate(gameSettings.musicTrackSpeed);
+    if (fadeMusic){ mmrpg_reset_music_volume(); }
 }
 
 // Define a function for preloading music files
@@ -2764,154 +1646,113 @@ function mmrpg_music_context(newContext){
 gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
-gameSettings.soundEffectPoolKey = -1;
+gameSettings.soundEffectPoolKey = 0;
 gameSettings.soundEffectPoolLimit = 10;
-// Define a list of sound effect aliases we can use in the code to abstract a bit
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
-// Define a function to play sound effects during game runtime
-function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
+async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (typeof effectConfig !== 'object'){ effectConfig = {}; }
     if (typeof isMenuSound !== 'boolean'){ isMenuSound = true; }
-    //console.log('%cmmrpg_play_sound_effect', 'color: cyan;', '(effectName:', effectName, 'effectConfig:', typeof effectConfig, effectConfig, 'isMenuSound:', isMenuSound, ')');
-    //console.log('gameSettings.soundEffectPool =', Object.keys(gameSettings.soundEffectPool).length, gameSettings.soundEffectPool);
-    //console.log('gameSettings.soundEffectSources =', gameSettings.soundEffectSources.length, gameSettings.soundEffectSources);
-    //console.log('gameSettings.soundEffectSprites =', Object.keys(gameSettings.soundEffectSprites).length, gameSettings.soundEffectSprites);
 
-    // If the game hasn't loaded we shoudln't be playing anything
-    if (!gameSettings.indexLoaded){ return false; }
-    if (gameSettings.enableSoundEffects === false){ return false; }
-    if (!mmrpgMusicSound.playing()){ return false; }
-    if (mmrpgMusicSound === false){ return false; }
+    if (!gameSettings.gameHasLoaded){ console.warn('aaa', effectName, gameSettings); return false; }
+    if (gameSettings.enableSoundEffects === false){ console.warn('bbb', effectName, gameSettings); return false; }
 
-    // If we don't have sound effect sounces or sprites loaded, we can't do anything
-    if (!gameSettings.soundEffectSources.length){ return false; }
-    if (gameSettings.soundEffectSprites === {}){ return false; }
+    if (gameSettings.indexLoaded){
+        if (typeof gameSettings.musicHasStarted === 'undefined'){ gameSettings.musicHasStarted = false; }
+        if (!gameSettings.musicHasStarted && mmrpgMusicSound.playing()){ gameSettings.musicHasStarted = true; }
+        if (!gameSettings.musicVolumeEnabled){ console.warn('ccc', effectName, gameSettings); return false; }
+        if (mmrpgMusicSound === false){ console.warn('ddd(1)', effectName, gameSettings); return false; }
+        else if (gameSettings.gameHasStarted && !gameSettings.musicHasStarted){ console.error('ddd(2)', effectName, gameSettings); return false; }
+    }
 
-    // Otherwise, define a base volume for these sound effects to use
+    if (!gameSettings.soundEffectSources.length){ console.warn('eee', effectName, gameSettings); return false; }
+
+    // FIX 1: Correctly check if the sprite object is actually empty
+    if (Object.keys(gameSettings.soundEffectSprites).length === 0){ console.warn('fff', effectName, gameSettings); return false; }
+
     var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
 
-    // Collect this effect's volume, rate factor, and loop boolean for use
+    if (typeof gameSettings.customIndex.soundsAliasesIndex !== 'undefined'
+        && typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
+        effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
+    } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+        && typeof gameSettings.customIndex.soundsIndex.sprite[effectName] !== 'undefined'){
+        // Valid
+    } else {
+        return false;
+    }
+
     var effectVolume = baseEffectVolume;
-    var effectRate = 1;
+    var effectRate = 1.0;
     var effectLoop = false;
+    var effectDelay = 0;
+
     if (isMenuSound === true){ effectVolume *= gameSettings.menuEffectVolume; }
     if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
     if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
     if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
+    if (typeof effectConfig.delay === 'number'){ effectDelay = effectConfig.delay; }
     if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
     if (effectVolume < 0){ effectVolume = 0; }
     if (effectVolume > 1){ effectVolume = 1; }
     effectVolume = (Math.round(effectVolume * 1000) / 1000);
-    //console.log('mmrpg_play_sound_effect // effectName:', effectName, 'effectVolume:', effectVolume, 'effectRate:', effectRate, 'effectLoop:', effectLoop);
 
-    // Get the next sound object from the pool
-    gameSettings.soundEffectPoolKey++;
-    if (gameSettings.soundEffectPoolKey >= gameSettings.soundEffectPoolLimit){ gameSettings.soundEffectPoolKey = 0; }
-    var soundEffectPoolKey = gameSettings.soundEffectPoolKey;
+    let sound;
+    let soundEffectPoolKey = gameSettings.soundEffectPoolKey;
+
     if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
         || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
 
-        // We must create a new sound object before we can use it
-        var sound = new Howl({
+        if (typeof window.HowlerGlobal !== 'undefined'){ window.HowlerGlobal.autoSuspend = false; }
+
+        sound = new Howl({
             src: gameSettings.soundEffectSources,
             sprite: gameSettings.soundEffectSprites,
+            pool: gameSettings.soundEffectPoolLimit,
             autoplay: false,
-            volume: effectVolume,
-            rate: effectRate,
-            loop: effectLoop,
-            pool: 8
+            volume: 1.0,
+            rate: 1.0,
+            loop: false,
+            html5: false,
             });
+
         gameSettings.soundEffectPool[soundEffectPoolKey] = {
             key: soundEffectPoolKey,
             name: effectName,
             sound: sound,
             time: Date.now()
+        };
+    }
+
+    let effect = gameSettings.soundEffectPool[soundEffectPoolKey];
+    effect.time = Date.now();
+    sound = effect.sound;
+
+    let playSoundWhenReady = function(effectName, effectVolume, effectRate){
+        let playSound = function(sound){
+            // Trigger play FIRST to get the unique ID for this specific playback
+            let playId = sound.play(effectName);
+            // Apply rate and volume strictly to this playId so it doesn't corrupt others
+            sound.rate(effectRate, playId);
+            //sound.volume(effectVolume, playId);
+            sound.fade(0, effectVolume, 10, playId);
+            // Store the id back into your effect object for if we need to manipulate it later
+            effect.id = playId;
             };
-
-        } else {
-
-        // We can pull an existing sound object to use from the pool
-        var effect = gameSettings.soundEffectPool[soundEffectPoolKey];
-        var sound = effect.sound;
-        effect.time = Date.now();
-
-        }
-
-    // Replace the effect name if we're using an alias at the moment
-    // TODO:  Make sure this effectName actually exists in the index of sound effect sprites
-    if (typeof gameSettings.customIndex.soundsAliasesIndex !== 'undefined'
-        && typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
-        //console.log('alias triggered // new effectName =', effectName);
-        // Pull the actual effect name from the index based on the alias provided
-        effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
-        } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
-        && typeof gameSettings.customIndex.soundsIndex.sprite[effectName] !== 'undefined'){
-        //console.log('using RAW name // effectName =', effectName);
-        // We should be using aliases but the effect name is technically fine as-is
-        } else {
-        //console.log('using UNKNOWN name // effectName =', effectName);
-        // Immediately return as this isn't real and might cause audio bugs
-        return false;
-        }
-
-    //console.log('sound =', sound);
-    //console.log('sound._volume', sound._volume);
-    //console.log('sound.volume() =', sound.volume());
-    //console.log('sound._sprite['+effectName+'] =', sound._sprite[effectName]);
-
-    // Stop any currently playing sound
-    sound.stop();
-
-    // Play the sound when ready using a function that checks load status
-    var playSoundWhenReady = function(effectName){
         if (sound.state() !== 'loaded'){
-            sound.once('play', function(){
-                //console.log('sound on play w/ effectVolume:', effectVolume);
-                this.volume(effectVolume);
-                this.rate(effectRate);
-                this.loop(effectLoop);
-                });
             sound.once('load', function(){
-                //console.log('sound on loaded w/ effectVolume:', effectVolume);
-                this.stop();
-                this.volume(effectVolume);
-                this.play(effectName);
+                playSound(sound);
                 });
             } else {
-            //console.log('sound immediate invoke w/ effectVolume:', effectVolume);
-            sound.stop();
-            sound.volume(effectVolume);
-            sound.play(effectName);
+            playSound(sound);
             }
         return true;
-        };
-    playSoundWhenReady(effectName);
+    };
 
-    // Now that the sound is actually playing we can do cleanup
-    // If the sound effect pool is full, we need to remove the oldest sound
-    var effectPoolSizeCurrent = Object.keys(gameSettings.soundEffectPool).length;
-    if (effectPoolSizeCurrent > gameSettings.soundEffectPoolLimit){
-        //console.log('soundEffectPool is full (', effectPoolSizeCurrent, ' / ', gameSettings.soundEffectPoolLimit, '), removing oldest sound');
-        var oldestSound = false;
-        var oldestSoundTime = false;
-        for (var soundName in gameSettings.soundEffectPool){
-            var sound = gameSettings.soundEffectPool[soundName];
-            if (oldestSoundTime === false || sound.time < oldestSoundTime){
-                oldestSound = sound;
-                oldestSoundTime = sound.time;
-                }
-            }
-        if (oldestSound !== false){
-            //console.log('removing oldest sound:', oldestSound.name);
-            oldestSound.sound.unload();
-            delete gameSettings.soundEffectPool[oldestSound.name];
-            }
-        }
+    if (effectDelay){ setTimeout(function(){ playSoundWhenReady(effectName, effectVolume, effectRate); }, effectDelay); }
+    else { playSoundWhenReady(effectName, effectVolume, effectRate); }
 
-    // Return now that we're done
     return true;
-
 }
 
 // Define a function for queueing something for when the game has started
@@ -2928,33 +1769,72 @@ function mmrpg_queue_for_game_start(onGameStart){
 // -- POPUP WINDOW EVENT FUNCTIONS -- //
 
 // Define a function that checks the server for any event popups to display
-function windowEventsPull(){
-    //console.log('windowEventsPull()');
-    // Do not pull events if we're currently in a sub-menu iframe
-    var $mmrpg = $('#mmrpg');
-    var $prototype = $('#prototype');
-    if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
-    else if ($mmrpg.is('.iframe')){ return -2; }
-    else if (!$prototype.length){ return -3; }
-    // Otherwise we can pull events from the server and display them
-    $.ajax({
-        url: 'scripts/get-events.php',
-        dataType: 'json',
-        success: function(response){
-            //console.log('scripts/get-events.php returned ', response);
-            if (typeof response.data !== 'undefined'
-                && typeof response.data.events !== 'undefined'
-                && typeof response.data.messages !== 'undefined'){
-                //console.log('creating event');
-                var eventsMarkup = response.data.events;
-                var messagesMarkup = response.data.messages;
-                if (eventsMarkup.length && messagesMarkup.length){
-                    windowEventCreate(eventsMarkup, messagesMarkup, false);
-                    windowEventDisplay();
-                    }
-                }
+gameSettings.eventPullTimeout = false;
+function windowEventsPull(forcePull){
+    //console.warn('windowEventsPull()');
+    // Clear the previous timeout every time the function is called
+    if (gameSettings.eventPullTimeout){
+        clearTimeout(gameSettings.eventPullTimeout);
+        }
+    // Set a new timeout. The code inside will ONLY run if 1000ms
+    // pass without this function being called again.
+    gameSettings.eventPullTimeout = setTimeout(function(){
+        // Do not pull events if we're currently in a sub-menu iframe
+        forcePull = typeof forcePull === 'boolean' ? forcePull : false;
+        var $mmrpg = $('#mmrpg');
+        var $prototype = $('#prototype');
+        if (!forcePull){
+            // If any of these are true, we just return to safely exit the timeout callback
+            if (!$mmrpg.length || $mmrpg.is('.iframe')){ return -1; }
+            else if ($mmrpg.is('.iframe')){ return -2; }
+            else if (!$prototype.length){ return -3; }
             }
-        });
+        // Otherwise we can pull events from the server and display them
+        //console.log('sending...');
+        $.ajax({
+            url: 'scripts/get-events.php',
+            dataType: 'json',
+            success: function(response){
+                //console.log('scripts/get-events.php returned ', response);
+                if (typeof response.data !== 'undefined'
+                    && typeof response.data.events !== 'undefined'
+                    && typeof response.data.messages !== 'undefined'){
+                    var eventsMarkup = response.data.events;
+                    var messagesMarkup = response.data.messages;
+                    if (eventsMarkup.length && messagesMarkup.length){
+                        windowEventCreate(eventsMarkup, messagesMarkup, false);
+                        windowEventDisplay();
+                        }
+                    }
+                },
+            error: function(response){
+                //console.log('scripts/get-events.php failed ', response);
+                // Silently fail or handle error
+                }
+            });
+        }, 1000);
+    // Return true immediately to indicate that the pull has been successfully queued
+    return true;
+}
+
+// Define a helper to resetting the events count stored in localStorage
+function resetPendingEventsCount(){
+    //console.log('resetPendingEventsCount()');
+    localStorage.setItem('pendingWindowEvents', 0);
+}
+
+// Define a helper to keep localStorage synced with the pending events count
+function updatePendingEventsCount(){
+    //console.log('updatePendingEventsCount()');
+    var pendingCount = gameSettings.messagesMarkupArray.length + (gameSettings.activeWindowEvent ? 1 : 0);
+    localStorage.setItem('pendingWindowEvents', pendingCount);
+}
+
+// Define a helper to get the events count stored in the localStorage
+function getPendingEventsCount(){
+    //console.log('getPendingEventsCount()');
+    let pendingEvents = Number(localStorage.getItem('pendingWindowEvents')) || 0;
+    return pendingEvents;
 }
 
 // Define a function for displaying event messages to the player
@@ -2963,21 +1843,28 @@ gameSettings.messagesMarkupArray = [];
 function windowEventCreate(canvasMarkupArray, messagesMarkupArray, autoDisplay){
     //console.log('windowEventCreate('+canvasMarkupArray+', '+messagesMarkupArray+')');
     if (typeof autoDisplay !== 'boolean'){ autoDisplay = true; }
-    gameSettings.canvasMarkupArray = canvasMarkupArray;
-    gameSettings.messagesMarkupArray = messagesMarkupArray;
+    for (var i = 0; i < canvasMarkupArray.length; i++){ gameSettings.canvasMarkupArray.push(canvasMarkupArray[i]); }
+    for (var i = 0; i < messagesMarkupArray.length; i++){ gameSettings.messagesMarkupArray.push(messagesMarkupArray[i]); }
+    updatePendingEventsCount();
     if (autoDisplay){
+        //console.log('autoDisplay requested');
         if (!gameSettings.gameHasStarted){
-            gameSettings.onGameStart.push(function(){ setTimeout(windowEventDisplay, 1000); });
+            //console.log('game not started, adding trigger to gameSettings.onGameStart');
+            mmrpg_queue_for_game_start(function(){ setTimeout(windowEventDisplay, 1000); });
             }
         else {
+            //console.log('game has started, using windowEventDisplay directly');
             windowEventDisplay();
             }
         }
 }
 
 // Define a function for displaying event messages to the player
+gameSettings.activeWindowEvent = false;
 function windowEventDisplay(){
     //console.log('windowEventDisplay()');
+    if (gameSettings.activeWindowEvent){ return false; }
+    gameSettings.activeWindowEvent = true;
 
     // Check if the event container exists and, if not, create it
     var $eventContainer = $('#events');
@@ -3002,30 +1889,56 @@ function windowEventDisplay(){
         if ($('#window').length){ $eventContainerParent = $('#window').first(); }
         else if ($('#prototype').length){ $eventContainerParent = $('#prototype').first(); }
         else if ($('#battle').length){ $eventContainerParent = $('#battle').first(); }
+        else if ($('#mmrpg').length){ $eventContainerParent = $('#mmrpg').first(); }
         $eventContainerParent.append($eventContainer);
 
         // Define a click event for the event window continue button
-        var eventContinue = $('#buttons .event_continue', $eventContainer);
-        eventContinue.bind('click', function(e){
+        var $eventContinue = $('#buttons .event_continue', $eventContainer);
+        $eventContinue.bind('click', function(e){
             e.preventDefault();
             //alert('clicked');
             if (typeof window.top.mmrpg_play_sound_effect !== 'undefined'){
                 window.top.mmrpg_play_sound_effect('link-click');
                 }
             windowEventDestroy();
+            gameSettings.activeWindowEvent = false;
+            updatePendingEventsCount();
             if (gameSettings.canvasMarkupArray.length || gameSettings.messagesMarkupArray.length){
                 windowEventDisplay();
+                } else {
+                let windowIframe = document.querySelector('#window iframe');
+                if (windowIframe){ windowIframe.contentWindow.focus(); }
                 }
             });
 
-        // Bind the keyboard's spacebar and enter key to the "continue" button while it exists
-        $(document).bind('keydown', function(e){
-            // capture the key pressed and compare it to the code for enter/return and spacebar to see if it matches either
-            var key = e.which || e.keyCode;
-            if (key == 13 || key == 32){
-                eventContinue.trigger('click');
+        // Define a function to run each time user inputs are updated so we can react
+        let listenForInput = true;
+        let eventsAreVisible = function(){ return $('#events').is(':visible:not(.hidden)') ? true : false; };
+        let ignoreInputFor = function(delay){ delay = typeof delay === 'number' ? delay : 250; listenForInput = false; setTimeout(function(){ listenForInput = true; }, delay); };
+        let checkUserInputs = function(kind, event, activeInputs, userInputs){
+            //console.log('%c' + 'windowEventDisplay.checkUserInputs(kind:' + kind + ', event)', 'color: cyan;');
+            if (!listenForInput){ return false; }
+            if (!eventsAreVisible()){ return false; }
+            if (!Object.keys(activeInputs).length){ return false; } // nothing pressed, ignore
+            //console.log('-> activeInputs:', activeInputs);
+            ignoreInputFor();
+            // Collect refs to important elements
+            let $eventContainer = $('#events');
+            //console.log('-> $eventContainer:', $eventContainer);
+            // If there's an event showing, then pressing the Start, A, or B will all dismiss to next
+            if (activeInputs.A || activeInputs.B || activeInputs.Start){
+                //console.log('%c' + 'Start/A/B button pressed!', 'color: orange;');
+                if (event){ event.preventDefault(); }
+                $eventContinue.trigger('click');
+                ignoreInputFor(1000);
+                return;
                 }
-            });
+            };
+
+        // Start the user input watcher and collect reference to active inputs
+        let userInputWatcher = new mmrpgUserInputWatcher();
+        userInputWatcher.onUserInput(checkUserInputs);
+        userInputWatcher.startWatching();
 
         }
 
@@ -3092,7 +2005,7 @@ function windowEventDisplay(){
         // Animate the event container into view and re-add the animate class to ensure it players
         $innerEventContainer.removeClass('animate');
         $eventContainer.animate({opacity:1},300,'swing');
-        $('#messages', $eventContainer).perfectScrollbar(thisScrollbarSettings);
+        if (typeof $.fn.perfectScrollbar !== 'undefined'){ $('#messages', $eventContainer).perfectScrollbar(gameSettings.scrollbarSettings); }
         setTimeout(function(){ $innerEventContainer.addClass('animate'); }, 250);
         $(window).focus();
 
@@ -3108,13 +2021,14 @@ function windowEventDisplay(){
 
 // Define a function for displaying event messages to the player
 function windowEventDestroy(){
+    //console.log('windowEventDestroy()');
     var $eventContainer = $('#events');
     //console.log('windowEventDestroy()');
     $('#canvas', $eventContainer).empty();
     $('#messages', $eventContainer).empty();
     $('.event_container', $eventContainer).removeClass('animate');
     $eventContainer.addClass('hidden');
-    //alert(eventMarkup);
+    updatePendingEventsCount();
 }
 
 // Define a function for updating the loaded status of the main index page
@@ -3122,6 +2036,7 @@ function mmrpg_toggle_index_loaded(toggleValue){
     //console.log('game loaded!');
     if (toggleValue == true && gameSettings.indexLoaded != true){
         //console.log('unfade the splash loader');
+        $('#mmrpg').removeClass('loading');
         // Fade out the splash loader text, change it to PLAY, then flade it in
         $('a.toggle span', gameMusic).css({opacity:1}).animate({opacity:0}, 1000, 'swing', function(){
             $('a.toggle', gameMusic).addClass('ready');
@@ -3130,6 +2045,7 @@ function mmrpg_toggle_index_loaded(toggleValue){
                 //$('iframe', gameWindow).css({opacity:0}).removeClass('loading').animate({opacity:1}, 1000, 'swing'); // DEBUG
                 // Set the toggle loader flag to true
                 gameSettings.indexLoaded = true;
+                gameSettings.gameHasLoaded = true;
                 });
             });
         }
@@ -3260,8 +2176,8 @@ function mmrpg_keep_session_alive(sessionUserID){
             + 'You will now be redirected to the login page... '
             );
         if (!confirmRedirect){ return; }
-        if (window.self !== window.parent){
-            window.parent.location.href = loginPageURL;
+        if (window.self !== window.top){
+            window.top.location.href = loginPageURL;
             } else {
             window.location.href = loginPageURL;
             }
@@ -3275,6 +2191,796 @@ function mmrpg_keep_session_alive(sessionUserID){
 
 }
 
+// Define a function that takes a given element and aligns it to a specific target X,Y
+// while knowing the bounds of the window and making sure the tooltip
+// is always fully visible.  This means making it center-bottom aligned
+// to the target position by default, but adjusting in the following:
+// -  when too far left to show entire tooltip, make left-aligned
+// -  when too far right to show entire tooltip, make right-aligned
+// -  when too far down to show entire tooltip, make bottom-aligned
+// -  when too far up to show entire tooltip, make top-aligned
+function mmrpg_align_element_to_target($element, targetX, targetY){
+    //console.log('mmrpg_align_element_to_target() w/ targetX =', targetX, ' & targetY =', targetY);
+    let $mmrpgBody = $('#mmrpg');
+    if (!$element.length){ console.error('no element found!'); return false; }
+    else if (!$element.is(':visible')){ console.error('element not visible!'); return false; }
+    let elementWidth = $element.outerWidth();
+    let elementHeight = $element.outerHeight();
+    let currentBodyWidth = gameSettings.currentBodyWidth;
+    let currentBodyHeight = gameSettings.currentBodyHeight;
+    //console.log('-> elementWidth:', elementWidth, '\n', '-> elementHeight:', elementHeight, '\n', '-> currentBodyWidth:', currentBodyWidth, '\n', '-> currentBodyHeight:', currentBodyHeight);
+    let newPosX = targetX - (elementWidth / 2);
+    let newPosY = targetY - elementHeight - 10;
+    let newPosRight = 'auto';
+    let newPosBottom = 'auto';
+    let newPosLeft = newPosX;
+    let newPosTop = newPosY;
+    // If the new X position is too far left, make it left-aligned
+    if (newPosX < 10){
+        newPosLeft = targetX + 10;
+        }
+    // If the new X position is too far right, make it right-aligned
+    else if ((newPosX + elementWidth) > (currentBodyWidth - 10)){
+        newPosLeft = 'auto';
+        newPosRight = currentBodyWidth - targetX + 10;
+        }
+    // If the new Y position is too far up, make it top-aligned
+    if (newPosY < 10){
+        newPosTop = targetY + 10;
+        newPosBottom = 'auto';
+        }
+    // If the new Y position is too far down, make it bottom-aligned
+    else if ((newPosY + elementHeight) > (currentBodyHeight - 10)){
+        newPosTop = 'auto';
+        newPosBottom = currentBodyHeight - targetY + 10;
+        }
+    $element.css({left:newPosLeft, top:newPosTop, right:newPosRight, bottom:newPosBottom});
+    return true;
+}
+
+// Define a reusable wait-for method and its sister functions
+let mmrpgWaitForIt = function(){
+    let _self = this;
+    let waitingFor, waitFor, onWaitComplete, doneWaitingFor, checkWaitComplete, startWaiting;
+    waitingFor = {};
+    waitFor = function(name, callback){ /*console.log('waitFor(', name, ', callback)');*/ waitingFor[name] = callback; };
+    onWaitComplete = function(callback){ /*console.log('onWaitComplete(callback)');*/ onWaitCompleteCallback = callback; };
+    doneWaitingFor = function(name){ /*console.log('doneWaitingFor(', name, ')');*/ delete waitingFor[name]; checkWaitComplete(); };
+    checkWaitComplete = function(){ /*console.log('checkWaitComplete()');*/ if (Object.keys(waitingFor).length < 1){ onWaitCompleteCallback(); } };
+    startWaiting = function(){
+        //console.log('startWaiting()');
+        let waitingForKeys = Object.keys(waitingFor);
+        //console.log('waitingForKeys =', waitingForKeys);
+        if (waitingForKeys.length < 1){ return false; }
+        for (var i = 0; i < waitingForKeys.length; i++){
+            let key = waitingForKeys[i], callback = waitingFor[key];
+            //console.log('running callback for key ', key);
+            callback.call(_self);
+            }
+        };
+    return {waitFor, onWaitComplete, doneWaitingFor, startWaiting};
+    };
+
+// Define a reusable object for watching user input and storing it button abstractions we can work with elsewhere
+class mmrpgUserInputWatcher {
+    constructor(config, callbacks){
+        //console.log('%c' + 'mmrpgUserInputWatcher.constructor()', 'color: magenta;');
+        config = typeof config === 'object' && config !== null ? config : {};
+        callbacks = typeof callbacks === 'object' && callbacks !== null ? callbacks : {};
+
+        // Define the top-level object and its defaults
+        let _self = this;
+        _self.config = null;
+        _self.events = null;
+        _self.userInputs = {}; // all possible inputs
+        _self.activeInputs = {}; // currently active inputs
+        _self.activeTimeouts = {}; // currently active timeout
+        _self.lastInputKind = null;
+        _self.lastInputEvent = null;
+        _self.lastInputKey = null;
+
+        // Define the config object and its defaults
+        let _config = {};
+        _config.autoStart = typeof config.autoStart === 'boolean' ? config.autoStart : false;
+        _config.inputTimeout = typeof config.inputTimeout === 'number' ? config.inputTimeout : (1000 / 30); // 30fps
+        _config.wheelTimeout = typeof config.wheelTimeout === 'number' ? config.wheelTimeout : _config.inputTimeout;
+        _config.gamepadTimeout = typeof config.gamepadTimeout === 'number' ? config.gamepadTimeout : _config.inputTimeout;
+        _config.autoRunCallbacks = typeof config.autoRunCallbacks === 'boolean' ? config.autoRunCallbacks : true;
+        _config.autoWheelMapping = (typeof config.autoWheelMapping === 'boolean' || typeof config.autoWheelMapping === 'number') ? config.autoWheelMapping : false;
+        _config.autoTouchMapping = typeof config.autoTouchMapping === 'boolean' ? config.autoTouchMapping : true;
+        _config.swipeThreshold = typeof config.swipeThreshold === 'number' ? config.swipeThreshold : 30; // Minimum distance (px)
+        _config.swipeTimeout = typeof config.swipeTimeout === 'number' ? config.swipeTimeout : 300; // Max time to complete swipe (ms)
+        _config.swipeActiveDuration = typeof config.swipeActiveDuration === 'number' ? config.swipeActiveDuration : _config.inputTimeout; // Duration D-Pad inputs stay active
+        _config.autoButtonMapping = typeof config.autoButtonMapping === 'boolean' ? config.autoButtonMapping : false;
+        _config.catchIframeInputs = typeof config.catchIframeInputs === 'boolean' ? config.catchIframeInputs : false;
+        _config.bubbleIframeInputs = typeof config.bubbleIframeInputs === 'boolean' ? config.bubbleIframeInputs : false;
+        _config.drillIframeInputs = typeof config.drillIframeInputs === 'boolean' ? config.drillIframeInputs : false;
+        _config.listenToIframeInputs = typeof config.listenToIframeInputs === 'boolean' ? config.listenToIframeInputs : false;
+        _config.stickDeadzone = typeof config.stickDeadzone === 'number' ? config.stickDeadzone : 0.25;
+        _config.diagonalBias = typeof config.diagonalBias === 'number' ? config.diagonalBias : 0.4;
+        _config.gamepadKind = typeof config.gamepadKind === 'string' ? config.gamepadKind : null;
+        _config.gamepadLayout = typeof config.gamepadLayout === 'string' ? config.gamepadLayout : null;
+        _config.buttonMapping = typeof config.buttonMapping === 'object' && config.buttonMapping !== null ? config.buttonMapping : {}; // custom
+        _self.config = _config;
+
+        // Check to see if custom button mapping was already defined
+        if (typeof gameSettings !== 'undefined' && typeof gameSettings.customButtonMapping !== 'undefined'){
+            let customButtonMapping = JSON.parse(JSON.stringify(gameSettings.customButtonMapping));
+            //console.log('customButtonMapping =', customButtonMapping);
+            _config.buttonMapping = customButtonMapping;
+            }
+
+        // Define an index of symbolic "userInputs" we can abstract actions behind, and then
+        // worry about specific key-bindings and button-mappings later on to keep things clean
+        let userInputs = {}; // below will be the default for now, but we'll allow customizing later
+        userInputs.A = {
+            gamepad: [0],
+            keyboard: ['d', ' ', 'Space'],
+            icon: 'Ⓐ', name: 'A',
+            sonyIcon: '⨯', sonyName: 'Cross',
+            keyboardIcon: '[D]', keyboardName: 'D'
+            };
+        userInputs.B = {
+            gamepad: [1],
+            keyboard: ['s', 'Backspace'],
+            icon: 'Ⓑ', name: 'B',
+            sonyIcon: '◯', sonyName: 'Circle',
+            keyboardIcon: '[S]', keyboardName: 'S'
+            };
+        userInputs.X = {
+            gamepad: [2],
+            keyboard: ['f', '\\'],
+            icon: 'Ⓧ', name: 'X',
+            sonyIcon: '▢', sonyName: 'Square',
+            keyboardIcon: '[F]', keyboardName: 'F'
+            };
+        userInputs.Y = {
+            gamepad: [3],
+            keyboard: ['a', 'Tab'],
+            icon: 'Ⓨ', name: 'Y',
+            sonyIcon: '△', sonyName: 'Triangle',
+            keyboardIcon: '[A]', keyboardName: 'A'
+            };
+        userInputs.L1 = {
+            gamepad: [4],
+            keyboard: ['q', '['],
+            icon: 'L1', name: 'L1',
+            keyboardIcon: '[Q]', keyboardName: 'Q'
+            };
+        userInputs.R1 = {
+            gamepad: [5],
+            keyboard: ['e', ']'],
+            icon: 'R1', name: 'R1',
+            keyboardIcon: '[E]', keyboardName: 'E'
+            };
+        userInputs.L2 = {
+            gamepad: [6],
+            keyboard: ['z', '-'],
+            icon: 'L2', name: 'L2',
+            nintendoIcon: 'ZL', nintendoName: 'ZL',
+            keyboardIcon: '[Z]', keyboardName: 'Z'
+            };
+        userInputs.R2 = {
+            gamepad: [7],
+            keyboard: ['c', '='],
+            icon: 'R2', name: 'R2',
+            nintendoIcon: 'ZR', nintendoName: 'ZR',
+            keyboardIcon: '[C]', keyboardName: 'C'
+            };
+        userInputs.Start = {
+            gamepad: [9],
+            keyboard: ['Enter', 'Home'],
+            icon: '+', name: 'Start',
+            sonyIcon: ']', sonyName: 'Option',
+            nintendoIcon: '+', nintendoName: 'Plus',
+            keyboardIcon: '[_↵]', keyboardName: 'Enter'
+            };
+        userInputs.Select = {
+            gamepad: [8],
+            keyboard: ['Shift', 'End'],
+            icon: '−', name: 'Select',
+            sonyIcon: '[', sonyName: 'Share',
+            nintendoIcon: '-', nintendoName: 'Minus',
+            keyboardIcon: '[↑_]', keyboardName: 'Shift'
+            };
+        userInputs.Up = {
+            gamepad: [12],
+            keyboard: ['ArrowUp'],
+            icon: '⏶', name: 'Up',
+            keyboardIcon: '[⏶]', keyboardName: 'Up'
+            };
+        userInputs.Down = {
+            gamepad: [13],
+            keyboard: ['ArrowDown'],
+            icon: '⏷', name: 'Down',
+            keyboardIcon: '[⏷]', keyboardName: 'Down'
+            };
+        userInputs.Left = {
+            gamepad: [14],
+            keyboard: ['ArrowLeft'],
+            icon: '⏴', name: 'Left',
+            keyboardIcon: '[⏴]', keyboardName: 'Left'
+            };
+        userInputs.Right = {
+            gamepad: [15],
+            keyboard: ['ArrowRight'],
+            icon: '⏵', name: 'Right',
+            keyboardIcon: '[⏵]', keyboardName: 'Right'
+            };
+        userInputs.LR1 = {
+            gamepad: [4, 5],
+            keyboard: ['w'],
+            isCombo: true,
+            icon: 'L1+R1', name: 'L1+R1',
+            keyboardIcon: '[W]', keyboardName: 'W'
+            };
+        userInputs.LR2 = {
+            gamepad: [6, 7],
+            keyboard: ['x'],
+            isCombo: true,
+            icon: 'L2+R2', name: 'L2+R2',
+            nintendoIcon: 'ZL+ZR', nintendoName: 'ZL+ZR',
+            keyboardIcon: '[X]', keyboardName: 'X'
+            };
+        _self.userInputs = userInputs;
+        _self.baseUserInputs = JSON.parse(JSON.stringify(userInputs));
+
+        // Hardware W3C button index -> Console-specific icon & name lookup tables
+        // Ensures icons always match the actual physical button even after layout swaps or custom remapping
+        const hardwareIcons = {
+            nintendo: { 0: 'Ⓑ', 1: 'Ⓐ', 2: 'Ⓨ', 3: 'Ⓧ', 4: 'L1', 5: 'R1', 6: 'ZL', 7: 'ZR', 8: '-', 9: '+', 12: '⏶', 13: '⏷', 14: '⏴', 15: '⏵' },
+            sony:     { 0: '⨯', 1: '◯', 2: '▢', 3: '△', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: '[', 9: ']', 12: '⏶', 13: '⏷', 14: '⏴', 15: '⏵' },
+            xbox:     { 0: 'Ⓐ', 1: 'Ⓑ', 2: 'Ⓧ', 3: 'Ⓨ', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: '−', 9: '+', 12: '⏶', 13: '⏷', 14: '⏴', 15: '⏵' },
+            other:    { 0: 'Ⓐ', 1: 'Ⓑ', 2: 'Ⓧ', 3: 'Ⓨ', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: '−', 9: '+', 12: '⏶', 13: '⏷', 14: '⏴', 15: '⏵' }
+            };
+        const hardwareNames = {
+            nintendo: { 0: 'B', 1: 'A', 2: 'Y', 3: 'X', 4: 'L1', 5: 'R1', 6: 'ZL', 7: 'ZR', 8: 'Minus', 9: 'Plus', 12: 'Up', 13: 'Down', 14: 'Left', 15: 'Right' },
+            sony:     { 0: 'Cross', 1: 'Circle', 2: 'Square', 3: 'Triangle', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: 'Share', 9: 'Option', 12: 'Up', 13: 'Down', 14: 'Left', 15: 'Right' },
+            xbox:     { 0: 'A', 1: 'B', 2: 'X', 3: 'Y', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: 'Select', 9: 'Start', 12: 'Up', 13: 'Down', 14: 'Left', 15: 'Right' },
+            other:    { 0: 'A', 1: 'B', 2: 'X', 3: 'Y', 4: 'L1', 5: 'R1', 6: 'L2', 7: 'R2', 8: 'Select', 9: 'Start', 12: 'Up', 13: 'Down', 14: 'Left', 15: 'Right' }
+            };
+
+        // Define the events object and its defaults
+        let _events = {};
+        _events.onUserInput = typeof callbacks.onUserInput === 'function'
+            ? callbacks.onUserInput : function(kind, event, activeInputs, userInputs){
+            // to-be-replaced by the calling function
+            console.warn('%c' + 'default onUserInput() called!', 'color: orange;');
+            console.warn('w/ -> kind:', kind, '\n', '-> event:', event, '\n', '-> activeInputs:', activeInputs, '\n', '-> userInputs:', userInputs);
+            return true;
+            };
+        _self.events = _events;
+
+        // Define an object to hold all currently pressed keys individually or in combo
+        let activeInputs = {};
+
+        // Create separate objects to return to listening functions post-mods in case of button mapping
+        let returnUserInputs = JSON.parse(JSON.stringify(userInputs));
+        let returnActiveInputs = JSON.parse(JSON.stringify(activeInputs));
+
+        // Collect (or set) the button mapping customizations if any
+        let buttonMapping = _config.buttonMapping;
+        if (_config.autoButtonMapping){
+            if (typeof buttonMapping.standard === 'undefined'){ buttonMapping.standard = {}; }
+            // Only apply default X/Y swap if the user hasn't explicitly remapped them already
+            if (typeof buttonMapping.standard.X === 'undefined'){ buttonMapping.standard.X = [3]; }
+            if (typeof buttonMapping.standard.Y === 'undefined'){ buttonMapping.standard.Y = [2]; }
+            }
+        _self.buttonMapping = buttonMapping;
+
+        // Define the abstraction method for handling user input events
+        let onUserInput = function(kind, event){
+            //console.log('mmrpgUserInputWatcher.onUserInput(kind:', kind, ', event:', event, ')');
+            _self.lastInputKind = kind;
+            _self.lastInputEvent = event;
+            returnUserInputs = JSON.parse(JSON.stringify(userInputs));
+            returnActiveInputs = JSON.parse(JSON.stringify(activeInputs));
+            _self.returnUserInputs = returnUserInputs;
+            _self.returnActiveInputs = returnActiveInputs;
+            if (_config.autoRunCallbacks){
+                _events.onUserInput.call(_self, kind, event, returnActiveInputs, returnUserInputs);
+                }
+            let isGamepadEvent = (kind === 'gamepadinput' || kind === 'gamepadconnected' || kind === 'gamepaddisconnected');
+            if (isGamepadEvent){ return; }
+            if (_config.bubbleIframeInputs){
+                if (window !== window.parent){
+                    window.parent.postMessage({
+                        action: 'bubbleUserInput',
+                        kind: kind,
+                        userInputs: returnUserInputs,
+                        activeInputs: returnActiveInputs
+                        }, window.location.origin);
+                    }
+                }
+            if (_config.drillIframeInputs){
+                let activeFrames = document.querySelectorAll('#mmrpg iframe:not(.blank)');
+                if (activeFrames && activeFrames.length){
+                    for (let frameKey = 0; frameKey < activeFrames.length; frameKey++){
+                        let activeIframe = activeFrames[frameKey];
+                        if (activeIframe && activeIframe.contentWindow){
+                            activeIframe.contentWindow.postMessage({
+                                action: 'drillUserInput',
+                                kind: kind,
+                                userInputs: returnUserInputs,
+                                activeInputs: returnActiveInputs
+                                }, window.location.origin);
+                            }
+                        }
+                    }
+                }
+            };
+
+        // If toggled, make sure we allow left-stick input to count as directional-input
+        let allowStickMovement = true; // TODO: make this customizable later
+        if (allowStickMovement){
+            // Grab the deadzone from config to use as our threshold
+            let dz = _config.stickDeadzone;
+            // axes[0] = Left Stick X, axes[1] = Left Stick Y
+            // axes[2] = Right Stick X, axes[3] = Right Stick Y
+            // Add an extra listener for gamepad axis to the directional inputs
+            userInputs.Left.axis = [0, -dz];
+            userInputs.Right.axis = [0, dz];
+            userInputs.Up.axis = [1, -dz];
+            userInputs.Down.axis = [1, dz];
+            //console.log('userInputs =', userInputs);
+            }
+
+        // Define a quick function that takes a given keyboard press (mixed) and returns the user input key for it
+        let getUserInputFromKeyboardEvent = function(keyCode){
+            //console.log('%c' + 'getUserInputFromKeyboardEvent(keyCode:', keyCode, ') called!', 'color: magenta;');
+            //console.log('-> keyCode =', keyCode);
+            if (!keyCode){ return false; }
+            // Normalize single-character keys to lowercase so holding Shift (Select) doesn't cause stuck keys on keyup
+            let normalizedKey = keyCode.length === 1 && keyCode !== ' ' ? keyCode.toLowerCase() : keyCode;
+            let returnKey = false;
+            Object.keys(userInputs).forEach(function(inputKey){
+                let inputData = userInputs[inputKey];
+                if (inputData.keyboard && (inputData.keyboard.indexOf(normalizedKey) !== -1 || inputData.keyboard.indexOf(keyCode) !== -1)){
+                    //console.log('-> inputKey =', inputKey);
+                    returnKey = inputKey;
+                    _self.lastInputKey = returnKey;
+                    return;
+                    }
+                });
+            return returnKey;
+            };
+
+        // Define a function for taking a scroll-wheel event and translating it into L1 + R1 button presses
+        // (make sure we ignore deltas less than +/- threshold to avoid accidental button presses)
+        let busyScrolling = false;
+        let wheelThreshold = typeof _config.autoWheelMapping === 'number' ? _config.autoWheelMapping : 150;
+        let wheelTimeout = _config.wheelTimeout;
+        let getUserInputFromWheelEvent = function(event){
+            if (!_config.autoWheelMapping){ return false; }
+            // Support both legacy wheelDelta and standard deltaY (for Firefox compatibility)
+            let delta = typeof event.wheelDelta === 'number' ? event.wheelDelta : (typeof event.deltaY === 'number' ? -event.deltaY * 40 : 0);
+            if (!delta){ return false; }
+            if (busyScrolling){ return false; }
+            //console.log('wheel delta =', delta);
+            if (delta > 0 && delta < wheelThreshold){ return false; }
+            else if (delta < 0 && delta > (-1 * wheelThreshold)){ return false; }
+            busyScrolling = true;
+            let inputKey = delta < 0 ? 'L1' : 'R1';
+            if (typeof activeInputs[inputKey] === 'undefined'){
+                activeInputs[inputKey] = true;
+                }
+            setTimeout(function(){
+                delete activeInputs[inputKey];
+                busyScrolling = false;
+                }, wheelTimeout);
+            return inputKey;
+            };
+
+        // Unified Swipe detection (Touch & Mouse)
+        let swipeStartX = 0;
+        let swipeStartY = 0;
+        let swipeStartTime = 0;
+        let busySwiping = false;
+        let isMouseDown = false; // To track if the user is actually dragging the mouse
+        // Generic start function that accepts X/Y coordinates
+        let onSwipeStart = function(x, y){
+            if (!_config.autoTouchMapping) return;
+            swipeStartX = x;
+            swipeStartY = y;
+            swipeStartTime = Date.now();
+            };
+        // Generic end function that accepts X/Y coordinates and the raw event
+        let onSwipeEnd = function(x, y, event){
+            if (!_config.autoTouchMapping || busySwiping){ return; }
+            let elapsed = Date.now() - swipeStartTime;
+            if (elapsed > _config.swipeTimeout){ return; } // Took too long, probably a slow drag
+            let dx = x - swipeStartX;
+            let dy = y - swipeStartY;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < _config.swipeThreshold){ return; } // Too short to register
+            // Calculate angle in degrees (0 to 360)
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            if (angle < 0) angle += 360;
+            let directions = [];
+            // Map angle to 8 directional sectors (45 degrees each)
+            if (angle >= 337.5 || angle < 22.5) { directions = ['Right']; }
+            else if (angle >= 22.5 && angle < 67.5) { directions = ['Right', 'Down']; }
+            else if (angle >= 67.5 && angle < 112.5) { directions = ['Down']; }
+            else if (angle >= 112.5 && angle < 157.5) { directions = ['Left', 'Down']; }
+            else if (angle >= 157.5 && angle < 202.5) { directions = ['Left']; }
+            else if (angle >= 202.5 && angle < 247.5) { directions = ['Left', 'Up']; }
+            else if (angle >= 247.5 && angle < 292.5) { directions = ['Up']; }
+            else if (angle >= 292.5 && angle < 337.5) { directions = ['Right', 'Up']; }
+            if (directions.length > 0){
+                busySwiping = true;
+                directions.forEach(dir => { activeInputs[dir] = true; });
+                onUserInput('swipe', event); // Registers the keydown and updates cache
+                setTimeout(() => {
+                    directions.forEach(dir => { delete activeInputs[dir]; });
+                    busySwiping = false;
+                    onUserInput('swipeend', event);
+                    }, _config.swipeActiveDuration);
+                }
+            };
+
+        // Define a function for determining the current controller type (for button icons) if possible
+        let gamepadLayout = null, gamepadKind = null, gamepadKinds = {
+            other: {id: 0, token: 'other', name: 'Generic/Other'},
+            nintendo: {id: 1, token: 'nintendo', name: 'Nintendo'},
+            sony: {id: 2, token: 'sony', name: 'PlayStation'},
+            xbox: {id: 3, token: 'xbox', name: 'Xbox'}
+            };
+        let updateGamepadKind = function(gamepad){
+            if (gamepadKind && gamepadKind !== null){ return gamepadKind; }
+            let gamepadToken = 'other';
+            if (_config.gamepadKind && typeof gamepadKinds[_config.gamepadKind] !== 'undefined'){
+                gamepadToken = _config.gamepadKind;
+                }
+            else if (gamepad && gamepad.id){
+                //console.log('updateGamepadKind() w/ gamepad:', gamepad);
+                let gamepadID = gamepad.id;
+                //console.log('...and gamepadID:', gamepadID);
+                if (gamepadID.includes("Nintendo") || gamepadID.includes("Joy-Con") || gamepadID.includes("Pro Controller")){ gamepadToken = 'nintendo'; }
+                else if (gamepadID.includes("Sony") || gamepadID.includes("DualSense") || gamepadID.includes("DualShock")){ gamepadToken = 'sony'; }
+                else if (gamepadID.includes("Xbox") || gamepadID.includes("X-Input")){ gamepadToken = 'xbox'; }
+                else if (gamepadID.includes("8BitDo")){ gamepadToken = 'nintendo'; }
+                }
+            //console.log('...gives gamepadToken:', gamepadToken);
+            if (typeof gamepadKinds[gamepadToken] !== 'undefined'){ gamepadKind = gamepadToken; } else { gamepadKind = null; }
+            //console.log('...resulting in gamepadKind =', gamepadKind);
+            gamepadLayout = _config.gamepadLayout || (gamepadKind === 'nintendo' ? 'nintendo' : 'standard');
+            //console.log('...and in gamepadLayout =', gamepadLayout, (_config.gamepadLayout ? '(via config)' : ''));
+            updateGamepadInputs(gamepadKind, gamepadLayout);
+            return gamepadKind;
+            };
+        let updateGamepadInputs = function(newGamepadKind, newGamepadLayout){
+            // Swap the A and B, X and Y buttons if we're on Nintendo, else default
+            if (typeof newGamepadKind === 'undefined'){ newGamepadKind = _self.gamepadKind; }
+            if (typeof newGamepadLayout === 'undefined'){ newGamepadLayout = _self.gamepadLayout; }
+            gamepadKind = newGamepadKind;
+            gamepadLayout = newGamepadLayout;
+            _self.gamepadKind = gamepadKind;
+            _self.gamepadLayout = gamepadLayout;
+            let userInputs = _self.userInputs;
+            let returnUserInputs = _self.returnUserInputs;
+            let baseUserInputs = _self.baseUserInputs, baseButtonKeys = {};
+            baseButtonKeys.A = baseUserInputs.A.gamepad, baseButtonKeys.B = baseUserInputs.B.gamepad;
+            baseButtonKeys.X = baseUserInputs.X.gamepad, baseButtonKeys.Y = baseUserInputs.Y.gamepad;
+            // 1. Apply default hardware layouts for gamepads
+            if (gamepadLayout === 'nintendo'){
+                // nintendo controllers use original A/B and X/Y placement
+                userInputs.A.gamepad = Object.values(baseButtonKeys.B);
+                userInputs.B.gamepad = Object.values(baseButtonKeys.A);
+                userInputs.X.gamepad = Object.values(baseButtonKeys.Y);
+                userInputs.Y.gamepad = Object.values(baseButtonKeys.X);
+                }
+            else {
+                // otherwise use the default button values and just leave it be
+                userInputs.A.gamepad = Object.values(baseButtonKeys.A);
+                userInputs.B.gamepad = Object.values(baseButtonKeys.B);
+                userInputs.X.gamepad = Object.values(baseButtonKeys.X);
+                userInputs.Y.gamepad = Object.values(baseButtonKeys.Y);
+                }
+            // 2. Reset keyboard arrays to base before applying any custom mapping
+            let userInputKeys = Object.keys(userInputs);
+            for (let i = 0; i < userInputKeys.length; i++){
+                let inputKey = userInputKeys[i];
+                if (baseUserInputs[inputKey].keyboard) {
+                    userInputs[inputKey].keyboard = Object.values(baseUserInputs[inputKey].keyboard);
+                    }
+                }
+            // 3. Apply custom user button mappings (Hardware Override)
+            let buttonMapping = _self.config.buttonMapping || {};
+            //console.log('buttonMapping =', buttonMapping);
+            // Gamepad Custom Mapping
+            if (gamepadLayout && buttonMapping[gamepadLayout]){
+                let mappedGamepad = buttonMapping[gamepadLayout];
+                let mappedKeys = Object.keys(mappedGamepad);
+                for (let i = 0; i < mappedKeys.length; i++){
+                    let logicalAction = mappedKeys[i];
+                    // Check if the mapped config is an array, not the parent object
+                    if (userInputs[logicalAction] && Array.isArray(mappedGamepad[logicalAction])){
+                        userInputs[logicalAction].gamepad = mappedGamepad[logicalAction].slice();
+                        }
+                    }
+                }
+            // Keyboard Custom Mapping
+            if (buttonMapping.keyboard){
+                let mappedKeyboard = buttonMapping.keyboard;
+                let mappedKeys = Object.keys(mappedKeyboard);
+                for (let i = 0; i < mappedKeys.length; i++){
+                    let logicalAction = mappedKeys[i];
+                    if (userInputs[logicalAction] && Array.isArray(mappedKeyboard[logicalAction])){
+                        let newKeys = mappedKeyboard[logicalAction].slice();
+                        userInputs[logicalAction].keyboard = newKeys;
+                        // Dynamically update the keyboard labels based on the first assigned key
+                        if (newKeys.length > 0) {
+                            let firstKey = newKeys[0];
+                            let keyName = firstKey.charAt(0).toUpperCase() + firstKey.slice(1);
+                            let keyIcon = '[' + firstKey.toUpperCase() + ']';
+                            // Map special keys back to nicely formatted symbols
+                            if (firstKey === 'ArrowUp') { keyName = 'Up'; keyIcon = '[⏶]'; }
+                            else if (firstKey === 'ArrowDown') { keyName = 'Down'; keyIcon = '[⏷]'; }
+                            else if (firstKey === 'ArrowLeft') { keyName = 'Left'; keyIcon = '[⏴]'; }
+                            else if (firstKey === 'ArrowRight') { keyName = 'Right'; keyIcon = '[⏵]'; }
+                            else if (firstKey === 'Enter') { keyName = 'Enter'; keyIcon = '[_↵]'; }
+                            else if (firstKey === 'Shift') { keyName = 'Shift'; keyIcon = '[↑_]'; }
+                            else if (firstKey === ' ' || firstKey === 'Space') { keyName = 'Space'; keyIcon = '[_]'; }
+                            // Add any other special key symbols you want here!
+                            userInputs[logicalAction].keyboardName = keyName;
+                            userInputs[logicalAction].keyboardIcon = keyIcon;
+                            }
+                        }
+                    }
+                }
+            // 4. Update the icons & names on a per-console basis using the actual mapped hardware button index
+            for (let i = 0; i < userInputKeys.length; i++){
+                let inputKey = userInputKeys[i];
+                let inputDefaults = _self.baseUserInputs[inputKey];
+                let userInput = userInputs[inputKey];
+                let newInputIcon = inputDefaults.icon;
+                let newInputName = inputDefaults.name;
+                if (gamepadKind && userInput.gamepad && userInput.gamepad.length){
+                    let iconMap = hardwareIcons[gamepadKind] || hardwareIcons.other;
+                    let nameMap = hardwareNames[gamepadKind] || hardwareNames.other;
+                    newInputIcon = userInput.gamepad.map(btnIdx => iconMap[btnIdx] || inputDefaults.icon).join('+');
+                    newInputName = userInput.gamepad.map(btnIdx => nameMap[btnIdx] || inputDefaults.name).join('+');
+                    }
+                else if (!gamepadKind && userInput.keyboardIcon){
+                    newInputIcon = userInput.keyboardIcon;
+                    newInputName = userInput.keyboardName || inputDefaults.name;
+                    }
+                userInput.icon = newInputIcon;
+                userInput.name = newInputName;
+                if (returnUserInputs && returnUserInputs[inputKey]){
+                    returnUserInputs[inputKey] = JSON.parse(JSON.stringify(userInput));
+                    }
+                }
+            };
+        _self.gamepadKind = gamepadKind;
+        _self.gamepadKinds = gamepadKinds;
+        _self.gamepadLayout = gamepadLayout;
+
+        // Define a function for watching gamepad inputs and updating the activeInputs object accordingly
+        let connectedGamepad = null;
+        let gamepadRafId = null;
+        let isWatchingInputs = false;
+        let watchGamepadInputs = function(gamepad){
+            if (gamepadRafId){
+                cancelAnimationFrame(gamepadRafId);
+                gamepadRafId = null;
+                }
+            if (gamepad === null){
+                connectedGamepad = null;
+                Object.keys(activeInputs).forEach(key => { delete activeInputs[key]; });
+                updateGamepadInputs(null, null);
+                return;
+                }
+            else if (typeof gamepad !== 'undefined'){
+                connectedGamepad = gamepad;
+                }
+            if (!connectedGamepad || typeof connectedGamepad.index === 'undefined'){ return false; }
+            let gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+            let gp = gamepads[connectedGamepad.index];
+            if (!gp){ return false; }
+            else { updateGamepadKind(gp); }
+            //console.log('watchGamepadInputs -> gamepadKind:', gamepadKind);
+            let consumedButtons = new Set();
+            let newActiveStates = {};
+            let isBtnPressed = (idx) => gp.buttons[idx] && gp.buttons[idx].pressed;
+            let isAxisPushed = (axisData) => {
+                if (!allowStickMovement || !axisData){ return false; }
+                let [axisIndex, threshold] = axisData;
+                let val = gp.axes[axisIndex];
+                let passesDeadzone = (threshold < 0 && val <= threshold) || (threshold > 0 && val >= threshold);
+                if (!passesDeadzone){ return false; }
+                let pairedAxisIndex = axisIndex % 2 === 0 ? axisIndex + 1 : axisIndex - 1;
+                let pairedVal = gp.axes[pairedAxisIndex];
+                if (Math.abs(val) < Math.abs(pairedVal) * _config.diagonalBias){ return false; }
+                return true;
+                };
+            Object.keys(userInputs).forEach(key => { // PASS 1: Check Combos First
+                let data = userInputs[key], gamepad = data.gamepad;
+                if (!data.isCombo){ return; } // skip if not a checkable combo
+                if (gamepad && gamepad.length && gamepad.every(isBtnPressed)) {
+                    newActiveStates[key] = true;
+                    gamepad.forEach(btn => consumedButtons.add(btn));
+                    }
+                });
+            //console.log('consumedButtons =', consumedButtons);
+            Object.keys(userInputs).forEach(key => { // PASS 2: Check Standard Inputs & Axes
+                if (newActiveStates[key]){ return; } // Skip if already handled by Pass 1
+                let data = userInputs[key], gamepad = data.gamepad, axis = data.axis;
+                if (data.isCombo){ return; } // skip if already-checked combo
+                let btnPressed = gamepad && gamepad.length && gamepad.some(btn => isBtnPressed(btn) && !consumedButtons.has(btn));
+                let axisPressed = isAxisPushed(axis);
+                if (btnPressed || axisPressed) {
+                    newActiveStates[key] = true;
+                    }
+                });
+            let nullfn = function(){};
+            Object.keys(userInputs).forEach(key => { // PASS 3: Update State & Fire Events
+                let isPressed = !!newActiveStates[key];
+                let wasPressed = !!activeInputs[key];
+                if (isPressed !== wasPressed) {
+                    if (isPressed) { activeInputs[key] = true; }
+                    else { delete activeInputs[key]; }
+                    let event = new Event('gamepadinput', { bubbles: true, cancelable: true });
+                    event.preventDefault = nullfn;
+                    event.stopPropagation = nullfn;
+                    document.dispatchEvent(event);
+                    onUserInput('gamepadinput', event);
+                    }
+                });
+            if (isWatchingInputs){
+                gamepadRafId = requestAnimationFrame(function(){ watchGamepadInputs(); });
+                }
+            };
+        // Assign the object that holds all currently pressed keys individually or in combo
+        _self.activeInputs = activeInputs;
+
+        // Update the parent with these new return objects separate from the source data (in case of mods)
+        _self.returnUserInputs = returnUserInputs;
+        _self.returnActiveInputs = returnActiveInputs;
+
+        // Run these functions at least once to ensure things are generated properly
+        updateGamepadInputs();
+        watchGamepadInputs();
+
+        // Define a quick object to hold all the listening objects (in case we need to remove them)
+        let eventListeners = {};
+        eventListeners.keydown = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ activeInputs[input] = true; } onUserInput('keydown', event); };
+        eventListeners.keyup = function(event){ let input = getUserInputFromKeyboardEvent(event.key); if (input){ delete activeInputs[input]; } onUserInput('keyup', event); };
+        eventListeners.blur = function(event){ Object.keys(activeInputs).forEach(function(key){ delete activeInputs[key]; }); onUserInput('blur', event); };
+        if (_config.autoWheelMapping){ eventListeners.wheel = function(event){ getUserInputFromWheelEvent(event); onUserInput('mousewheel', event); }; }
+        if (_config.autoTouchMapping){
+            eventListeners.touchstart = function(event){ if (event.touches.length > 0) onSwipeStart(event.touches[0].clientX, event.touches[0].clientY); };
+            eventListeners.touchend = function(event){ if (event.changedTouches.length > 0) onSwipeEnd(event.changedTouches[0].clientX, event.changedTouches[0].clientY, event); };
+            eventListeners.mousedown = function(event){ isMouseDown = true; onSwipeStart(event.clientX, event.clientY); };
+            eventListeners.mouseup = function(event){ if (isMouseDown){ isMouseDown = false; onSwipeEnd(event.clientX, event.clientY, event); } };
+            }
+        eventListeners.gamepadconnected = function(event){ watchGamepadInputs(event.gamepad); onUserInput('gamepadconnected', event); };
+        eventListeners.gamepaddisconnected = function(event){ watchGamepadInputs(null); onUserInput('gamepaddisconnected', event); };
+        eventListeners.message = function(event){
+            let data = event.data;
+            if (!data || !_config.listenToIframeInputs){ return; }
+            //console.log('_config.listenToIframeInputs = ', _config.listenToIframeInputs);
+            //console.log('-> w/ data = ', data);
+            if (data.action === 'bubbleUserInput'
+                || data.action === 'drillUserInput'){
+                _self.lastInputKind = data.kind;
+                _self.lastInputEvent = null;
+                returnUserInputs = data.userInputs;
+                returnActiveInputs = data.activeInputs;
+                _self.returnUserInputs = returnUserInputs;
+                _self.returnActiveInputs = returnActiveInputs;
+                if (_config.autoRunCallbacks || _events.onUserInput){
+                    _events.onUserInput.call(_self, data.kind, null, returnActiveInputs, returnUserInputs);
+                    }
+                }
+            };
+
+        // Define an event to call when we want to start watching all the inputs
+        let startWatchingInputs = function(){
+            //console.log('%c' + 'mmrpgUserInputWatcher.startWatchingInputs()', 'color: magenta;');
+            isWatchingInputs = true;
+
+            // Bind events to the keyboard arrow keys if detected to allow for it
+            document.addEventListener('keydown', eventListeners.keydown, { passive: false });
+            document.addEventListener('keyup', eventListeners.keyup, { passive: false });
+            window.addEventListener('blur', eventListeners.blur, { passive: false });
+
+            // Bind events to any connected gamepads to allow for the same
+            // functionality as the keyboard arrow keys (mirror for easier coding)
+            window.addEventListener("gamepadconnected", eventListeners.gamepadconnected, { passive: false });
+            window.addEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected, { passive: false });
+
+            // If a gamepad was already connected before startWatchingInputs() ran, resume polling
+            if (connectedGamepad){ watchGamepadInputs(connectedGamepad); }
+
+            // Bind events to the scrolling of the user's mouse if detected and map to L1 + R1 button inputs
+            if (_config.autoWheelMapping){ document.addEventListener('wheel', eventListeners.wheel, { passive: false }); }
+
+            // Bind events to touch screen and mouse actions to allow for directional swiping
+            if (_config.autoTouchMapping){
+                document.addEventListener('touchstart', eventListeners.touchstart, { passive: false });
+                document.addEventListener('touchend', eventListeners.touchend, { passive: false });
+                document.addEventListener('mousedown', eventListeners.mousedown, { passive: false });
+                document.addEventListener('mouseup', eventListeners.mouseup, { passive: false });
+                }
+
+            // Only listen for bubbled messages if we are the top-level parent window
+            if (_config.catchIframeInputs){ window.addEventListener('message', eventListeners.message, { passive: false }); }
+
+            };
+
+        // Define an event to call when we want to stop watching all the inputs
+        let stopWatchingInputs = function(){
+            //console.log('%c' + 'mmrpgUserInputWatcher.stopWatchingInputs()', 'color: magenta;');
+            isWatchingInputs = false;
+            if (gamepadRafId){
+                cancelAnimationFrame(gamepadRafId);
+                gamepadRafId = null;
+                }
+
+            // Remove events from the keyboard arrow keys
+            document.removeEventListener('keydown', eventListeners.keydown);
+            document.removeEventListener('keyup', eventListeners.keyup);
+            window.removeEventListener('blur', eventListeners.blur);
+
+            // Remove events from any connected gamepads
+            window.removeEventListener("gamepadconnected", eventListeners.gamepadconnected);
+            window.removeEventListener("gamepaddisconnected", eventListeners.gamepaddisconnected);
+
+            // Remove events from the scrolling of the user's mouse
+            if (_config.autoWheelMapping){ document.removeEventListener('wheel', eventListeners.wheel); }
+
+            // Remove touch screen and mouse swiping listeners
+            if (_config.autoTouchMapping){
+                document.removeEventListener('touchstart', eventListeners.touchstart);
+                document.removeEventListener('touchend', eventListeners.touchend);
+                document.removeEventListener('mousedown', eventListeners.mousedown);
+                document.removeEventListener('mouseup', eventListeners.mouseup);
+                }
+
+            // Clean up the message listener as well
+            if (_config.catchIframeInputs){ window.removeEventListener('message', eventListeners.message); }
+
+            };
+
+        // Start watching the inputs right away
+        if (_config.autoStart){ startWatchingInputs(); }
+
+        // Return a little API for accessing the userInputs and activeInputs objects
+        return {
+            config: _self.config,
+            events: _self.events,
+            userInputs: _self.userInputs,
+            activeInputs: _self.activeInputs,
+            get lastInputKind(){ return _self.lastInputKind; },
+            get lastInputEvent(){ return _self.lastInputEvent; },
+            get lastInputKey(){ return _self.lastInputKey; },
+            get gamepadKind(){ return _self.gamepadKind; },
+            get gamepadLayout(){ return _self.gamepadLayout; },
+            startWatching: startWatchingInputs,
+            stopWatching: stopWatchingInputs,
+            getUserInputs: function(){
+                return _self.returnUserInputs;
+                },
+            getActiveInputs: function(){
+                return _self.returnActiveInputs;
+                },
+            onUserInput: function(callback){
+                if (typeof callback !== 'function'){ return false; }
+                _self.events.onUserInput = callback;
+                return true;
+                },
+            checkUserInputs: function(){
+                if (!_events.onUserInput){ return false; }
+                let kind = _self.lastInputKind, event = _self.lastInputEvent;
+                let returnActiveInputs = _self.returnActiveInputs, returnUserInputs = _self.returnUserInputs;
+                _events.onUserInput.call(_self, kind, event, returnActiveInputs, returnUserInputs);
+                return true;
+                }
+            };
+
+    }
+}
 
 /**
  * Function : dump()
@@ -3475,6 +3181,18 @@ function dump(arr,level) {
     };
 })(jQuery);
 
+// Extend jQuery to offer a "removeClassByRegex" function that removes classes matching a regex
+// This allows us to remove classes that match a specific pattern without needing to know the exact class names
+(function($) {
+    $.fn.removeClassByRegex = function(regex) {
+      return $(this).removeClass(function(index, classes) {
+        return classes.split(/\s+/).filter(function(c) {
+          return regex.test(c);
+        }).join(' ');
+      });
+    };
+})(jQuery);
+
 /* Define a function to randomize an array in-place using Durstenfeld shuffle algorithm */
 if (typeof window.shuffleArray === 'undefined'){
     function shuffleArray(array) {
@@ -3483,50 +3201,41 @@ if (typeof window.shuffleArray === 'undefined'){
             var temp = array[i];
             array[i] = array[j];
             array[j] = temp;
+            }
         }
     }
-}
 
 /* Define a function to calculate distance between two points */
 if (typeof window.calcDistance === 'undefined'){
     function calculateDistance(x1, y1, x2, y2) {
-      return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
     }
-}
+
+if (typeof window.toUpperCaseWords === 'undefined'){
+    function toUpperCaseWords(str){ return str.toLowerCase().replace(/\b[a-z]/g, (l) => l.toUpperCase()); }
+    }
 
 // Fix the indexOf issue for IE8 and lower
 if (!Array.prototype.indexOf) {
-        Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
-                "use strict";
-                if (this === void 0 || this === null) {
-                        throw new TypeError();
-                }
-                var t = Object(this);
-                var len = t.length >>> 0;
-                if (len === 0) {
-                        return -1;
-                }
-                var n = 0;
-                if (arguments.length > 0) {
-                        n = Number(arguments[1]);
-                        if (n !== n) { // shortcut for verifying if it's NaN
-                                n = 0;
-                        } else if (n !== 0 && n !== Infinity && n !== -Infinity) {
-                                n = (n > 0 || -1) * Math.floor(Math.abs(n));
-                        }
-                }
-                if (n >= len) {
-                        return -1;
-                }
-                var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
-                for (; k < len; k++) {
-                        if (k in t && t[k] === searchElement) {
-                                return k;
-                        }
-                }
-                return -1;
+    Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+        "use strict";
+        if (this === void 0 || this === null) { throw new TypeError(); }
+        var t = Object(this);
+        var len = t.length >>> 0;
+        if (len === 0) { return -1; }
+        var n = 0;
+        if (arguments.length > 0) {
+            n = Number(arguments[1]);
+            if (n !== n) { n = 0; }
+            else if (n !== 0 && n !== Infinity && n !== -Infinity) { n = (n > 0 || -1) * Math.floor(Math.abs(n)); }
+            }
+        if (n >= len) { return -1; }
+        var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+        for (; k < len; k++) { if (k in t && t[k] === searchElement) { return k; } }
+        return -1;
         }
-}
+    };
 
 // Polyfill for requestAnimationFrame if not exists
 window.requestAnimationFrame = window.requestAnimationFrame
@@ -3537,3 +3246,4 @@ window.requestAnimationFrame = window.requestAnimationFrame
 window.cancelAnimationFrame = window.cancelAnimationFrame
     || window.mozCancelAnimationFrame
     || function(requestID){clearTimeout(requestID)};
+
