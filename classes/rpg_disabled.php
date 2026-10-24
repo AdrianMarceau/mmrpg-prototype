@@ -748,7 +748,7 @@ class rpg_disabled {
 
                         $debug_text = 'START EXPERIENCE | ';
                         $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
-                        $debug_text .= 'target_stats = '.(implode($temp_target_experience['stats'], '+')).' | ';
+                        $debug_text .= 'target_stats = '.(implode('+', $temp_target_experience['stats'])).' | ';
                         $debug_text .= 'base_experience = '.$temp_target_experience['experience'].' ';
                         $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
 
@@ -823,7 +823,7 @@ class rpg_disabled {
                             if (in_array('field', $custom_kinds)){ unset($custom_kinds[array_search('field', $custom_kinds)]); }
                             $debug_text = 'CUSTOM MODIFIERS | ';
                             $debug_text .= '(for '.$temp_target_robot->robot_token.' via '.$this_robot->robot_token.') <br /> ';
-                            $debug_text .= 'custom_modifiers = '.implode($custom_kinds, ', ').' | ';
+                            $debug_text .= 'custom_modifiers = '.implode(', ', $custom_kinds).' | ';
                             $debug_text .= 'this_experience_boost = '.$options->this_experience_boost.' | ';
                             $debug_text .= 'earned_experience = '.$options->earned_experience.' (adjusted value) ';
                             $this_battle->events_debug(__FILE__, __LINE__, $debug_text);
