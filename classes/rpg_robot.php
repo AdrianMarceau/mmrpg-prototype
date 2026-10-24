@@ -7133,7 +7133,7 @@ class rpg_robot extends rpg_object {
 
         // First, set this robot's current item to an empty string
         $itoken = $this->robot_item;
-        $itoken_equipped = $item.'__equipped';
+        $itoken_equipped = $itoken.'__equipped';
         $this->set_item('');
 
         // Also remove this robot's item from the session, we're done with it, if human character and appropriate to do so
