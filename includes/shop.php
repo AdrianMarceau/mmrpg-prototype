@@ -274,7 +274,7 @@ if (!empty($this_shop_index['auto'])){
         items.item_shop_level
         FROM mmrpg_index_items AS items
         LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
-        LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = 'item' AND groups.group_token = tokens.group_token
+        LEFT JOIN mmrpg_index_items_groups AS `groups` ON `groups`.group_class = 'item' AND `groups`.group_token = tokens.group_token
         WHERE
         items.item_flag_published = 1
         AND items.item_flag_complete = 1
@@ -282,7 +282,7 @@ if (!empty($this_shop_index['auto'])){
         AND items.item_shop_tab = 'auto/items'
         AND items.item_price > 0
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC,
         items.item_token ASC
         ;";
@@ -331,7 +331,7 @@ if (!empty($this_shop_index['auto'])){
             items.item_shop_level
             FROM mmrpg_index_items AS items
             LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
-            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = 'item' AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_items_groups AS `groups` ON `groups`.group_class = 'item' AND `groups`.group_token = tokens.group_token
             WHERE
             items.item_flag_published = 1
             AND items.item_flag_complete = 1
@@ -339,7 +339,7 @@ if (!empty($this_shop_index['auto'])){
             AND items.item_shop_tab = 'auto/parts'
             AND items.item_price > 0
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC,
             items.item_token ASC
             ;";
@@ -443,7 +443,7 @@ if (!empty($this_shop_index['reggae'])){
         abilities.ability_shop_level
         FROM mmrpg_index_abilities AS abilities
         LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-        LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+        LEFT JOIN mmrpg_index_abilities_groups AS `groups` ON `groups`.group_class = 'master' AND `groups`.group_token = tokens.group_token
         WHERE
         abilities.ability_flag_published = 1
         AND abilities.ability_flag_complete = 1
@@ -451,7 +451,7 @@ if (!empty($this_shop_index['reggae'])){
         AND abilities.ability_shop_tab = 'reggae/abilities'
         AND abilities.ability_price > 0
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC,
         abilities.ability_token ASC
         ;";
@@ -520,7 +520,7 @@ if (!empty($this_shop_index['reggae'])){
             abilities.ability_shop_level
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_abilities_groups AS `groups` ON `groups`.group_class = 'master' AND `groups`.group_token = tokens.group_token
             LEFT JOIN mmrpg_index_types AS types ON (types.type_token = abilities.ability_type OR types.type_token = 'none' AND abilities.ability_type = '')
             LEFT JOIN mmrpg_index_types AS types2 ON (types2.type_token = abilities.ability_type2 OR types2.type_token = 'none' AND abilities.ability_type2 = '')
             WHERE
@@ -535,7 +535,7 @@ if (!empty($this_shop_index['reggae'])){
             abilities.ability_token LIKE '%-buster' DESC,
             abilities.ability_token LIKE '%-overdrive' DESC,
             abilities.ability_shop_level ASC,
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC,
             abilities.ability_token ASC
             ;";
@@ -693,7 +693,7 @@ if (!empty($this_shop_index['kalinka'])){
             robots.robot_token
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+            LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = robots.robot_class
             LEFT JOIN mmrpg_index_players AS players1 ON players1.player_robot_hero = robots.robot_token
             LEFT JOIN mmrpg_index_players AS players2 ON players2.player_robot_support = robots.robot_token
             WHERE
@@ -706,7 +706,7 @@ if (!empty($this_shop_index['kalinka'])){
             AND players2.player_robot_support IS NULL
             ORDER BY
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;";
         $cache_token = md5($buyable_robots_query);
@@ -810,7 +810,7 @@ if (!empty($this_shop_index['kalinka'])){
                 robots.robot_image_alts
                 FROM mmrpg_index_robots AS robots
                 LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-                LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = 'master' AND groups.group_token = tokens.group_token
+                LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_class = 'master' AND `groups`.group_token = tokens.group_token
                 WHERE
                 robots.robot_flag_published = 1
                 AND robots.robot_flag_complete = 1
@@ -819,7 +819,7 @@ if (!empty($this_shop_index['kalinka'])){
                 AND robots.robot_image_alts <> ''
                 AND robots.robot_image_alts <> '[]'
                 ORDER BY
-                groups.group_order ASC,
+                `groups`.group_order ASC,
                 tokens.token_order ASC,
                 robots.robot_order ASC
                 ;";

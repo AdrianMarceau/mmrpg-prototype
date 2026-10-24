@@ -249,7 +249,7 @@ class cms_thread_post {
         $post_id = $post_info['post_id'];
         $user_name = !empty($post_info['author_name_public']) && $post_info['author_name_public'] !== $post_info['author_name']
             ? $post_info['author_name_public'] . ' / ' . $post_info['author_name']
-            : $post_info['author_name_public'] ?: $post_info['author_name'];
+            : $post_info['author_name'];
         $post_label = "Post ID {$post_id}";
         if ($include_user_name) {
             $post_label .= ' (by ' . $user_name . ')';

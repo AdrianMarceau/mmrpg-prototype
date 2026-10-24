@@ -115,8 +115,11 @@ $sprite_object_dir = $root_content_dir.$request_type.'/';
 // Collect the global cache time and break it down to an exact time
 //list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
 list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours')));
-$yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
-$hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
+$yyyy = (int)substr($new_cache_date, 0, 4);
+$mm = (int)substr($new_cache_date, 4, 2);
+$dd = (int)substr($new_cache_date, 6, 2);
+$hh = (int)substr($new_cache_time, 0, 2);
+$ii = (int)substr($new_cache_time, 2, 2);
 $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
 //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
 
@@ -500,7 +503,7 @@ if ($must_regenerate){
     // Calculate the grid size based on the total count
     $sprite_objects_sqrt = sqrt($sprite_objects_num);
     if ($request_crop){
-        $sprite_objects_grid_width = floor($sprite_objects_sqrt);
+        $sprite_objects_grid_width = (int)floor($sprite_objects_sqrt);
         $sprite_objects_grid_height = $sprite_objects_grid_width;
         while ($sprite_objects_grid_width * $sprite_objects_grid_height < $sprite_objects_num){ $sprite_objects_grid_width++; }
     } else {
@@ -512,8 +515,8 @@ if ($must_regenerate){
 
     // Create a lambda function to calculate col/row/x/y
     $calculate_position = function($object_key, $sprite_objects_grid_width, $sprite_objects_grid_height, $target_sprite_width, $target_sprite_height) {
-        $col = $object_key % $sprite_objects_grid_width;
-        $row = floor($object_key / $sprite_objects_grid_width);
+        $col = (int)($object_key % $sprite_objects_grid_width);
+        $row = (int)floor($object_key / $sprite_objects_grid_width);
         $x = $col * $target_sprite_width;
         $y = $row * $target_sprite_height;
         return array('col' => $col, 'row' => $row, 'x' => $x, 'y' => $y);
@@ -584,7 +587,7 @@ if ($must_regenerate){
 if ($must_regenerate && !empty($composite_index)){
 
     // If this is a request for the IMAGE and it doesn't exist, generate it now
-    if (true){
+    if ($must_regenerate_binary){
         if (file_exists($full_binary_path)){ unlink($full_binary_path); }
         //error_log('Time to generate the composite image binary file!');
         //error_log('$full_binary_path = '.print_r($full_binary_path, true));
@@ -646,42 +649,42 @@ if ($must_regenerate && !empty($composite_index)){
                     if ($align_method) {
                         if ($align_method === 'center-center'){
                             if ($sprite['size'] > $target_sprite_width) {
-                                $sourceX = ($sprite['size'] - $target_sprite_width) / 2;
+                                $sourceX = (int)(($sprite['size'] - $target_sprite_width) / 2);
                                 $sourceWidth = $target_sprite_width;
                             } else {
-                                $destX += ($target_sprite_width - $sprite['size']) / 2;
+                                $destX += (int)(($target_sprite_width - $sprite['size']) / 2);
                             }
                             if ($sprite['size'] > $target_sprite_height) {
-                                $sourceY = ($sprite['size'] - $target_sprite_height) / 2;
+                                $sourceY = (int)(($sprite['size'] - $target_sprite_height) / 2);
                                 $sourceHeight = $target_sprite_height;
                             } else {
-                                $destY += ($target_sprite_height - $sprite['size']) / 2;
+                                $destY += (int)(($target_sprite_height - $sprite['size']) / 2);
                             }
                         }
                         elseif ($align_method === 'bottom-center'){
                             if ($sprite['size'] > $target_sprite_width) {
-                                $sourceX = ($sprite['size'] - $target_sprite_width) / 2;
+                                $sourceX = (int)(($sprite['size'] - $target_sprite_width) / 2);
                                 $sourceWidth = $target_sprite_width;
                             } else {
-                                $destX += ($target_sprite_width - $sprite['size']) / 2;
+                                $destX += (int)(($target_sprite_width - $sprite['size']) / 2);
                             }
                             if ($sprite['size'] > $target_sprite_height) {
                                 $sourceY = $sprite['size'] - $target_sprite_height;
                                 $sourceHeight = $target_sprite_height;
                             } else {
-                                $destY += ($target_sprite_height - $sprite['size']);
+                                $destY += $target_sprite_height - $sprite['size'];
                             }
                         }
                         elseif ($align_method === 'bottom-left'){
                             if ($sprite['size'] <= $target_sprite_width) {
                                 // $destX should centered to make up the difference
-                                $destX += ($target_sprite_size - $sprite['size']) / 2;
+                                $destX += (int)(($target_sprite_size - $sprite['size']) / 2);
                             } else {
                                 $sourceX = 0; // Take from the left of the sprite
                                 $sourceWidth = $target_sprite_width; // Crop to the width of the target area
                             }
                             if ($sprite['size'] <= $target_sprite_height) {
-                                $destY += ($target_sprite_height - $sprite['size']); // Move sprite to the bottom
+                                $destY += $target_sprite_height - $sprite['size']; // Move sprite to the bottom
                             } else {
                                 $sourceY = $sprite['size'] - $target_sprite_height; // Take from the bottom of the sprite
                                 $sourceHeight = $target_sprite_height; // Crop to the height of the target area
@@ -727,7 +730,7 @@ if ($must_regenerate && !empty($composite_index)){
     }
 
     // If this is a request for the INDEX and it doesn't exist, generate it now
-    if (true){
+    if ($must_regenerate_index){
         if (file_exists($full_index_path)){ unlink($full_index_path); }
         //error_log('Time to generate the composite image index file!');
         //error_log('$full_index_path = '.print_r($full_index_path, true));

@@ -986,7 +986,7 @@ class rpg_battle extends rpg_object {
                 $force_zenny_rewards = true;
 
                 // Only run leaderboard and battle record operations if NOT facing yourself
-                if ($this_player->player_id !== $target_player->player_id){
+                if (!empty($this->flags['player_battle']) && $this_player->player_id !== $target_player->player_id){
 
                     // Create the temp robot sprites for the database
                     $temp_this_player_robots = array();

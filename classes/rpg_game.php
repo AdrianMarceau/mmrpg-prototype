@@ -1955,42 +1955,52 @@ class rpg_game {
         $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
         $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
         $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
-        //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
 
         //  Define the index JSON's path give the provided sprite path
         $composite_index_path = str_replace('.png', '.json', $composite_sprite_path);
         $composite_index_path_clean = preg_replace('/\?.*/', '', $composite_index_path);
-        //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
-        //error_log('$composite_index_path = '.print_r($composite_index_path, true));
-        //error_log('$composite_index_path_clean = '.print_r($composite_index_path_clean, true));
 
         // Check to see if we need to stream or load the static version already cached
         $can_load_static_file = false;
         if (file_exists(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean)){
             $composite_index_filemtime = filemtime(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean);
-            //error_log('$composite_index_filemtime = '.print_r($composite_index_filemtime, true));
             if ($composite_index_filemtime >= $mmrpg_config_cache_time){
-                //error_log('static file is up-to-date ($composite_index_filemtime >= $mmrpg_config_cache_time)');
                 $can_load_static_file = true;
             }
         }
-        //error_log('$can_load_static_file = '.($can_load_static_file ? 'true' : 'false'));
 
-        // If we can load the static file do so now, otherwise we have to use file_get_contents() and stream it
+        // If we can load the static file do so now, otherwise use cURL to stream it
         $composite_index_json = '';
         if ($can_load_static_file) {
             $file_handle = fopen(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean, "r");
             $composite_index_json = fread($file_handle, filesize(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean));
             fclose($file_handle);
         } else {
-            $stream_config = array('ssl' => array('verify_peer' => false, 'verify_peer_name' => false)); // permissive b/c self-request only
-            $composite_index_json = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path, false, stream_context_create($stream_config));
+            // Initialize cURL for the self-request
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, MMRPG_CONFIG_ROOTURL.$composite_index_path);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            // Impersonate a standard browser to bypass anti-bot filtering
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36');
+
+            // Permissive SSL settings with explicit SNI resolution
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $host = parse_url(MMRPG_CONFIG_ROOTURL, PHP_URL_HOST);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Host: ' . $host));
+
+            // Explicit timeouts
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+            // Execute the request
+            $composite_index_json = curl_exec($ch);
+            curl_close($ch);
         }
-        //error_log('$composite_index_json = '.print_r($composite_index_json, true));
 
         // Decode the JSON and return the array to the calling function
         $composite_index_array = !empty($composite_index_json) ? json_decode($composite_index_json, true) : array();
-        //error_log('$composite_index_array = '.print_r($composite_index_array, true));
         return $composite_index_array;
 
     }

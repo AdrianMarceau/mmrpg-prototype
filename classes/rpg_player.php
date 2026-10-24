@@ -223,10 +223,14 @@ class rpg_player extends rpg_object {
                 $this->player_controller = 'human';
             }
             // Otherwise if different human player, collect username token from db
-            elseif ($this->user_id != MMRPG_SETTINGS_TARGET_PLAYERID){
+            elseif (!empty($this->user_id) && $this->user_id != MMRPG_SETTINGS_TARGET_PLAYERID){
                 $db_info = $db->get_array("SELECT user_name_clean AS username_clean, user_omega AS omega FROM mmrpg_users WHERE user_id = {$this->user_id};");
-                $this->user_token = $db_info['username_clean'];
-                $this->user_omega = $db_info['omega'];
+                if (!empty($db_info)){
+                    $this->user_token = $db_info['username_clean'];
+                    $this->user_omega = $db_info['omega'];
+                } else {
+                    error_log('rpg_player::player_load() on line '.__LINE__.' error: unable to load omega info for user ID '.$this->user_id);
+                }
             }
 
         }
@@ -3603,7 +3607,7 @@ class rpg_player extends rpg_object {
             if (mmrpg_prototype_item_unlocked('stellar-beacon')){ $event_container_size++; }
 
             ?>
-            <div class="event event_double event_<?= $player_key == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
+            <div class="event event_double event_<?= $player_token == $first_player_token ? 'visible' : 'hidden' ?>" data-token="<?=$player_info['player_token']?>" data-size="<?= $event_container_size ?>">
 
                 <? /*
                 <div class="this_sprite sprite_left" style="top: 4px; left: 4px; width: 36px; height: 36px; background-image: url(images/fields/<?= $player_info['player_field'] ?>/battle-field_avatar.png?<?= MMRPG_CONFIG_CACHE_DATE ?>); background-position: center center; border: 1px solid #1A1A1A;">

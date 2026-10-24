@@ -2508,6 +2508,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                 $temp_right = false;
                 $temp_layer = 100;
                 $temp_count = count($this_battleinfo['battle_sprite']);
+                $real_player_id = !empty($this_targetinfo['player_id']) ? (int)(explode('x', $this_targetinfo['player_id'])[0]) : 0;
                 $disable_hiding_robots = false;
                 if (MMRPG_CONFIG_IS_LIVE === false && MMRPG_CONFIG_DEBUG_MODE === true){ $disable_hiding_robots = true; }
                 $this_option_label .= '<span class="battle_sprites">';
@@ -2526,7 +2527,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         }
                     if (!$disable_hiding_robots
                         && preg_match('/^robots/i', $temp_path)
-                        && $this_targetinfo['player_id'] != MMRPG_SETTINGS_TARGET_PLAYERID){
+                        && $real_player_id !== MMRPG_SETTINGS_TARGET_PLAYERID){
                         $temp_path = 'robots/robot';
                         $temp_size = 40;
                         }

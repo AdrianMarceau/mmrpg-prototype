@@ -5500,7 +5500,7 @@ class rpg_robot extends rpg_object {
 
             ?>
             <div
-                class="event event_double event_<?= $robot_key == $first_robot_token ? 'visible' : 'hidden' ?> <?= false && $robot_info['robot_level'] >= 100 && $robot_info['robot_core'] != 'copy' ? 'event_has_subcore' : '' ?>"
+                class="event event_double event_<?= $robot_token == $first_robot_token ? 'visible' : 'hidden' ?> <?= false && $robot_info['robot_level'] >= 100 && $robot_info['robot_core'] != 'copy' ? 'event_has_subcore' : '' ?>"
                 data-token="<?= $player_info['player_token'].'_'.$robot_info['robot_token']?>"
                 data-player="<?= $player_info['player_token'] ?>"
                 data-robot="<?= $robot_info['robot_token'] ?>"
