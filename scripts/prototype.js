@@ -847,6 +847,7 @@ function initUserInputWatcher(){
                     let shiftAmount = 1;
                     if (activeInputs.Up || activeInputs.Down){
                         if ($currentOptionHovered.is('.starfield')){ shiftAmount = 4; }
+                        else if ($currentOptionHovered.is('.challenge')){ shiftAmount = 12; }
                         else if ($currentOptionHovered.is('.versus')){ shiftAmount = 2; }
                         else if ($currentOptionHovered.is('.option_this-robot-select')){ shiftAmount = 4; }
                         }

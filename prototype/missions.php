@@ -1564,6 +1564,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
 
         // Create an array to hold all the challenge missions
         $temp_challenge_missions = array();
+        $temp_challenge_missions_max = 99;
 
         // Check to see if this user already has a playlist of challenges
         $temp_session_key = $this_prototype_data['this_player_token'].'_target-challenge-missions';
@@ -1574,9 +1575,9 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         }
 
         // Check to see if there are any event challenges to display right now
-        if (count($temp_challenge_missions) < 3){
+        if (count($temp_challenge_missions) < $temp_challenge_missions_max){
             $include_hidden = rpg_user::current_user_has_permission('edit-challenges') ? true : false;
-            $temp_required = 3 - count($temp_challenge_missions);
+            $temp_required = $temp_challenge_missions_max - count($temp_challenge_missions);
             $temp_event_challenges = rpg_mission_challenge::get_missions($this_prototype_data, 'event', $temp_required, $include_hidden, false);
             if (!empty($temp_event_challenges)){ $temp_challenge_missions = array_merge($temp_challenge_missions, $temp_event_challenges); }
         }
@@ -1592,6 +1593,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 if (!empty($temp_battle_omega['flags']['is_cleared'])){
                     $victory_results = $temp_battle_omega['values']['challenge_records']['personal'];
                     $victory_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, $victory_results, $victory_percent, $victory_rank);
+                    //$temp_battle_omega['option_class'] = 'cleared '.strtolower($victory_rank).'-rank';
                     $cleared_token_colour = 'electric'; //!empty($temp_battle_omega['values']['colour_token']) ? $temp_battle_omega['values']['colour_token'] : 'none';
                     $temp_battle_omega['battle_button'] = (!empty($temp_battle_omega['battle_button']) ? $temp_battle_omega['battle_button'] : $temp_battle_omega['battle_name']).' <sup class="special_type player_type player_type_'.$cleared_token_colour.'">&#9733; '.$victory_rank.'<span class="nobanner">-Rank Clear!</span></sup>';
                 }

@@ -17,7 +17,8 @@ class rpg_mission_challenge extends rpg_mission {
         // Collect or define the order for the query
         $challenge_order = array();
         if ($shuffle_list){ $challenge_order[] = 'RAND()'; }
-        else { $challenge_order[] = 'challenges.challenge_creator ASC'; $challenge_order[] = 'challenges.challenge_id ASC'; }
+        //else { $challenge_order[] = 'challenges.challenge_creator ASC'; $challenge_order[] = 'challenges.challenge_id ASC'; }
+        else { $challenge_order[] = 'challenges.challenge_difficulty ASC'; $challenge_order[] = 'challenges.challenge_id ASC'; }
         $challenge_order = !empty($challenge_order) ? implode(', ', $challenge_order) : 'challenges.challenge_id ASC';
         // Collect or define the query result limit
         $challenge_limit = !empty($challenge_limit) && is_numeric($challenge_limit) ? 'LIMIT '.$challenge_limit : '';
@@ -298,9 +299,16 @@ class rpg_mission_challenge extends rpg_mission {
 
         // Define the marker type for this challenge
         $challenge_marker_type = 'base';
-        if ($challenge_kind == 'event'){ $challenge_marker_type = 'gold'; }
+        if ($challenge_kind == 'event'){
+            $challenge_difficulty = !empty($challenge_data['challenge_difficulty']) ? $challenge_data['challenge_difficulty'] : 0;
+            if ($challenge_difficulty === 0){ $challenge_marker_type = 'base'; }
+            elseif ($challenge_difficulty === 1){ $challenge_marker_type = 'bronze'; }
+            elseif ($challenge_difficulty === 2){ $challenge_marker_type = 'silver'; }
+            elseif ($challenge_difficulty === 3){ $challenge_marker_type = 'gold'; }
+        }
 
         // Increase the reward zenny if this is a bronze, silver, or gold challenge
+        if ($challenge_marker_type == 'base'){ $challenge_reward_zenny += ($challenge_reward_zenny * 0); }
         if ($challenge_marker_type == 'bronze'){ $challenge_reward_zenny += ($challenge_reward_zenny * 1); }
         if ($challenge_marker_type == 'silver'){ $challenge_reward_zenny += ($challenge_reward_zenny * 2); }
         if ($challenge_marker_type == 'gold'){ $challenge_reward_zenny += ($challenge_reward_zenny * 3); }

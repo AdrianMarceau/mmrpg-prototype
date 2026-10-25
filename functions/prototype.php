@@ -2695,6 +2695,7 @@ function mmrpg_prototype_options_markup(&$battle_options, $player_token){
                         $this_option_title .= ' <br />Turns: '.$victory_results['challenge_turns_used'].'/'.$victory_results['challenge_turn_limit'];
                         $this_option_title .= ' | Robots: '.$victory_results['challenge_robots_used'].'/'.$victory_results['challenge_robot_limit'];
                         $this_option_title .= ' | Reward: '.number_format($victory_points, 0, '.', ',').' BP ('.$victory_percent.'%)';
+                        $this_option_class .= ' cleared '.strtolower($victory_rank).'-rank';
                     }
 
             } elseif ($is_challenge_battle
