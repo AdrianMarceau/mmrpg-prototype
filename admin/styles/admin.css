@@ -2334,6 +2334,7 @@ input[type=file] {
 .adminform .results .list .target,
 .adminform .results .list .game,
 .adminform .results .list .points,
+.adminform .results .list .difficulty,
 .adminform .results .list .class {
     text-align: center;
 }

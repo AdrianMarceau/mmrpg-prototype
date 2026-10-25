@@ -373,6 +373,7 @@ class rpg_mission_challenge extends rpg_mission {
             'challenge_creator',
             'challenge_name',
             'challenge_description',
+            'challenge_difficulty',
             'challenge_robot_limit',
             'challenge_turn_limit',
             'challenge_field_data',
