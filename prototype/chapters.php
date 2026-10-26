@@ -188,16 +188,6 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $disabled_extra_tab_markup .= '<a class="chapter_link extra first random chapter_link_disabled">???</a>';
             }
 
-        // CHAPTER STARS(7)
-        if ($allow_star_fields){
-            $chapters_display_count++;
-            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 8);
-            $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
-            } elseif ($num_extra > 0){
-            $chapters_display_count++;
-            $disabled_extra_tab_markup .= '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
-            }
-
         // CHAPTER PLAYERS(6)
         if ($allow_player_battles){
             $chapters_display_count++;
@@ -216,6 +206,16 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             } elseif ($num_extra > 0){
             $chapters_display_count++;
             $disabled_extra_tab_markup .= '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';
+            }
+
+        // CHAPTER STARS(7)
+        if ($allow_star_fields){
+            $chapters_display_count++;
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 8);
+            $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
+            } elseif ($num_extra > 0){
+            $chapters_display_count++;
+            $disabled_extra_tab_markup .= '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
             }
 
         // Print out the enabled and disabled tab markup

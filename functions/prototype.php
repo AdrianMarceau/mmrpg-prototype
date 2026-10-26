@@ -4455,8 +4455,10 @@ function mmrpg_prototype_leaderboard_online(){
 function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = '', &$this_leaderboard_defeated_players = array(), &$personal_leaderboard_target_player = array()){
     global $db;
     // Check to see if the leaderboard targets have already been pulled or not
-    if (!empty($db->INDEX['LEADERBOARD']['targets'])){
+    if (!empty($db->INDEX['LEADERBOARD']['targets'])
+        && !empty($db->INDEX['LEADERBOARD']['defeated'])){
         $this_leaderboard_target_players = json_decode($db->INDEX['LEADERBOARD']['targets'], true);
+        $this_leaderboard_defeated_players = json_decode($db->INDEX['LEADERBOARD']['defeated'], true);
     } else {
 
         // Collect the leaderboard index and online players for ranking
@@ -4683,6 +4685,7 @@ function mmrpg_prototype_leaderboard_targets($this_userid, $player_robot_sort = 
         // Update the database index cache
         //if (!empty($player_robot_sort)){ uasort($this_leaderboard_target_players, 'mmrpg_prototype_leaderboard_targets_sort'); }
         $db->INDEX['LEADERBOARD']['targets'] = json_encode($this_leaderboard_target_players);
+        $db->INDEX['LEADERBOARD']['defeated'] = json_encode($this_leaderboard_defeated_players);
         //die($temp_leaderboard_query);
     }
 

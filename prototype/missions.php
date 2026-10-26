@@ -1219,11 +1219,23 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $remaining_stars = mmrpg_prototype_remaining_stars(true, $possible_star_list);
         $num_remaining_stars = count($remaining_stars);
 
+        // If we know the number of stars collected and the total, append it to the maintext
+        if (!empty($possible_star_list)){
+            $num_stars_total = count($possible_star_list);
+            $field_stars_collected = mmrpg_prototype_stars_unlocked('', 'field');
+            $fusion_stars_collected = mmrpg_prototype_stars_unlocked('', 'fusion');
+            $num_stars_collected = $field_stars_collected + $fusion_stars_collected;
+            $append_totals = $num_stars_collected.' / '.$num_stars_total.' <i class="fa fa-fw fa-star"></i>';
+            $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($num_stars_total) ? ' <em>'.$append_totals.'</em>' : '');
+        }
+
+        /*
         // If we have a stars remaining to collect, append it to the maintext
         if (!empty($num_remaining_stars)){
             $append_remaining = ''.$num_remaining_stars.' <i class="fa fa-fw fa-star"></i>';
             $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($num_remaining_stars) ? ' <em>'.$append_remaining.'</em>' : '');
         }
+        */
 
         // Calculate the current starforce total vs max starforce total for mission gen
         $current_starforce = !empty($_SESSION[$session_token]['values']['star_force']) ? $_SESSION[$session_token]['values']['star_force'] : array();
@@ -1335,6 +1347,15 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
             //error_log('$temp_self_data = '.print_r($temp_self_data, true));
             //error_log('$temp_player_list (count) = '.print_r(count($temp_player_list), true));
 
+            // Collect the total number of leaderboard targets and display how many defeated so far
+            $this_leaderboard_index = mmrpg_prototype_leaderboard_index();
+            $num_leaderboard_targets = count($this_leaderboard_index);
+            if (!empty($num_leaderboard_targets)){
+                $append_total = count($defeated).' / '.$num_leaderboard_targets.' <i class="fa fa-fw fa-stop-circle"></i>';
+                $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($append_total) ? ' <em>'.$append_total.'</em>' : '');
+            }
+
+            /*
             // If we have a leaderboard target count, append it to the maintext
             $player_targets_remaining = 0;
             if (!empty($_SESSION['LEADERBOARD']['player_targets_remaining'])){
@@ -1342,6 +1363,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $append_remaining = ''.$player_targets_remaining.' <i class="fa fa-fw fa-stop-circle"></i>';
                 $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($player_targets_remaining) ? ' <em>'.$append_remaining.'</em>' : '');
             }
+            */
 
             // If we have a leaderboard target count, append it to the maintext
             $player_rematches_remaining = 0;
@@ -1552,6 +1574,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
     if ($this_prototype_data['prototype_complete'] || $this_prototype_data['this_chapter_unlocked']['8']){
 
         // EVENT MESSAGE : CHALLENGE CHAPTER
+        $next_key = count($this_prototype_data['battle_options']);
         $this_prototype_data['battle_options'][] = array(
             'option_type' => 'message',
             'option_chapter' => $this_prototype_data['this_current_chapter'],
@@ -1583,6 +1606,8 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         }
 
         // Loop through any collected event or user challenges and then add them to the list
+        $num_cleared_missions = 0;
+        $num_challenge_missions = count($temp_challenge_missions);
         if (!empty($temp_challenge_missions)){
             //echo('<pre>$this_prototype_data = '.print_r($this_prototype_data, true).'</pre>');
             //echo('<pre>$temp_challenge_missions = '.print_r($temp_challenge_missions, true).'</pre>');
@@ -1591,6 +1616,7 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 if (empty($temp_battle_omega) || empty($temp_battle_omega['values'])){ continue; }
                 $temp_challenge_kind = $temp_battle_omega['values']['challenge_battle_kind'];
                 if (!empty($temp_battle_omega['flags']['is_cleared'])){
+                    $num_cleared_missions++;
                     $victory_results = $temp_battle_omega['values']['challenge_records']['personal'];
                     $victory_points = rpg_mission_challenge::calculate_challenge_reward_points($temp_challenge_kind, $victory_results, $victory_percent, $victory_rank);
                     //$temp_battle_omega['option_class'] = 'cleared '.strtolower($victory_rank).'-rank';
@@ -1604,6 +1630,12 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
                 $this_prototype_data['battle_options'][] = $temp_battle_omega;
                 rpg_battle::update_index_info($temp_battle_omega['battle_token'], $temp_battle_omega);
             }
+        }
+
+        // Collect the total number of challenge missions and display how many cleared so far
+        if (!empty($num_challenge_missions)){
+            $append_total = $num_cleared_missions.' / '.$num_challenge_missions.' <i class="fa fa-fw fa-skull"></i>';
+            $this_prototype_data['battle_options'][$next_key]['option_maintext'] .= (!empty($append_total) ? ' <em>'.$append_total.'</em>' : '');
         }
 
 
