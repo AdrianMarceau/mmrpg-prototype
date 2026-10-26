@@ -1865,7 +1865,7 @@ class rpg_game {
 
         // Strip the root directory and remove any trailing slashes to normalize directory checks
         $relative_path = rtrim(str_replace(MMRPG_CONFIG_ROOTDIR, '', $real_path), '/');
-        error_log('rpg_game::sprite_exists('.$relative_path.')');
+        //error_log('rpg_game::sprite_exists('.$relative_path.')');
 
         // Extract the asset category from the relative path (e.g., 'robots', 'fields', 'abilities')
         preg_match('#^content/([^/]+)/#i', $relative_path, $matches);
@@ -1997,8 +1997,8 @@ class rpg_game {
 
         // Collect the global cache time and break it down to an exact time
         list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
-        $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
-        $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
+        $yyyy = (int)substr($new_cache_date, 0, 4); $mm = (int)substr($new_cache_date, 4, 2); $dd = (int)substr($new_cache_date, 6, 2);
+        $hh = (int)substr($new_cache_time, 0, 2); $ii = (int)substr($new_cache_time, 2, 2);
         $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
 
         //  Define the index JSON's path give the provided sprite path
