@@ -1855,21 +1855,66 @@ class rpg_game {
 
     // Define a function for checking to see if a given sprite exists (at its real location)
     public static function sprite_exists($sym_path){
+        //error_log('rpg_game::sprite_exists('.$sym_path.')');
 
-        // Get the real path given the sym link
-        $real_path = self::get_real_sprite_path($sym_path, true);
+        // Maintain a static memory cache for the duration of the current script execution
+        static $category_cache = array();
 
-        // Now that we have the real path, check to see if it exists
-        $file_exists = file_exists($real_path);
+        // Get the real path, passing "false" so it doesn't force the full absolute path
+        $real_path = self::get_real_sprite_path($sym_path, false);
 
-        //error_log('$sym_path = '.print_r($sym_path, true));
-        //error_log('$real_path = '.print_r($real_path, true));
-        //error_log('$file_exists = '.($file_exists ? 'true' : 'false'));
-        //exit();
+        // Strip the root directory and remove any trailing slashes to normalize directory checks
+        $relative_path = rtrim(str_replace(MMRPG_CONFIG_ROOTDIR, '', $real_path), '/');
+        error_log('rpg_game::sprite_exists('.$relative_path.')');
 
-        // Return the result of the check
-        return $file_exists;
+        // Extract the asset category from the relative path (e.g., 'robots', 'fields', 'abilities')
+        preg_match('#^content/([^/]+)/#i', $relative_path, $matches);
+        $category = !empty($matches[1]) ? $matches[1] : 'misc';
 
+        // If we haven't loaded this category into memory yet, do it now
+        if (!isset($category_cache[$category])) {
+
+            // Define cache variables for your file-based caching system
+            $cache_kind = 'sprites.' . $category;
+            $cache_token = md5('sprite_index_' . $category);
+
+            // Attempt to load from the flat-file cache
+            $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token);
+
+            if (!empty($cached_index)) {
+                // Success: Load the file-cached index into static memory
+                $category_cache[$category] = $cached_index;
+            } else {
+                // Miss/Expired: Run the heavy glob() operation
+                $search_pattern = MMRPG_CONFIG_ROOTDIR . 'content/' . $category . '/*/*/*.*';
+                $files = glob($search_pattern);
+
+                $cache_data = array();
+                if ($files) {
+                    // Strip the absolute root directory from all paths
+                    $files = str_replace(MMRPG_CONFIG_ROOTDIR, '', $files);
+
+                    foreach ($files as $file) {
+                        // 1. Add the file itself to the cache
+                        $cache_data[$file] = true;
+
+                        // 2. Walk up the directory tree and add parent folders so directory checks pass
+                        $dir = dirname($file);
+                        while ($dir != '.' && $dir != 'content' && !isset($cache_data[$dir])) {
+                            $cache_data[$dir] = true;
+                            $dir = dirname($dir);
+                        }
+                    }
+                }
+                $category_cache[$category] = $cache_data;
+
+                // Save this relative-path array to the file cache
+                rpg_object::save_cached_index($cache_kind, $cache_token, $category_cache[$category]);
+            }
+        }
+
+        // Return true if the relative path (or its stripped directory path) exists in our cache
+        return isset($category_cache[$category][$relative_path]);
     }
 
     // Define a function for converting a sprite config array into a path string
