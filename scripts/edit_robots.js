@@ -375,6 +375,7 @@ $(document).ready(function(){
         var dataToken = dataSprite.attr('data-token');
         var dataRobot = dataSprite.attr('data-robot');
         var dataPlayer = dataSprite.attr('data-player');
+        localStorage.setItem('mmrpgPrototype_lastSelectedRobot', dataToken);
         if (dataSprite.hasClass('loading')){ return false; }
         dataSprite.addClass('loading');
 
@@ -1875,30 +1876,35 @@ function robotEditorCanvasInit(){
             countRobotsLoaded = 0;
             countWrapperLoop = 0;
             $('.sprite[data-robot]', robotCanvas).addClass('notloaded');
-            while (countRobotsTriggered < countRobotLinks){
-
-                $('.wrapper[data-player]', robotCanvas).each(function(index){
-
-                    var tempWrapper = $(this);
-                    var tempPlayer = $(this).attr('data-player');
-                    var tempRobot = $('.sprite[data-robot]', tempWrapper).eq(countWrapperLoop);
-                    if (!tempRobot.length || tempRobot == undefined){
-                        return false;
-                        } else {
-                        //console.log('calling loadConsoleRobotMarkup from checkpoint B');
-                        loadConsoleRobotMarkup(tempRobot, index, function(){
-                            showRobotInReadyRoom(tempPlayer, tempRobot.attr('data-robot'));
-                            });
-                        }
-                    return false;
-
-                    });
-
-                countRobotsTriggered++;
-                countWrapperLoop++;
-                break;
-
-                }
+            // Check local storage for the last selected robot
+            var lastSelectedRobot = localStorage.getItem('mmrpgPrototype_lastSelectedRobot');
+            var $targetRobot = false;
+            if (lastSelectedRobot){ $targetRobot = $('.sprite[data-token="' + lastSelectedRobot + '"]', robotCanvas); }
+            // Fallback to the first available robot if none found in storage
+            if (!$targetRobot || !$targetRobot.length){ $targetRobot = $('.sprite[data-token]', robotCanvas).first(); }
+            if ($targetRobot.length) {
+                var targetPlayerToken = $targetRobot.attr('data-player');
+                var targetRobotToken = $targetRobot.attr('data-robot');
+                var targetDataToken = $targetRobot.attr('data-token');
+                var $targetParent = $targetRobot.closest('.wrapper');
+                var targetDataSelect = $targetParent.attr('data-select');
+                var targetIndex = $('.wrapper[data-player]', robotCanvas).index($targetParent);
+                // Instantly update canvas visual classes
+                $('.sprite[data-token]', robotCanvas).removeClass('sprite_robot_current sprite_robot_dr-light_current sprite_robot_dr-wily_current sprite_robot_dr-cossack_current');
+                $targetRobot.addClass('sprite_robot_current sprite_robot_' + targetPlayerToken + '_current');
+                $targetParent.css({display: 'block'});
+                // Fetch the console markup for this target robot explicitly
+                // Pass 0 as the index so thisConsole.animate(...) always triggers
+                loadConsoleRobotMarkup($targetRobot, 0, function(){
+                    // Swap the console visibility seamlessly once it is appended
+                    var dataSelectorNext = '#' + targetDataSelect + ' .event[data-token="' + targetDataToken + '"]';
+                    $(dataSelectorNext, gameConsole).css({opacity: 0}).removeClass('event_hidden').addClass('event_visible').animate({opacity: 1.0}, 250, 'swing');
+                    showRobotInReadyRoom(targetPlayerToken, targetRobotToken);
+                });
+            }
+            // Increment the tracker variables to match the initialization state
+            countRobotsTriggered++;
+            countWrapperLoop++;
 
             if (gameSettings.allowEditing){
 

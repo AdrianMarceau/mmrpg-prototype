@@ -584,6 +584,8 @@ body.windowFlag_landscapeMode #prototype {
     margin: 0 auto 2px;
     width: 100% !important;
     min-height: 230px;
+    max-height: 235px;
+    overflow: hidden;
 }
 #edit td.console {
     overflow: visible;
