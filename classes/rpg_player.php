@@ -4021,7 +4021,7 @@ class rpg_player extends rpg_object {
 
                     <? } ?>
 
-                    <? if(mmrpg_prototype_item_unlocked('stellar-beacon')){ ?>
+                    <? if(!empty($player_info['player_fields_current']) && mmrpg_prototype_item_unlocked('stellar-beacon')){ ?>
 
                         <table class="full">
                             <colgroup>
