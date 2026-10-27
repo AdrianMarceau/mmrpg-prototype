@@ -75,10 +75,32 @@ $(document).ready(function(){
 
         }
 
+    // Restore starchart group positions from local storage before initial resizing
+    var lastGroupTop = localStorage.getItem('mmrpgStarforce_lastGroupTop');
+    if (lastGroupTop){
+        var $topbar = $('.starchart .grouplist.topbar', thisBody);
+        // Ensure the saved group actually exists on the page
+        if ($topbar.find('.group[data-group="' + lastGroupTop + '"]').length) {
+            $topbar.attr('data-current', lastGroupTop);
+            $topbar.find('.group').removeClass('current');
+            $topbar.find('.group[data-group="' + lastGroupTop + '"]').addClass('current');
+            }
+        }
+    var lastGroupSide = localStorage.getItem('mmrpgStarforce_lastGroupSide');
+    if (lastGroupSide){
+        var $sidebar = $('.starchart .grouplist.sidebar', thisBody);
+        // Ensure the saved group actually exists on the page
+        if ($sidebar.find('.group[data-group="' + lastGroupSide + '"]').length) {
+            $sidebar.attr('data-current', lastGroupSide);
+            $sidebar.find('.group').removeClass('current');
+            $sidebar.find('.group[data-group="' + lastGroupSide + '"]').addClass('current');
+            }
+        }
+
     thisWindow.resize(function(){ windowResizeStarforce(); });
     setTimeout(function(){ windowResizeStarforce(); }, 1000);
     windowResizeStarforce();
-    refreshArrowButtons();
+    //refreshArrowButtons();
 
     var windowHeight = $(window).height();
     var htmlHeight = $('html').height();
@@ -102,17 +124,21 @@ $(document).ready(function(){
             if (newView === currentView){ return; }
             $viewToggle.attr('data-view', newView);
             $viewContent.attr('data-view', newView);
+            localStorage.setItem('mmrpgStarforce_lastView', newView);
             };
         $('.option[data-view]', $viewToggle).bind('click', function(){
             let $option = $(this);
             let view = $option.attr('data-view');
             switchContentView(view);
             });
+        let lastSelectedView = localStorage.getItem('mmrpgStarforce_lastView');
+        if (lastSelectedView){ switchContentView(lastSelectedView); }
         }
 
     // Expose the pagination function so the resize handler can call it
     window.showStarListPage = function(pageNum){
         $starListPages.attr('data-current-page', pageNum);
+        localStorage.setItem('mmrpgStarforce_lastPage', pageNum);
         $('a[data-page]', $starListPages).removeClass('active');
         $starListPages.find('a[data-page="' + pageNum + '"]').addClass('active');
         let numPerPage = parseInt($starListPages.attr('data-per-page')) || 32;
@@ -160,7 +186,8 @@ $(document).ready(function(){
                 window.showStarListPage(newPageNum);
                 }
             });
-        window.showStarListPage(1);
+        let lastSelectedPage = localStorage.getItem('mmrpgStarforce_lastPage');
+        window.showStarListPage(lastSelectedPage ? parseInt(lastSelectedPage) : 1);
         }
     /*
     if ($starList && $starListPages){
@@ -235,6 +262,10 @@ $(document).ready(function(){
         thisGrouplist.attr('data-current', newGroupToken);
         currentGroupContainer.removeClass('current');
         newGroupContainer.addClass('current');
+
+        // Save the updated top or side group to local storage
+        if (thisGrouplist.hasClass('topbar')){ localStorage.setItem('mmrpgStarforce_lastGroupTop', newGroupToken); }
+        else if (thisGrouplist.hasClass('sidebar')){ localStorage.setItem('mmrpgStarforce_lastGroupSide', newGroupToken); }
 
         // Trigger a refresh of the buttons and visible stars
         playSoundEffect.call(this, 'icon-click', {volume: 1.0});
