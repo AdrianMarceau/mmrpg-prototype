@@ -122,8 +122,8 @@ $(document).ready(function(){
 
             }
 
-        // Update the session variable with the current page link number
-        $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,current_database_robot_token,'+dataToken});
+        // Save the selected robot to local storage instead of pinging the server
+        localStorage.setItem('mmrpgDatabase_lastSelectedRobot', dataToken);
 
         });
     // Trigger a click on the first robot
@@ -166,15 +166,34 @@ $(document).ready(function(){
             }
         //console.log(firstVisibleSprite.text());
         firstVisibleSprite.triggerSilentClick();
-        // Update the session variable with the current page link number
-        $.post('scripts/script.php',{requestType:'session',requestData:'battle_settings,current_database_page_key,'+dataGame});
+        // Save the selected page/game tab to local storage instead of pinging the server
+        localStorage.setItem('mmrpgDatabase_lastSelectedGame', dataGame);
         // Return true on succes
         return true;
         });
-    // Click the first game link, whatever it is
-    if ($('.game_link_active[data-game]', gameCanvas).length){ var tempFirstLink = $('.game_link_active[data-game]', gameCanvas); }
-    else { var tempFirstLink = $('.game_link[data-game]', gameCanvas).first(); }
-    tempFirstLink.triggerSilentClick();
+
+    // Check local storage for previous selections
+    var lastSelectedGame = localStorage.getItem('mmrpgDatabase_lastSelectedGame');
+    var lastSelectedRobot = localStorage.getItem('mmrpgDatabase_lastSelectedRobot');
+    // Override the PHP-injected first robot if we have one in local storage
+    if (lastSelectedRobot){
+        gameSettings.firstRobot = lastSelectedRobot;
+        // Instantly swap the console visibility classes to prevent the animation flash
+        $('#console .event_visible').removeClass('event_visible').addClass('event_hidden');
+        $('#console .event[data-token="' + lastSelectedRobot + '"]').removeClass('event_hidden').addClass('event_visible').css({opacity: 1});
+        // Pre-apply the active class to the canvas sprite so the click handler skips the crossfade
+        $('.sprite_robot[data-token="' + lastSelectedRobot + '"]', gameCanvas).addClass('sprite_robot_current');
+        }
+    // Find the correct game link to click based on local storage, falling back to defaults
+    var tempFirstLink = false;
+    if (lastSelectedGame){ tempFirstLink = $('.game_link[data-game="' + lastSelectedGame + '"]', gameCanvas); }
+    // If no valid link was found in storage, fallback to the active class or the very first link
+    if (!tempFirstLink || !tempFirstLink.length){
+        if ($('.game_link_active[data-game]', gameCanvas).length){ tempFirstLink = $('.game_link_active[data-game]', gameCanvas); }
+        else { tempFirstLink = $('.game_link[data-game]', gameCanvas).first(); }
+        }
+    // Trigger the initial click to load the tab and its robot
+    if (tempFirstLink.length){ tempFirstLink.triggerSilentClick(); }
 
     // Create the click event for the back button
     $('a.back', gameCanvas).click(function(e){
