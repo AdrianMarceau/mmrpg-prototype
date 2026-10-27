@@ -847,7 +847,7 @@ function initUserInputWatcher(){
                     let shiftAmount = 1;
                     if (activeInputs.Up || activeInputs.Down){
                         if ($currentOptionHovered.is('.starfield')){ shiftAmount = 4; }
-                        else if ($currentOptionHovered.is('.challenge')){ shiftAmount = 12; }
+                        else if ($currentOptionHovered.is('.challenge')){ shiftAmount = 3; }
                         else if ($currentOptionHovered.is('.versus')){ shiftAmount = 2; }
                         else if ($currentOptionHovered.is('.option_this-robot-select')){ shiftAmount = 4; }
                         }
@@ -1719,6 +1719,15 @@ function prototype_menu_click_option(thisContext, thisOption, onComplete){
         let oldOnComplete = onComplete;
         let newOnComplete = function(){
             triggerWindowEventsPull();
+            // Setup perfect scrollbar for the incoming mission select menu
+            var tempCondition = 'this_player_token='+battleOptions['this_player_token'];
+            var $tempMenu = $('.menu[data-select="this_battle_token"]', thisContext);
+            var $tempWrapper = $('.option_wrapper[data-condition="'+tempCondition.replace('=', '\\=')+'"]', $tempMenu);
+            var $tempInnerWrapper = $tempWrapper.find('> .wrap');
+            if ($tempInnerWrapper.length){
+                $tempInnerWrapper.scrollTop(1);
+                $tempInnerWrapper.perfectScrollbar(gameSettings.perfectScrollbar);
+            }
             oldOnComplete();
             };
         onComplete = newOnComplete;
@@ -2250,13 +2259,24 @@ function prototype_menu_switch_action(switchOptions){
                                         tempMenuWrapper.find('.option').not('.option_sticky').remove();
                                         var innerMenuWrapper = tempMenuWrapper.find('.wrap');
                                         if (innerMenuWrapper.length){
-                                            innerMenuWrapper.empty();
-                                            innerMenuWrapper.append(innerMarkup);
+                                            // Prevent .wrap nesting by completely replacing it for missions
+                                            if (currentMenuSelect === 'this_battle_token') {
+                                                innerMenuWrapper.remove();
+                                                tempMenuWrapper.append(innerMarkup);
                                             } else {
-                                            tempMenuWrapper.append(innerMarkup);
+                                                innerMenuWrapper.empty();
+                                                innerMenuWrapper.append(innerMarkup);
                                             }
-                                        $('.option_message:gt(0)', tempMenuWrapper).triggerSilentClick();
+                                        } else {
+                                            tempMenuWrapper.append(innerMarkup);
                                         }
+                                        $('.option_message:gt(0)', tempMenuWrapper).triggerSilentClick();
+                                        // Re-initialize perfectScrollbar for the freshly injected wrap
+                                        var $newInnerWrapper = tempMenuWrapper.find('.wrap');
+                                        if ($newInnerWrapper.length){
+                                            $newInnerWrapper.perfectScrollbar(gameSettings.perfectScrollbar);
+                                        }
+                                    }
 
                                     // If this was a mission select loading, auto-click the proper chapter
                                     if (currentMenuSelect == 'this_battle_token'){

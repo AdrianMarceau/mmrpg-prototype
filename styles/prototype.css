@@ -2037,11 +2037,13 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 }
 
 #prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
-    padding-right: 0;
-}
-#prototype .menu[data-select] .option_wrapper > .wrap.ps-container {
     padding-right: 10px;
     padding-left: 10px;
+}
+#prototype .menu[data-select="this_battle_token"] .option_wrapper > .wrap.ps-container {
+    height: 260px;
+}
+#prototype .menu[data-select="this_player_robots"] .option_wrapper > .wrap.ps-container {
     height: 232px;
 }
 
@@ -2079,6 +2081,11 @@ body.mobileFlag_landscapeMode #prototype .banner .tooltip:hover,
 
 }
 #prototype.main_menu .option_wrapper_missions {
+    padding-top: 24px;
+    position: relative;
+}
+#prototype.main_menu .option_wrapper_missions > .wrap {
+    margin-top: -24px;
     padding-top: 24px;
     position: relative;
 }
@@ -3306,9 +3313,8 @@ body[data-source="website"] #prototype .menu {
     display: block;
     position: relative;
     box-sizing: border-box;
-    width: calc((100% / 12) - 5px);
+    width: calc((100% / 3) - 5px);
     height: 48px;
-    border-width: 1px;
     margin: 0 0 4px 4px;
 }
 #mmrpg #prototype.main_menu .option_wrapper_missions .option[data-token="dr-light-endless-mission"],
@@ -3389,7 +3395,23 @@ body[data-source="website"] #prototype .menu {
 #mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .has_image {
     min-height: 0;
 }
-#mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .multi,
+#mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .multi .maintext {
+    font-size: 9px;
+    line-height: 12px;
+    padding-right: 25px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .multi .maintext .special_type {
+    display: none;
+}
+#mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .multi .subtext {
+    font-size: 8px;
+    font-weight: normal;
+    top: 18px;
+}
+#mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .multi .subtext2,
 #mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .platform .arrow {
     display: none;
 }
@@ -3410,15 +3432,14 @@ body[data-source="website"] #prototype .menu {
     display: block;
     position: absolute;
     z-index: 100;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 12px;
+    right: 12px;
     background-color: rgb(136, 137, 23);
     border: 1px solid rgb(181 182 32);
     border-radius: 6px;
     color: #ffffff;
     font-weight: bold;
-    padding: 2px 6px;
+    padding: 4px 6px;
     text-align: center;
 }
 #mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge.cleared.ss-rank .platform:after { content: "\002605 SS"; }
@@ -4380,7 +4401,7 @@ body[data-source="website"] #prototype .menu {
     width: 25%;
     height: calc(26em - 3px);
     position: absolute;
-    top: 51px;
+    top: 5px;
     right: 0;
 }
 #mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter="3"] {
@@ -4394,7 +4415,7 @@ body[data-source="website"] #prototype .menu {
     width: 25%;
     height: calc(26em - 3px);
     position: absolute;
-    top: 51px;
+    top: 5px;
     right: 0;
 }
 #mmrpg.battleButtonMode_default #prototype .menu.select_this_battle .option_this-battle-select[data-chapter].option_placeholder .maintext {
@@ -4684,7 +4705,7 @@ body[data-source="website"] #prototype .menu {
     }
 
     #mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge:not([data-token*="-endless-mission"]) {
-        width: calc((100% / 12) - 5px);
+        width: calc((100% / 3) - 5px);
     }
     #mmrpg #prototype.main_menu .option_wrapper_missions .option.challenge .battle_sprites .sprite_marker {
         transform: translateX(-13px);
