@@ -343,6 +343,10 @@ body.windowFlag_landscapeMode #prototype {
     border-color: rgba(0, 0, 0, 0.25) !important;
     box-shadow: none !important;
 }
+#edit #canvas .sprite_robot:hover,
+#edit #canvas .sprite_robot.hovered {
+    outline: 1px solid #ffffff;
+}
 #edit #canvas .sprite_robot:before,
 #edit #canvas .sprite_robot:after {
     content: "";
@@ -406,6 +410,8 @@ body.windowFlag_landscapeMode #prototype {
 }
 #edit #canvas .sprite_robot:hover .sprite_40x40,
 #edit #canvas .sprite_robot:hover .sprite_80x80,
+#edit #canvas .sprite_robot.hovered .sprite_40x40,
+#edit #canvas .sprite_robot.hovered .sprite_80x80,
 #edit #canvas .sprite_robot_current .sprite_40x40,
 #edit #canvas .sprite_robot_current .sprite_80x80 {
     bottom: 0px;

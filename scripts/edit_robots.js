@@ -484,8 +484,8 @@ $(document).ready(function(){
                         //console.log('robotToken1('+robotToken1+') = robotToken1Position('+robotToken1Position+');\n');
                         //console.log('robotToken2('+robotToken2+') = robotToken2Position('+robotToken2Position+');\n ');
                         // compare
-                        if (robotToken1Position > robotToken2Position) { return 1; }
-                        else if (robotToken1Position < robotToken2Position) { return -1; }
+                        if (robotToken1Position > robotToken2Position){ return 1; }
+                        else if (robotToken1Position < robotToken2Position){ return -1; }
                         else { return 0; }
                         });
                     // put sorted results back on page
@@ -2539,4 +2539,140 @@ function resetEditorMenus(robotEvent, onComplete){
     return onComplete();
 
 
+}
+
+// Define a robot-specific function to call when polling user input variables
+function checkUserInputsForRobotsFrame(kind, event, activeInputs, userInputs){
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+
+    // Ensure we are looking at the robot canvas
+    let $robotCanvas = $('#canvas .robot_canvas', $thisPrototype);
+    if (!$robotCanvas.is(':visible')){ return; }
+
+    let $playerWrappers = $('.wrapper[data-player]', $robotCanvas);
+    let $allRobots = $('.sprite[data-robot]:visible', $robotCanvas);
+
+    // Find the currently hovered robot, or default to the active (current) one
+    let $hoveredRobot = $allRobots.filter('.hovered');
+    if (!$hoveredRobot.length){
+        $hoveredRobot = $allRobots.filter('.sprite_robot_current');
+    }
+
+    // If STILL no hovered robot (rare), just pick the very first visible one
+    if (!$hoveredRobot.length){
+        $hoveredRobot = $allRobots.first();
+    }
+
+    if (!$hoveredRobot.length){ return; } // Nothing to navigate
+
+    let $currentWrapper = $hoveredRobot.closest('.wrapper[data-player]');
+    let $wrapperRobots = $('.sprite[data-robot]:visible', $currentWrapper);
+    let currentIndex = $wrapperRobots.index($hoveredRobot);
+
+    // -- L2/R2 BUTTONS: SWITCH PLAYER CONTAINER -- //
+    if (activeInputs.L2 || activeInputs.R2){
+        if (event){ event.preventDefault(); }
+
+        // L2 goes backward (-1), R2 goes forward (+1)
+        let shiftDirection = activeInputs.L2 ? -1 : 1;
+
+        let wrapperIndex = $playerWrappers.index($currentWrapper);
+        let nextWrapperIndex = wrapperIndex + shiftDirection;
+
+        // Wrap around the ends of the array
+        if (nextWrapperIndex >= $playerWrappers.length){ nextWrapperIndex = 0; }
+        else if (nextWrapperIndex < 0){ nextWrapperIndex = $playerWrappers.length - 1; }
+
+        let $nextWrapper = $playerWrappers.eq(nextWrapperIndex);
+        let $nextWrapperRobots = $('.sprite[data-robot]:visible', $nextWrapper);
+
+        // Find the current active robot in the next wrapper to hover, or the first one
+        let $nextHover = $nextWrapperRobots.filter('.sprite_robot_current');
+        if (!$nextHover.length){ $nextHover = $nextWrapperRobots.first(); }
+
+        if ($nextHover.length){
+            $allRobots.removeClass('hovered');
+            $nextHover.addClass('hovered');
+            // Auto-click it so the console updates too
+            $nextHover.trigger('click');
+        }
+        return;
+    }
+
+    // -- DIRECTIONAL BUTTONS: GRID NAVIGATION -- //
+    if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+        if (event){ event.preventDefault(); }
+
+        let nextIndex = currentIndex;
+
+        // Calculate columns dynamically by comparing the 'top' position of the elements
+        // This is the most bulletproof way to handle floating responsive grids
+        let columns = 1;
+        let firstTop = $wrapperRobots.eq(0).position().top;
+        for (let i = 1; i < $wrapperRobots.length; i++){
+            if ($wrapperRobots.eq(i).position().top > firstTop){
+                columns = i;
+                break;
+            }
+        }
+
+        if (activeInputs.Left){
+            nextIndex = currentIndex - 1;
+            if (nextIndex < 0) nextIndex = $wrapperRobots.length - 1; // Wrap around
+        } else if (activeInputs.Right){
+            nextIndex = currentIndex + 1;
+            if (nextIndex >= $wrapperRobots.length) nextIndex = 0; // Wrap around
+        } else if (activeInputs.Up){
+            nextIndex = currentIndex - columns;
+            if (nextIndex < 0){
+                // Keep jumping down by columns until we reach the bottom of the column
+                while (nextIndex + columns < $wrapperRobots.length){
+                    nextIndex += columns;
+                }
+            }
+        } else if (activeInputs.Down){
+            nextIndex = currentIndex + columns;
+            if (nextIndex >= $wrapperRobots.length){
+                // Wrap back to the top of the column
+                nextIndex = currentIndex % columns;
+            }
+        }
+
+        let $nextRobot = $wrapperRobots.eq(nextIndex);
+        if ($nextRobot.length && nextIndex !== currentIndex){
+            $allRobots.removeClass('hovered');
+            $nextRobot.addClass('hovered');
+
+            // Scroll the container if the newly hovered robot is out of bounds
+            let $overflowContainer = $nextRobot.closest('.wrapper_overflow');
+            if ($overflowContainer.length){
+                let containerScrollTop = $overflowContainer.scrollTop();
+                let containerHeight = $overflowContainer.height();
+                let elementTop = $nextRobot.position().top;
+                let elementHeight = $nextRobot.outerHeight(true);
+
+                if (elementTop < 0){
+                    $overflowContainer.scrollTop(containerScrollTop + elementTop);
+                } else if (elementTop + elementHeight > containerHeight){
+                    $overflowContainer.scrollTop(containerScrollTop + elementTop + elementHeight - containerHeight);
+                }
+                $overflowContainer.perfectScrollbar('update');
+            }
+
+            playSoundEffect('icon-hover', {volume: 0.5});
+        }
+        return;
+    }
+
+    // -- A BUTTON: SELECT HIGHLIGHTED ROBOT -- //
+    if (activeInputs.A){
+        if (event){ event.preventDefault(); }
+        // Click the hovered robot if it isn't already the selected one
+        if ($hoveredRobot.length && !$hoveredRobot.hasClass('sprite_robot_current')){
+            $hoveredRobot.trigger('click');
+        }
+        return;
+    }
 }
