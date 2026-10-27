@@ -3770,7 +3770,7 @@ class rpg_player extends rpg_object {
 
                     ?>
 
-                    <? if(mmrpg_prototype_item_unlocked('challenge-permit')){ ?>
+                    <? if(false && mmrpg_prototype_item_unlocked('challenge-permit')){ ?>
 
                         <?
                         // Collect a list of applicable challenges from the database
