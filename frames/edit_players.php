@@ -360,7 +360,9 @@ if (true){
     // Loop through the allowed edit data for all players
     $key_counter = 0;
     $player_counter = 0;
-    foreach($allowed_edit_data AS $player_token => $player_info){
+    foreach($mmrpg_database_players AS $player_token => $player_index_info){
+        if (!isset($allowed_edit_data[$player_token])){ continue; }
+        $player_info = $allowed_edit_data[$player_token];
         $player_counter++;
         //echo '<td style="width: '.floor(100 / $allowed_edit_player_count).'%;">'."\n";
             echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="players" data-player="'.$player_info['player_token'].'">'."\n";
@@ -410,7 +412,9 @@ if (true){
 
     // Predefine the player options markup
     $player_options_markup = '';
-    foreach($allowed_edit_data AS $player_token => $player_info){
+    foreach($mmrpg_database_players AS $player_token => $player_index_info){
+        if (!isset($allowed_edit_data[$player_token])){ continue; }
+        $player_info = $allowed_edit_data[$player_token];
         $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
         $temp_player_transfer = $temp_player_battles >= 1 ? true : false;
         $player_options_markup .= '<option value="'.$player_info['player_token'].'" data-label="'.$player_info['player_token'].'" title="'.$player_info['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$player_info['player_name'].'</option>';
@@ -426,7 +430,9 @@ if (true){
     }
 
     // Loop through the players in the field edit data
-    foreach($allowed_edit_data AS $player_token => $player_info){
+    foreach($mmrpg_database_players AS $player_token => $player_index_info){
+        if (!isset($allowed_edit_data[$player_token])){ continue; }
+        $player_info = $allowed_edit_data[$player_token];
 
         // Collect the rewards for this player
         $player_rewards = mmrpg_prototype_player_rewards($player_token);

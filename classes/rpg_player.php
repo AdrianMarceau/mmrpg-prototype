@@ -3705,8 +3705,8 @@ class rpg_player extends rpg_object {
 
                             <tr>
                                 <td  class="right">
-                                    <label style="display: block; float: left;">Unlocked Robots :</label>
-                                    <span class="player_stat player_type player_type_<?= !empty($player_info['player_robots_count']) ? 'cutter' : 'none' ?>"><?= $player_info['player_robots_count'].' '.($player_info['player_robots_count'] == 1 ? 'Robot' : 'Robots') ?></span>
+                                    <label style="display: block; float: left;">Unlocked <?= $player_token === 'dr-lalinde' ? 'Mecha' : 'Robots' ?> :</label>
+                                    <span class="player_stat player_type player_type_<?= !empty($player_info['player_robots_count']) ? 'cutter' : 'none' ?>"><?= $player_info['player_robots_count'].' '.($player_token === 'dr-lalinde' ? 'Mecha' : ($player_info['player_robots_count'] == 1 ? 'Robot' : 'Robots')) ?></span>
                                 </td>
                                 <td class="center">&nbsp;</td>
                                 <td  class="right">
