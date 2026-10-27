@@ -584,13 +584,35 @@ $(document).ready(function(){
     // Update the player and player count by counting elements
     thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
     thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
-    // Find the first player and make sure we automaticallu show them in the ready-room onload
-    if (typeof gameCanvas !== 'undefined'
-        && typeof showPlayerInReadyRoom !== 'undefined'){
-        var $firstPlayer = $('.sprite[data-token]', gameCanvas).first();
-        if ($firstPlayer.length){
-            var firstPlayerToken = $firstPlayer.attr('data-player');
-            showPlayerInReadyRoom(firstPlayerToken);
+    if (typeof gameCanvas !== 'undefined' && typeof showPlayerInReadyRoom !== 'undefined'){
+        // Check local storage for the last selected player
+        var lastSelectedPlayer = localStorage.getItem('mmrpgPrototype_lastSelectedPlayer');
+        var $targetPlayer = false;
+        if (lastSelectedPlayer){
+            $targetPlayer = $('.sprite[data-player="' + lastSelectedPlayer + '"]', gameCanvas);
+            }
+        // Fallback to the first player if no valid player was found in storage
+        if (!$targetPlayer || !$targetPlayer.length){
+            $targetPlayer = $('.sprite[data-token]', gameCanvas).first();
+            }
+        if ($targetPlayer.length){
+            var targetPlayerToken = $targetPlayer.attr('data-player');
+            if (!$targetPlayer.hasClass('sprite_player_current')){
+                // Instantly swap the visible player without the 250ms animation delay
+                var $dataParent = $targetPlayer.closest('.wrapper');
+                var dataSelect = $dataParent.attr('data-select');
+                // Update Canvas Classes
+                $('.sprite[data-token]', gameCanvas).removeClass('sprite_player_current sprite_player_dr-light_current sprite_player_dr-wily_current sprite_player_dr-cossack_current');
+                $targetPlayer.addClass('sprite_player_current sprite_player_' + targetPlayerToken + '_current');
+                $dataParent.css({display: 'block'});
+                // Update Console Classes
+                var dataSelectorCurrent = '#' + dataSelect + ' .event_visible';
+                var dataSelectorNext = '#' + dataSelect + ' .event[data-token=' + targetPlayerToken + ']';
+                $(dataSelectorCurrent, gameConsole).removeClass('event_visible').addClass('event_hidden').css({opacity: 1});
+                $(dataSelectorNext, gameConsole).removeClass('event_hidden').addClass('event_visible').css({opacity: 1});
+                }
+            // 3. Show in ready room
+            showPlayerInReadyRoom(targetPlayerToken);
             }
         }
 });

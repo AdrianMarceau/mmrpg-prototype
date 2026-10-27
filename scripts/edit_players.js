@@ -107,6 +107,7 @@ $(document).ready(function(){
         var dataSelect = dataParent.attr('data-select');
         var dataToken = $(this).attr('data-token');
         var dataPlayer = $(this).attr('data-player');
+        localStorage.setItem('mmrpgPrototype_lastSelectedPlayer', dataPlayer);
         var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
         var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
         $('.sprite[data-token]', gameCanvas).removeClass('sprite_player_current').removeClass('sprite_player_dr-light_current sprite_player_dr-wily_current sprite_player_dr-cossack_current');
