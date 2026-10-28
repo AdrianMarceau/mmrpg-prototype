@@ -300,8 +300,19 @@ $(document).ready(function(){
 
         }
 
+    // Sync mouse hovering with keyboard/gamepad navigation
+    $('.sprite_robot[data-token]', gameCanvas).live('mouseenter', function(){
+        $('.sprite_robot[data-token]', gameCanvas).removeClass('hovered');
+        $(this).addClass('hovered');
+        });
+    $('#canvas', thisPrototype).live('mouseleave', function(){
+        var $allRobots = $('.sprite_robot:visible:not(.sprite_robot_hidden)', $(this));
+        $allRobots.removeClass('hovered');
+        $allRobots.filter('.sprite_robot_current').addClass('hovered');
+        });
 
 });
+
 // Create the windowResize event for this page
 function windowResizeFrame(){
 
@@ -321,3 +332,151 @@ function windowResizeFrame(){
     //console.log('windowWidth = '+windowWidth+'; parentWidth = '+parentWidth+'; thisTypeContainerWidth = '+thisTypeContainerWidth+'; thisStarContainerWidth = '+thisStarContainerWidth+'; ');
 
 }
+
+// Define a database-specific function to call when polling user input variables
+function checkUserInputsForDatabaseFrame(kind, event, activeInputs, userInputs){
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+
+    let $databaseCanvas = $('#canvas', $thisPrototype);
+    if (!$databaseCanvas.is(':visible')){ return; }
+
+    let $gameLinks = $('#robot_games .game_link', $databaseCanvas);
+
+    // Grab all visible robots, explicitly excluding the ones hidden by the active game tab
+    let $visibleRobots = $('.wrapper_robots:visible .sprite_robot:not(.sprite_robot_hidden)', $databaseCanvas);
+
+    // Find the currently hovered robot, or default to the active (current) one
+    let $activeRobot = $visibleRobots.filter('.sprite_robot_current');
+    let $hoveredRobot = $visibleRobots.filter('.hovered');
+    if (!$hoveredRobot.length) { $hoveredRobot = $activeRobot; }
+    if (!$hoveredRobot.length) { $hoveredRobot = $visibleRobots.first(); }
+    if (!$hoveredRobot.length) { return; }
+
+    let currentIndex = $visibleRobots.index($hoveredRobot);
+
+    // -- L2/R2 BUTTONS: SWITCH GAME PAGES -- //
+    if (activeInputs.L2 || activeInputs.R2){
+        if (event){ event.preventDefault(); }
+        let shiftDirection = activeInputs.L2 ? -1 : 1;
+        let $activeLink = $gameLinks.filter('.game_link_active');
+        let linkIndex = $gameLinks.index($activeLink);
+        let nextLinkIndex = linkIndex;
+        // Loop to find the next available tab that isn't disabled
+        let loopCount = 0;
+        while(loopCount < $gameLinks.length){
+            nextLinkIndex += shiftDirection;
+            if (nextLinkIndex >= $gameLinks.length) { nextLinkIndex = 0; }
+            else if (nextLinkIndex < 0) { nextLinkIndex = $gameLinks.length - 1; }
+            let $nextLink = $gameLinks.eq(nextLinkIndex);
+            if (!$nextLink.hasClass('game_link_disabled')){
+                $nextLink.trigger('click');
+                break;
+                }
+            loopCount++;
+            }
+        return;
+        }
+
+    // -- DIRECTIONAL BUTTONS: GRID NAVIGATION -- //
+    if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
+        if (event){ event.preventDefault(); }
+        let nextIndex = currentIndex;
+        // Calculate columns dynamically
+        let columns = 1;
+        if ($visibleRobots.length > 0){
+            let firstTop = $visibleRobots.eq(0).offset().top;
+            for (let i = 1; i < $visibleRobots.length; i++){
+                if ($visibleRobots.eq(i).offset().top > firstTop){
+                    columns = i;
+                    break;
+                    }
+                }
+            }
+        if (activeInputs.Left){
+            nextIndex = currentIndex - 1;
+            if (nextIndex < 0){ nextIndex = $visibleRobots.length - 1; }
+            }
+        else if (activeInputs.Right){
+            nextIndex = currentIndex + 1;
+            if (nextIndex >= $visibleRobots.length){ nextIndex = 0; }
+            }
+        else if (activeInputs.Up){
+            nextIndex = currentIndex - columns;
+            if (nextIndex < 0){
+                while (nextIndex + columns < $visibleRobots.length){
+                    nextIndex += columns;
+                    }
+                }
+            }
+        else if (activeInputs.Down){
+            nextIndex = currentIndex + columns;
+            if (nextIndex >= $visibleRobots.length){
+                nextIndex = currentIndex % columns;
+                }
+            }
+        let $nextRobot = $visibleRobots.eq(nextIndex);
+        if ($nextRobot.length && nextIndex !== currentIndex){
+            $visibleRobots.removeClass('hovered');
+            $nextRobot.addClass('hovered');
+            // Handle scrolling natively within the database canvas
+            let containerScrollTop = $databaseCanvas.scrollTop();
+            let containerHeight = $databaseCanvas.height();
+            let elementTop = $nextRobot.position().top;
+            let elementHeight = $nextRobot.outerHeight(true);
+            if (elementTop < 0){
+                $databaseCanvas.scrollTop(containerScrollTop + elementTop);
+                } else if (elementTop + elementHeight > containerHeight){
+                $databaseCanvas.scrollTop(containerScrollTop + elementTop + elementHeight - containerHeight);
+                }
+            playSoundEffect('icon-hover', {volume: 0.5});
+        }
+        return;
+    }
+
+    // -- X BUTTON: CYCLE SPRITE FRAMES -- //
+    if (activeInputs.X){
+        if (event){ event.preventDefault(); }
+        let $visibleEvent = $('#console .event_visible');
+        let $showcaseButtons = $('.sprite_showcase_buttons', $visibleEvent);
+        if ($showcaseButtons.length){
+            let $frames = $('.frame', $showcaseButtons);
+            let $activeFrame = $frames.filter('.active');
+            let currentIndex = 0; // Default to base frame (index 0)
+            if ($activeFrame.length){
+                currentIndex = $frames.index($activeFrame);
+                }
+            // Advance to the next frame, skipping index 0 (base) which is normally hidden/default
+            let nextIndex = currentIndex + 1;
+            if (nextIndex >= $frames.length){
+                nextIndex = 1;
+                }
+            // Trigger the existing mouseenter event to activate the frame
+            $frames.eq(nextIndex).trigger('mouseenter');
+            playSoundEffect('icon-hover', {volume: 0.5});
+            // Clear any existing timeout to prevent the reset from firing too early if mashing X
+            if ($showcaseButtons.data('x-timeout')){
+                clearTimeout($showcaseButtons.data('x-timeout'));
+                }
+            // Set a new timeout to revert to the base sprite after 1 second by triggering your existing mouseleave event
+            let timeoutId = setTimeout(function(){
+                $showcaseButtons.trigger('mouseleave');
+                }, 1000);
+            $showcaseButtons.data('x-timeout', timeoutId);
+            }
+        return;
+        }
+
+    // -- A BUTTON: SELECT HIGHLIGHTED ROBOT -- //
+    if (activeInputs.A){
+        if (event){ event.preventDefault(); }
+        // Click the hovered robot if it isn't already the selected one
+        if ($hoveredRobot.length && !$hoveredRobot.hasClass('sprite_robot_current')){
+            $hoveredRobot.trigger('click');
+            }
+        return;
+        }
+
+}
+

@@ -175,8 +175,10 @@
     -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
     transition: border-color 0.3s;
 }
-#database #canvas .sprite_robot:hover {
+#database #canvas .sprite_robot:hover,
+#database #canvas .sprite_robot.hovered {
     border-color: #414141;
+    outline: 1px solid #ffffff;
 }
 #database #canvas .sprite_robot_current,
 #database #canvas .sprite_robot_current:hover {
