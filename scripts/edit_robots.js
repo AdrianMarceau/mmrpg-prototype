@@ -363,6 +363,20 @@ $(document).ready(function(){
 
     // -- ROBOT CANVAS EVENTS -- //
 
+    // Sync mouse hovering with keyboard/gamepad navigation
+    $('.robot_canvas .sprite[data-token]', gameCanvas).live('mouseenter', function(){
+        $('.robot_canvas .sprite[data-token]', gameCanvas).not('.sprite_robot_current').removeClass('hovered');
+        $(this).addClass('hovered');
+        });
+
+    // Snap back to the active robot when the mouse leaves the robot area
+    $('.robot_canvas .sprite[data-token]', gameCanvas).live('mouseleave', function(){
+        if ($(this).is('.sprite_robot_current')){ return true; }
+        var $allRobots = $('.sprite[data-token]', gameCanvas);
+        $allRobots.not('.sprite_robot_current').removeClass('hovered');
+        $allRobots.filter('.sprite_robot_current').addClass('hovered');
+        });
+
     // Create the click event for canvas sprites
     $('.robot_canvas .sprite[data-token]', gameCanvas).live('click', function(e){
         e.preventDefault();
@@ -815,6 +829,9 @@ $(document).ready(function(){
                             }
                         }
                     });
+
+                $('.ability_name', thisAbilityCanvas).removeClass('hovered');
+                $('.ability_name:not([data-status="disabled"])', thisAbilityCanvas).first().addClass('hovered');
 
                 });
 
@@ -1354,6 +1371,9 @@ $(document).ready(function(){
                         }
                     });
 
+                $('.player_name', thisPlayerCanvas).removeClass('hovered');
+                $('.player_name:not([data-status="disabled"])', thisPlayerCanvas).first().addClass('hovered');
+
                 });
 
             }
@@ -1482,6 +1502,9 @@ $(document).ready(function(){
                         $(this).removeAttr('data-status'); //.css({display:''});
                         }
                     });
+
+                $('.item_name', thisItemCanvas).removeClass('hovered');
+                $('.item_name:not([data-status="disabled"])', thisItemCanvas).first().addClass('hovered');
 
                 });
 
@@ -2547,32 +2570,105 @@ function checkUserInputsForRobotsFrame(kind, event, activeInputs, userInputs){
     let $thisPrototype = $mmrpgElements.thisPrototype;
     let playSoundEffect = mmrpgPrototype.playSoundEffect;
 
-    // Ensure we are looking at the robot canvas
     let $robotCanvas = $('#canvas .robot_canvas', $thisPrototype);
-    if (!$robotCanvas.is(':visible')){ return; }
 
+    // Instead of returning, we check if a submenu is currently covering the robots
+    let inSubMenu = !$robotCanvas.is(':visible');
+
+    // We drop the ':visible' pseudo-selector here so it can find the current robot
+    // even while the canvas is temporarily hidden by a submenu!
     let $playerWrappers = $('.wrapper[data-player]', $robotCanvas);
-    let $allRobots = $('.sprite[data-robot]:visible', $robotCanvas);
+    let $allRobots = $('.sprite[data-robot]', $robotCanvas);
 
     // Find the currently hovered robot, or default to the active (current) one
+    let $activeRobot = $allRobots.filter('.sprite_robot_current');
     let $hoveredRobot = $allRobots.filter('.hovered');
-    if (!$hoveredRobot.length){
-        $hoveredRobot = $allRobots.filter('.sprite_robot_current');
-    }
+    if (!$hoveredRobot.length){ $hoveredRobot = $activeRobot; }
 
-    // If STILL no hovered robot (rare), just pick the very first visible one
-    if (!$hoveredRobot.length){
-        $hoveredRobot = $allRobots.first();
-    }
+    // If STILL no hovered robot (rare), just pick the very first one
+    if (!$hoveredRobot.length){ $hoveredRobot = $allRobots.first(); }
 
     if (!$hoveredRobot.length){ return; } // Nothing to navigate
 
     let $currentWrapper = $hoveredRobot.closest('.wrapper[data-player]');
-    let $wrapperRobots = $('.sprite[data-robot]:visible', $currentWrapper);
+    let $wrapperRobots = $('.sprite[data-robot]', $currentWrapper); // Dropped :visible here too
     let currentIndex = $wrapperRobots.index($hoveredRobot);
+    let activeRobotToken = $activeRobot.attr('data-token');
+    let hoveredRobotToken = $hoveredRobot.attr('data-token');
+    //console.log('activeRobotToken =', activeRobotToken);
+    //console.log('hoveredRobotToken =', hoveredRobotToken);
+
+    let $allConsoleEvents, $currentConsoleEvent;
+    let $playerNameField, $itemNameField, $skillNameField, $abilityNameFields, $allEditorFields;
+
+    // Accept an optional 'targetToken' so we can force it to look at the new robot immediately
+    let refreshConsoleReferences = function(targetToken){
+        // Use the explicitly provided token, OR query the DOM fresh for the currently active one
+        let token = targetToken || $('.sprite_robot_current', $robotCanvas).attr('data-token');
+        $allConsoleEvents = $('.event[data-token]', gameConsole);
+        $currentConsoleEvent = $('.event[data-token="' + token + '"]', gameConsole);
+        $playerNameField = $('a.player_name', $currentConsoleEvent);
+        $itemNameField = $('a.item_name', $currentConsoleEvent);
+        $skillNameField = $('span.skill_name', $currentConsoleEvent);
+        $abilityNameFields = $('a.ability_name', $currentConsoleEvent);
+        // Chain the field additions together cleanly (no need for a dummy .foobar class)
+        $allEditorFields = $playerNameField
+            .add($itemNameField)
+            .add($skillNameField)
+            .add($abilityNameFields);
+        };
+
+    let enterEditorMode = function(targetToken){
+        // 1. Wipe previous focus/hover states globally to prevent ghosting during crossfades
+        $('.event.focused', gameConsole).removeClass('focused');
+        $('.hovered', gameConsole).removeClass('hovered');
+
+        // 2. Locate the target console event
+        let $targetConsoleEvent = $('.event[data-token="' + targetToken + '"]', gameConsole);
+
+        // 3. Define the function that applies the classes
+        let applyEditorFocus = function(){
+            $targetConsoleEvent.addClass('focused');
+            // Querying multiple classes at once returns them in strict document order (perfect for tabbing)
+            let $editorFields = $('a.player_name, a.item_name, span.skill_name, a.ability_name', $targetConsoleEvent);
+            $editorFields.removeClass('hovered');
+            if ($editorFields.length){
+                $editorFields.first().addClass('hovered');
+                }
+            };
+
+        // 4. If the console event doesn't exist yet (AJAX loading), poll for it safely.
+        // Otherwise, apply immediately. (CSS classes will stick beautifully even while it fades in!)
+        if (!$targetConsoleEvent.length) {
+            let attempts = 0;
+            let waitForLoadInterval = setInterval(function(){
+                attempts++;
+                $targetConsoleEvent = $('.event[data-token="' + targetToken + '"]', gameConsole);
+                if ($targetConsoleEvent.length || attempts > 20) {
+                    clearInterval(waitForLoadInterval);
+                    if ($targetConsoleEvent.length) applyEditorFocus();
+                    }
+                }, 50);
+            } else {
+            applyEditorFocus();
+            }
+        };
+
+    let exitEditorMode = function(){
+        $('.event.focused', gameConsole).removeClass('focused');
+        $('.hovered', gameConsole).removeClass('hovered');
+        };
+
+    // Gather current context states for the action buttons
+    let currentToken = $('.sprite_robot_current', $robotCanvas).attr('data-token');
+
+    // Drop the 'let' here to simply update the existing variable we declared earlier
+    $currentConsoleEvent = $('.event[data-token="' + currentToken + '"]', gameConsole);
+    refreshConsoleReferences(currentToken); // Refresh references every frame so $allEditorFields is always populated for the D-Pad
+    let isEditMode = $currentConsoleEvent.hasClass('focused');
 
     // -- L2/R2 BUTTONS: SWITCH PLAYER CONTAINER -- //
-    if (activeInputs.L2 || activeInputs.R2){
+    if ((activeInputs.L2 || activeInputs.R2) && !inSubMenu){
         if (event){ event.preventDefault(); }
 
         // L2 goes backward (-1), R2 goes forward (+1)
@@ -2601,78 +2697,194 @@ function checkUserInputsForRobotsFrame(kind, event, activeInputs, userInputs){
         return;
     }
 
-    // -- DIRECTIONAL BUTTONS: GRID NAVIGATION -- //
+    // -- DIRECTIONAL BUTTONS: UNIVERSAL NAVIGATION -- //
     if (activeInputs.Up || activeInputs.Down || activeInputs.Left || activeInputs.Right){
         if (event){ event.preventDefault(); }
 
-        let nextIndex = currentIndex;
+        let $targets, currentIndex, columns = 1;
+        let isGrid = true;
 
-        // Calculate columns dynamically by comparing the 'top' position of the elements
-        // This is the most bulletproof way to handle floating responsive grids
-        let columns = 1;
-        let firstTop = $wrapperRobots.eq(0).position().top;
-        for (let i = 1; i < $wrapperRobots.length; i++){
-            if ($wrapperRobots.eq(i).position().top > firstTop){
-                columns = i;
-                break;
-            }
-        }
-
-        if (activeInputs.Left){
-            nextIndex = currentIndex - 1;
-            if (nextIndex < 0) nextIndex = $wrapperRobots.length - 1; // Wrap around
-        } else if (activeInputs.Right){
-            nextIndex = currentIndex + 1;
-            if (nextIndex >= $wrapperRobots.length) nextIndex = 0; // Wrap around
-        } else if (activeInputs.Up){
-            nextIndex = currentIndex - columns;
-            if (nextIndex < 0){
-                // Keep jumping down by columns until we reach the bottom of the column
-                while (nextIndex + columns < $wrapperRobots.length){
-                    nextIndex += columns;
+        // 1. SUBMENU NAVIGATION
+        if (inSubMenu) {
+            let $activeSubmenu = $('.player_canvas:visible, .ability_canvas:visible, .item_canvas:visible', $thisPrototype);
+            // Grab all VISIBLE items (including disabled ones) so grid math stays perfectly aligned.
+            // We explicitly use :visible because incompatible abilities are given 'display: none',
+            // which breaks coordinate math and hides the cursor if navigated to!
+            $targets = $('a.player_name:visible, a.ability_name:visible, a.item_name:visible', $activeSubmenu);
+            let $currentHover = $targets.filter('.hovered');
+            if (!$currentHover.length) { $currentHover = $targets.first(); $currentHover.addClass('hovered'); }
+            currentIndex = $targets.index($currentHover);
+            // Calculate submenu columns dynamically
+            if ($targets.length > 0){
+                let firstTop = $targets.eq(0).offset().top;
+                for (let i = 1; i < $targets.length; i++){
+                    if ($targets.eq(i).offset().top > firstTop){
+                        columns = i;
+                        break;
+                        }
+                    }
                 }
             }
-        } else if (activeInputs.Down){
-            nextIndex = currentIndex + columns;
-            if (nextIndex >= $wrapperRobots.length){
-                // Wrap back to the top of the column
-                nextIndex = currentIndex % columns;
+        // 2. EDITOR NAVIGATION
+        else if (isEditMode) {
+            $targets = $allEditorFields;
+            let $currentHover = $targets.filter('.hovered');
+            if (!$currentHover.length) { $currentHover = $targets.first(); $currentHover.addClass('hovered'); }
+            currentIndex = $targets.index($currentHover);
+            // Turn off dynamic grid math so we can use smart 2D mapping below
+            isGrid = false;
             }
-        }
+        // 3. ROBOT CANVAS NAVIGATION
+        else {
+            $targets = $wrapperRobots;
+            currentIndex = $targets.index($hoveredRobot);
+            // Calculate robot grid columns dynamically
+            if ($targets.length > 0) {
+                let firstTop = $targets.eq(0).offset().top;
+                for (let i = 1; i < $targets.length; i++){
+                    if ($targets.eq(i).offset().top > firstTop){
+                        columns = i;
+                        break;
+                        }
+                    }
+                }
+            }
 
-        let $nextRobot = $wrapperRobots.eq(nextIndex);
-        if ($nextRobot.length && nextIndex !== currentIndex){
-            $allRobots.removeClass('hovered');
-            $nextRobot.addClass('hovered');
+        if (!$targets || !$targets.length) return;
+        let nextIndex = currentIndex;
 
-            // Scroll the container if the newly hovered robot is out of bounds
-            let $overflowContainer = $nextRobot.closest('.wrapper_overflow');
+        if (isGrid) {
+            // Standard Grid Math (Robots & Submenus)
+            if (activeInputs.Left){
+                nextIndex = currentIndex - 1;
+                if (nextIndex < 0) nextIndex = $targets.length - 1;
+                } else if (activeInputs.Right){
+                nextIndex = currentIndex + 1;
+                if (nextIndex >= $targets.length) nextIndex = 0;
+                } else if (activeInputs.Up){
+                nextIndex = currentIndex - columns;
+                if (nextIndex < 0){
+                    while (nextIndex + columns < $targets.length){
+                        nextIndex += columns;
+                        }
+                    }
+                } else if (activeInputs.Down){
+                nextIndex = currentIndex + columns;
+                if (nextIndex >= $targets.length){
+                    nextIndex = currentIndex % columns;
+                    }
+                }
+            }
+        else {
+            // Smart 2D Mapping for Editor Fields (Player=0, Item=1, Skill=2, Abilities=3-10)
+            if (activeInputs.Left) {
+                if (currentIndex === 2) nextIndex = 1; // Skill -> Item
+                else nextIndex = currentIndex - 1;
+                } else if (activeInputs.Right) {
+                if (currentIndex === 0) nextIndex = 2; // Player -> Skill
+                else if (currentIndex === 1) nextIndex = 2; // Item -> Skill
+                else nextIndex = currentIndex + 1;
+                } else if (activeInputs.Up) {
+                if (currentIndex === 1) nextIndex = 0; // Item -> Player
+                else if (currentIndex === 2) nextIndex = 0; // Skill -> Player
+                else if (currentIndex >= 7) nextIndex = currentIndex - 4; // Abil row 2 -> 1
+                else if (currentIndex === 3 || currentIndex === 4) nextIndex = 1; // Abil 1/2 -> Item
+                else if (currentIndex === 5 || currentIndex === 6) nextIndex = 2; // Abil 3/4 -> Skill
+                else nextIndex = currentIndex - 1;
+                } else if (activeInputs.Down) {
+                if (currentIndex === 0) nextIndex = 1; // Player -> Item
+                else if (currentIndex === 1) nextIndex = 3; // Item -> Abil 1
+                else if (currentIndex === 2) nextIndex = 5; // Skill -> Abil 3
+                else if (currentIndex >= 3 && currentIndex <= 6) nextIndex = currentIndex + 4; // Abil row 1 -> 2
+                else nextIndex = currentIndex + 1;
+                }
+            // Clamp bounds safely
+            if (nextIndex < 0) nextIndex = $targets.length - 1;
+            if (nextIndex >= $targets.length) nextIndex = 0;
+            }
+
+        let $nextHover = $targets.eq(nextIndex);
+        if ($nextHover.length && nextIndex !== currentIndex){
+            $targets.removeClass('hovered');
+            $nextHover.addClass('hovered');
+            // Scroll container if out of bounds
+            let $overflowContainer = $nextHover.closest('.wrapper_overflow');
             if ($overflowContainer.length){
                 let containerScrollTop = $overflowContainer.scrollTop();
                 let containerHeight = $overflowContainer.height();
-                let elementTop = $nextRobot.position().top;
-                let elementHeight = $nextRobot.outerHeight(true);
-
+                let elementTop = $nextHover.position().top;
+                let elementHeight = $nextHover.outerHeight(true);
                 if (elementTop < 0){
                     $overflowContainer.scrollTop(containerScrollTop + elementTop);
-                } else if (elementTop + elementHeight > containerHeight){
+                    } else if (elementTop + elementHeight > containerHeight){
                     $overflowContainer.scrollTop(containerScrollTop + elementTop + elementHeight - containerHeight);
-                }
+                    }
                 $overflowContainer.perfectScrollbar('update');
-            }
-
+                }
             playSoundEffect('icon-hover', {volume: 0.5});
-        }
+            }
         return;
-    }
+        }
 
-    // -- A BUTTON: SELECT HIGHLIGHTED ROBOT -- //
+    // -- A BUTTON: SELECT HIGHLIGHTED ROBOT OR FIELD -- //
     if (activeInputs.A){
         if (event){ event.preventDefault(); }
-        // Click the hovered robot if it isn't already the selected one
-        if ($hoveredRobot.length && !$hoveredRobot.hasClass('sprite_robot_current')){
-            $hoveredRobot.trigger('click');
-        }
+        if (inSubMenu) {
+            // Select the hovered item inside the active submenu
+            let $activeSubmenu = $('.player_canvas:visible, .ability_canvas:visible, .item_canvas:visible', $thisPrototype);
+            let $hoveredField = $('a.hovered:not([data-status="disabled"])', $activeSubmenu);
+            if ($hoveredField.length) {
+                $hoveredField.trigger('click');
+                }
+            }
+        else if (isEditMode){
+            // We are in Edit Mode: click the currently hovered editor field
+            let $hoveredField = $('.hovered', $currentConsoleEvent);
+            if ($hoveredField.length){
+                $hoveredField.trigger('click');
+                }
+            }
+        else {
+            // We are in Canvas Navigation Mode: select the hovered robot
+            if ($hoveredRobot.length){
+                if (!$hoveredRobot.hasClass('sprite_robot_current')){
+                    $hoveredRobot.trigger('click');
+                    }
+                let newToken = $hoveredRobot.attr('data-token');
+                enterEditorMode(newToken);
+                }
+            }
         return;
-    }
+        }
+
+    // -- B BUTTON: BACK / CANCEL -- //
+    if (activeInputs.B){
+        if (event){ event.preventDefault(); }
+        if (inSubMenu){
+            // Close the submenu by clicking the 'pending' field that opened it
+            let $pendingField = $('a[data-status="pending"]', $currentConsoleEvent);
+            if ($pendingField.length){ $pendingField.trigger('click'); }
+            } else if (isEditMode){
+            // Exit Edit Mode and return to the robot canvas
+            exitEditorMode();
+            }
+        return;
+        }
+
+    // -- X BUTTON: TOGGLE EDIT MODE -- //
+    if (activeInputs.X){
+        if (event){ event.preventDefault(); }
+        if (inSubMenu) {
+            // Optional: You can leave this here so X toggles the submenu closed too,
+            // or remove this if block if you want B to be the ONLY way to back out.
+            let $pendingField = $('a[data-status="pending"]', $currentConsoleEvent);
+            if ($pendingField.length){ $pendingField.trigger('click'); }
+            } else if (!isEditMode){
+            enterEditorMode(currentToken);
+            } else {
+            exitEditorMode();
+            }
+        return;
+        }
+
 }

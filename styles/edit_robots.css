@@ -831,6 +831,11 @@ body.windowFlag_landscapeMode #prototype {
 #edit #console .event span.skill_name:after {
     content: "";
 }
+#edit #console .event a.player_name.hovered,
+#edit #console .event a.item_name.hovered,
+#edit #console .event span.skill_name.hovered {
+    outline: 1px solid #ffffff;
+}
 #edit #console .event a.item_name {
     width: 185px;
 }
@@ -1065,6 +1070,12 @@ body[data-mode="viewer"] #edit #console .event a.item_name label .arrow {
     _cursor: hand;
     background-clip: padding-box;
     position: relative;
+}
+#edit #console .event a.ability_name.hovered,
+#edit #canvas .player_canvas a.player_name.hovered,
+#edit #canvas .ability_canvas a.ability_name.hovered,
+#edit #canvas .item_canvas a.item_name.hovered {
+    outline: 1px solid #ffffff;
 }
 #edit #console .event a.ability_name:after,
 #edit #canvas .player_canvas a.player_name:after,
