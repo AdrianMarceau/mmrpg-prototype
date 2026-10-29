@@ -4037,7 +4037,14 @@ class rpg_world {
                 'messages' => array(
                     'default' => array('...?'),
                     ),
-                'alt9_messages' => array( // Mayl
+                // Proxy
+                'alt_colour' => 'empty',
+                'alt_messages' => array(
+                    'default' => array('Congratulations on defeating the last Slur, and thank you.', 'Justice has finally been served.', 'I will take over from here.', 'Wish me... "luck".'),
+                    ),
+                // Mayl
+                'alt9_colour' => 'laser',
+                'alt9_messages' => array(
                     'default' => array('Oh, hello there.', 'Do you know where I am?', 'Can you tell me where my friends are?'),
                     ),
                 ),
@@ -4116,6 +4123,8 @@ class rpg_world {
                         $alt_colour = $proxy_alt_info['colour'];
                         $name = preg_replace('/^(?:Proxy)\s+\((?:[^\/\(\)]+)\/\/([^\/\(\)]+)\)$/i', '$1', $alt_name);
                         $colour = $alt_colour;
+                        if (!empty($actor_info[$image.'_type'])){ $type = $actor_info[$image.'_type']; }
+                        if (!empty($actor_info[$image.'_colour'])){ $colour = $actor_info[$image.'_colour']; }
                         if (!empty($actor_info[$image.'_messages'])){ $actor_info['messages'] = $actor_info[$image.'_messages']; }
                         if (!empty($actor_info[$image.'_actions'])){ $actor_info['actions'] = $actor_info[$image.'_actions']; }
                         if (!empty($actor_info[$image.'_advice'])){ $actor_info['advice'] = $actor_info[$image.'_advice']; }
