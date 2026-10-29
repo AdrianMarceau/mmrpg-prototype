@@ -42,16 +42,16 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
     $robot_fields = rpg_robot::get_index_fields(true, 'robots');
     $mmrpg_database_robots = $db->get_array_list("SELECT
         {$robot_fields},
-        groups.group_token AS robot_group,
+        `groups`.group_token AS robot_group,
         tokens.token_order AS robot_order
         FROM mmrpg_index_robots AS robots
         LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-        LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+        LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = robots.robot_class
         LEFT JOIN mmrpg_index_fields AS fields ON fields.field_token = robots.robot_field
         WHERE {$robot_where}
         ORDER BY
         robots.robot_class DESC,
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'robot_token');
 
@@ -71,12 +71,12 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
         0 AS robot_key
         FROM mmrpg_index_robots AS robots
         LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-        LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+        LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = robots.robot_class
         WHERE robots.robot_token <> 'robot'
         AND robots.robot_class = 'master'
         AND robots.robot_flag_published = 1
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'robot_token');
     $robot_key = 1;

@@ -313,14 +313,14 @@ class rpg_field extends rpg_object {
         $field_fields = rpg_field::get_index_fields(true, 'fields');
         $field_index = $db->get_array_list("SELECT
             {$field_fields},
-            groups.group_token AS field_group,
+            `groups`.group_token AS field_group,
             tokens.token_order AS field_order
             FROM mmrpg_index_fields AS fields
             LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-            LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_fields_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE field_id <> 0 {$temp_where}
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'field_token');
 

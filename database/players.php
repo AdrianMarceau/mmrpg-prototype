@@ -26,15 +26,15 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
     $player_fields = rpg_player::get_index_fields(true, 'players');
     $mmrpg_database_players = $db->get_array_list("SELECT
         {$player_fields},
-        groups.group_token AS player_group,
+        `groups`.group_token AS player_group,
         tokens.token_order AS player_order
         FROM mmrpg_index_players AS players
         LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
-        LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
+        LEFT JOIN mmrpg_index_players_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = 'player'
         WHERE {$player_where}
         ORDER BY
         players.player_class DESC,
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'player_token');
 
@@ -51,12 +51,12 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
         0 AS player_key
         FROM mmrpg_index_players AS players
         LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
-        LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'player'
+        LEFT JOIN mmrpg_index_players_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = 'player'
         WHERE players.player_token <> 'player'
         AND players.player_flag_published = 1
         ORDER BY
         players.player_class ASC,
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'player_token');
     $player_key = 1;

@@ -856,14 +856,14 @@ class rpg_skill extends rpg_object {
         $skill_fields = rpg_skill::get_index_fields(true, 'skills');
         $skill_index = $db->get_array_list("SELECT
             {$skill_fields},
-            groups.group_token AS skill_group,
+            `groups`.group_token AS skill_group,
             tokens.token_order AS skill_order
             FROM mmrpg_index_skills AS skills
             LEFT JOIN mmrpg_index_skills_groups_tokens AS tokens ON tokens.skill_token = skills.skill_token
-            LEFT JOIN mmrpg_index_skills_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_skills_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE skill_id <> 0 {$temp_where}
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'skill_token');
 

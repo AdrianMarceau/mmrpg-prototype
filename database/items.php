@@ -36,14 +36,14 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
     $item_fields = rpg_item::get_index_fields(true, 'items');
     $mmrpg_database_items = $db->get_array_list("SELECT
         {$item_fields},
-        groups.group_token AS item_group,
+        `groups`.group_token AS item_group,
         tokens.token_order AS item_order
         FROM mmrpg_index_items AS items
         LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
-        LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+        LEFT JOIN mmrpg_index_items_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = items.item_class
         WHERE {$item_where}
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'item_token');
 
@@ -63,12 +63,12 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
         0 AS item_key
         FROM mmrpg_index_items AS items
         LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
-        LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = items.item_class
+        LEFT JOIN mmrpg_index_items_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = items.item_class
         WHERE items.item_id <> 0
         AND items.item_class <> 'system'
         AND items.item_flag_published = 1
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'item_token');
     $item_key = 1;

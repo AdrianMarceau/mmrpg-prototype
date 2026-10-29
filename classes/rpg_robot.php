@@ -3437,15 +3437,15 @@ class rpg_robot extends rpg_object {
         $robot_fields = rpg_robot::get_index_fields(true, 'robots');
         $robot_index = $db->get_array_list("SELECT
             {$robot_fields},
-            groups.group_token AS robot_group,
+            `groups`.group_token AS robot_group,
             tokens.token_order AS robot_order
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE robots.robot_id <> 0 {$temp_where}
             ORDER BY
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'robot_token');
 

@@ -43,14 +43,14 @@ if (!empty($cached_index)){
         FROM mmrpg_index_fields AS fields
         LEFT JOIN mmrpg_index_robots AS robots ON robots.robot_token = fields.field_master
         LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-        LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+        LEFT JOIN mmrpg_index_fields_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
         WHERE
         fields.field_type <> ''
         AND fields.field_class = 'master'
         AND fields.field_flag_published = 1
         AND fields.field_flag_complete = 1
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;");
     rpg_object::save_cached_index('omega', $cache_token, $raw_omega_factors);
