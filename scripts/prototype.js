@@ -670,6 +670,7 @@ function initUserInputWatcher(){
 
             // Prevent gamepad inputs from interrupting menu transitions
             if ($thisBanner.hasClass('is-switching')){
+                //console.log('sorry we\'re switching');
                 return false;
                 }
 
@@ -1995,12 +1996,14 @@ function prototype_menu_switch_action(switchOptions){
         if (stepToken !== gameSettings.startLink){ return false; }
         }
 
-    // Add a class to the banner so it knows it's current switching
+    // Add a class to the banner so it knows it's currently switching
     $thisBanner.addClass('is-switching');
-    let beforeOnComplete = switchOptions.beforeOnComplete;
-    switchOptions.beforeOnComplete = function(){
+
+    // Wrap the onComplete function so it ALWAYS removes the class when finished
+    let originalOnComplete = switchOptions.onComplete;
+    switchOptions.onComplete = function(){
         $thisBanner.removeClass('is-switching');
-        return beforeOnComplete.call(this, );
+        return originalOnComplete.apply(this, arguments);
         };
 
     // Prevent switching to the same menu twice
