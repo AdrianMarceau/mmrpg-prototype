@@ -2436,15 +2436,15 @@ class rpg_player extends rpg_object {
         $player_fields = rpg_player::get_index_fields(true, 'players');
         $player_index = $db->get_array_list("SELECT
             {$player_fields},
-            groups.group_token AS player_group,
+            `groups`.group_token AS player_group,
             tokens.token_order AS player_order
             FROM mmrpg_index_players AS players
             LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
-            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_players_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE players.player_id <> 0 {$temp_where}
             ORDER BY
             players.player_class ASC,
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'player_token');
 

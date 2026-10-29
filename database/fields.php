@@ -25,14 +25,14 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
     $field_fields = rpg_field::get_index_fields(true, 'fields');
     $mmrpg_database_fields = $db->get_array_list("SELECT
         {$field_fields},
-        groups.group_token AS field_group,
+        `groups`.group_token AS field_group,
         tokens.token_order AS field_order
         FROM mmrpg_index_fields AS fields
         LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-        LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+        LEFT JOIN mmrpg_index_fields_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = 'field'
         WHERE {$field_where}
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'field_token');
 
@@ -52,12 +52,12 @@ if (!empty($cached_index) && empty($_GET['refresh'])){
         0 AS field_key
         FROM mmrpg_index_fields AS fields
         LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-        LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = 'field'
+        LEFT JOIN mmrpg_index_fields_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = 'field'
         WHERE fields.field_token <> 'field'
         AND fields.field_class <> 'system'
         AND fields.field_flag_published = 1
         ORDER BY
-        groups.group_order ASC,
+        `groups`.group_order ASC,
         tokens.token_order ASC
         ;", 'field_token');
     $field_key = 1;
