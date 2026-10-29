@@ -19,6 +19,7 @@
 #---------------------------#
 @portals[]  = south-exit(11-21, space-area-2__north-exit, down-only)
 #---------------------------#
+@actors[]   = proxy-first-encounter(11-11, player, proxy, alt, first-encounter)
 @portals[]  = debug-world-portal(11-11, debug__debug-area-1__spawn, void-alt, confirm)
 #---------------------------#
 @pickups    = small-screw(2),space-shard(1)
