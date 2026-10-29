@@ -203,7 +203,107 @@ function windowResizeLeaderboard(){
 <script type="text/javascript">
 $(document).ready(function(){
 
+    // Sync mouse hovering with keyboard/gamepad navigation
+    // We explicitly target a.file[data-player] so we don't accidentally hover the hidden padding div
+    $('.leaderboard .wrapper a.file[data-player]').live('mouseenter', function(){
+        $('.leaderboard .wrapper a.file[data-player]').removeClass('hovered');
+        $(this).addClass('hovered');
+        });
+
+    $('.leaderboard .wrapper').live('mouseleave', function(){
+        $('.leaderboard .wrapper a.file[data-player]').removeClass('hovered');
+        });
+
 });
+
+// Define the polling function expected by prototype.js for the leaderboard iframe
+window.checkUserInputsForLeaderboardFrame = function(kind, event, activeInputs, userInputs){
+
+    let $thisPrototype = $('#prototype');
+    let $leaderboardCanvas = $('.leaderboard .wrapper', $thisPrototype);
+    if (!$leaderboardCanvas.is(':visible')){ return; }
+
+    let $allEntries = $('a.file[data-player]', $leaderboardCanvas);
+    if (!$allEntries.length) { return; }
+
+    let $hoveredEntry = $allEntries.filter('.hovered');
+    let hasHover = $hoveredEntry.length > 0;
+
+    // Default to the first entry if nothing is hovered (so the A button has a fallback)
+    if (!hasHover) { $hoveredEntry = $allEntries.first(); }
+
+    // Use -1 as our index if nothing is actually hovered so the first directional press selects index 0
+    let currentIndex = hasHover ? $allEntries.index($hoveredEntry) : -1;
+
+    // Define a quick local function for routing sound effects up to the parent window
+    let playSoundEffect = function(soundName, options){
+        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+            top.mmrpg_play_sound_effect(soundName, options);
+            }
+        };
+
+    // -- L2/R2 or LEFT/RIGHT: SWITCH PAGES -- //
+    if (activeInputs.L2 || activeInputs.R2 || activeInputs.Left || activeInputs.Right){
+        if (event){ event.preventDefault(); }
+        let isNext = activeInputs.R2 || activeInputs.Right;
+        let $pageLink = isNext ? $('a.more.next', $leaderboardCanvas) : $('a.more.prev', $leaderboardCanvas);
+        if ($pageLink.length){
+            playSoundEffect('icon-click', {volume: 1.0});
+            // Execute the native page jump
+            window.location.href = $pageLink.attr('href');
+            }
+        return;
+        }
+
+    // -- UP/DOWN: VERTICAL LIST NAVIGATION -- //
+    if (activeInputs.Up || activeInputs.Down){
+        if (event){ event.preventDefault(); }
+        let nextIndex = currentIndex;
+        if (!hasHover) {
+            nextIndex = 0; // First press always highlights the top entry
+            } else if (activeInputs.Up){
+            nextIndex = currentIndex - 1;
+            if (nextIndex < 0) nextIndex = 0; // Clamp to the top
+            } else if (activeInputs.Down){
+            nextIndex = currentIndex + 1;
+            if (nextIndex >= $allEntries.length) nextIndex = $allEntries.length - 1; // Clamp to the bottom
+            }
+        let $nextEntry = $allEntries.eq(nextIndex);
+        // Since currentIndex is -1 on the first press, 0 !== -1 will pass and apply the class!
+        if ($nextEntry.length && nextIndex !== currentIndex){
+            $allEntries.removeClass('hovered');
+            $nextEntry.addClass('hovered');
+            // Handle scrolling natively within the wrapper container
+            let containerScrollTop = $leaderboardCanvas.scrollTop();
+            let containerHeight = $leaderboardCanvas.height();
+            let elementTop = $nextEntry.position().top;
+            let elementHeight = $nextEntry.outerHeight(true);
+            // Compensate for the fixed header over the scroll area
+            let headerOffset = $('.header', $thisPrototype).outerHeight(true) || 50;
+            // Add a tiny 5px buffer so the entry doesn't press against the exact pixel edge of the header
+            let topPadding = headerOffset + 5;
+            // Use the topPadding to trigger the scroll early and offset the final position
+            if (elementTop < topPadding){
+                $leaderboardCanvas.scrollTop(containerScrollTop + elementTop - topPadding);
+                } else if (elementTop + elementHeight > containerHeight){
+                $leaderboardCanvas.scrollTop(containerScrollTop + elementTop + elementHeight - containerHeight);
+                }
+            playSoundEffect('icon-hover', {volume: 0.5});
+            }
+        return;
+        }
+
+    // -- A BUTTON: SELECT HIGHLIGHTED ENTRY -- //
+    if (activeInputs.A){
+        if (event){ event.preventDefault(); }
+        if ($hoveredEntry.length){
+            playSoundEffect('icon-click', {volume: 1.0});
+            $hoveredEntry.trigger('click');
+            }
+        return;
+        }
+
+};
 </script>
 <?
 

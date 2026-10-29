@@ -112,6 +112,10 @@
 #prototype .leaderboard .file:last-child {
     border-bottom-width: 2px;
 }
+.leaderboard .wrapper a.file:hover,
+.leaderboard .wrapper a.file.hovered {
+    outline: 1px solid #ffffff;
+}
 #prototype .leaderboard .file_1st {
     background-color: rgba(136, 113, 19, 0.75);
     box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
