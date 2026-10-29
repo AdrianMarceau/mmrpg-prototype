@@ -668,6 +668,11 @@ function initUserInputWatcher(){
         if ($thisBannerMenu && $thisBannerMenu.length){
             //console.log('MMRPG BANNER MENU TRIGGERS (ALWAYS ON)');
 
+            // Prevent gamepad inputs from interrupting menu transitions
+            if ($thisBanner.hasClass('is-switching')){
+                return false;
+                }
+
             // If the user has pressed the SELECT key, we click the leaderboard button
             if (activeInputs.Select){
                 //console.log('%c' + 'Select key pressed!', 'color: orange;');
