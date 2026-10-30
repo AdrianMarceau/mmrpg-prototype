@@ -45,7 +45,7 @@ function prepareActorEventOptions(firstEvent, options){
             messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
             actionData.sideButtonsMarkup += '<div class="button-title big-button-title'+(dataColour ? ' type '+dataColour : '')+'">';
                 actionData.sideButtonsMarkup += '<i class="icon">' + avatarSprite + '</i>';
-                actionData.sideButtonsMarkup += '<p class="text">' + messagesText + '</p>';
+                actionData.sideButtonsMarkup += '<p class="text typewriter" style="opacity: 0;">' + messagesText + '</p>';
             actionData.sideButtonsMarkup += '</div>';
             }
 
@@ -252,7 +252,12 @@ function handleActorActionClick(action, $button, firstEvent){
 
         _self.currentAdviceKey = randomKey;
         let selectedMessageText = possibleMessages[randomKey];
-        _elements.sideButtons.find('.text').html(selectedMessageText);
+
+        // Target the text element, update its raw text cache, and run the typewriter
+        let $textElement = _elements.sideButtons.find('.text');
+        $textElement.data('raw-text', selectedMessageText);
+        _self.playTypewriterEffect($textElement);
+
         _self.enableActionDropdown();
         _elements.sideButtons.find('.clicked').removeClass('clicked').addClass('hovered maybe');
         }

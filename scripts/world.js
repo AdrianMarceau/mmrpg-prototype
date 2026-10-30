@@ -4847,7 +4847,7 @@ class mmrpgWorldMap {
 
     // -- REUSABLE UI & ANIMATION METHODS -- //
 
-// Quick function for showing the action dropdown and sidebar buttons
+    // Quick function for showing the action dropdown and sidebar buttons
     showActionDropdown(options){
         //console.log('%c' + 'mmrpgWorldMap.showActionDropdown()', 'color: cyan;');
         let _self = this;
@@ -4906,6 +4906,14 @@ class mmrpgWorldMap {
             // Apply the alignment to the dropdown
             $actionDropdown.attr('data-align', dropdownAlign);
 
+            // Trigger typewriter effects if any exist in the markup
+            let $typewriters = $sideButtons.find('.typewriter');
+            if ($typewriters.length){
+                $typewriters.each(function(){
+                    _self.playTypewriterEffect($(this));
+                    });
+                }
+
             // If sound effect(s) have been defined play now
             if (showActionAreaSound){
                 let sound = showActionAreaSound, repeat = 1, delay = 0;
@@ -4941,6 +4949,13 @@ class mmrpgWorldMap {
         if (playSound){ _self.playSoundEffect('back-click'); }
 
         _self.enableActionDropdown();
+
+        // Clear any active typewriter intervals before destroying the DOM elements
+        $('.typewriter', $sideButtonsWrapper).each(function(){
+            if ($(this).data('typewriterInterval')){
+                clearInterval($(this).data('typewriterInterval'));
+                }
+            });
 
         // Crucially, clear all positioning and custom attributes so they don't bleed into the next interaction
         $actionDropdown.removeClass('active hover').css({left: '', top: ''}).removeAttr('data-dir').removeAttr('data-type').removeAttr('data-align');
@@ -5196,6 +5211,59 @@ class mmrpgWorldMap {
                 }, rushDuration);
             }
         return true;
+        }
+
+    // Quick function to animate text appearing one character at a time
+    playTypewriterEffect($element, speed){
+        let _self = this;
+        speed = typeof speed === 'number' ? speed : 20; // 20ms = ~50 chars per second
+        let rawHTML = $element.data('raw-text');
+        if (!rawHTML){
+            rawHTML = $element.html();
+            $element.data('raw-text', rawHTML);
+            }
+        $element.html('');
+        $element.css('opacity', 1);
+        if ($element.data('typewriterInterval')){
+            clearInterval($element.data('typewriterInterval'));
+            }
+        let i = 0;
+        let textBuffer = '';
+        let interval = setInterval(function(){
+            if (i >= rawHTML.length){
+                clearInterval(interval);
+                return;
+                }
+            let char = rawHTML.charAt(i);
+            textBuffer += char;
+            // Fast-forward through HTML tags (like <br /> or <strong>)
+            if (char === '<'){
+                while (i < rawHTML.length && rawHTML.charAt(i) !== '>'){
+                    i++;
+                    if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
+                    }
+                $element.html(textBuffer);
+                i++;
+                return;
+                }
+            // Fast-forward through HTML entities (like &hellip;)
+            if (char === '&') {
+                while (i < rawHTML.length && rawHTML.charAt(i) !== ';'){
+                    i++;
+                    if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
+                    }
+                $element.html(textBuffer);
+                i++;
+                return;
+                }
+            $element.html(textBuffer);
+            // Play the blip sound every time we hit a space/whitespace
+            if (char.trim() === ''){
+                _self.playSoundEffect('tooltip-text');
+                }
+            i++;
+            }, speed);
+        $element.data('typewriterInterval', interval);
         }
 
     // -- MISC HELPER METHODS -- //
