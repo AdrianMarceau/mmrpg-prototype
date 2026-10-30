@@ -241,17 +241,26 @@ function handleActorActionClick(action, $button, firstEvent){
             possibleMessages.push('I don\'t have any advice to share right now, sorry.');
             }
 
-        let currentKey = typeof _self.currentAdviceKey !== 'undefined' ? _self.currentAdviceKey : -1;
-        let randomKey;
-        if (possibleMessages.length === 1){
-            randomKey = 0;
-            } else {
-            do { randomKey = Math.floor(Math.random() * possibleMessages.length) + 0; }
-            while (randomKey === currentKey);
+        // Initialize an object to track advice queues for different actors if it doesn't exist yet
+        _self.adviceQueues = _self.adviceQueues || {};
+        let queueKey = actorNameKey || actorToken;
+
+        // If the queue for this actor is missing or empty, build and shuffle a new deck of indices
+        if (!_self.adviceQueues[queueKey] || _self.adviceQueues[queueKey].length === 0){
+            let newQueue = [];
+            for (let i = 0; i < possibleMessages.length; i++){
+                newQueue.push(i);
+                }
+            for (let i = newQueue.length - 1; i > 0; i--){
+                let j = Math.floor(Math.random() * (i + 1));
+                [newQueue[i], newQueue[j]] = [newQueue[j], newQueue[i]];
+                }
+            _self.adviceQueues[queueKey] = newQueue;
             }
 
-        _self.currentAdviceKey = randomKey;
-        let selectedMessageText = possibleMessages[randomKey];
+        // Pop the next message index off the front of the queue
+        let selectedMessageIndex = _self.adviceQueues[queueKey].shift();
+        let selectedMessageText = possibleMessages[selectedMessageIndex];
 
         // Target the text element, update its raw text cache, and run the typewriter
         let $textElement = _elements.sideButtons.find('.text');

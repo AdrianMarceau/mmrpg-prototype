@@ -3949,7 +3949,7 @@ class rpg_world {
                     'You can change direction in-place by holding down the cancel button before trying to move!',
                     'Boss Stars contain Starforce power, and that power makes your robots stronger! Try to collect a lot!',
                     'Heal Pads are green and restore your energy, while Reset Pads are red and blue and reset your stats!',
-                    'Hold down the confirm button while picking up items to automatically use/give them to your robots!',
+                    //'Hold down the confirm button while picking up items to automatically use/give them to your robots!',
                     'Support mecha can be recruited using the Mecha Whistle, but only when they\'re totally isolated.',
                     'Holding an elemental core allows a robots to equip virtually any ability that matches its type!',
                     'Elemental shards don\'t do much on their own, but collect four of the same kind and they\'ll fuse!',
