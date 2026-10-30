@@ -4082,7 +4082,7 @@ class rpg_world {
                 $hidden = in_array('hidden', $actor_data) ? true : false; if ($hidden){ unset($actor_data[array_search('hidden', $actor_data)]); }
                 $locked = in_array('locked', $actor_data) ? true : false; if ($locked){ unset($actor_data[array_search('locked', $actor_data)]); }
                 $removed = in_array('removed', $actor_data) ? true : false; if ($removed){ unset($actor_data[array_search('removed', $actor_data)]); }
-                if (!empty($world_map_actors[$actor_namekey])){ $removed = true; }
+                $interacted = !empty($world_map_actors[$actor_namekey]) ? $world_map_actors[$actor_namekey] : false;
                 if ($removed){ continue; }
                 $pos = $actor_data[0]; list($col, $row) = explode('-', $pos); unset($actor_data[0]);
                 $kind = !empty($actor_data[1]) ? $actor_data[1] : ''; unset($actor_data[1]);
@@ -4174,6 +4174,7 @@ class rpg_world {
                     'hidden' => $hidden,
                     'locked' => $locked,
                     'removed' => $removed,
+                    'interacted' => $interacted,
                     'data' => $data,
                     'type' => $type,
                     );

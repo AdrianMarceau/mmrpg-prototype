@@ -4926,6 +4926,9 @@ class mmrpgWorldMap {
         let _self = this;
         let _elements = _self.elements;
 
+        // Cancel actor interaction timeout if the player walks away early
+        if (_self.actorInteractTimeout) { clearTimeout(_self.actorInteractTimeout); }
+
         let $actionDropdown = _elements.actionDropdown;
         let $actionDropdownWrapper = $('> .wrapper', $actionDropdown);
         let $sideButtons = _elements.sideButtons;

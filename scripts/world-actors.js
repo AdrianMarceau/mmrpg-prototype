@@ -32,6 +32,7 @@ function prepareActorEventOptions(firstEvent, options){
 
     if (dataActor && !actorInfo.removed && !playerIsCursor){
         actionData.showActionArea = true;
+        actionData.showActionAreaSound = 'tooltip-text';
         if (!dataLabel){ dataLabel = 'Denizen'; }
         if (dataLabel){ actionData.actionAreaMarkup += '<strong class="label">' + dataLabel + '</strong>'; }
 
@@ -93,6 +94,23 @@ function prepareActorEventOptions(firstEvent, options){
         actionData.zoomTimeoutDuration = 500;
         }
 
+    // If the dialogue is about to be shown, start a 2-second timeout to track the interaction
+    if (actionData.showActionArea && dataActor){
+        let hasInteracted = typeof _world.actors[dataActor] !== 'undefined' || actorInfo.interacted ? true : false;
+        if (!hasInteracted){
+            // Clear any existing dialogue timeout just in case
+            if (_self.actorInteractTimeout){ clearTimeout(_self.actorInteractTimeout); }
+            _self.actorInteractTimeout = setTimeout(function(){
+                let $activeDropdown = _self.elements.actionDropdown;
+                // Verify the dropdown is still visible and showing an actor interaction
+                if ($activeDropdown && $activeDropdown.is('.active') && $activeDropdown.attr('data-type') === 'actor'){
+                    _world.actors[dataActor] = new Date().getTime();
+                    _self.saveWorldState();
+                    }
+                }, 2000);
+            }
+        }
+
     return actionData;
     }
 
@@ -111,6 +129,18 @@ function handleActorActionClick(action, $button, firstEvent){
     let isShop = action.indexOf('-shop') !== -1 || action.indexOf('shop-') !== -1;
     let isAdvice = action.indexOf('-advice') !== -1 || action.indexOf('advice-') !== -1;
     let isReset = action === 'reset-world-pickups' || action === 'reset-world-encounters';
+
+    let $actorEvent = $(firstEvent.sprite);
+    let dataActor = $actorEvent.attr('data-actor') || false;
+    let actorInfo = dataActor && _config.mapActorsIndex[dataActor] ? _config.mapActorsIndex[dataActor] : false;
+    let hasInteracted = dataActor && (typeof _world.actors[dataActor] !== 'undefined' || (actorInfo && actorInfo.interacted)) ? true : false;
+
+    // If an action was taken (other than dismiss) and they haven't been tracked yet, save immediately
+    if (action !== 'dismiss' && dataActor && !hasInteracted){
+        if (_self.actorInteractTimeout){ clearTimeout(_self.actorInteractTimeout); }
+        _world.actors[dataActor] = new Date().getTime();
+        _self.saveWorldState();
+        }
 
     if (isShop){
         let shopToken = action.replace(/^shop-with-/, '');
