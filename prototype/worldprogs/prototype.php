@@ -12,12 +12,10 @@ if (!empty($map_data_parsed['actors'])
 
     // If Auto has not been interacted with yet, make sure we set him to first-encounter
     $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
-    if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
+    if (!$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
     //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }
-
-
 
 // If the shopkeeper AUTO is currently on this map
 $actor_token = 'auto';
@@ -69,6 +67,20 @@ if (!empty($map_data_parsed['actors'])
     // If Kalinka has not been interacted with yet, make sure we set her to first-encounter
     $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
+    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
+
+}
+
+
+// If the the final PROXY is currently on this map
+$actor_token = 'proxy';
+$actor_namekey = 'postgame-area-proxy';
+if (!empty($map_data_parsed['actors'])
+    && !empty($map_data_parsed['actors'][$actor_namekey])){
+
+    // If Auto has not been interacted with yet, make sure we set him to first-encounter
+    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    if (!$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
     //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }

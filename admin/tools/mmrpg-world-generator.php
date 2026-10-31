@@ -441,8 +441,8 @@ echo('<pre>'.PHP_EOL);
             // If this area is the postgame Backdoor, place the debug portal in the exact center
             if (in_array('postgame', $area_tags)) {
                 $area_file_markup[] = '#---------------------------#';
-                $area_file_markup[] = '@actors[]   = proxy-first-encounter('.$area_spawn.', player, proxy, alt, first-encounter)';
-                $area_file_markup[] = '@portals[]  = debug-world-portal('.$area_spawn.', debug__debug-area-1__spawn, void-alt, confirm)';
+                $area_file_markup[] = '@actors[]   = postgame-area-proxy('.$area_spawn.', player, proxy, alt, default)';
+                $area_file_markup[] = '@portals[]  = postgame-area-portal('.$area_spawn.', debug__debug-area-1__spawn, void-alt, confirm)';
                 // We don't need to add this to $protected_zones because 'spawn-buffer'
                 // already protects the exact center coordinate ($area_spawn) with a 0-radius buffer
             }

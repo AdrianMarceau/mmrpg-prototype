@@ -4040,7 +4040,8 @@ class rpg_world {
                 // Proxy
                 'alt_colour' => 'empty',
                 'alt_messages' => array(
-                    'default' => array('Congratulations on defeating the last Slur, and thank you.', 'Justice has finally been served.', 'I will take over from here.', 'Wish me... "luck".'),
+                    'first-encounter' => array('Congratulations on defeating the last Slur, and thank you.', 'Justice has finally been served.', 'I will take over from here.', 'Wish me... "luck".'),
+                    'default' => array('Please allow me some time to prepare...', '||', 'I have a long journey ahead.'),
                     ),
                 // Mayl
                 'alt9_colour' => 'laser',
