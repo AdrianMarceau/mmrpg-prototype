@@ -4953,7 +4953,7 @@ class mmrpgWorldMap {
         // Clear any active typewriter intervals before destroying the DOM elements
         $('.typewriter', $sideButtonsWrapper).each(function(){
             if ($(this).data('typewriterInterval')){
-                clearInterval($(this).data('typewriterInterval'));
+                clearTimeout($(this).data('typewriterInterval'));
                 }
             });
 
@@ -5217,6 +5217,11 @@ class mmrpgWorldMap {
     playTypewriterEffect($element, speed){
         let _self = this;
         speed = typeof speed === 'number' ? speed : 20; // 20ms = ~50 chars per second
+        // Define dynamic pauses based on the base speed multiplier
+        let pauseComma = speed * 8;       // ~160ms at base speed
+        let pauseSentence = speed * 15;   // ~300ms at base speed
+        let pauseSinglePipe = speed * 25; // ~500ms at base speed
+        let pauseDoublePipe = speed * 40; // ~800ms at base speed
         let rawHTML = $element.data('raw-text');
         if (!rawHTML){
             rawHTML = $element.html();
@@ -5224,46 +5229,76 @@ class mmrpgWorldMap {
             }
         $element.html('');
         $element.css('opacity', 1);
+        // Clear existing timeouts to prevent overlapping animations
         if ($element.data('typewriterInterval')){
-            clearInterval($element.data('typewriterInterval'));
+            clearTimeout($element.data('typewriterInterval'));
             }
         let i = 0;
         let textBuffer = '';
-        let interval = setInterval(function(){
+        let typeNextChar = function(){
+            // Stop if we've reached the end of the string
             if (i >= rawHTML.length){
-                clearInterval(interval);
                 return;
                 }
             let char = rawHTML.charAt(i);
-            textBuffer += char;
-            // Fast-forward through HTML tags (like <br /> or <strong>)
-            if (char === '<'){
-                while (i < rawHTML.length && rawHTML.charAt(i) !== '>'){
-                    i++;
-                    if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
+            let currentDelay = speed;
+            // Handle custom pause tokens
+            if (char === '|'){
+                if (rawHTML.charAt(i + 1) === '|'){
+                    // Double pipe: add line break, pause longer, skip both pipes
+                    textBuffer += '<br />';
+                    currentDelay = pauseDoublePipe;
+                    i += 2;
+                    } else {
+                    // Single pipe: just pause, skip the pipe
+                    currentDelay = pauseSinglePipe;
+                    i += 1;
                     }
-                $element.html(textBuffer);
-                i++;
-                return;
-                }
-            // Fast-forward through HTML entities (like &hellip;)
-            if (char === '&') {
-                while (i < rawHTML.length && rawHTML.charAt(i) !== ';'){
+                // Eat exactly ONE trailing space after a pipe to prevent double-spaces or indentation
+                if (rawHTML.charAt(i) === ' '){
                     i++;
-                    if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
                     }
-                $element.html(textBuffer);
+                } else {
+                // Standard character handling
+                textBuffer += char;
+
+                // Fast-forward through HTML tags (like <br /> or <strong>)
+                if (char === '<'){
+                    while (i < rawHTML.length && rawHTML.charAt(i) !== '>'){
+                        i++;
+                        if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
+                        }
+                    }
+                // Fast-forward through HTML entities (like &hellip;)
+                else if (char === '&') {
+                    while (i < rawHTML.length && rawHTML.charAt(i) !== ';'){
+                        i++;
+                        if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
+                        }
+                    }
+                // Apply automatic pause for end-of-sentence punctuation
+                else if (char === '.' || char === '?' || char === '!'){
+                    currentDelay = pauseSentence;
+                    }
+                // Apply a shorter breath-pause for commas
+                else if (char === ','){
+                    currentDelay = pauseComma;
+                    }
+                // Play the blip sound every time we hit a space/whitespace
+                // (unless the NEXT character is a pipe, to keep our dramatic pauses completely silent)
+                if (char.trim() === '' && rawHTML.charAt(i + 1) !== '|'){
+                    _self.playSoundEffect('tooltip-text');
+                    }
                 i++;
-                return;
                 }
             $element.html(textBuffer);
-            // Play the blip sound every time we hit a space/whitespace
-            if (char.trim() === ''){
-                _self.playSoundEffect('tooltip-text');
-                }
-            i++;
-            }, speed);
-        $element.data('typewriterInterval', interval);
+            // Queue up the next character using the dynamic delay
+            let timeoutId = setTimeout(typeNextChar, currentDelay);
+            $element.data('typewriterInterval', timeoutId);
+            };
+        // Kick off the initial loop
+        let initialTimeout = setTimeout(typeNextChar, speed);
+        $element.data('typewriterInterval', initialTimeout);
         }
 
     // -- MISC HELPER METHODS -- //
