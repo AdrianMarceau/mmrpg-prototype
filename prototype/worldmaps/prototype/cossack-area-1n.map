@@ -17,7 +17,7 @@
 #---------------------------#
 @portals[]  = spawn(8-8, hidden)
 #---------------------------#
-@portals[]  = north-exit(8-1, star-gate-20sw__south-exit, up-only)
+@portals[]  = north-exit(8-1, star-gate-10sw__south-exit, up-only)
 @portals[]  = south-exit(8-15, cossack-area-1__north-exit, down-only)
 #---------------------------#
 @pickups    = small-screw(3),energy-pellet(2),energy-capsule(1)

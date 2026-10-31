@@ -17,7 +17,7 @@
 @portals[]  = spawn(11-11, hidden)
 #---------------------------#
 @portals[]  = north-exit(11-1, missile-area-1__south-exit, up-only)
-@portals[]  = west-exit(1-11, star-gate-20ssw__east-exit, left-only)
+@portals[]  = west-exit(1-11, star-gate-10ssw__east-exit, left-only)
 #---------------------------#
 @pickups    = speed-pellet(3),small-screw(2),missile-shard(1)
 #---------------------------#

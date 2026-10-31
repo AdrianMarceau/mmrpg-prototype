@@ -18,7 +18,7 @@
 @portals[]  = spawn(8-8, hidden)
 #---------------------------#
 @portals[]  = west-exit(1-8, cossack-area-1e__east-exit, left-only)
-@portals[]  = east-exit(15-8, star-gate-20ssw__west-exit, right-only)
+@portals[]  = east-exit(15-8, star-gate-10ssw__west-exit, right-only)
 #---------------------------#
 @pickups    = small-screw(3),weapon-pellet(2),weapon-capsule(1)
 #---------------------------#

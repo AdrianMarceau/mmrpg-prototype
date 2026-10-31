@@ -17,7 +17,7 @@
 #---------------------------#
 @portals[]  = spawn(11-11, hidden)
 #---------------------------#
-@portals[]  = south-exit(11-21, star-gate-20sw__north-exit, down-only)
+@portals[]  = south-exit(11-21, star-gate-10sw__north-exit, down-only)
 @portals[]  = east-exit(21-11, water-area-1__west-exit, right-only)
 #---------------------------#
 @pickups    = defense-pellet(3),small-screw(2),water-shard(1)

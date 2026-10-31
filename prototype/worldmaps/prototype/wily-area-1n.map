@@ -17,7 +17,7 @@
 #---------------------------#
 @portals[]  = spawn(8-8, hidden)
 #---------------------------#
-@portals[]  = north-exit(8-1, star-gate-20se__south-exit, up-only)
+@portals[]  = north-exit(8-1, star-gate-10se__south-exit, up-only)
 @portals[]  = south-exit(8-15, wily-area-1__north-exit, down-only)
 #---------------------------#
 @pickups    = small-screw(3),energy-pellet(2),energy-capsule(1)

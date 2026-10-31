@@ -1695,19 +1695,19 @@ function mmrpg_prototype_world_areas($world, &$index){
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
-    $index['star-gate-20se'] = [
-        'name' => 'STAR Gate 20SE',
+    $index['star-gate-10se'] = [
+        'name' => 'STAR Gate 10SE',
         'position' => '19-12',
-        'level' => 20,
+        'level' => 10,
         'element' => 'space',
         'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
-    $index['star-gate-20sse'] = [
-        'name' => 'STAR Gate 20SSE',
+    $index['star-gate-10sse'] = [
+        'name' => 'STAR Gate 10SSE',
         'position' => '16-14',
-        'level' => 20,
+        'level' => 10,
         'element' => 'space',
         'field' => 'prototype-subspace',
         'tags' => ['stargate'],
@@ -1722,19 +1722,19 @@ function mmrpg_prototype_world_areas($world, &$index){
         'tags' => ['stargate'],
         'exits' => ['east', 'west']
         ];
-    $index['star-gate-20sw'] = [
-        'name' => 'STAR Gate 20SW',
+    $index['star-gate-10sw'] = [
+        'name' => 'STAR Gate 10SW',
         'position' => '5-12',
-        'level' => 20,
+        'level' => 10,
         'element' => 'space',
         'field' => 'prototype-subspace',
         'tags' => ['stargate'],
         'exits' => ['north', 'south']
         ];
-    $index['star-gate-20ssw'] = [
-        'name' => 'STAR Gate 20SSW',
+    $index['star-gate-10ssw'] = [
+        'name' => 'STAR Gate 10SSW',
         'position' => '8-14',
-        'level' => 20,
+        'level' => 10,
         'element' => 'space',
         'field' => 'prototype-subspace',
         'tags' => ['stargate'],

@@ -1,10 +1,10 @@
 #---------------------------#
-# STAR Gate 20SE (SPACE)
+# STAR Gate 10SW (SPACE)
 #---------------------------#
-@token      = star-gate-20se
-@name       = STAR Gate 20SE
+@token      = star-gate-10sw
+@name       = STAR Gate 10SW
 @type       = space
-@level      = 20
+@level      = 10
 @size       = 11 x 11
 @sheet      = mmrpg-overworld-2k25-v6
 #---------------------------#
@@ -16,15 +16,15 @@
 #---------------------------#
 @portals[]  = spawn(6-6, hidden)
 #---------------------------#
-@portals[]  = north-exit(6-1, electric-area-1e__south-exit, up-only)
-@portals[]  = south-exit(6-11, wily-area-1n__north-exit, down-only)
+@portals[]  = north-exit(6-1, water-area-1w__south-exit, up-only)
+@portals[]  = south-exit(6-11, cossack-area-1n__north-exit, down-only)
 #---------------------------#
-@blocks[]    = star-gate-01-b1(5-4, star-block, horz-up, x20)
-@gates[]     = star-gate-01-g1(6-4, star-gate, horizontal, x20)
-@blocks[]    = star-gate-01-b2(7-4, star-block, horz-up, x20)
-@blocks[]    = star-gate-02-b1(5-8, star-block, horz-down, x20)
-@gates[]     = star-gate-02-g1(6-8, star-gate, horizontal, x20)
-@blocks[]    = star-gate-02-b2(7-8, star-block, horz-down, x20)
+@blocks[]    = star-gate-01-b1(5-4, star-block, horz-up, x10)
+@gates[]     = star-gate-01-g1(6-4, star-gate, horizontal, x10)
+@blocks[]    = star-gate-01-b2(7-4, star-block, horz-up, x10)
+@blocks[]    = star-gate-02-b1(5-8, star-block, horz-down, x10)
+@gates[]     = star-gate-02-g1(6-8, star-gate, horizontal, x10)
+@blocks[]    = star-gate-02-b2(7-8, star-block, horz-down, x10)
 #---------------------------#
 @events[]   = auto-heal(6-6, healpad, any, trigger-effects, restore-team-energy, restore-team-weapons)
 #---------------------------#

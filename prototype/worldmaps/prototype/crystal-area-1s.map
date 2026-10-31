@@ -17,7 +17,7 @@
 @portals[]  = spawn(11-11, hidden)
 #---------------------------#
 @portals[]  = north-exit(11-1, crystal-area-1__south-exit, up-only)
-@portals[]  = east-exit(21-11, star-gate-20sse__west-exit, right-only)
+@portals[]  = east-exit(21-11, star-gate-10sse__west-exit, right-only)
 #---------------------------#
 @pickups    = speed-pellet(3),small-screw(2),crystal-shard(1)
 #---------------------------#
