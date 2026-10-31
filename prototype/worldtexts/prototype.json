@@ -9,12 +9,10 @@
       ],
       "hello-world": [
         "Welcome to the world!",
-        "...",
-        "Hello world!"
+        "||| ... ||| Hello world!"
       ],
       "helpless-stuck": [
-        "Thanks for breaking me out of there!",
-        "I thought I'd be stuck between those rocks forever."
+        "Thanks for breaking me out of there! I thought I'd be stuck between those rocks forever."
       ]
     }
   },
@@ -24,14 +22,10 @@
     "colour": "nature",
     "messages": {
       "default": [
-        "Hey there, {player_name}!",
-        "Hope you're collecting lots of bolts!",
-        "Now, what can I do for you today?"
+        "Hey there, {player_name}! Hope you're collecting lots of bolts! | Now, what can I do for you today?"
       ],
       "first-encounter": [
-        "Hey there, {player_name}!",
-        "Fancy meeting you here!",
-        "Where is here, anyway?"
+        "Hey there, {player_name}! Fancy meeting you here! ||| Where is here, anyway?"
       ]
     },
     "actions": {
@@ -62,14 +56,10 @@
     "colour": "explode",
     "messages": {
       "default": [
-        "Welcome to shop! Squawk!",
-        "New abilities you want? Squaaawk!",
-        "Give me your zenny! Squawk!!"
+        "Welcome to shop! Squawk! New abilities you want? Squaaawk! Give me your zenny! Squawk!!"
       ],
       "first-encounter": [
-        "Reggae's Shop this is! Squawk!",
-        "New abilities you want! Squaaawk!",
-        "Zenny I accept!"
+        "Reggae's Shop this is! Squawk! New abilities you want! Squaaawk! Zenny I accept!"
       ]
     },
     "actions": {
@@ -98,13 +88,10 @@
     "colour": "freeze",
     "messages": {
       "default": [
-        "Greetings {player_name}, welcome back.",
-        "Is there something you'd like to discuss with me?"
+        "Greetings {player_name}, welcome back. Is there something you'd like to discuss with me?"
       ],
       "first-encounter": [
-        "Greetings {player_name}.",
-        "It is good to see you again.",
-        "Perhaps under better circumstances next time?"
+        "Greetings {player_name}. It is good to see you again. || Perhaps under better circumstances next time?"
       ]
     },
     "actions": {
@@ -134,14 +121,10 @@
     "colour": "shadow",
     "messages": {
       "default": [
-        "Hello again!",
-        "I can \"reset\" parts of this area for you if you've got the goods.",
-        "Whaddya say?"
+        "Hello again! I can \"reset\" parts of this area for you if you've got the goods. Whaddya say?"
       ],
       "first-encounter": [
-        "Psst, can you keep a secret?",
-        "I can \"reset\" parts of this area.",
-        "You gotta have the goods though!"
+        "Psst, can you keep a secret? I can \"reset\" parts of this area. | You gotta have the goods though!"
       ]
     },
     "actions": {
