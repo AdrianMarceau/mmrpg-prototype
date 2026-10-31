@@ -161,7 +161,7 @@ $mmrpg_index_gates = rpg_world::get_static_gates_index();
 $mmrpg_index_locks = rpg_world::get_static_locks_index();
 $mmrpg_index_blocks = rpg_world::get_static_blocks_index();
 $mmrpg_index_hazards = rpg_world::get_static_hazards_index();
-$mmrpg_index_actors = rpg_world::get_static_actors_index();
+//$mmrpg_index_actors = rpg_world::get_static_actors_index();
 $mmrpg_indexes = array(
     'types' => &$mmrpg_index_types,
     'fields' => &$mmrpg_index_fields,
@@ -174,7 +174,7 @@ $mmrpg_indexes = array(
     'locks' => &$mmrpg_index_locks,
     'blocks' => &$mmrpg_index_blocks,
     'hazards' => &$mmrpg_index_hazards,
-    'actors' => &$mmrpg_index_actors,
+    //'actors' => &$mmrpg_index_actors,
     );
 rpg_world::preload_indexes($mmrpg_indexes);
 
@@ -506,6 +506,10 @@ if (!empty($_REQUEST['player'])
     header('Location: '.$return_url);
     exit();
 }
+
+// Now that we know the world token, we can preload actor indexes
+$mmrpg_index_actors = rpg_world::get_static_actors_index($request_world_token);
+rpg_world::preload_indexes(array('actors' => &$mmrpg_index_actors));
 
 // Load map data from the appropriate map file
 $world_map_token = $this_prototype_data['this_current_world'].'__'.$this_prototype_data['this_current_map'];
