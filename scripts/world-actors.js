@@ -40,8 +40,8 @@ function prepareActorEventOptions(firstEvent, options){
             let avatarSprite = '&hellip;';
             if (actorInfo.kind === 'player'){ avatarSprite = _self.getPlayerSpriteMarkup(actorInfo.sprite, {alt: actorInfo.image, kind: 'mug'}); }
             else if (actorInfo.kind === 'robot'){ avatarSprite = _self.getRobotSpriteMarkup(actorInfo.sprite, {alt: actorInfo.image, kind: 'mug'}); }
-            let messagesText = typeof actorInfo.messages === 'object' ? actorInfo.messages.join('\n') : actorInfo.messages;
-            messagesText = messagesText.replaceAll('//', '<br />');
+            // Join the array strings directly with HTML linebreaks
+            let messagesText = typeof actorInfo.messages === 'object' ? actorInfo.messages.join('<br />') : actorInfo.messages;
             messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
             actionData.sideButtonsMarkup += '<div class="button-title big-button-title'+(dataColour ? ' type '+dataColour : '')+'">';
                 actionData.sideButtonsMarkup += '<i class="icon">' + avatarSprite + '</i>';

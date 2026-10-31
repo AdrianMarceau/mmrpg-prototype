@@ -5220,8 +5220,7 @@ class mmrpgWorldMap {
         // Define dynamic pauses based on the base speed multiplier
         let pauseComma = speed * 8;       // ~160ms at base speed
         let pauseSentence = speed * 15;   // ~300ms at base speed
-        let pauseSinglePipe = speed * 25; // ~500ms at base speed
-        let pauseDoublePipe = speed * 40; // ~800ms at base speed
+        let pausePipe = speed * 25;       // ~500ms at base speed
         let rawHTML = $element.data('raw-text');
         if (!rawHTML){
             rawHTML = $element.html();
@@ -5244,29 +5243,30 @@ class mmrpgWorldMap {
             let currentDelay = speed;
             // Handle custom pause tokens
             if (char === '|'){
-                if (rawHTML.charAt(i + 1) === '|'){
-                    // Double pipe: add line break, pause longer, skip both pipes
-                    textBuffer += '<br />';
-                    currentDelay = pauseDoublePipe;
-                    i += 2;
-                    } else {
-                    // Single pipe: just pause, skip the pipe
-                    currentDelay = pauseSinglePipe;
-                    i += 1;
-                    }
-                // Eat exactly ONE trailing space after a pipe to prevent double-spaces or indentation
-                if (rawHTML.charAt(i) === ' '){
+                // Single pipe: just pause, skip the pipe
+                currentDelay = pausePipe;
+                // Eat exactly ONE trailing space after a pipe to prevent double-spaces or indentation.
+                // We only do this if the NEXT character isn't another pipe, so |||| stacks seamlessly.
+                if (rawHTML.charAt(i + 1) === ' ' && rawHTML.charAt(i + 2) !== '|'){
                     i++;
                     }
                 } else {
                 // Standard character handling
                 textBuffer += char;
-
                 // Fast-forward through HTML tags (like <br /> or <strong>)
                 if (char === '<'){
+                    let fullTag = char;
                     while (i < rawHTML.length && rawHTML.charAt(i) !== '>'){
                         i++;
-                        if (i < rawHTML.length){ textBuffer += rawHTML.charAt(i); }
+                        if (i < rawHTML.length){
+                            char = rawHTML.charAt(i);
+                            textBuffer += char;
+                            fullTag += char;
+                            }
+                        }
+                    // Apply an automatic pause when rendering a line break
+                    if (fullTag.toLowerCase() === '<br>' || fullTag.toLowerCase() === '<br/>' || fullTag.toLowerCase() === '<br />'){
+                        currentDelay = pausePipe;
                         }
                     }
                 // Fast-forward through HTML entities (like &hellip;)
@@ -5289,8 +5289,8 @@ class mmrpgWorldMap {
                 if (char.trim() === '' && rawHTML.charAt(i + 1) !== '|'){
                     _self.playSoundEffect('tooltip-text');
                     }
-                i++;
                 }
+            i++;
             $element.html(textBuffer);
             // Queue up the next character using the dynamic delay
             let timeoutId = setTimeout(typeNextChar, currentDelay);
