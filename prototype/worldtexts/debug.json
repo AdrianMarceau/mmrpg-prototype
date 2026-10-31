@@ -1,0 +1,172 @@
+{
+  "heal-bot": {
+    "name": "Heal Bot",
+    "type": "none",
+    "colour": "energy",
+    "messages": {
+      "default": [
+        "...?"
+      ],
+      "hello-world": [
+        "Welcome to the world!",
+        "| ... |",
+        "Hello world!"
+      ],
+      "helpless-stuck": [
+        "Thanks for breaking me out of there! I thought I'd be stuck between those rocks forever."
+      ]
+    }
+  },
+  "auto": {
+    "name": "Auto",
+    "type": "none",
+    "colour": "nature",
+    "messages": {
+      "default": [
+        "Hey there, {player_name}! Hope you're collecting lots of bolts! | Now, what can I do for you today?"
+      ],
+      "first-encounter": [
+        "Hey there, {player_name}! Fancy meeting you here! ||| Where is here, anyway?"
+      ]
+    },
+    "actions": {
+      "default": [
+        ["Open The Shop", "shop-with-auto", "none"],
+        ["Get Some Advice", "advice-from-auto", "none"]
+      ]
+    },
+    "advice": [
+      "Defeat robot masters with super effective attacks to increase the chance of elemental cores dropping!",
+      "Defeat support mecha with super effective attacks to increase the odds of elemental shards dropping!",
+      "Experience points in battle are split among your whole team, so everyone gets to level-up together!",
+      "You can't bring robots into battle without Limit Hearts, so try to earn as many as you can!",
+      "You can change direction in-place by holding down the cancel button before trying to move!",
+      "Boss Stars contain Starforce power, and that power makes your robots stronger! Try to collect a lot!",
+      "Heal Pads are green and restore your energy, while Reset Pads are red and blue and reset your stats!",
+      "Support mecha can be recruited using the Mecha Whistle, but only when they're totally isolated.",
+      "Holding an elemental core allows a robots to equip virtually any ability that matches its type!",
+      "Elemental shards don't do much on their own, but collect four of the same kind and they'll fuse!",
+      "Benched robots regain more Weapon Energy between turns than active ones.  Make sure you swap often!",
+      "Different battle fields have different multipliers, boosting or lowering different elemental types!",
+      "Stat buffs in battle max-out at +5 stages, so don't get greedy! The same is true for stat breaks!"
+    ]
+  },
+  "reggae": {
+    "name": "Reggae",
+    "type": "none",
+    "colour": "explode",
+    "messages": {
+      "default": [
+        "Welcome to shop! Squawk! New abilities you want? Squaaawk! Give me your zenny! Squawk!!"
+      ],
+      "first-encounter": [
+        "Reggae's Shop this is! Squawk! New abilities you want! Squaaawk! Zenny I accept!"
+      ]
+    },
+    "actions": {
+      "default": [
+        ["Open The Shop", "shop-with-reggae", "none"],
+        ["Get Some Advice", "advice-from-reggae", "none"]
+      ]
+    },
+    "advice": [
+      "Collect shards! Shards! Squawk! Four shards makes a core! Four shards makes a core! Squaaawk!",
+      "Robot equip ability if same type! Squawk! Robot hold core! Now robot equip more ability! Squaaawk!",
+      "Player sell cores! Sell cores! Squawk! Reggae make abilities! Make abilities! Squaaawk!",
+      "Weakness! Weakness! Squawk! Weakness make robot take twice damage! Careful! Squaaawk!",
+      "Resistance! Resistance! Squawk! Resistance make robot take half damage! Helpful! Squaaawk!",
+      "Affinity! Robot can have them! Squawk! Affinity make robot heal from damage! Madness! Squaaawk!",
+      "Immunity! Robot can have them! Squawk! Immunity make robot take no damage! Amazing! Squaaawk!",
+      "Hit enemy weaknesses for extra experience! Squawk! Annihilate 'em! Squaaawk!",
+      "Resisted hits earn less experience points! Squawk! Don't be stupid! Squaaawk!",
+      "Use the Copy Shot! Squawk! Steals last ability opponent used! Squaawk! Permanently! Squaaawk!",
+      "Some abilities hit benched robots! Squawk! No where is safe from Reggae's weapons! Squaaawk!"
+    ]
+  },
+  "kalinka": {
+    "name": "Kalinka",
+    "type": "none",
+    "colour": "freeze",
+    "messages": {
+      "default": [
+        "Greetings {player_name}, welcome back. Is there something you'd like to discuss with me?"
+      ],
+      "first-encounter": [
+        "Greetings {player_name}. It is good to see you again. || Perhaps under better circumstances next time?"
+      ]
+    },
+    "actions": {
+      "default": [
+        ["Open The Shop", "shop-with-kalinka", "none"],
+        ["Get Some Advice", "advice-from-kalinka", "none"]
+      ]
+    },
+    "advice": [
+      "Make sure you scan unknown robots you find in battle, some can only be unlocked that way!",
+      "Collecting stars boosts the elemental damage of all doctors' recruited robots and mechas!",
+      "Player Battles use the ghost data of real players and are great for earning Battle Points!",
+      "Endless Mode let's you challenge a gauntlet of robots with only a small team to fight with!",
+      "Star Fields are fusions of different battlefields, each with their own unique star to collect!",
+      "Starforce permanently boosts the AT/DF/SP stats of all robots that share its elemental type!",
+      "Copy-type robots benefit from all Starforce types at once, but less-so than elemental robots do.",
+      "Neutral-type robots benefit from all Starforce types at once, but it only boosts their LE and WE.",
+      "Passive skills can be incredibly helpful. Crystal Man's skill lets you scan target abilities!",
+      "Hold items have a variety of effects and are very useful. I heard one lets you survive OHKOs!",
+      "Rhythm discovered that this entire place is made from a substance called Quanta. Fascinating, isn't it?",
+      "Subspace area has me curious about what lies beyond the portals, deep in the pitch black darkness."
+    ]
+  },
+  "anti-eddie": {
+    "name": "Anti Eddie",
+    "type": "none",
+    "colour": "shadow",
+    "messages": {
+      "default": [
+        "Hello again! I can \"reset\" parts of this area for you if you've got the goods. Whaddya say?"
+      ],
+      "first-encounter": [
+        "Psst, can you keep a secret? I can \"reset\" parts of this area. | You gotta have the goods though!"
+      ]
+    },
+    "actions": {
+      "default": [
+        ["Reset Encounters", "reset-world-encounters", "none", "items:small-screw", 20],
+        ["Reset Pickups", "reset-world-pickups", "none", "items:large-screw", 20]
+      ]
+    }
+  },
+  "proxy": {
+    "name": "Proxy",
+    "type": "none",
+    "colour": "copy",
+    "messages": {
+      "default": [
+        "...?"
+      ]
+    },
+    "alt_colour": "empty",
+    "alt_messages": {
+      "first-encounter": [
+        "Congratulations on defeating the last Slur, and thank you.",
+        "Justice has finally been served.",
+        "I will take over from here.",
+        "|",
+        "Wish me... \"luck\"."
+      ],
+      "default": [
+        "Again, congratulations on your victory.",
+        "Please allow me some time to prepare for our next phase...",
+        "||",
+        "I have a long journey ahead."
+      ]
+    },
+    "alt9_colour": "laser",
+    "alt9_messages": {
+      "default": [
+        "Oh, hello there.",
+        "Do you know where I am?",
+        "Can you tell me where my friends are?"
+      ]
+    }
+  }
+}
