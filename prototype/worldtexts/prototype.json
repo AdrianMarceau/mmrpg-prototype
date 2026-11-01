@@ -134,6 +134,29 @@
       ]
     }
   },
+  "slur": {
+    "name": "Slur",
+    "type": "none",
+    "colour": "space",
+    "messages": {
+      "default": [
+        "Quit wasting my time and let's battle! I should end you right here for your insolence..."
+        ],
+      "first-encounter": [
+        "Welcome, {player_name}! I'm impressed you got this far! | Unfortunately, this is where your journey ends."
+        ]
+      }
+    },
+  "trill": {
+    "name": "Trill",
+    "type": "none",
+    "colour": "space",
+    "messages": {
+      "default": [
+        "For the master!"
+        ]
+      }
+    },
   "proxy": {
     "name": "Proxy",
     "type": "none",
@@ -167,5 +190,5 @@
         "Can you tell me where my friends are?"
       ]
     }
-  }
+    }
 }
