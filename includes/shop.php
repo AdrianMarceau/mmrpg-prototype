@@ -325,7 +325,7 @@ if (!empty($this_shop_index['auto'])){
         // Create arrays to hold combined sellable parts
         $auto_parts_selling = $base_parts_selling;
 
-        // Collect the list of items Auto is selling based on his level
+        // Collect the list of parts Auto is selling based on his level
         $unlocked_parts_query = "SELECT
             items.item_token,
             items.item_shop_level
@@ -415,6 +415,47 @@ if (!empty($this_shop_index['auto'])){
                 if (!empty($omega_boost)){ $item_price = ceil($item_price * 1.5); }
                 $this_shop_index['auto']['shop_items']['items_buying'][$item_token] = $item_price;
             }
+        }
+    }
+
+    // Calculate the Hyper Screw discount for items Auto is selling
+    $hyper_screws_found = 0;
+    if (!empty($global_unlocked_items['hyper-screw'])){
+        $hyper_screws_found = $global_unlocked_items['hyper-screw'];
+    }
+    // If any Hyper Screws have been sold, apply the discount and update dialogue
+    if ($hyper_screws_found > 0){
+        // Cap the number of screws at 10 for a maximum 50% discount
+        if ($hyper_screws_found > 10){ $hyper_screws_found = 10; }
+        // Calculate the discount multiplier (0.05 per screw) and percentage for display
+        $hyper_discount = $hyper_screws_found * 0.05;
+        $hyper_discount_percentage = $hyper_screws_found * 5;
+        // Loop through the selling items and apply the discount
+        if (!empty($this_shop_index['auto']['shop_items']['items_selling'])){
+            foreach ($this_shop_index['auto']['shop_items']['items_selling'] AS $item_token => $item_price){
+                $new_price = $item_price - floor($item_price * $hyper_discount);
+                $this_shop_index['auto']['shop_items']['items_selling'][$item_token] = $new_price;
+            }
+        }
+        // If the parts shop is unlocked, apply the discount to held items/parts as well
+        if (!empty($this_shop_index['auto']['shop_parts']['parts_selling'])){
+            foreach ($this_shop_index['auto']['shop_parts']['parts_selling'] AS $part_token => $part_price){
+                $new_price = $part_price - floor($part_price * $hyper_discount);
+                $this_shop_index['auto']['shop_parts']['parts_selling'][$part_token] = $new_price;
+            }
+        }
+        // Update Auto's greeting quote to reflect the current discount tier
+        if ($hyper_screws_found < 10){
+            $new_items_quote = 'Welcome back! Thanks to those Hyper Screws you\'ve been finding for me, all my items are '.$hyper_discount_percentage.'% off!';
+            $new_parts_quote = 'Thanks again for finding all those Hyper Screws! Now I can replicate parts for you at '.$hyper_discount_percentage.'% off!';
+        } else {
+            $new_items_quote = 'Incredible! You found all the Hyper Screws! As promised, you get a 50% discount on everything in the shop!';
+            $new_parts_quote = 'Simply amazing! With all the Hyper Screws found, I can replicate any part for you at at 50% discount!';
+        }
+        // Overwrite the default items and parts tab quotes
+        $this_shop_index['auto']['shop_quote_selling']['items'] = $new_items_quote;
+        if (isset($this_shop_index['auto']['shop_quote_selling']['parts'])) {
+            $this_shop_index['auto']['shop_quote_selling']['parts'] = $new_parts_quote;
         }
     }
 
