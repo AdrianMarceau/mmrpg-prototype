@@ -3895,6 +3895,29 @@ class rpg_world {
             $markup = self::get_sprite($kind, $token, $alt, $dir, $class, $style, $attrs);
             $markup = str_replace('data-sprite="'.$kind.'"', 'data-sprite="battle-'.$kind.'"', $markup);
             if ($subkind === 'rescue'){ $markup = str_replace('data-frame="00"', 'data-frame="08"', $markup); }
+            // Check if this battle target has dialogue defined in the actors index
+            static $mmrpg_index_actors_static = null;
+            if ($mmrpg_index_actors_static === null){ $mmrpg_index_actors_static = self::get_index('actors'); }
+            $messages = array();
+            if (!empty($mmrpg_index_actors_static[$token])){
+                $actor_info = $mmrpg_index_actors_static[$token];
+                $alt_prefix = !empty($alt) ? $alt.'_' : '';
+                // Check if this battle token has been interacted with (acting as a pseudo-actor)
+                $has_interacted = !empty($WORLD_SESSION['world_actors'][$world_map_token][$battle]) ? true : false;
+                $msg_context = !$has_interacted ? 'first-encounter' : 'default';
+                // Try alt-specific contextual messages (e.g. 'alt9_messages' -> 'first-encounter')
+                if (!empty($alt_prefix) && !empty($actor_info[$alt_prefix.'messages'][$msg_context])){
+                    $messages = $actor_info[$alt_prefix.'messages'][$msg_context];
+                }
+                // Try base contextual messages (e.g. 'messages' -> 'first-encounter')
+                elseif (!empty($actor_info['messages'][$msg_context])){
+                    $messages = $actor_info['messages'][$msg_context];
+                }
+                // Fallback to default if the specific context doesn't exist
+                elseif (!empty($actor_info['messages']['default'])){
+                    $messages = $actor_info['messages']['default'];
+                }
+            }
             $battles_markup[] = $markup;
             $battle_symbols[$pos] = $battle;
             $battles_index[$battle] = array(
@@ -3904,7 +3927,8 @@ class rpg_world {
                 'alt' => $alt,
                 'col' => $col,
                 'row' => $row,
-                'pos' => $pos
+                'pos' => $pos,
+                'messages' => $messages
                 );
             }
         $battle_symbols_json = json_encode($battle_symbols, JSON_NUMERIC_CHECK);

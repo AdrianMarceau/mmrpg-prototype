@@ -11,7 +11,10 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
     let _worldToken = _config.mapWorld;
     let _mapToken = _config.mapToken;
     let _mapBattlesIndex = _config.mapBattlesIndex;
+    let _mmrpgPlayersIndex = _self.indexes.players;
     let _mmrpgRobotsIndex = _self.indexes.robots;
+
+    let _playerIndexInfo = _mmrpgPlayersIndex[_worldPlayer.token];
 
     options = options || {};
 
@@ -124,7 +127,34 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
         joinedDataAttrs += ' data-skip-fadein="' + (skipFadein ? 'true' : 'false') + '"';
 
         actionData.actionAreaMarkup += dataLabelsJoined;
-        actionData.sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> ' + (dataBattles.length > 1 ? dataBattles.length+' ' : '') + 'Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
+
+        if (firstBattleInfo.messages && firstBattleInfo.messages.length){
+            let avatarSprite = _self.getRobotSpriteMarkup(firstBattleInfo.token, {alt: firstBattleInfo.alt, kind: 'mug'});
+            let messagesText = firstBattleInfo.messages.join('<br />');
+            messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
+            // Determine dialogue box color based on the robot's core typing
+            let dataColour = firstBattleRobot.core || 'none';
+            if (firstBattleRobot.core2) { dataColour += '_' + firstBattleRobot.core2; }
+            actionData.sideButtonsMarkup += '<div class="button-title big-button-title type ' + dataColour + '">';
+                actionData.sideButtonsMarkup += '<i class="icon">' + avatarSprite + '</i>';
+                actionData.sideButtonsMarkup += '<p class="text typewriter" style="opacity: 0;">' + messagesText + '</p>';
+            actionData.sideButtonsMarkup += '</div>';
+            // Start a 2-second timeout to track the interaction, just like normal actors!
+            let dataBattleToken = dataBattles[0][0]; // Get the specific battle token
+            let hasInteracted = typeof _world.actors[dataBattleToken] !== 'undefined' ? true : false;
+            if (!hasInteracted){
+                if (_self.actorInteractTimeout) { clearTimeout(_self.actorInteractTimeout); }
+                _self.actorInteractTimeout = setTimeout(function(){
+                    let $activeDropdown = _self.elements.actionDropdown;
+                    if ($activeDropdown && $activeDropdown.is('.active') && $activeDropdown.attr('data-type') === 'battle') {
+                        _world.actors[dataBattleToken] = new Date().getTime();
+                        _self.saveWorldState(); // Silent background save
+                        }
+                    }, 2000);
+                }
+        } else {
+            actionData.sideButtonsMarkup += '<strong class="button big-button-title type empty"><span><sup>Engage With</sup> ' + (dataBattles.length > 1 ? dataBattles.length+' ' : '') + 'Target' + (dataBattles.length > 1 ? 's' : '') + ' ?</span></strong>';
+        }
 
         let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
         let playerActiveRobots = 0;
