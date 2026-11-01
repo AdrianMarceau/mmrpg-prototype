@@ -12,6 +12,14 @@ ob_start();
             }
         }
     }
+    // Check if the opponent has an active Magnet Module locking us down
+    $target_magnet_robots = $target_player->get_value('magnet_robots');
+    $target_active_robot = $target_player->get_active_robot();
+    if (!empty($target_magnet_robots)
+        && !empty($target_active_robot)
+        && in_array($target_active_robot->robot_id, $target_magnet_robots)){
+        $this_switch_disabled = true;
+    }
 
     // Check to see if a switch SHOULD be allowed
     $this_switch_required = false;

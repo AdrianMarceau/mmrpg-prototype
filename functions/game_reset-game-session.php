@@ -30,6 +30,7 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
     // Unset known session variables used by the game
     unset(
         $_SESSION['GAME'],
+        $_SESSION['WORLD'],
         //$_SESSION['INDEX'],
         $_SESSION['PROTOTYPE_TEMP'],
         //$_SESSION['LEADERBOARD'],
@@ -96,6 +97,7 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
             && !empty($delete_db_records_user_id)
             && $delete_db_records_user_id === $user_id
             && rpg_user::is_member()){
+            $db->delete('mmrpg_users_worlds', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_users_save_counters', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_users_robots_records', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_users_items_unlocked', array('user_id' => $delete_db_records_user_id));
@@ -103,14 +105,25 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
             $db->delete('mmrpg_users_stars_unlocked', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_challenges_leaderboard', array('user_id' => $delete_db_records_user_id));
             $db->delete('mmrpg_challenges_waveboard', array('user_id' => $delete_db_records_user_id));
+            $db->update('mmrpg_saves', array(
+                'save_values_battle_items' => '[]',
+                'save_values_battle_abilities' => '[]',
+                'save_values_battle_stars' => '[]',
+                'save_values_robot_alts' => '[]',
+                'save_values_robot_database' => '[]',
+                ), array('user_id' => $delete_db_records_user_id));
         }
 
         // Define a session var to ensure full reset
         $_SESSION[$session_token]['RESET'] = true;
 
         // Create the global item and ability arrays
+        $_SESSION[$session_token]['values']['battle_rewards'] = array();
+        $_SESSION[$session_token]['values']['battle_settings'] = array();
         $_SESSION[$session_token]['values']['battle_items'] = array();
         $_SESSION[$session_token]['values']['battle_abilities'] = array('buster-shot');
+
+        /*
 
         // Unlock Dr. Light as a playable character
         $unlock_player_info = $mmrpg_index_players['dr-light'];
@@ -127,6 +140,8 @@ function mmrpg_reset_game_session($delete_db_records = false, $delete_db_records
         $unlock_robot_info['robot_experience'] = 999;
         mmrpg_game_unlock_robot($unlock_player_info, $unlock_robot_info, true, false);
         //$_SESSION[$session_token]['values']['battle_rewards']['dr-light']['player_robots']['mega-man']['robot_experience'] = 4000;
+
+        */
 
     }
 

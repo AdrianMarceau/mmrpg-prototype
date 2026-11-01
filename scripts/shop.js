@@ -85,6 +85,35 @@ $(document).ready(function(){
 
         }
 
+    // -- PRIMARY SCRIPT FUNCTIONALITY -- //
+
+    // Ensure mouse hovers trigger the same visual state as gamepad inputs
+    $('#console .event .item_cell, #console .event .item_cell_confirm', thisShop).live('mouseenter', function(){
+        $('#console .event .item_cell, #console .event .item_cell_confirm', thisShop).removeClass('hovered');
+        $(this).addClass('hovered');
+        });
+    $('#console .event .item_cell, #console .event .item_cell_confirm', thisShop).live('mouseleave', function(){
+        $(this).removeClass('hovered');
+        });
+
+    // Define a function for showing/highlighting a player in the above ready room when possible
+    showShopInReadyRoom = function(shopToken){
+        //console.log('showShopInReadyRoom(shopToken:', shopToken, ')');
+        // We should add the new player to the parent ready room
+        if (typeof window.parent.mmrpgReadyRoom !== 'undefined'
+            && typeof window.parent.mmrpgReadyRoom.updatePlayer !== 'undefined'
+            && typeof window.parent.mmrpgReadyRoom.updateRobot !== 'undefined'){
+            // If the extra data in dataExtra was not empty and is JSON, parse it into playerInfo
+            var readyRoom = window.parent.mmrpgReadyRoom;
+            var spriteBounds = readyRoom.config.spriteBounds;
+            readyRoom.updatePlayer('all', {frame: 'base', position: [null, (spriteBounds.maxY - 4)]});
+            readyRoom.updateRobot('all', {frame: 'base', position: [null, (spriteBounds.maxY - 6)]});
+            var spriteUpdateData = {frame: 'taunt', direction: 'right', position: [50, (spriteBounds.minY - 2)]};
+            if (readyRoom.isPlayer(shopToken)){ readyRoom.updatePlayer(shopToken, spriteUpdateData); }
+            else if (readyRoom.isRobot(shopToken)){ readyRoom.updateRobot(shopToken, spriteUpdateData); }
+            }
+        };
+
     // Update the player and player count by counting elements
     thisShopData.shopTotal = $('#canvas .wrapper[data-shop]', thisShop).length;
     //console.log('thisShopData', thisShopData);
@@ -101,6 +130,7 @@ $(document).ready(function(){
     // Define a variable to hold the timeout for saving shop settings
     var saveShopSettingTimeout;
     var lastShopToken = thisShopData.lastShopToken.length ? thisShopData.lastShopToken.split('/') : [];
+    showShopInReadyRoom(lastShopToken);
     //console.log('lastShopToken', lastShopToken);
 
     // Create the click event for canvas sprites
@@ -116,12 +146,15 @@ $(document).ready(function(){
         var dataSelectorCurrent = '#'+dataSelect+' .event_visible';
         var dataSelectorNext = '#'+dataSelect+' .event[data-token='+dataToken+']';
         //console.log('.sprite[data-token] clicked!', {dataToken:dataToken,dataShop:dataShop,dataSelectorCurrent:dataSelectorCurrent,dataSelectorNext:dataSelectorNext});
+        $('.item_cell', gameCanvas).removeClass('hovered');
+        $('.item_cell_confirm', gameCanvas).removeClass('hovered');
         $('.wrapper_active', gameCanvas).removeClass('wrapper_active');
         $('.sprite_shop_current', gameCanvas).removeClass('sprite_shop_current');
         //console.log('updating perfect scrollbar 1');
         $('#console .scroll_wrapper', thisShop).perfectScrollbar('update');
         dataParent.addClass('wrapper_active').css({display:'block'});
         dataSprite.addClass('sprite_shop_current');
+        showShopInReadyRoom(dataToken);
         var $firstTabLink = false;
         if ($(dataSelectorCurrent, gameConsole).length){
             //console.log('dataSelectorCurrent (', dataSelectorCurrent, ') exists');
@@ -270,6 +303,7 @@ $(document).ready(function(){
         var thisToken = thisCell.attr('data-token');
         var thisQuantity = thisCell.find('.item_quantity').attr('data-quantity') || 0;
         var thisPrice = thisCell.find('.item_price').attr('data-price') || 0;
+        var thisPlayer = thisCell.attr('data-player') || '';
         thisQuantity = parseInt(thisQuantity);
         thisPrice = parseInt(thisPrice);
         var sellQuantity = 1;
@@ -290,7 +324,15 @@ $(document).ready(function(){
             itemCellConfirm.find('.item_price').attr('data-price', sellPrice).html('&hellip; '+printNumberWithCommas(sellPrice)+'z');
             } else {
             itemCellConfirm.empty();
-            itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', sellQuantity).attr('data-shop', thisSeller);
+            itemCellConfirm
+                .attr('data-kind', thisKind)
+                .attr('data-action', thisAction)
+                .attr('data-token', thisToken)
+                .attr('data-price', thisPrice)
+                .attr('data-quantity', sellQuantity)
+                .attr('data-shop', thisSeller)
+                .attr('data-player', thisPlayer)
+                ;
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<label class="item_price" data-price="'+sellPrice+'">&hellip; '+printNumberWithCommas(sellPrice)+'z</label>');
@@ -323,6 +365,7 @@ $(document).ready(function(){
 
     // Functionality to the buy links for all shops
     $('.item_cell[data-token][data-action="buy"] .buy_button', gameConsole).live('click', function(e){
+        //console.log('buy button clicked!');
         e.preventDefault();
         if (!thisShopData.allowEdit){ return false; }
         var thisButton = $(this);
@@ -334,6 +377,7 @@ $(document).ready(function(){
         var thisToken = thisCell.attr('data-token');
         var thisQuantity = thisCell.find('.item_quantity').attr('data-quantity') || 0;
         var thisPrice = thisCell.find('.item_price').attr('data-price') || 0;
+        var thisPlayer = thisCell.attr('data-player') || 'all';
         thisQuantity = parseInt(thisQuantity);
         thisPrice = parseInt(thisPrice);
         var buyQuantity = 1;
@@ -341,7 +385,7 @@ $(document).ready(function(){
         var thisDisabled = thisCell.hasClass('item_cell_disabled') ? true : false;
         if (thisDisabled){ return false; }
         var thisItemName = thisCell.find('.item_name').clone();
-        //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z');
+        //console.log(thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / '+thisPrice+'z / '+thisPlayer);
         var itemCellConfirm = $('.item_cell_confirm', thisTab);
         itemCellConfirm.removeClass('with_mods');
         if (thisKind == 'item'){ itemCellConfirm.addClass('with_mods'); }
@@ -352,7 +396,15 @@ $(document).ready(function(){
             //console.log('thisUnlocked', thisUnlocked);
             //console.log('ABILITY-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+actualQuantity+' / '+thisPrice+'z '+' / '+(thisUnlocked ? 'Unlocked' : 'Not Unlocked'));
             itemCellConfirm.empty();
-            itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer).attr('data-player', 'all');
+            itemCellConfirm
+                .attr('data-kind', thisKind)
+                .attr('data-action', thisAction)
+                .attr('data-token', thisToken)
+                .attr('data-price', thisPrice)
+                .attr('data-quantity', buyQuantity)
+                .attr('data-shop', thisBuyer)
+                .attr('data-player', thisPlayer)
+                ;
             itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
             itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
             var buttonCounter = 0;
@@ -402,11 +454,19 @@ $(document).ready(function(){
                 itemCellConfirm.append(thisItemName);
                 }
             } else {
-            //console.log('OTHER-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z');
+            //console.log('OTHER-A) '+thisBuyer+' / '+thisKind+' / '+thisAction+' / '+thisToken+' / x'+buyQuantity+' / '+thisPrice+'z / '+thisPlayer);
             itemCellConfirm.empty();
-            itemCellConfirm.attr('data-kind', thisKind).attr('data-action', thisAction).attr('data-token', thisToken).attr('data-price', thisPrice).attr('data-quantity', buyQuantity).attr('data-shop', thisBuyer);
-            itemCellConfirm.append('<a class="cancel_button ability_type ability_type_attack" href="#">Cancel</a>');
-            itemCellConfirm.append('<a class="confirm_button ability_type ability_type_energy" href="#">Confirm</a>');
+            itemCellConfirm
+                .attr('data-kind', thisKind)
+                .attr('data-action', thisAction)
+                .attr('data-token', thisToken)
+                .attr('data-price', thisPrice)
+                .attr('data-quantity', buyQuantity)
+                .attr('data-shop', thisBuyer)
+                .attr('data-player', thisPlayer)
+                ;
+            itemCellConfirm.append('<a class="cancel_button type type_attack" href="#">Cancel</a>');
+            itemCellConfirm.append('<a class="confirm_button type type_energy" href="#">Confirm</a>');
             itemCellConfirm.append('<label class="item_price" data-price="'+buyPrice+'">&hellip; '+printNumberWithCommas(buyPrice)+'z</label>');
             itemCellConfirm.append('<label class="item_quantity" data-quantity="'+buyQuantity+'">x '+buyQuantity+'</label>');
             itemCellConfirm.append(thisItemName);
@@ -449,8 +509,10 @@ $(document).ready(function(){
 
         var $shopDiv = thisTab.closest('.event[data-token="'+thisKeeper+'"]');
         var $shopSprite = $('> .this_sprite', $shopDiv);
+        var shopLevel = parseInt($shopDiv.attr('data-level'));
         //console.log('$shopDiv = ', $shopDiv.length, $shopDiv);
         //console.log('$shopSprite = ', $shopSprite.length, $shopSprite);
+        //console.log('shopLevel = ', shopLevel);
 
         // Define the post options for the ajax call
         var postData = {shop:thisKeeper,kind:thisKind,action:thisAction,token:thisToken,quantity:thisQuantity,price:thisPrice,player:thisPlayer};
@@ -491,12 +553,15 @@ $(document).ready(function(){
                     //console.log(data);
 
                     // Update this item's global quantity
+                    var oldZennyTotal = thisShopData.zennyCounter;
                     var newItemCount = data[2] != undefined ? parseInt(data[2]) : false;
                     var newZennyTotal = data[3] != undefined ? parseInt(data[3]) : false;
                     var newPointsTotal = data[4] != undefined && data[4].indexOf('points:') !== -1 ? parseInt(data[4].replace('points:', '')) : false;
                     var newLeaderboardRank = data[5] != undefined && data[5].indexOf('rank:') !== -1 ? data[5].replace('rank:', '') : false;
+                    var newShopLevel = data[6] != undefined && data[6].indexOf('shop:') !== -1 ? parseInt(data[6].replace('shop:', '')) : false;
                     var zennyDifference = Math.abs(newZennyTotal - thisShopData.zennyCounter);
                     //console.log({newItemCount:newItemCount,newZennyTotal:newZennyTotal,newPointsTotal:newPointsTotal,newLeaderboardRank:newLeaderboardRank});
+                    //console.log('newShopLevel =', newShopLevel);
 
                     // Define the change text
                     if (thisAction == 'buy'){ var thisChangeText = '<span class="zenny" style="color: #C35E5E;">-'+printNumberWithCommas(thisPrice)+'z</span>'; }
@@ -522,7 +587,8 @@ $(document).ready(function(){
                         */
 
                     var thisZennyFormatted = printNumberWithCommas(newZennyTotal);
-                    $('#zenny_counter', thisBody).css({color:'#8CEB80'}).html(thisZennyFormatted);
+                    var thisZennyDiffClass = (newZennyTotal - oldZennyTotal) > 0 ? 'increased' : 'decreased';
+                    $('#zenny_counter', thisBody).addClass(thisZennyDiffClass).html(thisZennyFormatted);
                     if (window.self !== window.parent){
                         parent.prototype_update_zenny(thisZennyFormatted+' z');
                         if (newPointsTotal !== false){
@@ -557,12 +623,26 @@ $(document).ready(function(){
 
                     // Animate the cell to show that an action has been completed
                     thisConfirmCell.stop().animate({opacity:1.0},300,'swing',function(){
-                        thisConfirmCell.animate({opacity:0.3},600,'swing',function(){
+                        thisConfirmCell.animate({opacity:0.3},300,'swing',function(){
                             $(this).css({opacity:1.0}).empty().append('<div class="placeholder">&hellip;</div>');
-                            $('#zenny_counter', thisBody).css({color:''});
+                            $('#zenny_counter', thisBody).removeClass(thisZennyDiffClass);
                             //console.log('we just completed an action... postData = ', postData);
 
-                            // If the completed action was buying a new robot, refresh page
+                            // If the completed action was buying a new robot or ability, refresh page afterward
+                            if ((postData.kind === 'robot'
+                                || postData.kind === 'ability')
+                                && postData.action === 'buy'
+                                && postData.quantity >= 1){
+
+                                // If we're in a world view, we should update the parent to ask for a refresh
+                                if (typeof window.parent.gameSettings !== 'undefined'
+                                    && typeof window.parent.gameSettings.worldState !== 'undefined'){
+                                    window.parent.gameSettings.worldState.refreshRequired = true;
+                                    }
+
+                                }
+
+                            // If the completed action was buying a new robot, update the ready room
                             if (postData.kind === 'robot'
                                 && postData.action === 'buy'
                                 && postData.quantity >= 1){
@@ -629,6 +709,14 @@ $(document).ready(function(){
                                             }
                                     }
 
+                                // If this was explicitly a sell action, make sure we reload the page
+                                // in case the shop level and/or inventory have changed
+                                if (newShopLevel !== shopLevel
+                                    || postData.token.match(/-core$/)){
+                                    setTimeout(function(){
+                                        window.location.reload();
+                                        }, 600);
+                                    }
 
                                 }
 
@@ -638,16 +726,7 @@ $(document).ready(function(){
 
                     // Make sure we always poll the server for popup events after our action
                     //console.log('queuing the windowEventsPull event (via shop)');
-                    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
-                        window.top.mmrpg_queue_for_game_start(function(){
-                            //console.log('i guess the game has started');
-                            setTimeout(function(){ parent.windowEventsPull(); }, 1000);
-                            });
-                        }
-                    else if (typeof window.top.windowEventsPull !== 'undefined'){
-                        //console.log('i guess we pull events manually');
-                        setTimeout(function(){ parent.windowEventsPull(); }, 1000);
-                        }
+                    triggerWindowEventsPull();
 
                     return true;
 
@@ -679,11 +758,12 @@ $(document).ready(function(){
     $('#console .scroll_wrapper', thisShop).perfectScrollbar({suppressScrollX: true, scrollYMarginOffset: 6});
 
     // Automatically click the first shop link
+    var $firstShop = $('#canvas #links .sprite[data-token]').first();
     if (lastShopToken.length){
         var $lastShop = $('#canvas #links .sprite[data-token="'+lastShopToken[0]+'"]');
-        $lastShop.triggerSilentClick();
+        if ($lastShop && $lastShop.length){ $lastShop.triggerSilentClick(); }
+        else { $firstShop.triggerSilentClick(); }
         } else {
-        var $firstShop = $('#canvas #links .sprite[data-token]').first();
         $firstShop.triggerSilentClick();
         }
 
@@ -741,6 +821,9 @@ function updateItemQuantities(){
         var itemQuantity = thisShopData.itemQuantities[itemToken];
         updateItemQuantity(itemToken, itemQuantity);
     }
+    if (typeof parent.prototype_update_item_quantities === 'function'){
+        parent.prototype_update_item_quantities(thisShopData.itemQuantities);
+        }
 }
 // Define a function for updating a single item's quantity
 function updateItemQuantity(itemToken, itemQuantity){
@@ -753,13 +836,15 @@ function updateItemQuantity(itemToken, itemQuantity){
         if (thisKind == 'item'){
 
             thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('x '+itemQuantity);
-            if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
+            if (thisCell.is('.item_cell_blocked')){ thisCell.addClass('item_cell_disabled'); }
+            else if (thisAction == 'buy' && itemQuantity >= 99){ thisCell.addClass('item_cell_disabled');  }
             else if (thisAction == 'sell' && itemQuantity <= 0){ thisCell.addClass('item_cell_disabled');  }
 
             } else if (thisKind == 'ability'){
 
             thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');
-            if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
+            if (thisCell.is('.item_cell_blocked')){ thisCell.addClass('item_cell_disabled'); }
+            else if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
             else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
 
             } else if (thisKind == 'field' || thisKind == 'robot'){
@@ -767,7 +852,8 @@ function updateItemQuantity(itemToken, itemQuantity){
             if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled');  }
 
             thisCell.find('label[data-quantity]').attr('data-quantity', itemQuantity).html('&nbsp;');
-            if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
+            if (thisCell.is('.item_cell_blocked')){ thisCell.addClass('item_cell_disabled'); }
+            else if (itemQuantity < 0){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&nbsp;'); }
             else if (itemQuantity >= 1){ thisCell.addClass('item_cell_disabled').find('label[data-quantity]').html('&#10004;'); }
 
             } else if (thisKind == 'alt'){
@@ -837,7 +923,316 @@ function windowResizeFrame(){
 
 }
 
+// Define a quick functino for polling the server for new events (but only if we can actually show them)
+function triggerWindowEventsPull(afterDelay){
+    //console.log('%c' + 'mmrpgShop.triggerWindowEventsPull()', 'color: magenta;');
+    afterDelay = typeof afterDelay === 'number' ? afterDelay : 1000; // default to zero if not provided
+    //console.log('queuing the windowEventsPull event (via world)');
+    if (typeof window.top.mmrpg_queue_for_game_start !== 'undefined'){
+        //console.log('i guess we wait for the game to start via parent.mmrpg_queue_for_game_start()', parent.mmrpg_queue_for_game_start);
+        window.top.mmrpg_queue_for_game_start(function(){
+            //console.log('i guess the game has started');
+            setTimeout(function(){
+                //console.log('attempting to pull window events via parent.windowEventsPull()', parent.windowEventsPull);
+                let result = window.top.windowEventsPull(true);
+                if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+                //else { console.log('windowEventsPull returned successfully: ' + result); }
+                }, afterDelay);
+            });
+        }
+    else if (typeof window.top.windowEventsPull !== 'undefined'){
+        //console.log('i guess we pull events manually via parent.windowEventsPull()', parent.windowEventsPull);
+        setTimeout(function(){
+            let result = window.top.windowEventsPull(true);
+            if (result < 0){ console.error('windowEventsPull returned an error code: ' + result); }
+            //else { console.log('windowEventsPull returned successfully: ' + result); }
+            }, afterDelay);
+        }
+    else {
+        //console.warn('could not find a way to pull window events from the parent window!');
+        }
+    // Return no specific result
+    return;
+    }
+
 // Define a function for printing a number with commas as thousands separators
 function printNumberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+// Define a shop-specific function to call when polling user input variables
+function checkUserInputsForShopFrame(kind, event, activeInputs, userInputs){
+    //console.log('%c' + 'prototypeReady.checkUserInputsForShopFrame()', 'color: magenta;');
+    let _self = this;
+    let $thisPrototype = $mmrpgElements.thisPrototype;
+    let playSoundEffect = mmrpgPrototype.playSoundEffect;
+    //console.log('-> playSoundEffect:', typeof playSoundEffect, playSoundEffect);
+    //console.log('-> $thisPrototype:', typeof $thisPrototype, $thisPrototype);
+
+    // Collect references to available panels, tabs, and buttons before starting
+    let $thisShop = $('#shop', $thisPrototype);
+    let $thisShopCanvas = $('#canvas', $thisShop);
+    let $thisShopConsole = $('#console', $thisShop);
+    let $availablePanels = $('#links .wrapper[data-shop]', $thisShopCanvas);
+    let $availableTabs = $('#shops .event_visible .tab_link', $thisShopConsole);
+    //console.log('-> $thisShop:', ($thisShop ? $thisShop.length : 0), typeof $thisShop, $thisShop);
+    //console.log('-> $availablePanels:', ($availablePanels ? $availablePanels.length : 0), typeof $availablePanels, $availablePanels);
+    //console.log('-> $availableTabs:', ($availableTabs ? $availableTabs.length : 0), typeof $availableTabs, $availableTabs);
+
+    // COMMON CONTROLS: Try to keep these consistent!
+
+    // If the user pressed the X button, we should scroll through visible panels
+    if (activeInputs.X){
+        //console.log('%c' + 'X button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activePanel = $availablePanels.filter('.wrapper_active');
+        let activePanelIndex = $activePanel && $activePanel.length ? $availablePanels.index($activePanel) : -1;
+        let maxPanelIndex = $availablePanels.length - 1;
+        let nextPanelIndex = activePanelIndex + 1;
+        if (nextPanelIndex > maxPanelIndex){ nextPanelIndex = 0; }
+        let $nextPanel = $availablePanels.eq(nextPanelIndex);
+        if ($nextPanel && $nextPanel.length){
+            $nextPanel.trigger('mouseenter');
+            $nextPanel.trigger('click');
+            }
+        return;
+        }
+
+    // If the user pressed the L2/R2 button2, we should scroll through visible tabs
+    if (activeInputs.L2 || activeInputs.R2){
+        //console.log('%c' + (activeInputs.L2 ? 'L2' : 'L1') + ' trigger button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        let $activeTab = $availableTabs.filter('.tab_link_active');
+        let activeTabIndex = $activeTab && $activeTab.length ? $availableTabs.index($activeTab) : -1;
+        let maxTabIndex = $availableTabs.length - 1;
+        let nextTabIndex = activeTabIndex + (activeInputs.L2 ? -1 : 1);
+        if (nextTabIndex > maxTabIndex){ nextTabIndex = 0; }
+        let $nextTab = $availableTabs.eq(nextTabIndex);
+        if ($nextTab && $nextTab.length){
+            $nextTab.trigger('mouseenter');
+            $nextTab.trigger('click');
+            }
+        return;
+        }
+
+    // SHOP CONTROLS: These controls only apply to the shop menu
+
+    // Collect refs to important elements we'll be checking below
+    let $activePanel, $activeTab, activePanelToken, activeTabToken;
+    $activePanel = $('#shops .event_visible[data-token]', $thisShopConsole);
+    $activeTab = $('.shop_tabs_containers .tab_container_active', $activePanel);
+    activePanelToken = $activePanel && $activePanel.length ? $activePanel.attr('data-token') : false;
+    activeTabToken = $activeTab && $activeTab.length ? $activeTab.attr('data-tab') : false;
+    //console.log('-> $activePanel:', ($activePanel ? $activePanel.length : 0), typeof $activePanel, $activePanel);
+    //console.log('-> $activeTab:', ($activeTab ? $activeTab.length : 0), typeof $activeTab, $activeTab);
+    //console.log('-> activePanelToken:', typeof activePanelToken, activePanelToken);
+    //console.log('-> activeTabToken:', typeof activeTabToken, activeTabToken);
+    let $availableItemCells, $activeConfirmCell, $activeItemCell;
+    $availableItemCells = $('.item_cell:not([data-kind=""])', $activeTab); if (!$availableItemCells || !$availableItemCells.length){ $availableItemCells = null; }
+    $activeConfirmCell = $('.item_cell_confirm:not([data-kind=""])', $activeTab); if (!$activeConfirmCell || !$activeConfirmCell.length){ $activeConfirmCell = null; }
+    $activeItemCell = $availableItemCells.filter('.hovered').first(); if (!$activeItemCell || !$activeItemCell.length){ $activeItemCell = null; }
+    //console.log('-> $availableItemCells:', ($availableItemCells ? $availableItemCells.length : 0), typeof $availableItemCells, $availableItemCells);
+    //console.log('-> $activeConfirmCell:', ($activeConfirmCell ? $activeConfirmCell.length : 0), typeof $activeConfirmCell, $activeConfirmCell);
+    //console.log('-> $activeItemCell:', ($activeItemCell ? $activeItemCell.length : 0), typeof $activeItemCell, $activeItemCell);
+
+    let closeTooltipFunction;
+    if (typeof window.mmrpgCloseTooltipFunction !== 'undefined'){ closeTooltipFunction = window.mmrpgCloseTooltipFunction; }
+    else { closeTooltipFunction = function(){ $('#mmrpg-tooltip').empty(); }; }
+
+    // If the user pressed a directional button, we should try to scroll through pages
+    if (activeInputs.Up || activeInputs.Down
+        || activeInputs.Left || activeInputs.Right){
+        let whichDirection = activeInputs.Up ? 'up' : activeInputs.Down ? 'down' : activeInputs.Left ? 'left' : activeInputs.Right ? 'right' : '';
+        //console.log('%c' + 'Directional button (' + whichDirection.toUpperCase() + ') pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            // up/down = quantity +1/-1, left/right = quantity -10/+10
+            $availableItemCells.removeClass('hovered');
+            $activeConfirmCell.addClass('hovered');
+            let modValue, $modButtons, $modButton;
+            modValue = whichDirection === 'up' ? 1 : whichDirection === 'down' ? -1 : whichDirection === 'right' ? 10 : whichDirection === 'left' ? -10 : 0;
+            $modIncButtons = $('.item_quantity_mods a[data-inc]', $activeConfirmCell);
+            $modDecButtons = $('.item_quantity_mods a[data-dec]', $activeConfirmCell);
+            if (modValue > 0){ $modButton = $modIncButtons.filter('[data-inc="' + modValue + '"]'); }
+            else if (modValue < 0){ $modButton = $modDecButtons.filter('[data-dec="' + Math.abs(modValue) + '"]'); }
+            if ($modButton && $modButton.length){
+                $modIncButtons.removeClass('hovered');
+                $modDecButtons.removeClass('hovered');
+                $modButton.addClass('hovered');
+                $modButton.trigger('mouseenter');
+                $modButton.trigger('click');
+                if (typeof userInputs.modButtonHoverTimeout !== 'undefined'){ clearTimeout(userInputs.modButtonHoverTimeout); }
+                userInputs.modButtonHoverTimeout = setTimeout(function(){
+                    $modIncButtons.removeClass('hovered');
+                    $modDecButtons.removeClass('hovered');
+                    }, 100);
+                return;
+                }
+            }
+        else {
+            //console.log('we are in browsing mode!');
+            // up/down/left/right navigate 2 columns of item cells
+            closeTooltipFunction();
+            let $nextItemCell;
+            if (!$activeItemCell || !$activeItemCell.length){
+                if (whichDirection === 'down' || whichDirection === 'right'){ $nextItemCell = $availableItemCells.first(); }
+                else if (whichDirection === 'up' || whichDirection === 'left'){ $nextItemCell = $availableItemCells.last(); }
+                } else {
+                let activeItemCellIndex = $availableItemCells.index($activeItemCell);
+                let maxItemCellIndex = $availableItemCells.length - 1;
+                //console.log('activeItemCellIndex =', activeItemCellIndex);
+                //console.log('maxItemCellIndex =', maxItemCellIndex);
+                let nextItemCellIndex = activeItemCellIndex;
+                if (whichDirection === 'right'){ nextItemCellIndex += 1; }
+                else if (whichDirection === 'left'){ nextItemCellIndex -= 1; }
+                else if (whichDirection === 'down'){ nextItemCellIndex += 2; }
+                else if (whichDirection === 'up'){ nextItemCellIndex -= 2; }
+                //console.log('nextItemCellIndex(A) =', nextItemCellIndex);
+                if (nextItemCellIndex < 0){ nextItemCellIndex = maxItemCellIndex; }
+                else if (nextItemCellIndex > maxItemCellIndex){ nextItemCellIndex = 0;}
+                //console.log('nextItemCellIndex(B) =', nextItemCellIndex);
+                $nextItemCell = $availableItemCells.eq(nextItemCellIndex);
+                }
+            if ($nextItemCell && $nextItemCell.length){
+                $availableItemCells.removeClass('hovered');
+                $nextItemCell.addClass('hovered');
+                let $scrollWrapper = $nextItemCell.closest('.scroll_wrapper');
+                if ($scrollWrapper.length){
+                    let containerTop = $scrollWrapper.offset().top;
+                    let containerBottom = containerTop + $scrollWrapper.height();
+                    let elemTop = $nextItemCell.offset().top;
+                    let elemBottom = elemTop + $nextItemCell.outerHeight();
+                    if (elemTop < containerTop){ $scrollWrapper.scrollTop($scrollWrapper.scrollTop() - (containerTop - elemTop)); }
+                    else if (elemBottom > containerBottom){ $scrollWrapper.scrollTop($scrollWrapper.scrollTop() + (elemBottom - containerBottom)); }
+                    if (typeof $scrollWrapper.perfectScrollbar === 'function'){ $scrollWrapper.perfectScrollbar('update'); }
+                    return;
+                    }
+                }
+            }
+        return;
+        }
+
+    // Define a quick function for hovering + clicking a given item cell button
+    let hoverClickCellButton = function($button, mouseLeave){
+        mouseLeave = typeof mouseLeave === 'boolean' ? mouseLeave : true;
+        let $parent = $button.closest('td[data-kind]');
+        $('.button', $parent).removeClass('hovered');
+        $button.addClass('hovered');
+        $button.trigger('mouseenter');
+        $button.trigger('click');
+        if (typeof userInputs.hoverClickButtonTimeout !== 'undefined'){ clearTimeout(userInputs.hoverClickButtonTimeout); }
+        userInputs.hoverClickButtonTimeout = setTimeout(function(){
+            $('.button', $parent).removeClass('hovered');
+            if (mouseLeave){ $button.trigger('mouseleave'); }
+            $button.removeClass('hovered');
+            }, 100);
+        };
+
+    // Define a helper function to restore hover to the previously active item and scroll it into view
+    let restoreLastItemCellHover = function(confirmToken, confirmAction){
+        let $targetCell = null;
+        if (typeof userInputs.lastItemCell !== 'undefined' && userInputs.lastItemCell.length){
+            $targetCell = userInputs.lastItemCell;
+            } else if (confirmToken && confirmAction) {
+            // Fallback: If lastItemCell was lost, find it via the confirm cell's data attributes
+            $targetCell = $('.item_cell[data-token="' + confirmToken + '"][data-action="' + confirmAction + '"]', $activeTab);
+            }
+        if ($targetCell && $targetCell.length){
+            // A slight delay ensures we calculate offsets AFTER synchronous DOM clears (like canceling)
+            setTimeout(function(){
+                $('.item_cell', $activeTab).removeClass('hovered');
+                $targetCell.addClass('hovered');
+                let $scrollWrapper = $targetCell.closest('.scroll_wrapper');
+                if ($scrollWrapper.length){
+                    let containerTop = $scrollWrapper.offset().top;
+                    let containerBottom = containerTop + $scrollWrapper.height();
+                    let elemTop = $targetCell.offset().top;
+                    let elemBottom = elemTop + $targetCell.outerHeight();
+                    if (elemTop < containerTop){
+                        $scrollWrapper.scrollTop($scrollWrapper.scrollTop() - (containerTop - elemTop));
+                        } else if (elemBottom > containerBottom) {
+                        $scrollWrapper.scrollTop($scrollWrapper.scrollTop() + (elemBottom - containerBottom));
+                        }
+                    if (typeof $scrollWrapper.perfectScrollbar === 'function'){
+                        $scrollWrapper.perfectScrollbar('update');
+                        }
+                    }
+                }, 50);
+            }
+        delete userInputs.lastItemCell;
+        };
+
+    // If the user pressed the A button, we should ?????
+    if (activeInputs.A){
+        //console.log('%c' + 'A button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            let confirmToken = $activeConfirmCell.attr('data-token');
+            let confirmAction = $activeConfirmCell.attr('data-action');
+            let $confirmButton = $('.confirm_button', $activeConfirmCell);
+            //console.log('-> $confirmButton:', ($confirmButton ? $confirmButton.length : 0), typeof $confirmButton, $confirmButton);
+            if (!$confirmButton || !$confirmButton.length){ return; }
+            //closeTooltipFunction();
+            hoverClickCellButton($confirmButton);
+            $activeConfirmCell.removeClass('hovered');
+            restoreLastItemCellHover(confirmToken, confirmAction);
+            } else {
+            //console.log('we are in browsing mode!');
+            let $actionButton = $activeItemCell ? $('a.button', $activeItemCell) : null;
+            //console.log('-> $actionButton:', ($actionButton ? $actionButton.length : 0), typeof $actionButton, $actionButton);
+            if (!$actionButton || !$actionButton.length){ return; }
+            //closeTooltipFunction();
+            hoverClickCellButton($actionButton);
+            $activeConfirmCell = $('.item_cell_confirm:not([data-kind=""])', $activeTab);
+            if (!$activeConfirmCell || !$activeConfirmCell.length){ return; }
+            userInputs.lastItemCell = $activeItemCell;
+            $activeItemCell.removeClass('hovered');
+            $activeConfirmCell.addClass('hovered');
+            }
+        return;
+        }
+
+    // If the user pressed the Y button, we should ?????
+    if (activeInputs.Y){
+        //console.log('%c' + 'Y button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            let $tooltipButton = $activeConfirmCell ? $('span[data-click-tooltip]', $activeConfirmCell) : null;
+            //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
+            if (!$tooltipButton || !$tooltipButton.length){ return; }
+            hoverClickCellButton($tooltipButton, false);
+            } else {
+            //console.log('we are in browsing mode!');
+            let $tooltipButton = $activeItemCell ? $('span[data-click-tooltip]', $activeItemCell) : null;
+            //console.log('-> $tooltipButton:', ($tooltipButton ? $tooltipButton.length : 0), typeof $tooltipButton, $tooltipButton);
+            if (!$tooltipButton || !$tooltipButton.length){ return; }
+            hoverClickCellButton($tooltipButton, false);
+            }
+        return;
+        }
+
+    // If the user pressed the B button, we should ?????
+    if (activeInputs.B){
+        //console.log('%c' + 'B button pressed!', 'color: orange;');
+        if (event){ event.preventDefault(); }
+        if ($activeConfirmCell){
+            //console.log('we are in checkout mode!');
+            let confirmToken = $activeConfirmCell.attr('data-token');
+            let confirmAction = $activeConfirmCell.attr('data-action');
+            $activeConfirmCell.removeClass('hovered');
+            let $cancelButton = $('.cancel_button', $activeConfirmCell);
+            //console.log('-> $cancelButton:', ($cancelButton ? $cancelButton.length : 0), typeof $cancelButton, $cancelButton);
+            if (!$cancelButton || !$cancelButton.length){ return; }
+            hoverClickCellButton($cancelButton);
+            restoreLastItemCellHover(confirmToken, confirmAction);
+            } else {
+            //console.log('we are in browsing mode!');
+            //console.log('-> nothing to dismiss!');
+            }
+        return;
+        }
+
 }

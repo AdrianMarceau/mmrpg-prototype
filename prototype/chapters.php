@@ -188,16 +188,6 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $disabled_extra_tab_markup .= '<a class="chapter_link extra first random chapter_link_disabled">???</a>';
             }
 
-        // CHAPTER STARS(7)
-        if ($allow_star_fields){
-            $chapters_display_count++;
-            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 8);
-            $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
-            } elseif ($num_extra > 0){
-            $chapters_display_count++;
-            $disabled_extra_tab_markup .= '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
-            }
-
         // CHAPTER PLAYERS(6)
         if ($allow_player_battles){
             $chapters_display_count++;
@@ -218,6 +208,16 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             $disabled_extra_tab_markup .= '<a class="chapter_link extra challenges chapter_link_disabled">???</a>';
             }
 
+        // CHAPTER STARS(7)
+        if ($allow_star_fields){
+            $chapters_display_count++;
+            $chapter_music = mmrpg_prototype_get_chapter_music($player_token, 8);
+            $enabled_extra_tab_markup .= '<a class="chapter_link extra stars '.($temp_last_chapter === '7' ? 'chapter_link_active ' : '').'" href="#" data-chapter="7" data-music="'.$chapter_music.'" data-maybe-title="Bonus Chapter : Star Fields || [[Collect elemental stars to power up your robots!]]">Stars'.($battle_star_counter >= MMRPG_SETTINGS_STARFORCE_STARTOTAL ? ' &check;' : '').'</a>';
+            } elseif ($num_extra > 0){
+            $chapters_display_count++;
+            $disabled_extra_tab_markup .= '<a class="chapter_link extra stars chapter_link_disabled">???</a>';
+            }
+
         // Print out the enabled and disabled tab markup
         echo $enabled_extra_tab_markup;
         echo $disabled_extra_tab_markup;
@@ -232,31 +232,33 @@ function temp_generate_player_mission_markup($player_token, &$chapters_unlocked,
             echo '<div class="chapter_select chapter_select_'.$chapters_display_count.'" data-player="'.$ptoken.'">';
                 echo $chapters_display_markup;
             echo '</div>';
+            // Gather the raw missions markup based on the current state
+            $raw_missions_markup = '';
             if ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && empty($_SESSION[$session_token]['battle_settings']['this_player_token'])){
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
-
-                echo $prototype_data[$player_token]['missions_markup']."\n";
+                $raw_missions_markup = $prototype_data[$player_token]['missions_markup'];
             }
             elseif ($prototype_start_link == 'home' && !defined('MMRPG_SCRIPT_REQUEST') && !empty($_SESSION[$session_token]['battle_settings']['this_player_token']) && $_SESSION[$session_token]['battle_settings']['this_player_token'] == $player_token){
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
-
-                echo $prototype_data[$player_token]['missions_markup']."\n";
+                $raw_missions_markup = $prototype_data[$player_token]['missions_markup'];
             }
             elseif (defined('MMRPG_SCRIPT_REQUEST')){
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
-
-                echo $prototype_data[$player_token]['missions_markup']."\n";
+                $raw_missions_markup = $prototype_data[$player_token]['missions_markup'];
             }
-            else {
-                // DEBUG
-                //echo 'checkpoint_'.__LINE__.'<br />';
-
-                echo '';
+            // Extract any .option_message elements so they sit outside the scrollable wrap
+            $extracted_messages = '';
+            $pattern = '/(<(a|div)[^>]+class="[^"]*option_message[^"]*"[^>]*>[\s\S]*?<\/\2>)/i';
+            if (preg_match_all($pattern, $raw_missions_markup, $matches)){
+                foreach ($matches[0] as $msg_markup){
+                    $extracted_messages .= $msg_markup."\n";
+                    $raw_missions_markup = str_replace($msg_markup, '', $raw_missions_markup);
+                }
             }
+            // Output the extracted option messages
+            echo $extracted_messages;
+            // Open the wrap container for the scrolling missions
+            echo '<div class="wrap">'."\n";
+            echo $raw_missions_markup."\n";
             echo '<a class="option option_1x4 option_spacer" style="visibility: hidden;">&nbsp;</a>'."\n";
+            echo '</div>'."\n";
         echo '</div>'."\n";
 
     // Collect the final markup and return

@@ -5,6 +5,8 @@ $api_request_path = 'bosses/index/{token}';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for bosses and then parse necessary data
+define('FORCE_INCLUDE_HIDDEN_BOSSES', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_BOSSES', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/bosses.php');
 if (empty($mmrpg_database_bosses)){ print_error_and_quit('The boss database could not be loaded'); }

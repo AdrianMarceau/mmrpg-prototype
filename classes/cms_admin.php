@@ -65,9 +65,14 @@ class cms_admin {
         error_log('$output = '.print_r($output, true));
         error_log('$return = '.print_r($return, true));
         */
-        $command = "php -l {$file_name}";
+        //$command = "php -l {$file_name}";
+        //$command = "php -l ".escapeshellarg($file_name)." 2>&1";
+        $command = MMRPG_CONFIG_PHP_DIR." -l ".escapeshellarg($file_name)." 2>&1";
         exec($command, $output, $return);
+        // If syntax is invalid, log the exact error so it's not a mystery
         $output = trim(implode(PHP_EOL, $output));
+        if ($return !== 0){ error_log("cms_admin::is_valid_php_syntax() syntax validation failed: " . $output); }
+        //else { error_log("cms_admin::is_valid_php_syntax() validation success: " . $output); }
         //error_log('$command = '.print_r($command, true));
         //error_log('$output = '.print_r($output, true));
         //error_log('$return = '.print_r($return, true));
@@ -200,15 +205,15 @@ class cms_admin {
         $mmrpg_players_fields = rpg_player::get_index_fields(true, 'players');
         $mmrpg_players_index = $db->get_array_list("SELECT
             {$mmrpg_players_fields},
-            groups.group_token AS player_group,
+            `groups`.group_token AS player_group,
             tokens.token_order AS player_order
             FROM mmrpg_index_players AS players
             LEFT JOIN mmrpg_index_players_groups_tokens AS tokens ON tokens.player_token = players.player_token
-            LEFT JOIN mmrpg_index_players_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_players_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE players.player_id <> 0 AND players.player_token <> 'player'
             ORDER BY
             players.player_class ASC,
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'player_token');
         return !empty($mmrpg_players_index) ? $mmrpg_players_index : array();
@@ -220,15 +225,15 @@ class cms_admin {
         $mmrpg_robots_fields = rpg_robot::get_index_fields(true, 'robots');
         $mmrpg_robots_index = $db->get_array_list("SELECT
             {$mmrpg_robots_fields},
-            groups.group_token AS robot_group,
+            `groups`.group_token AS robot_group,
             tokens.token_order AS robot_order
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE robots.robot_id <> 0 AND robots.robot_token <> 'robot'
             ORDER BY
             FIELD(robots.robot_class, 'master', 'mecha', 'boss'),
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'robot_token');
         return !empty($mmrpg_robots_index) ? $mmrpg_robots_index : array();
@@ -241,15 +246,15 @@ class cms_admin {
         $mmrpg_abilities_index = $db->get_array_list("
             SELECT
             {$mmrpg_abilities_fields},
-            groups.group_token AS ability_group,
+            `groups`.group_token AS ability_group,
             tokens.token_order AS ability_order
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_abilities_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE abilities.ability_id <> 0 AND abilities.ability_token <> 'ability' AND abilities.ability_class <> 'system'
             ORDER BY
             FIELD(abilities.ability_class, 'master', 'mecha', 'boss'),
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'ability_token');
         return !empty($mmrpg_abilities_index) ? $mmrpg_abilities_index : array();
@@ -261,14 +266,14 @@ class cms_admin {
         $mmrpg_items_fields = rpg_item::get_index_fields(true, 'items');
         $mmrpg_items_index = $db->get_array_list("SELECT
             {$mmrpg_items_fields},
-            groups.group_token AS item_group,
+            `groups`.group_token AS item_group,
             tokens.token_order AS item_order
             FROM mmrpg_index_items AS items
             LEFT JOIN mmrpg_index_items_groups_tokens AS tokens ON tokens.item_token = items.item_token
-            LEFT JOIN mmrpg_index_items_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_items_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE items.item_id <> 0 AND items.item_token <> 'item' AND items.item_class <> 'system'
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'item_token');
         return !empty($mmrpg_items_index) ? $mmrpg_items_index : array();
@@ -280,14 +285,14 @@ class cms_admin {
         $mmrpg_skills_fields = rpg_skill::get_index_fields(true, 'skills');
         $mmrpg_skills_index = $db->get_array_list("SELECT
             {$mmrpg_skills_fields},
-            groups.group_token AS skill_group,
+            `groups`.group_token AS skill_group,
             tokens.token_order AS skill_order
             FROM mmrpg_index_skills AS skills
             LEFT JOIN mmrpg_index_skills_groups_tokens AS tokens ON tokens.skill_token = skills.skill_token
-            LEFT JOIN mmrpg_index_skills_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_skills_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE skills.skill_id <> 0 AND skills.skill_token <> 'skill' AND skills.skill_class <> 'system'
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'skill_token');
         return !empty($mmrpg_skills_index) ? $mmrpg_skills_index : array();
@@ -299,14 +304,14 @@ class cms_admin {
         $mmrpg_fields_fields = rpg_field::get_index_fields(true, 'fields');
         $mmrpg_fields_index = $db->get_array_list("SELECT
             {$mmrpg_fields_fields},
-            groups.group_token AS field_group,
+            `groups`.group_token AS field_group,
             tokens.token_order AS field_order
             FROM mmrpg_index_fields AS fields
             LEFT JOIN mmrpg_index_fields_groups_tokens AS tokens ON tokens.field_token = fields.field_token
-            LEFT JOIN mmrpg_index_fields_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_fields_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE fields.field_id <> 0 AND fields.field_token <> 'field' AND fields.field_class <> 'system'
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'field_token');
         return !empty($mmrpg_fields_index) ? $mmrpg_fields_index : array();
@@ -1007,7 +1012,7 @@ class cms_admin {
                 && $search_data[$flag_name] !== ''){
                 foreach ($search_results AS $key => $data){
                     if ($object_kind === 'star' || $object_kind === 'challenge'){ $search_token = self::git_get_id_token($object_kind, $data[$object_kind.'_id']); }
-                    elseif ($object_kind === 'page'){ $search_token = git_get_url_token($object_kind, $data[$object_kind.'_url']); }
+                    elseif ($object_kind === 'page'){ $search_token = self::git_get_url_token($object_kind, $data[$object_kind.'_url']); }
                     else { $search_token = $data[$object_kind.'_token']; }
                     if ($search_data[$flag_name] && !in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
                     elseif (!$search_data[$flag_name] && in_array($search_token, $git_file_arrays[$array_name])){ unset($search_results[$key]); }
@@ -1413,22 +1418,22 @@ class cms_admin {
         $force_kind_as_class = !in_array($kind, array('robot', 'ability')) ? true : false;
 
         // Collect the group and group tokens from the database
-        $select_where = !empty($class) ? "WHERE groups.group_class = '{$class}'" : '';
+        $select_where = !empty($class) ? "WHERE `groups`.group_class = '{$class}'" : '';
         $raw_groups = $db->get_array_list("SELECT
-            groups.group_id, groups.group_class, groups.group_token, groups.group_order
-            FROM mmrpg_index_{$xkind}_groups AS groups
+            `groups`.group_id, `groups`.group_class, `groups`.group_token, `groups`.group_order
+            FROM mmrpg_index_{$xkind}_groups AS `groups`
             {$select_where}
-            ORDER BY groups.group_order ASC
+            ORDER BY `groups`.group_order ASC
             ;", 'group_id');
         $join_on = "groups.group_token = tokens.group_token ";
         $join_on .= "AND ".(!$force_kind_as_class ? "groups.group_class = {$xkind}.{$kind}_class" : "groups.group_class = '{$class}'");
         $raw_groups_tokens = $db->get_array_list("SELECT
-            tokens.token_id, groups.group_class, tokens.group_token, tokens.{$kind}_token, tokens.token_order
+            tokens.token_id, `groups`.group_class, tokens.group_token, tokens.{$kind}_token, tokens.token_order
             FROM mmrpg_index_{$xkind}_groups_tokens AS tokens
             LEFT JOIN mmrpg_index_{$xkind} AS {$xkind} ON {$xkind}.{$kind}_token = tokens.{$kind}_token
-            LEFT JOIN mmrpg_index_{$xkind}_groups AS groups ON {$join_on}
+            LEFT JOIN mmrpg_index_{$xkind}_groups AS `groups` ON {$join_on}
             {$select_where}
-            ORDER BY groups.group_order ASC, tokens.token_order ASC
+            ORDER BY `groups`.group_order ASC, tokens.token_order ASC
             ;", 'token_id');
 
         // Collect a list of all relevant object tokens from the database
@@ -1586,9 +1591,9 @@ class cms_admin {
             $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups;');
             $db->query('TRUNCATE mmrpg_index_'.$xkind.'_groups_tokens;');
         } else {
-            $db->query("DELETE groups
-                FROM mmrpg_index_{$xkind}_groups AS groups
-                WHERE groups.group_class = '{$class}'
+            $db->query("DELETE `groups`
+                FROM mmrpg_index_{$xkind}_groups AS `groups`
+                WHERE `groups`.group_class = '{$class}'
                 ;");
             $db->query("DELETE tokens
                 FROM mmrpg_index_{$xkind}_groups_tokens AS tokens

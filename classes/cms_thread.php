@@ -117,7 +117,7 @@ class cms_thread {
                 {$select_fields_imploded}
                 FROM `mmrpg_threads` AS `threads`
                 LEFT JOIN `mmrpg_categories` AS `categories` ON `categories`.`category_id` = `threads`.`category_id`
-                LEFT JOIN `mmrpg_posts` AS `posts` ON `posts`.`thread_id` = `threads`.`thread_id`
+                LEFT JOIN `mmrpg_posts` AS `posts` ON `posts`.`thread_id` = `threads`.`thread_id` AND `posts`.`post_deleted` = 0
                 LEFT JOIN `mmrpg_users` AS `users` ON `users`.`user_id` = `threads`.`user_id`
                 WHERE 1 = 1 ";
 
@@ -169,6 +169,7 @@ class cms_thread {
         $query_string .= "; ";
 
         // Execute the query string against the DB and format as requested
+        $db->query("SET SESSION group_concat_max_len = 1000000;"); // required for thread_post_ids to have a chance of being accurate
         $community_threads_index = $db->get_array_list($query_string, 'thread_id');
         if (!$index_by_id){ $community_threads_index = array_values($community_threads_index); }
         if (empty($community_threads_index)){ $community_threads_index = array(); }

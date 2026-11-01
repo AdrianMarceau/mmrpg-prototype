@@ -91,12 +91,16 @@ define('MMRPG_SETTINGS_STARFORCE_FIELDCOUNT', 32);
 define('MMRPG_SETTINGS_STARFORCE_FUSIONCOUNT', 992);
 define('MMRPG_SETTINGS_STARFORCE_STARTOTAL', 1024);
 
+// Define the global variables for the main menu-related settings
+define('MMRPG_SETTINGS_MENUROBOTS_PERPLAYER', 10); // The minimum number of robots displayed per player button
+
 // Define the global variables for the total number of abilities allowed per robot
 define('MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX', 8); // The maximum number of abilities allowed per robot
 
 // Define the global variables for the total number of robots allower per player
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MIN', 1); // The minimum number of robots required for battle per side
 define('MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX', 8); // The maximum number of robots allowed for battle per side
+define('MMRPG_SETTINGS_BATTLEROBOTS_STORAGE_MAX', 99); // The maximum number of robots allowed per player character
 
 // Define the global multiplier for battle points per level
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERLEVEL0', 2500); // The point rate per fortress boss level for normal battles
@@ -108,6 +112,7 @@ define('MMRPG_SETTINGS_BATTLETURNS_PERMECHA', 1); // The point rate per target s
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERZENNY_MULTIPLIER', 0.05); // The conversion rate for battle points into zenny rewards
 define('MMRPG_SETTINGS_BATTLEPOINTS_PLAYERBATTLE_MULTIPLIER', 2.0); // The point rate per robot level multiplier for player battles
 define('MMRPG_SETTINGS_BATTLETURNS_PLAYERBATTLE_MULTIPLIER', 0.5); // The point rate per target robot multiplier for player battles
+define('MMRPG_SETTINGS_BATTLEPOINTS_PERMISSION', 1000); // The point rate per mission completed when averaging for new-game-plus
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERPLAYER', 10000); // The point rate per wave completed in endless attack mode
 define('MMRPG_SETTINGS_BATTLEPOINTS_PERWAVE', 10000); // The point rate per wave completed in endless attack mode
 

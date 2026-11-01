@@ -1,0 +1,107 @@
+#---------------------------#
+# DEBUG AREA 0 (SUBSPACE)
+@token    = debug-area-0
+@name     = DEBUG Area 0
+@type     = shadow
+@level    = 80
+@size     = 50 x 16
+@sheet    = mmrpg-overworld-2k25-v3
+#---------------------------#
+@field      = prototype-subspace
+#---------------------------#
+@aliases[] = 70:prototype-subspace
+@aliases[] = 80:darkness
+@aliases[] = 90:water
+#---------------------------#
+@portals[]  = spawn(28-8)
+#---------------------------#
+@portals[]  = surface-portal(13-14, debug-area-1__subspace-portal)
+#---------------------------#
+@portals[]  = winter-portal(28-6, debug-area-1n__subspace-portal, purple-alt)
+@locks[]    = freeze-portal-flower(28-6, portal-flower, freeze, items:freeze-core, x10, locked)
+#---------------------------#
+@portals[]  = arctic-portal(28-4, debug-area-1n2__subspace-portal, purple-alt)
+@locks[]    = crystal-portal-flower(28-4, portal-flower, crystal, items:crystal-core, x10, locked)
+#---------------------------#
+@portals[]  = desert-portal(30-8, debug-area-1e__subspace-portal, yellow-alt)
+@locks[]    = flame-portal-flower(30-8, portal-flower, flame, items:flame-core, x10, locked)
+#---------------------------#
+@portals[]  = works-portal(32-8, debug-area-1e2__subspace-portal, orange-alt)
+@locks[]    = impact-portal-flower(32-8, portal-flower, impact, items:impact-core, x10, locked)
+#---------------------------#
+@portals[]  = beach-portal(28-10, debug-area-1s__subspace-portal, blue-alt)
+@locks[]    = water-portal-flower(28-10, portal-flower, water, items:water-core, x10, locked)
+#---------------------------#
+@portals[]  = ocean-portal(28-12, debug-area-1s2__subspace-portal, blue-alt)
+@locks[]    = explode-portal-flower(28-12, portal-flower, explode, items:explode-core, x10, locked)
+#---------------------------#
+@portals[]  = hideaway-portal(26-8, debug-area-1w__subspace-portal, red-alt)
+@locks[]    = earth-portal-flower(26-8, portal-flower, earth, items:earth-core, x10, locked)
+#---------------------------#
+@portals[]  = forest-portal(24-8, debug-area-1w2__subspace-portal, green-alt)
+@locks[]    = nature-portal-flower(24-8, portal-flower, nature, items:nature-core, x10, locked)
+#---------------------------#
+@portals[]  = tower-portal(25-11, debug-area-1sw__subspace-portal, yellow-alt)
+@locks[]    = electric-portal-flower(25-11, portal-flower, electric, items:electric-core, x10, locked)
+#---------------------------#
+@pickups    = space-shard(9),shadow-shard(6),empty-shard(3),energy-upgrade(1),weapon-upgrade(1),attack-booster(3),defense-booster(3),speed-booster(3),field-booster(1),attack-diverter(1),defense-diverter(1),speed-diverter(1),charge-module(1),target-module(1),hyperscan-module(1),guard-module(1),uptick-module(1),copycat-module(1),reverse-module(1),xtreme-module(1),overkill-module(1),siphon-module(1),gambit-module(1),persist-module(1),repair-module(1),alchemy-module(1),distill-module(1),magnet-module(1),transport-module(1),bulwark-module(1),spreader-module(1),hourglass-module(1),growth-module(1),salvage-module(1),fortune-module(1),battery-circuit(1),sponge-circuit(1),forge-circuit(1),sapling-circuit(1),chrono-circuit(1),cosmo-circuit(1)
+#---------------------------#
+@encounters = dark-frag(12),trille-bot(6),novamite(3),mega-man-ds(1),bass-ds(1),proto-man-ds(1)
+@groups[]   = no-encounters_da1-exit-buffer(9-5...11-7)
+@groups[]   = no-encounters_world-portals-buffer(24-4...32-12)
+#---------------------------#
+@actors[]     = purple-reset-dude(45-15, robot, anti-eddie, -, first-encounter)
+@actors[]     = maylu-lost-alone(9-3, player, proxy, alt9, first-encounter)
+@actors[]     = regal-lost-alone(44-2, player, proxy, alt10, first-encounter)
+@actors[]     = match-lost-alone(30-15, player, proxy, alt20, first-encounter)
+#---------------------------#
+@terrain[]   = darkness(genesis-tower)
+@terrain[]   = prototype-subspace(prototype-subspace)
+@terrain[]   = water(reflection-chamber)
+#---------------------------#
+@habitats[] = dark-frag(darkness)
+@habitats[] = trille-bot(prototype-subspace)
+@habitats[] = novamite(water)
+@habitats[] = mega-man-ds(prototype-subspace)
+@habitats[] = bass-ds(prototype-subspace)
+@habitats[] = proto-man-ds(prototype-subspace)
+#---------------------------#
+@items[]     = void-mecha-whistle(21-15, mecha-whistle)
+@items[]     = lalinde-random-bypass(49-4, random-bypass)
+#---------------------------#
+@blocks[]    = star-gate-west-b1(18-9, star-block, horz-down, x12)
+@gates[]     = star-gate-west-g1(19-9, star-gate, horizontal, x12)
+@blocks[]    = star-gate-west-b2(20-9, star-block, horz-down, x12)
+#------------------------
+@blocks[]    = star-gate-east-b1(37-3, star-block, vert-left, x15)
+@gates[]     = star-gate-east-g1(37-4, star-gate, vertical, x15)
+@blocks[]    = star-gate-east-b2(37-5, star-block, vert-left, x15)
+#------------------------
+@items[]     = slur-module-1(47-8, chrono-circuit)
+@items[]     = slur-module-2(47-9, cosmo-circuit)
+@items[]     = slur-omega-seed(47-7, omega-seed)
+#---------------------------#
+@bosses[]    = subspace-rogue(49-7, ra-thor, 80)
+@bosses[]    = subspace-guard-1(45-8, trill, 60)
+@bosses[]    = subspace-guard-2(45-9, trill, 60)
+@bosses[]    = subspace-guard-3(46-9, trill, 60)
+@bosses[]    = subspace-boss(46-8, slur, 100)
+#---------------------------#
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+[__],[70],[70],[__],[70],[70],[70],[70],[70],[70],[70],[__],[70],[70],[90],[70],[70],[70],[70],[90],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[80],[80],[__],[70],[__],[70],[__],[__],[70],[70],[70],[__],[__],[__],[__],[__]
+[__],[70],[__],[__],[70],[70],[70],[90],[70],[70],[90],[70],[70],[__],[__],[__],[__],[90],[__],[80],[90],[70],[70],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[70],[70],[80],[80],[70],[70],[70],[90],[70],[70],[__],[70],[__],[__],[__],[__],[__]
+[__],[__],[__],[__],[__],[70],[70],[70],[70],[70],[70],[70],[70],[__],[70],[70],[90],[__],[70],[70],[80],[70],[__],[__],[__],[__],[__],[80],[__],[__],[__],[__],[__],[__],[90],[70],[80],[80],[70],[80],[70],[__],[70],[__],[70],[__],[70],[70],[70],[__]
+[__],[__],[70],[__],[70],[__],[70],[70],[70],[90],[70],[80],[80],[__],[__],[70],[70],[90],[70],[90],[70],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[__],[70],[70],[80],[80],[80],[80],[70],[70],[70],[70],[70],[70],[__],[70],[__]
+[__],[__],[70],[80],[70],[70],[__],[__],[70],[70],[70],[80],[80],[__],[70],[__],[70],[__],[70],[70],[70],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[__],[__],[__],[80],[70],[70],[70],[70],[70],[80],[70],[__],[__],[__],[70],[__]
+[__],[90],[80],[80],[__],[70],[70],[__],[__],[70],[90],[__],[80],[70],[__],[__],[80],[80],[70],[70],[__],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[__],[__],[__],[__],[__],[70],[70],[70],[80],[80],[__],[__],[70],[__],[70],[__]
+[__],[70],[70],[__],[70],[90],[70],[70],[70],[70],[70],[70],[70],[70],[70],[80],[80],[90],[70],[70],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[70],[90],[80],[__],[__],[70],[70],[80],[80],[70],[70],[70],[__],[70],[__]
+[__],[70],[__],[70],[70],[70],[70],[70],[70],[__],[70],[__],[90],[70],[70],[80],[__],[80],[80],[80],[__],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[70],[90],[80],[90],[70],[70],[70],[70],[70],[80],[70],[70],[70],[__],[70],[__]
+[__],[70],[80],[80],[80],[80],[70],[70],[70],[__],[70],[70],[70],[__],[__],[__],[__],[70],[80],[80],[__],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[90],[90],[90],[70],[70],[70],[80],[__],[__],[80],[80],[80],[__],[__],[70],[__]
+[__],[__],[80],[80],[80],[80],[80],[80],[70],[70],[90],[70],[70],[__],[70],[80],[70],[70],[70],[80],[__],[__],[__],[__],[80],[80],[80],[80],[80],[80],[80],[__],[__],[__],[90],[90],[90],[70],[70],[70],[__],[__],[80],[80],[80],[80],[80],[80],[70],[__]
+[__],[__],[80],[80],[80],[80],[70],[70],[70],[70],[__],[__],[__],[__],[80],[80],[80],[70],[70],[__],[__],[__],[__],[__],[__],[__],[__],[80],[__],[__],[__],[__],[__],[90],[90],[70],[__],[__],[__],[__],[__],[70],[80],[90],[90],[90],[90],[90],[70],[__]
+[__],[70],[70],[__],[__],[70],[70],[70],[70],[90],[__],[70],[70],[70],[70],[80],[70],[70],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[90],[70],[__],[__],[90],[70],[70],[70],[70],[90],[90],[90],[90],[90],[90],[70],[__]
+[__],[70],[70],[__],[90],[70],[70],[70],[__],[__],[__],[70],[70],[70],[70],[70],[70],[70],[70],[70],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[70],[70],[70],[70],[90],[70],[70],[70],[70],[70],[90],[90],[90],[90],[90],[90],[70],[70],[__]
+[__],[__],[__],[__],[70],[70],[70],[70],[70],[__],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[__],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[70],[90],[70],[70],[__],[__]
+[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
+#---------------------------#
+

@@ -9,7 +9,7 @@ $this_shop_index['auto'] = array(
     'shop_source' => 'robots',
     'shop_name' => 'Auto\'s Shop',
     'shop_owner' => 'Auto',
-    'shop_unlock' => 'Complete the first chapter as Dr. Light.',
+    'shop_unlock' => 'Complete the first chapter as Dr. Light or find one of his codes.',
     'shop_seeking' => 'screws',
     'shop_seeking_text' => 'Junk Lover',
     'shop_seeking_image' => 'large-screw',
@@ -28,7 +28,9 @@ $this_shop_index['auto'] = array(
     'shop_items' => array(
         'items_selling' => array(),
         'items_buying' => array()
-        )
+        ),
+    'shop_max_level' => 10,
+    'shop_base_cost' => 1000
     );
 
 // REGGAE'S SHOP
@@ -37,7 +39,7 @@ $this_shop_index['reggae'] = array(
     'shop_source' => 'robots',
     'shop_name' => 'Reggae\'s Shop',
     'shop_owner' => 'Reggae',
-    'shop_unlock' => 'Complete the first chapter as Dr. Wily.',
+    'shop_unlock' => 'Complete the first chapter as Dr. Wily or find one of his codes.',
     'shop_seeking' => 'cores',
     'shop_seeking_text' => 'Core Expert',
     'shop_seeking_image' => 'none-core',
@@ -58,7 +60,9 @@ $this_shop_index['reggae'] = array(
         ),
     'shop_items' => array(
         'items_buying' => array()
-        )
+        ),
+    'shop_max_level' => 20,
+    'shop_base_cost' => 15000
     );
 
 
@@ -68,7 +72,7 @@ $this_shop_index['kalinka'] = array(
     'shop_source' => 'players',
     'shop_name' => 'Kalinka\'s Shop',
     'shop_owner' => 'Kalinka',
-    'shop_unlock' => 'Complete the prototype as any of the three playable characters.',
+    'shop_unlock' => 'Complete the first chapter as Dr. Cossack or find one of his codes.',
     'shop_seeking' => 'stars',
     'shop_seeking_text' => 'Star Seeker',
     'shop_seeking_image' => 'field-star',
@@ -80,7 +84,9 @@ $this_shop_index['kalinka'] = array(
     'shop_kind_buying' => array(),
     'shop_quote_selling' => array(),
     'shop_quote_buying' => array(),
-    'shop_alts' => array()
+    'shop_alts' => array(),
+    'shop_max_level' => 30,
+    'shop_base_cost' => 30000
     );
 
 

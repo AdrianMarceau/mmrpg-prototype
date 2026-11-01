@@ -1,0 +1,17 @@
+#---------------------------#
+# SHEET PROTOTYPE
+@token    = sheet
+@name     = Sheet
+@image    = sheet.png
+@size     = 40 x 40
+#---------------------------#
+@tiles[]    = void(00, 40, 700)
+@tiles[]    = water(99, 440, 40)
+@tiles[]    = darkness(88, 200, 40)
+#---------------------------#
+@sprites[]  = grid(40, 520)
+@sprites[]  = hover(40, 520)
+@sprites[]  = outline(280, 520)
+@sprites[]  = focus(680, 520)
+@sprites[]  = active(200, 520)
+#---------------------------#

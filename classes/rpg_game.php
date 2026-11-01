@@ -646,6 +646,49 @@ class rpg_game {
     }
 
 
+    // -- SETTINGS FUNCTIONS -- //
+
+    // Define a function for collecting relevant settings and generating appropriate body classes for the HTML
+    public static function get_mmrpgBodyClasses($context = 'index', $include_session = true){
+        $session_token = self::session_token();
+        $battleSettings = self::get_battleSettings($include_session);
+        $readyRoomConfig = self::get_readyRoomConfig($include_session);
+        $menuButtonConfig = self::get_menuButtonConfig($include_session);
+        $mmrpgBodyClasses = array();
+        $mmrpgBodyClasses[] = 'battleButtonMode_'.(isset($battleSettings['battleButtonMode']) ? $battleSettings['battleButtonMode'] : 'default');
+        if ($menuButtonConfig['menuButtonSpriteMotion']){ $mmrpgBodyClasses[] = 'menuButtonSpriteMotion'; }
+        if ($menuButtonConfig['menuBackgroundImageMotion']){ $mmrpgBodyClasses[] = 'menuBackgroundImageMotion'; }
+        return $mmrpgBodyClasses;
+    }
+
+    // Define a function for getting the battle settings, with defaults where applicable
+    public static function get_battleSettings($include_session = true){
+        $session_token = self::session_token();
+        $battleSettings = !empty($_SESSION[$session_token]['battle_settings']) ? $_SESSION[$session_token]['battle_settings'] : array();
+        return $battleSettings;
+    }
+
+    // Define a function for getting the Ready Room config settings, with defaults where applicable
+    public static function get_readyRoomConfig($include_session = true){
+        $session_token = self::session_token();
+        $battleSettings = self::get_battleSettings($include_session);
+        $readyRoomConfig = $include_session && !empty($battleSettings['readyRoomConfig']) ? $battleSettings['readyRoomConfig'] : array();
+        $readyRoomConfig['allowReadyRoomSprites'] = isset($readyRoomConfig['allowReadyRoomSprites']) ? $readyRoomConfig['allowReadyRoomSprites'] : 1;
+        $readyRoomConfig['readyRoomSpriteMotion'] = isset($readyRoomConfig['readyRoomSpriteMotion']) ? $readyRoomConfig['readyRoomSpriteMotion'] : 1;
+        $readyRoomConfig['readyRoomSpriteLimit'] = isset($readyRoomConfig['readyRoomSpriteLimit']) ? $readyRoomConfig['readyRoomSpriteLimit'] : 100;
+        return $readyRoomConfig;
+    }
+
+    // Define a function for the Menu Button config settings, with defaults where applicable
+    public static function get_menuButtonConfig($include_session = true){
+        $session_token = self::session_token();
+        $battleSettings = self::get_battleSettings($include_session);
+        $menuButtonConfig = $include_session && !empty($battleSettings['menuButtonConfig']) ? $battleSettings['menuButtonConfig'] : array();
+        $menuButtonConfig['menuButtonSpriteMotion'] = isset($menuButtonConfig['menuButtonSpriteMotion']) ? $menuButtonConfig['menuButtonSpriteMotion'] : 1;
+        $menuButtonConfig['menuBackgroundImageMotion'] = isset($menuButtonConfig['menuBackgroundImageMotion']) ? $menuButtonConfig['menuBackgroundImageMotion'] : 1;
+        return $menuButtonConfig;
+    }
+
 
     // -- PLAYER FUNCTIONS -- //
 
@@ -776,14 +819,18 @@ class rpg_game {
 
 
     // Define a function for checking is a prototype robot has been unlocked
-    public static function robot_unlocked($player_token = '', $robot_token = ''){
+    public static function robot_unlocked($player_token = '', $robot_token = '', $robot_id = 0){
         // Define the game session helper var
         $session_token = self::session_token();
+        $robot_string = $robot_id.'_'.$robot_token;
         // If the player token was not false, check to see if that particular player has unlocked
         if (empty($robot_token)){ return false; }
         if (!empty($player_token)){
             // Check if this battle has been completed and return true is it was
-            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
+            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])
+                && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+                return true;
+            } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
                 && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                 return true;
             } else {
@@ -795,7 +842,12 @@ class rpg_game {
             // Loop through all the player tokens in the battle rewards
             $robot_unlocked = false;
             foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-                if (isset($player_info['player_robots'][$robot_token])
+                if (isset($player_info['player_robots'][$robot_string])
+                    && !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])
+                    && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+                    $robot_unlocked = true;
+                    break;
+                } elseif (isset($player_info['player_robots'][$robot_token])
                     && !empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])
                     && !empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                     $robot_unlocked = true;
@@ -860,10 +912,12 @@ class rpg_game {
 
 
     // Define a function for collecting all robots unlocked by player or all
-    public static function robot_tokens_unlocked($player_token = ''){
+    public static function robot_tokens_unlocked($player_token = '', $return_keys = false){
+        //error_log('rpg_game::robot_tokens_unlocked($player_token: "'.$player_token.'", $return_keys: '.($return_keys ? 'true' : 'false').') called');
         // Define the game session helper var
         $session_token = self::session_token();
         // Define the temp robot and return arrays
+        $unlocked_robots_keys = array();
         $unlocked_robots_tokens = array();
         // If the player token was not false, attempt to collect rewards and settings arrays for that player
         if (!empty($player_token)){
@@ -871,10 +925,11 @@ class rpg_game {
             $battle_values = array('battle_rewards', 'battle_settings');
             foreach ($battle_values AS $value_token){
                 if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
-                    foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_token => $robot_info){
-                        if (!empty($robot_token) && !empty($robot_info) && !in_array($robot_token, $unlocked_robots_tokens)){
-                            $unlocked_robots_tokens[] = $robot_token;
-                        }
+                    foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_key => $robot_info){
+                        $robot_token = !empty($robot_info['robot_token']) ? $robot_info['robot_token'] : '';
+                        if (empty($robot_key) || empty($robot_token) || empty($robot_info)){ continue; }
+                        if (!in_array($robot_key, $unlocked_robots_keys)){ $unlocked_robots_keys[] = $robot_key; }
+                        if (!empty($robot_token) && !in_array($robot_token, $unlocked_robots_tokens)){ $unlocked_robots_keys[] = $robot_token; }
                     }
                 }
             }
@@ -883,13 +938,19 @@ class rpg_game {
         else {
             // Loop through and collect the robot settings and rewards for all players
             $battle_values = array('battle_rewards', 'battle_settings');
+            //error_log('looping battle values');
             foreach ($battle_values AS $value_token){
+                //error_log('battle values '.$value_token);
                 foreach ($_SESSION[$session_token]['values'][$value_token] AS $player_token => $player_info){
+                    //error_log('$_SESSION['.$session_token.'][\'values\']['.$value_token.']['.$player_token.']');
                     if (!empty($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'])){
-                        foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_token => $robot_info){
-                            if (!empty($robot_token) && !empty($robot_info) && !in_array($robot_token, $unlocked_robots_tokens)){
-                                $unlocked_robots_tokens[] = $robot_token;
-                            }
+                        foreach ($_SESSION[$session_token]['values'][$value_token][$player_token]['player_robots'] AS $robot_key => $robot_info){
+                        //error_log('$_SESSION['.$session_token.'][\'values\']['.$value_token.']['.$player_token.']['.$robot_key.']');
+                        $robot_token = !empty($robot_info['robot_token']) ? $robot_info['robot_token'] : '';
+                        if (empty($robot_key) || empty($robot_token) || empty($robot_info)){ continue; }
+                        //error_log($value_token.' for '.$robot_token.' exist!');
+                        if (!in_array($robot_key, $unlocked_robots_keys)){ $unlocked_robots_keys[] = $robot_key; }
+                        if (!empty($robot_token) && !in_array($robot_token, $unlocked_robots_tokens)){ $unlocked_robots_tokens[] = $robot_token; }
                         }
                     }
                 }
@@ -911,52 +972,69 @@ class rpg_game {
         // Update or create the player setting in the session
         $player_token = $player_info['player_token'];
         $robot_token = $robot_info['robot_token'];
-        $_SESSION[self::session_token()]['values']['battle_settings'][$player_token]['player_robots'][$robot_token][$setting_token] = $setting_value;
+        if (!empty($robot_info['robot_id'])){
+            $robot_id = $robot_info['robot_id'];
+            $robot_string = $robot_id.'_'.$robot_token;
+            $_SESSION[self::session_token()]['values']['battle_settings'][$player_token]['player_robots'][$robot_string][$setting_token] = $setting_value;
+        } else {
+            $_SESSION[self::session_token()]['values']['battle_settings'][$player_token]['player_robots'][$robot_token][$setting_token] = $setting_value;
+        }
         // Return true on success
         return true;
     }
 
 
     // Define a function for checking a robot's prototype experience total
-    public static function robot_experience($player_token, $robot_token){
+    public static function robot_experience($player_token, $robot_token, $robot_id = 0){
         // Return the current point total for this robot
         $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
+        $robot_string = $robot_id.'_'.$robot_token;
+        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_experience']; }
+        elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_experience']; }
         elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_points'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_points']; }
         else { return 0; }
     }
 
 
     // Define a function for checking a robot's prototype current level
-    public static function robot_level($player_token, $robot_token){
+    public static function robot_level($player_token, $robot_token, $robot_id = 0){
         // Return the current level total for this robot
         $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
+        $robot_string = $robot_id.'_'.$robot_token;
+        if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string]['robot_level']; }
+        elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level'])){ return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token]['robot_level']; }
         else { return 1; }
     }
 
 
     // Define a function for checking a robot's prototype current level
-    public static function robot_original_player($player_token, $robot_token){
+    public static function robot_original_player($player_token, $robot_token, $robot_id = 0){
         // Return the current level total for this robot
         $session_token = self::session_token();
-        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
+        $robot_string = $robot_id.'_'.$robot_token;
+        if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string]['original_player']; }
+        elseif (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player'])){ return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token]['original_player']; }
         else { return $player_token; }
     }
 
 
     // Define a function for checking a robot's prototype reward array
-    public static function robot_rewards($player_token = '', $robot_token){
+    public static function robot_rewards($player_token = '', $robot_token, $robot_id = 0){
         // Define the game session helper var
         $session_token = self::session_token();
+        $robot_string = $robot_id.'_'.$robot_token;
         // Return the current reward array for this robot
         if (!empty($player_token)){
-            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
+            if (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string])){
+                return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_string];
+            } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token])){
                 return $_SESSION[$session_token]['values']['battle_rewards'][$player_token]['player_robots'][$robot_token];
             }
         } elseif (!empty($_SESSION[$session_token]['values']['battle_rewards'])){
             foreach ($_SESSION[$session_token]['values']['battle_rewards'] AS $player_token => $player_info){
-                if (!empty($player_info['player_robots'][$robot_token])){
+                if (!empty($player_info['player_robots'][$robot_string])){
+                    return $player_info['player_robots'][$robot_string];
+                } elseif (!empty($player_info['player_robots'][$robot_token])){
                     return $player_info['player_robots'][$robot_token];
                 }
             }
@@ -966,17 +1044,22 @@ class rpg_game {
 
 
     // Define a function for checking a robot's prototype settings array
-    public static function robot_settings($player_token = '', $robot_token){
+    public static function robot_settings($player_token = '', $robot_token, $robot_id = 0){
         // Define the game session helper var
         $session_token = self::session_token();
+        $robot_string = $robot_id.'_'.$robot_token;
         // Return the current setting array for this robot
         if (!empty($player_token)){
-            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
+            if (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string])){
+                return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_string];
+            } elseif (!empty($_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token])){
                 return $_SESSION[$session_token]['values']['battle_settings'][$player_token]['player_robots'][$robot_token];
             }
         } elseif (!empty($_SESSION[$session_token]['values']['battle_settings'])){
             foreach ($_SESSION[$session_token]['values']['battle_settings'] AS $player_token => $player_info){
-                if (!empty($player_info['player_robots'][$robot_token])){
+                if (!empty($player_info['player_robots'][$robot_string])){
+                    return $player_info['player_robots'][$robot_string];
+                } elseif (!empty($player_info['player_robots'][$robot_token])){
                     return $player_info['player_robots'][$robot_token];
                 }
             }
@@ -986,9 +1069,9 @@ class rpg_game {
 
 
     // Define a function for checking a robot's prototype settings array
-    public static function robot_settings_abilities($player_token = '', $robot_token){
+    public static function robot_settings_abilities($player_token = '', $robot_token, $robot_id = 0){
         // Direct collect the settings for this robot
-        $this_settings = self::robot_settings($player_token, $robot_token);
+        $this_settings = self::robot_settings($player_token, $robot_token, $robot_id);
         $this_abilities = !empty($this_settings['robot_abilities']) ? array_keys($this_settings['robot_abilities']) : array();
         return $this_abilities;
     }
@@ -1546,7 +1629,7 @@ class rpg_game {
         // Define the game session helper var
         $session_token = self::session_token();
         // Collect the zenny count and return it
-        if (!empty($_SESSION[$session_token]['values']['battle_zenny'])){ return $_SESSION[$session_token]['values']['battle_zenny']; }
+        if (!empty($_SESSION[$session_token]['counters']['battle_zenny'])){ return $_SESSION[$session_token]['counters']['battle_zenny']; }
         else { return 0; }
     }
 
@@ -1630,10 +1713,11 @@ class rpg_game {
 
     // Define a function for getting (or generating) a CDN file index for a given directory
     public static function get_cdn_index($project, $content){
+        //error_log('rpg_game::get_cdn_index($project: '.print_r($project, true).', $content: '.print_r($content, true).')');
 
         // Return false if either argument is invalid
-        if (!preg_match('/^[-_a-z0-9]+$/i', $project)){ return false; }
-        if (!preg_match('/^[-_a-z0-9\/]+$/i', $content)){ return false; }
+        if (!preg_match('/^[-_a-z0-9]+$/i', $project)){ error_log('rpg_game::get_cdn_index() $project string was invalid ('.gettype($project).' '.print_r($project, type).')'); return false; }
+        if (!preg_match('/^[-_a-z0-9\/]+$/i', $content)){ error_log('rpg_game::get_cdn_index() $content string was invalid ('.gettype($content).' '.print_r($content, type).')'); return false; }
 
         // Define the cache file name and path given everything we've learned
         $cache_file_name = 'cache.cdn_'.$project.'-'.str_replace('/', '-', $content).'.json';
@@ -1644,6 +1728,7 @@ class rpg_game {
 
         // LOAD FROM CACHE if data exists and is current, otherwise continue so script can refresh and replace
         if (MMRPG_CONFIG_CACHE_INDEXES && $cache_file_exists && $cache_file_date >= MMRPG_CONFIG_CACHE_DATE){
+            //error_log('returning json from cached file '.$cache_file_path);
             $cache_file_markup = file_get_contents($cache_file_path);
             $cache_file_json = json_decode($cache_file_markup, true);
             return $cache_file_json;
@@ -1652,6 +1737,9 @@ class rpg_game {
         // Otherwise we need to collect the list and add it to the local cache
         $url = MMRPG_CONFIG_CDN_ROOTURL.$project.'/'.rtrim($content, '/').'/index';
         $ch = curl_init();
+        //error_log('pulling json from curl request to '.$url);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 9);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (MMRPG_CONFIG_IS_LIVE ? true : false));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -1660,6 +1748,7 @@ class rpg_game {
         curl_close($ch);
 
         // If results were empty, exit now
+        //error_log('$result = '.print_r($result, true));
         if (empty($result)){ return false; }
 
         // Otherwise we can decode the data and extract the index
@@ -1766,21 +1855,66 @@ class rpg_game {
 
     // Define a function for checking to see if a given sprite exists (at its real location)
     public static function sprite_exists($sym_path){
+        //error_log('rpg_game::sprite_exists('.$sym_path.')');
 
-        // Get the real path given the sym link
-        $real_path = self::get_real_sprite_path($sym_path, true);
+        // Maintain a static memory cache for the duration of the current script execution
+        static $category_cache = array();
 
-        // Now that we have the real path, check to see if it exists
-        $file_exists = file_exists($real_path);
+        // Get the real path, passing "false" so it doesn't force the full absolute path
+        $real_path = self::get_real_sprite_path($sym_path, false);
 
-        //error_log('$sym_path = '.print_r($sym_path, true));
-        //error_log('$real_path = '.print_r($real_path, true));
-        //error_log('$file_exists = '.($file_exists ? 'true' : 'false'));
-        //exit();
+        // Strip the root directory and remove any trailing slashes to normalize directory checks
+        $relative_path = rtrim(str_replace(MMRPG_CONFIG_ROOTDIR, '', $real_path), '/');
+        //error_log('rpg_game::sprite_exists('.$relative_path.')');
 
-        // Return the result of the check
-        return $file_exists;
+        // Extract the asset category from the relative path (e.g., 'robots', 'fields', 'abilities')
+        preg_match('#^content/([^/]+)/#i', $relative_path, $matches);
+        $category = !empty($matches[1]) ? $matches[1] : 'misc';
 
+        // If we haven't loaded this category into memory yet, do it now
+        if (!isset($category_cache[$category])) {
+
+            // Define cache variables for your file-based caching system
+            $cache_kind = 'sprites.' . $category;
+            $cache_token = md5('sprite_index_' . $category);
+
+            // Attempt to load from the flat-file cache
+            $cached_index = rpg_object::load_cached_index($cache_kind, $cache_token);
+
+            if (!empty($cached_index)) {
+                // Success: Load the file-cached index into static memory
+                $category_cache[$category] = $cached_index;
+            } else {
+                // Miss/Expired: Run the heavy glob() operation
+                $search_pattern = MMRPG_CONFIG_ROOTDIR . 'content/' . $category . '/*/*/*.*';
+                $files = glob($search_pattern);
+
+                $cache_data = array();
+                if ($files) {
+                    // Strip the absolute root directory from all paths
+                    $files = str_replace(MMRPG_CONFIG_ROOTDIR, '', $files);
+
+                    foreach ($files as $file) {
+                        // 1. Add the file itself to the cache
+                        $cache_data[$file] = true;
+
+                        // 2. Walk up the directory tree and add parent folders so directory checks pass
+                        $dir = dirname($file);
+                        while ($dir != '.' && $dir != 'content' && !isset($cache_data[$dir])) {
+                            $cache_data[$dir] = true;
+                            $dir = dirname($dir);
+                        }
+                    }
+                }
+                $category_cache[$category] = $cache_data;
+
+                // Save this relative-path array to the file cache
+                rpg_object::save_cached_index($cache_kind, $cache_token, $category_cache[$category]);
+            }
+        }
+
+        // Return true if the relative path (or its stripped directory path) exists in our cache
+        return isset($category_cache[$category][$relative_path]);
     }
 
     // Define a function for converting a sprite config array into a path string
@@ -1812,7 +1946,7 @@ class rpg_game {
         $composite_sprite_path = 'images/'.$kind_path.'all/'.$config_path.$image_path;
         if ($include_cache_date){ $composite_sprite_path .= '?'.MMRPG_CONFIG_CACHE_DATE; }
         // Return the generated path value
-        //error_log('$composite_sprite_path = '.print_r($composite_sprite_path, true));
+        //error_log('get_sprite_composite_path() = $composite_sprite_path = '.print_r($composite_sprite_path, true));
         return $composite_sprite_path;
     }
 
@@ -1826,12 +1960,14 @@ class rpg_game {
         if (!empty($config['frame'])){ $composite_base_token .= '_f-'.$config['frame']; }
         if (!empty($config['editor'])){ $composite_base_token .= '_e-'.$config['editor']; }
         if (!empty($config['token'])){ $composite_base_token .= '_t-'.preg_replace('/[^-a-z0-9]+/i', '-', (is_array($config['token']) ? implode(',', $config['token']) : $config['token'])); }
+        if (!empty($config['zoom'])){ $composite_base_token .= '_x2'; }
         $composite_cache_token = $config['kind'].'_'.$composite_base_token;
         $composite_cache_path_full = $composite_base_path.$composite_cache_token.'.png';
         $composite_cache_path_rel = str_replace(MMRPG_CONFIG_ROOTDIR, '', $composite_cache_path_full);
         //error_log('$composite_cache_token = '.print_r($composite_cache_token, true));
         //error_log('$composite_cache_path_full = '.print_r($composite_cache_path_full, true));
         //error_log('$composite_cache_path_rel = '.print_r($composite_cache_path_rel, true));
+        //error_log('get_sprite_composite_cache_path() = $composite_cache_path_rel = '.print_r($composite_cache_path_rel, true));
         return $composite_cache_path_rel;
     }
 
@@ -1846,7 +1982,7 @@ class rpg_game {
         static $composite_index_cache = array();
         //error_log('$composite_index_cache = '.print_r($composite_index_cache, true));
         if (!isset($composite_index_cache[$composite_sprite_path])){
-            $composite_index_array = self::get_sprite_composite_index_json($composite_sprite_cache_path);
+            $composite_index_array = self::get_sprite_composite_index_json($composite_sprite_path);
             //error_log('$composite_index_array = '.print_r($composite_index_array, true));
             $composite_index_cache[$composite_sprite_path] = $composite_index_array;
         }
@@ -1861,43 +1997,55 @@ class rpg_game {
 
         // Collect the global cache time and break it down to an exact time
         list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
-        $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
-        $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
+        $yyyy = (int)substr($new_cache_date, 0, 4); $mm = (int)substr($new_cache_date, 4, 2); $dd = (int)substr($new_cache_date, 6, 2);
+        $hh = (int)substr($new_cache_time, 0, 2); $ii = (int)substr($new_cache_time, 2, 2);
         $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
-        //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
 
         //  Define the index JSON's path give the provided sprite path
         $composite_index_path = str_replace('.png', '.json', $composite_sprite_path);
         $composite_index_path_clean = preg_replace('/\?.*/', '', $composite_index_path);
-        //error_log('$composite_index_path = '.print_r($composite_index_path, true));
-        //error_log('$composite_index_path_clean = '.print_r($composite_index_path_clean, true));
 
         // Check to see if we need to stream or load the static version already cached
         $can_load_static_file = false;
         if (file_exists(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean)){
             $composite_index_filemtime = filemtime(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean);
-            //error_log('$composite_index_filemtime = '.print_r($composite_index_filemtime, true));
             if ($composite_index_filemtime >= $mmrpg_config_cache_time){
-                //error_log('static file is up-to-date ($composite_index_filemtime >= $mmrpg_config_cache_time)');
                 $can_load_static_file = true;
             }
         }
-        //error_log('$can_load_static_file = '.($can_load_static_file ? 'true' : 'false'));
 
-        // If we can load the static file do so now, otherwise we have to use file_get_contents() and stream it
+        // If we can load the static file do so now, otherwise use cURL to stream it
         $composite_index_json = '';
         if ($can_load_static_file) {
             $file_handle = fopen(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean, "r");
             $composite_index_json = fread($file_handle, filesize(MMRPG_CONFIG_ROOTDIR.$composite_index_path_clean));
             fclose($file_handle);
         } else {
-            $composite_index_json = file_get_contents(MMRPG_CONFIG_ROOTURL.$composite_index_path);
+            // Initialize cURL for the self-request
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, MMRPG_CONFIG_ROOTURL.$composite_index_path);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            // Impersonate a standard browser to bypass anti-bot filtering
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36');
+
+            // Permissive SSL settings with explicit SNI resolution
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $host = parse_url(MMRPG_CONFIG_ROOTURL, PHP_URL_HOST);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Host: ' . $host));
+
+            // Explicit timeouts
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
+            // Execute the request
+            $composite_index_json = curl_exec($ch);
+            curl_close($ch);
         }
-        //error_log('$composite_index_json = '.print_r($composite_index_json, true));
 
         // Decode the JSON and return the array to the calling function
         $composite_index_array = !empty($composite_index_json) ? json_decode($composite_index_json, true) : array();
-        //error_log('$composite_index_array = '.print_r($composite_index_array, true));
         return $composite_index_array;
 
     }
@@ -2349,6 +2497,7 @@ class rpg_game {
 
     // Define a function for exiting the game session
     public static function exit_session(){
+        //error_log('rpg_game::exit_session() called!');
 
         // Clear the current session objects
         unset($_SESSION['GAME']);

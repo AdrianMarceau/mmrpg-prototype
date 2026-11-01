@@ -5,6 +5,7 @@ if (!isset($session_token)){ $session_token = mmrpg_game_token(); }
 // Collect the field stars from the session variable
 $this_battle_stars = !empty($_SESSION[$session_token]['values']['battle_stars']) ? $_SESSION[$session_token]['values']['battle_stars'] : array();
 $this_battle_stars_count = !empty($this_battle_stars) ? count($this_battle_stars) : 0;
+$this_battle_stars_boss_count = 0;
 $this_battle_stars_field_count = 0;
 $this_battle_stars_fusion_count = 0;
 $this_battle_stars_perfect_fusion_count = 0;
@@ -23,7 +24,8 @@ foreach ($this_battle_stars AS $temp_key => $temp_data){
     if ($star_kind == 'fusion' && $star_type != $star_type2){ $star_kind = 'fusion'; }
     elseif ($star_kind == 'fusion' && $star_type == $star_type2){ $star_kind = 'perfect-fusion'; }
 
-    if ($star_kind == 'field'){ $this_battle_stars_field_count++; }
+    if ($star_kind == 'boss'){ $this_battle_stars_boss_count++; }
+    else if ($star_kind == 'field'){ $this_battle_stars_field_count++; }
     elseif ($star_kind == 'fusion'){ $this_battle_stars_fusion_count++; }
     elseif ($star_kind == 'perfect-fusion'){ $this_battle_stars_perfect_fusion_count++; }
 
@@ -52,6 +54,14 @@ foreach ($this_battle_stars AS $temp_key => $temp_data){
 }
 asort($this_star_force);
 $this_star_force = array_reverse($this_star_force);
+$this_star_force_real = $this_star_force;
+
+// Loop through the generated starforce array and apply a hard limit on starforce power per element
+$max_power = 100; // equal to +1000 for each stat
+foreach ($this_star_force AS $type => $power){
+    if ($power <= $max_power){ continue; }
+    $this_star_force[$type] = $max_power;
+}
 
 // Unless we're specifically disabled, include Rogue Star power now
 if (!isset($include_rogue_star_power)){ $include_rogue_star_power = true; }
@@ -71,11 +81,13 @@ if ($include_rogue_star_power){
 
 // Update the session with current starforce values
 $_SESSION[$session_token]['values']['star_force'] = $this_star_force;
+$_SESSION[$session_token]['values']['star_force_real'] = $this_star_force_real;
 $_SESSION[$session_token]['values']['star_force_strict'] = $this_star_force_strict;
 
-//echo('<pre>$this_star_force = '.print_r($this_star_force, true).'</pre>'."\n\n");
-//echo('<pre>$this_star_force_strict = '.print_r($this_star_force_strict, true).'</pre>'."\n\n");
-//echo('<pre>$this_star_kind_counts = '.print_r($this_star_kind_counts, true).'</pre>'."\n\n");
+//error_log('$this_star_force = '.print_r($this_star_force, true));
+//error_log('$this_star_force_real = '.print_r($this_star_force_real, true));
+//error_log('$this_star_force_strict = '.print_r($this_star_force_strict, true));
+//error_log('$this_star_kind_counts = '.print_r($this_star_kind_counts, true));
 //$player_starforce = rpg_game::starforce_unlocked();
 //echo('<pre>$player_starforce = '.print_r($player_starforce, true).'</pre>'."\n\n");
 //die();

@@ -133,7 +133,7 @@ if (!empty($_REQUEST['action']) && $_REQUEST['action'] == 'console_markup'){
 }
 
 // Determine the token for the very first robot in the edit
-$first_robot_token = $allowed_edit_robots[0];
+$first_robot_token = isset($allowed_edit_robots[0]) ? $allowed_edit_robots[0] : '';
 
 ?>
 <!DOCTYPE html>
@@ -150,6 +150,7 @@ $first_robot_token = $allowed_edit_robots[0];
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/edit_robots.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -206,21 +207,17 @@ $first_robot_token = $allowed_edit_robots[0];
                 </div>
         </div>
     </div>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src=".libs/jquery-ui-sortable/jquery.sortable.min.js"></script>
-<script type="text/javascript" src=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/edit_robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? $game_sortingRequired = true; ?>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
+    <script type="text/javascript" src="scripts/edit_robots.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
 // Update game settings for this page
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-gameSettings.autoScrollTop = false;
 gameSettings.userNumber = <?= MMRPG_REMOTE_GAME_ID ?>;
 gameSettings.allowEditing = <?= $global_allow_editing ? 'true' : 'false' ?>;
-gameSettings.shareProgramUnlocked = <?= mmrpg_prototype_item_unlocked('light-program') ? 'true' : 'false' ?>;
-gameSettings.transferProgramUnlocked = <?= mmrpg_prototype_item_unlocked('wily-program') ? 'true' : 'false' ?>;
-gameSettings.searchProgramUnlocked = <?= mmrpg_prototype_item_unlocked('cossack-program') ? 'true' : 'false' ?>;
+gameSettings.shareProgramUnlocked = <?= true ? 'true' : 'false' ?>;
+gameSettings.transferProgramUnlocked = <?= true ? 'true' : 'false' ?>;
+gameSettings.searchProgramUnlocked = <?= mmrpg_prototype_item_unlocked('stellar-beacon') ? 'true' : 'false' ?>;
 gameSettings.mmrpgIndexTypes = [<?= "'".implode("','", array_keys($mmrpg_database_types))."'" ?>];
 gameSettings.mmrpgIndexTypesForSort = [<?= "'".implode("','", $mmrpg_database_types_forsort)."'" ?>];
 var countRobotLinks = false;

@@ -204,11 +204,11 @@
         $temp_robot_fields = rpg_robot::get_index_fields(true, 'robots');
         $search_query = "SELECT
             {$temp_robot_fields},
-            groups.group_token AS robot_group,
+            `groups`.group_token AS robot_group,
             tokens.token_order AS robot_order
             FROM mmrpg_index_robots AS robots
             LEFT JOIN mmrpg_index_robots_groups_tokens AS tokens ON tokens.robot_token = robots.robot_token
-            LEFT JOIN mmrpg_index_robots_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = robots.robot_class
+            LEFT JOIN mmrpg_index_robots_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = robots.robot_class
             WHERE 1=1
             AND robots.robot_token <> 'robot'
             ";
@@ -277,7 +277,7 @@
 
         // If the robot group was provided
         if (!empty($search_data['robot_group'])){
-            $search_query .= "AND groups.group_token = '{$search_data['robot_group']}' ";
+            $search_query .= "AND `groups`.group_token = '{$search_data['robot_group']}' ";
             $search_results_limit = false;
         }
 
@@ -1118,6 +1118,7 @@
                 $levelup_compatible = false;
                 if ($robot_data['robot_class'] === 'boss' && $ability_info['ability_class'] !== 'mecha'){ $levelup_compatible = true; }
                 elseif ($ability_info['ability_class'] === $robot_data['robot_class']){ $levelup_compatible = true; }
+                elseif ($ability_info['ability_class'] === 'master' && $robot_data['robot_class'] == 'mecha'){ $levelup_compatible = true; }
                 elseif (in_array($ability_token, $global_ability_tokens)){ $levelup_compatible = true; }
                 elseif (in_array($ability_token, $global_buster_tokens)){ $levelup_compatible = true; }
                 if ($levelup_compatible){

@@ -45,7 +45,10 @@ class rpg_object {
         $session_id = $this->session_id;
         // Now load the object data from the session or index
         $load_function = $this->class.'_load';
-        $this->{$load_function}($this->{$this->session_id}, $this->{$this->session_token});
+        $this->{$load_function}(array(
+            $this->session_id => $this->{$this->session_id},
+            $this->session_token => $this->{$this->session_token}
+            ));
         // Update the session variable
         $this->update_session();
     }
@@ -662,7 +665,7 @@ class rpg_object {
             unset($key_array[$key2]);
             unset($_SESSION[$session_key][$this->$session_id][$key][$key2]);
         } else {
-            unset($key_array);
+            unset($this->$key);
             unset($_SESSION[$session_key][$this->$session_id][$key]);
         }
     }
@@ -765,7 +768,7 @@ class rpg_object {
         $this_objectinfo = isset($args[3]) ? $args[3] : array('object_id' => 0, 'object_token' => 'object');
 
         if (!is_array($this_objectinfo)){
-            die('!is_array($this_objectinfo){ '.print_r($this_objectinfo, true)).' }';
+            die('!is_array($this_objectinfo){ '.print_r($this_objectinfo, true).' }');
         }
 
         // Now load the object data from the session or index
@@ -807,7 +810,10 @@ class rpg_object {
         // Collect current object data from the session if available
         $this_objectinfo_backup = $this_objectinfo;
         if (isset($_SESSION['OBJECTS'][$this_objectinfo['object_id']])){
-            $this_objectinfo = $_SESSION['OBJECTS'][$this_objectinfo['object_id']];
+            $this_objectinfo = array_replace(
+                $this_objectinfo_backup,
+                $_SESSION['OBJECTS'][$this_objectinfo['object_id']]
+            );
         }
 
         // Define the internal object values using the provided array
@@ -929,8 +935,8 @@ class rpg_object {
         // Collect the global cache time and break it down to an exact time
         if (empty($cache_time)){
             list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
-            $yyyy = substr($new_cache_date, 0, 4); $mm = substr($new_cache_date, 4, 2); $dd = substr($new_cache_date, 6, 2);
-            $hh = substr($new_cache_time, 0, 2); $ii = substr($new_cache_time, 2, 2);
+            $yyyy = (int)(substr($new_cache_date, 0, 4)); $mm = (int)(substr($new_cache_date, 4, 2)); $dd = (int)(substr($new_cache_date, 6, 2));
+            $hh = (int)(substr($new_cache_time, 0, 2)); $ii = (int)(substr($new_cache_time, 2, 2));
             $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
             //error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
             $cache_time = $mmrpg_config_cache_time;

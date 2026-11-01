@@ -57,6 +57,9 @@ ob_start();
             } $dataOrder++;
         ?></div><?
 
+        // Define the order counter and start at one
+        $dataOrder = 1;
+
         // Display the available sub options
         ?><div class="sub_actions" data-size="<?= $items_unlocked && $switch_allowed ? 4 : 3 ?>"><?
 

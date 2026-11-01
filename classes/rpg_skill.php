@@ -73,7 +73,7 @@ class rpg_skill extends rpg_object {
         }
         // Otherwise if the ID appears to have already been set
         elseif (!empty($this_skillinfo['skill_id'])
-            && strstr($this_skillinfo['skill_id'], $this->robot_id)){
+            && strstr($this_skillinfo['skill_id'], strval($this->robot_id))){
             $skill_id = $this_skillinfo['skill_id'];
         }
         // Otherwise base the ID off of the robot
@@ -279,6 +279,15 @@ class rpg_skill extends rpg_object {
     public function get_target_options(){ return $this->get_info('target_options'); }
     public function set_target_options($value){ $this->set_info('target_options', $value); }
 
+    public function get_damage_options(){ return $this->get_info('damage_options'); }
+    public function set_damage_options($value){ $this->set_info('damage_options', $value); }
+
+    public function get_recovery_options(){ return $this->get_info('recovery_options'); }
+    public function set_recovery_options($value){ $this->set_info('recovery_options', $value); }
+
+    public function get_attachment_options(){ return $this->get_info('attachment_options'); }
+    public function set_attachment_options($value){ $this->set_info('attachment_options', $value); }
+
     // Define a public function for getting all global objects related to this skill
     private function get_objects($extra_objects = array()){
 
@@ -473,7 +482,7 @@ class rpg_skill extends rpg_object {
             $this->target_options['skill_failure_frame_offset']['y'] = $target_options['failure'][2];
             $this->target_options['skill_failure_frame_offset']['z'] = $target_options['failure'][3];
             $this->target_options['target_text'] = $target_options['failure'][4];
-            $this->target_options['skill_failure_frame_span'] = isset($target_options['success'][5]) ? $target_options['success'][5] : 1;
+            $this->target_options['skill_failure_frame_span'] = isset($target_options['failure'][5]) ? $target_options['failure'][5] : 1;
         }
         // Return the new array
         return $this->target_options;
@@ -847,14 +856,14 @@ class rpg_skill extends rpg_object {
         $skill_fields = rpg_skill::get_index_fields(true, 'skills');
         $skill_index = $db->get_array_list("SELECT
             {$skill_fields},
-            groups.group_token AS skill_group,
+            `groups`.group_token AS skill_group,
             tokens.token_order AS skill_order
             FROM mmrpg_index_skills AS skills
             LEFT JOIN mmrpg_index_skills_groups_tokens AS tokens ON tokens.skill_token = skills.skill_token
-            LEFT JOIN mmrpg_index_skills_groups AS groups ON groups.group_class = tokens.group_class AND groups.group_token = tokens.group_token
+            LEFT JOIN mmrpg_index_skills_groups AS `groups` ON `groups`.group_class = tokens.group_class AND `groups`.group_token = tokens.group_token
             WHERE skill_id <> 0 {$temp_where}
             ORDER BY
-            groups.group_order ASC,
+            `groups`.group_order ASC,
             tokens.token_order ASC
             ;", 'skill_token');
 
@@ -885,6 +894,18 @@ class rpg_skill extends rpg_object {
             }
         }
         return $index;
+    }
+
+    // Define a function for getting an index of IDs mapped to their corresponding tokens
+    public static function get_indexed_ids(){
+        static $skill_index_byid = false;
+        if ($skill_index_byid === false){
+            $skill_index_byid = array();
+            $skill_index = self::get_index(true, true);
+            if (empty($skill_index)){ $skill_index = array(); }
+            foreach ($skill_index AS $token => $skill){ $skill_index_byid[$skill['skill_id']] = $token; }
+        }
+        return $skill_index_byid;
     }
 
     // Define a public function for collecting index data from the database

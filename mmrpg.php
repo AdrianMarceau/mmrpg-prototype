@@ -8,7 +8,8 @@ ini_set('memory_limit', '256M');
  */
 
 // If we're in a file page, prevent userinfo caching
-if (preg_match('/file.php$/i', basename(__FILE__))){
+if (preg_match('/file.php$/i', basename(__FILE__))
+    || preg_match('/settings.php$/i', basename(__FILE__))){
     // Prevent userinfo caching for this page
     unset($_SESSION['GAME']['USER']['userinfo']);
 }

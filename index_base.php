@@ -183,6 +183,9 @@ if (!defined('MMRPG_CRITICAL_ERROR')){
                         <?
                         foreach ($sub_menu_links AS $sub_token => $sub_info){
 
+                            // Skip if the user is not logged in yet, we don't want them searching
+                            if ($parent_token == 'community' && $sub_token === 'search' && rpg_user::is_guest()){ continue; }
+
                             // Collect basic info about this link
                             $name = !empty($sub_info['name']) ? $sub_info['name'] : ucfirst($sub_token);
                             $url = !empty($sub_info['url']) ? $sub_info['url'] : $parent_token.'/'.$sub_token.'/';
@@ -303,7 +306,7 @@ if (empty($this_markup_body)
 
 ?>
 <!DOCTYPE html>
-<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/" data-index="base">
+<html lang="en" xmlns:og="http://opengraphprotocol.org/schema/" data-index="base" data-view=<?= MMRPG_INDEX_PRINT_VIEW === true ? 'print' : 'full' ?>>
 <head>
 
 <meta charset="UTF-8" />
@@ -344,7 +347,9 @@ if (empty($this_markup_body)
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href=".libs/jquery-perfect-scrollbar/jquery.scrollbar.min.css" rel="stylesheet" />
 <link type="text/css" href="styles/index.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
-<link type="text/css" href="styles/index-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? if (MMRPG_INDEX_FULL_VIEW){ ?>
+    <link type="text/css" href="styles/index-responsive.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<? } ?>
 
 <? if ($this_current_page == 'dev'): ?>
     <link type="text/css" href="styles/dev.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -370,6 +375,8 @@ if ($this_current_page == 'file' // File sub-pages
 ?>
 <? if ($legacy_viewport_required): ?>
     <meta name="viewport" content="user-scalable=yes, width=768, height=1004">
+<? elseif (MMRPG_INDEX_PRINT_VIEW): ?>
+    <meta name="viewport" content="width=1040, initial-scale=1" />
 <? else: ?>
     <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0">
 <? endif; ?>
@@ -380,6 +387,7 @@ if ($this_current_page == 'file' // File sub-pages
 
     <div id="window" style="position: relative; height: auto !important;">
 
+        <? if (MMRPG_INDEX_FULL_VIEW){ ?>
         <div class="banner <?= defined('MMRPG_INDEX_COMPACT_MODE') ? 'compact' : '' ?>">
 
             <?
@@ -473,10 +481,13 @@ if ($this_current_page == 'file' // File sub-pages
             ?>
 
         </div>
+        <? } ?>
 
+        <? if (MMRPG_INDEX_FULL_VIEW){ ?>
         <div class="menu field_type field_type_<?= MMRPG_SETTINGS_CURRENT_FIELDTYPE ?>">
             <?= !empty($index_nav_markup) ? $index_nav_markup : '&hellip;&gt;_&lt;&hellip;' ?>
         </div>
+        <? } ?>
 
         <div class="page page_<?= $this_current_page ?>">
             <? if (!empty($this_markup_header)): ?>
@@ -504,8 +515,10 @@ if ($this_current_page == 'file' // File sub-pages
 
     <?
     // Require the common footer
-    $footer_context = 'base';
-    require(MMRPG_CONFIG_ROOTDIR.'includes/footer.php');
+    if (MMRPG_INDEX_FULL_VIEW){
+        $footer_context = 'base';
+        require(MMRPG_CONFIG_ROOTDIR.'includes/footer.php');
+    }
     ?>
 
     <a id="topscroll" href="<?= $this_current_url ?>"></a>
@@ -523,9 +536,9 @@ if ($this_current_page == 'file' // File sub-pages
     <? if ($this_current_page == 'dev'): ?>
     <script type="text/javascript" src="scripts/dev.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
     <? endif; ?>
+    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
     <script type="text/javascript">
     // Define the key client variables
-    <? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
     gameSettings.autoScrollTop = false;
     gameSettings.autoResizeHeight = false;
     <? if($this_current_page == 'community' && $this_current_cat == 'chat'): ?>

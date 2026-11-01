@@ -5,6 +5,8 @@ $api_request_path = 'players/index/{token}';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for players and then parse necessary data
+define('FORCE_INCLUDE_HIDDEN_PLAYERS', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_PLAYERS', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/players.php');
 if (empty($mmrpg_database_players)){ print_error_and_quit('The player database could not be loaded'); }

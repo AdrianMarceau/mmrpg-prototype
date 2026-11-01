@@ -1,0 +1,2055 @@
+<?
+if (!isset($mmrpg_worlds)){ $mmrpg_worlds = []; }
+//---------------------------------//
+// PROTOTYPE WORLD 2k25 (2025-11-06)
+//---------------------------------//
+$this_world = 'prototype';
+$mmrpg_worlds[$this_world] = [];
+$mmrpg_worlds[$this_world]['areas'] = [];
+function mmrpg_prototype_world_areas($world, &$index){
+    //--------------------------//
+    $index['prototype-area-0'] = [
+        'name' => 'PROTOTYPE Area 0',
+        'position' => '12-7',
+        'level' => 1,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'encounters' => ['trill@north-exit'],
+        'encounters2' => ['dark-frag'],
+        'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
+        'items' => ['item-codes@south-exit'],
+        'tags' => ['start'],
+        'exits' => ['north', 'south']
+        ];
+    //--------------------------//
+    $index['light-area-1'] = [
+        'name' => 'LIGHT Area 1',
+        'position' => '12-8',
+        'level' => 5,
+        'element' => 'copy',
+        'field' => 'light-laboratory',
+        'objects' => ['player-platform'],
+        //'encounters' => ['dr-light', 'mega-man'],
+        'encounters' => [], //'sniper-joe@west-exit', 'sniper-joe@east-exit', 'sniper-joe@south-exit'
+        'encounters2' => ['met'],
+        'rescues' => [],
+        'items' => ['light-program!!', 'light-heart!!', 'light-core!!'],
+        'tags' => ['central', 'player', 'main', 'spawn'],
+        'exits' => ['north', 'east', 'south', 'west']
+        ];
+    $index['light-area-1e'] = [
+        'name' => 'LIGHT Area 1E',
+        'subname' => 'East',
+        'position' => '13-8',
+        'level' => 10,
+        'element' => 'copy',
+        'field' => 'gentle-countryside',
+        'encounters' => [],
+        'encounters2' => ['met', 'sniper-joe', 'killer-bullet'],
+        'items' => ['equip-codes@west-exit', 'mecha-whistle'],
+        'abilities' => ['light-buster'],
+        'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'west']
+        ];
+    $index['light-area-1s'] = [
+        'name' => 'LIGHT Area 1S',
+        'subname' => 'South',
+        'position' => '12-9',
+        'level' => 10,
+        'element' => 'copy',
+        'field' => 'gentle-countryside',
+        'encounters' => [],
+        'encounters2' => ['met', 'sniper-joe', 'picket-man'],
+        //'rescues' => ['roll'],
+        'items' => ['equip-codes@south-exit', 'mecha-whistle'],
+        'abilities' => ['light-buster'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
+        'tags' => ['central', 'player'],
+        'exits' => ['north', 'south']
+        ];
+    $index['light-area-1w'] = [
+        'name' => 'LIGHT Area 1W',
+        'subname' => 'West',
+        'position' => '11-8',
+        'level' => 10,
+        'element' => 'copy',
+        'field' => 'gentle-countryside',
+        'encounters' => [],
+        'encounters2' => ['met', 'sniper-joe', 'flea'],
+        'items' => ['equip-codes@east-exit', 'mecha-whistle'],
+        'abilities' => ['light-buster'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['wily-area-1'] = [
+        'name' => 'WILY Area 1',
+        'position' => '19-14',
+        'level' => 60,
+        'element' => 'copy',
+        'field' => 'wily-castle',
+        'objects' => ['player-platform'],
+        //'encounters' => ['dr-wily', 'bass'],
+        'encounters2' => ['met'],
+        'rescues' => ['heel-bot'],
+        'items' => ['wily-program!!', 'wily-heart!!', 'wily-core!!'],
+        'tags' => ['central', 'player', 'main', 'spawn'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['wily-area-1n'] = [
+        'name' => 'WILY Area 1N',
+        'subname' => 'North',
+        'position' => '19-13',
+        'level' => 80,
+        'element' => 'copy',
+        'field' => 'maniacal-hideaway',
+        'encounters' => [],
+        'encounters2' => ['met', 'skeleton-joe'],
+        'items' => ['ability-codes'],
+        'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['north', 'south']
+        ];
+    $index['wily-area-1w'] = [
+        'name' => 'WILY Area 1W',
+        'subname' => 'West',
+        'position' => '18-14',
+        'level' => 40,
+        'element' => 'copy',
+        'field' => 'maniacal-hideaway',
+        'encounters' => ['trill'],
+        'encounters2' => ['met', 'skeleton-joe'],
+        //'rescues' => ['disco'],
+        'abilities' => ['wily-buster'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'west']
+        ];
+    $index['wily-area-1w2'] = [
+        'name' => 'WILY Area 1W2',
+        'subname' => 'Far West',
+        'position' => '17-14',
+        'level' => 20,
+        'element' => 'copy',
+        'field' => 'maniacal-hideaway',
+        'encounters' => [],
+        'encounters2' => ['met', 'skeleton-joe'],
+        'items' => ['weapon-codes'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['cossack-area-1'] = [
+        'name' => 'COSSACK Area 1',
+        'position' => '5-14',
+        'level' => 60,
+        'element' => 'copy',
+        'field' => 'cossack-citadel',
+        'objects' => ['player-platform'],
+        //'encounters' => ['dr-cossack', 'proto-man'],
+        'encounters2' => ['met'],
+        'rescues' => ['heal-bot'],
+        'items' => ['cossack-program!!', 'cossack-heart!!', 'cossack-core!!'],
+        'tags' => ['central', 'player', 'main', 'spawn'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['cossack-area-1n'] = [
+        'name' => 'COSSACK Area 1N',
+        'subname' => 'North',
+        'position' => '5-13',
+        'level' => 80,
+        'element' => 'copy',
+        'field' => 'wintry-forefront',
+        'encounters' => [],
+        'encounters2' => ['met', 'crystal-joe'],
+        'items' => ['master-codes'],
+        'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['north', 'south']
+        ];
+    $index['cossack-area-1e'] = [
+        'name' => 'COSSACK Area 1E',
+        'subname' => 'East',
+        'position' => '6-14',
+        'level' => 40,
+        'element' => 'copy',
+        'field' => 'wintry-forefront',
+        'encounters' => ['trill'],
+        'encounters2' => ['met', 'crystal-joe'],
+        //'rescues' => ['rhythm'],
+        'abilities' => ['cossack-buster'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'energy-pellet'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'west']
+        ];
+    $index['cossack-area-1e2'] = [
+        'name' => 'COSSACK Area 1E2',
+        'subname' => 'Far East',
+        'position' => '7-14',
+        'level' => 20,
+        'element' => 'copy',
+        'field' => 'wintry-forefront',
+        'encounters' => [],
+        'encounters2' => ['met', 'crystal-joe'],
+        'items' => ['dress-codes'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['lalinde-area-1'] = [
+        'name' => 'LALINDE Area 1',
+        'position' => '12-18',
+        'level' => 100,
+        'element' => 'copy',
+        'field' => '',
+        'objects' => ['player-platform'],
+        'encounters' => ['trill@north-exit-portal', 'trill@east-exit-portal', 'trill@west-exit-portal'],
+        'items' => ['lalinde-program!!', 'empty-heart!!', 'empty-core!!', 'mecha-whistle'],
+        'tags' => ['central', 'player', 'main', 'spawn', 'intro'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['lalinde-area-1n'] = [
+        'name' => 'LALINDE Area 1N',
+        'subname' => 'North',
+        'position' => '12-17',
+        'level' => 90,
+        'element' => 'copy',
+        'field' => '',
+        'encounters' => ['trill@center'],
+        'encounters2' => ['bunby-heli', 'flutter-fly', 'petit-snakey', 'batton'],
+        'rescues' => ['beat@center-up'],
+        'items' => ['field-booster@north'],
+        'pickups' => ['small-screw', 'energy-pellet', 'weapon-pellet'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east', 'south', 'west']
+        ];
+    $index['lalinde-area-1e'] = [
+        'name' => 'LALINDE Area 1E',
+        'subname' => 'East',
+        'position' => '13-18',
+        'level' => 120,
+        'element' => 'copy',
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['petit-snakey', 'batton', 'petal-anne', 'air-stone'],
+        'abilities' => ['lalinde-buster'],
+        'pickups' => ['small-screw', 'energy-pellet', 'energy-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['west']
+        ];
+    $index['lalinde-area-1w'] = [
+        'name' => 'LALINDE Area 1W',
+        'subname' => 'West',
+        'position' => '11-18',
+        'level' => 120,
+        'element' => 'copy',
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['air-stone', 'rockscotch', 'drill-mole', 'colton'],
+        'items' => ['extra-life'],
+        'pickups' => ['small-screw', 'weapon-pellet', 'weapon-capsule'],
+        'tags' => ['central', 'player'],
+        'exits' => ['east']
+        ];
+    //--------------------------//
+    $index['storage-area-1'] = [
+        'name' => 'STORAGE Area 1',
+        'subname' => 'Entrance',
+        'position' => '23-7',
+        'level' => 120,
+        'field' => 'robot-museum',
+        'encounters' => ['doc-robot@north-exit'],
+        'encounters2' => ['sniper-joe', 'robo-transport', 'blocky', 'ben-k'],
+        'items' => ['extra-life'],
+        'tags' => ['outer', 'main'],
+        'exits' => ['north', 'west']
+        ];
+    $index['storage-area-2'] = [
+        'name' => 'STORAGE Area 2',
+        'subname' => 'Interior',
+        'position' => '23-6',
+        'level' => 140,
+        'field' => 'robot-museum',
+        'encounters' => ['trill@south-exit'],
+        'encounters2' => ['blocky', 'robo-transport', 'trio-the-wheel', 'power-muscler'],
+        'rescues' => ['treble@west'],
+        'items' => ['speed-booster@east', 'hyper-screw@north'],
+        'tags' => ['outer', 'main2', 'button'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['storage-area-1s'] = [
+        'name' => 'STORAGE Area 1S',
+        'subname' => 'Basement',
+        'position' => '23-9',
+        'level' => 160,
+        'field' => 'robot-museum',
+        'encounters' => ['weapon-archivist@west-exit'],
+        'encounters2' => ['weapon-archivist_explode', 'weapon-archivist_flame', 'weapon-archivist_wind', 'weapon-archivist_shadow', 'weapon-archivist_electric'],
+        'items' => ['defense-booster', 'hyper-screw'],
+        'tags' => ['outer'],
+        'exits' => ['west']
+        ];
+    //--------------------------//
+    $index['control-area-1'] = [
+        'name' => 'CONTROL Area 1',
+        'subname' => 'Entrance',
+        'position' => '1-7',
+        'level' => 120,
+        'field' => 'royal-palace',
+        'encounters' => ['king_alt@north-exit'],
+        'encounters2' => ['pyre-fly', 'flea', 'merserker', 'oni-robo'],
+        'items' => ['extra-life'],
+        'tags' => ['outer', 'main'],
+        'exits' => ['north', 'east']
+        ];
+    $index['control-area-2'] = [
+        'name' => 'CONTROL Area 2',
+        'subname' => 'Interior',
+        'position' => '1-6',
+        'level' => 140,
+        'field' => 'royal-palace',
+        'encounters' => ['trill@south-exit'],
+        'encounters2' => ['merserker', 'oni-robo', 'pandeeta', 'goriblue'],
+        'rescues' => ['tango@east'],
+        'items' => ['speed-diverter@west', 'hyper-screw@north'],
+        'tags' => ['outer', 'main2', 'button'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['control-area-1s'] = [
+        'name' => 'CONTROL Area 1S',
+        'subname' => 'Basement',
+        'position' => '1-9',
+        'level' => 160,
+        'field' => 'royal-palace',
+        'encounters' => ['weapon-archivist@east-exit'],
+        'encounters2' => ['weapon-archivist_cutter', 'weapon-archivist_freeze', 'weapon-archivist_nature', 'weapon-archivist_earth', 'weapon-archivist_water'],
+        'items' => ['defense-diverter', 'hyper-screw'],
+        'tags' => ['outer'],
+        'exits' => ['east']
+        ];
+    //--------------------------//
+    $index['security-area-1'] = [
+        'name' => 'SECURITY Area 1',
+        'subname' => '1st Floor',
+        'position' => '14-16',
+        'level' => 100,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['spine_alt', 'cannon-roader_alt', 'tatepakkan_alt2', 'crazy-cannon_alt2'],
+        'items' => ['yashichi'],
+        'tags' => ['outer', 'main'],
+        'exits' => ['east', 'west']
+        ];
+    $index['security-area-2'] = [
+        'name' => 'SECURITY Area 2',
+        'subname' => '2nd Floor',
+        'position' => '15-16',
+        'level' => 120,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['cannon-roader', 'tatepakkan_alt', 'kakinba-tank', 'dodonpa-cannon_alt2'],
+        'items' => ['attack-booster'],
+        'tags' => ['outer'],
+        'exits' => ['east', 'west']
+        ];
+    $index['security-area-3'] = [
+        'name' => 'SECURITY Area 3',
+        'subname' => '3rd Floor',
+        'position' => '16-16',
+        'level' => 140,
+        'field' => '',
+        'encounters' => ['trill@west-exit'],
+        'encounters2' => ['tatepakkan_alt2', 'dodonpa-cannon_alt', 'hammer-joe', 'vavaliant'],
+        'rescues' => ['heel-bot@east'],
+        'items' => ['hyper-screw@north'],
+        'tags' => ['outer', 'button'],
+        'exits' => ['west']
+        ];
+    //--------------------------//
+    $index['research-area-1'] = [
+        'name' => 'RESEARCH Area 1',
+        'subname' => '1st Floor',
+        'position' => '10-16',
+        'level' => 100,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['pointan', 'bulb-blaster', 'plasma-plus', 'flipping-suzy'],
+        'items' => ['yashichi'],
+        'tags' => ['outer', 'main'],
+        'exits' => ['east', 'west']
+        ];
+    $index['research-area-2'] = [
+        'name' => 'RESEARCH Area 2',
+        'subname' => '2nd Floor',
+        'position' => '9-16',
+        'level' => 120,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['plasma-plus', 'electriri', 'arc-weldy', 'coiln'],
+        'items' => ['attack-diverter'],
+        'tags' => ['outer'],
+        'exits' => ['east', 'west']
+        ];
+    $index['research-area-3'] = [
+        'name' => 'RESEARCH Area 3',
+        'subname' => '3rd Floor',
+        'position' => '8-16',
+        'level' => 140,
+        'field' => '',
+        'encounters' => ['trill@east-exit'],
+        'encounters2' => ['electriri', 'coiln', 'pitchan', 'tosanaizer-v'],
+        'rescues' => ['heal-bot@west'],
+        'items' => ['hyper-screw@north'],
+        'tags' => ['outer', 'button'],
+        'exits' => ['east']
+        ];
+    //--------------------------//
+    $index['hunter-area-1'] = [
+        'name' => 'HUNTER Area 1',
+        'subname' => '1st Floor',
+        'position' => '17-4',
+        'level' => 140,
+        'element' => 'shadow',
+        'field' => 'hunter-compound',
+        'encounters' => ['enker@north-exit'],
+        'encounters2' => ['mouslider', 'picket-man'],
+        'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
+        'tags' => ['upper', 'main', 'blocks'],
+        'exits' => ['north', 'west']
+        ];
+    $index['hunter-area-2'] = [
+        'name' => 'HUNTER Area 2',
+        'subname' => '2nd Floor',
+        'position' => '17-3',
+        'level' => 150,
+        'element' => 'shadow',
+        'field' => 'hunter-compound',
+        'encounters2' => ['mouslider', 'picket-man'],
+        'encounters' => ['punk@north-exit'],
+        'pickups' => ['attack-capsule', 'defense-capsule', 'speed-capsule'],
+        'tags' => ['upper', 'blocks'],
+        'exits' => ['north', 'south']
+        ];
+    $index['hunter-area-3'] = [
+        'name' => 'HUNTER Area 3',
+        'subname' => '3rd Floor',
+        'position' => '17-2',
+        'level' => 160,
+        'element' => 'shadow',
+        'field' => 'hunter-compound',
+        'encounters' => ['ballade@center'],
+        'encounters2' => ['mouslider', 'picket-man'],
+        'pickups' => ['super-pellet', 'super-capsule'],
+        'items' => ['hyper-screw@center-up'],
+        'tags' => ['upper', 'blocks'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['genesis-area-1'] = [
+        'name' => 'GENESIS Area 1',
+        'subname' => '1st Floor',
+        'position' => '7-4',
+        'level' => 140,
+        'element' => 'shadow',
+        'field' => 'genesis-tower',
+        'encounters' => ['buster-rod-g@north-exit'],
+        'encounters2' => ['beak', 'pooker', 'molier'],
+        'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
+        'tags' => ['upper', 'main', 'blocks'],
+        'exits' => ['north', 'east']
+        ];
+    $index['genesis-area-2'] = [
+        'name' => 'GENESIS Area 2',
+        'subname' => '2nd Floor',
+        'position' => '7-3',
+        'level' => 150,
+        'element' => 'shadow',
+        'field' => 'genesis-tower',
+        'encounters' => ['mega-water-s@north-exit'],
+        'encounters2' => ['molier', 'colton', 'shield-attacker-gtr'],
+        'pickups' => ['attack-capsule', 'defense-capsule', 'speed-capsule'],
+        'tags' => ['upper', 'blocks'],
+        'exits' => ['north', 'south']
+        ];
+    $index['genesis-area-3'] = [
+        'name' => 'GENESIS Area 3',
+        'subname' => '3rd Floor',
+        'position' => '7-2',
+        'level' => 160,
+        'element' => 'shadow',
+        'field' => 'genesis-tower',
+        'encounters' => ['hyper-storm-h@center'],
+        'encounters2' => ['beak', 'pooker', 'shield-attacker-gtr', 'propeller-eye'],
+        'pickups' => ['super-pellet', 'super-capsule'],
+        'items' => ['hyper-screw@center-up'],
+        'tags' => ['upper', 'blocks'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['hifi-area-1'] = [
+        'name' => 'HiFi Area 1',
+        'subname' => 'A-Side',
+        'position' => '20-4',
+        'level' => 100,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['heal-bot'],
+        'tags' => ['upper', 'path'],
+        'exits' => ['north', 'west']
+        ];
+    $index['hifi-area-2'] = [
+        'name' => 'HiFi Area 2',
+        'subname' => 'B-Side',
+        'position' => '20-3',
+        'level' => 100,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['heal-bot', 'heal-bot_alt4'],
+        'tags' => ['upper', 'path'],
+        'exits' => ['north', 'south']
+        ];
+    //--------------------------//
+    $index['stellar-area-1'] = [
+        'name' => 'STELLAR Area 1',
+        'subname' => 'Orbit',
+        'position' => '22-2',
+        'level' => 120,
+        'element' => 'space',
+        'field' => 'stardroid-base',
+        'encounters' => ['mercury', 'venus', 'neptune', 'jupiter'],
+        'encounters2' => ['malmet', 'covercannon', 'biribaree'],
+        'tags' => ['upper', 'special', 'main'],
+        'exits' => ['east', 'west']
+        ];
+    $index['stellar-area-2'] = [
+        'name' => 'STELLAR Area 2',
+        'subname' => 'Rotation',
+        'position' => '23-2',
+        'level' => 140,
+        'element' => 'space',
+        'field' => 'stardroid-base',
+        'encounters' => ['mars', 'saturn', 'uranus', 'pluto'],
+        'encounters2' => ['malmet', 'handoo', 'biribaree'],
+        'tags' => ['upper', 'special'],
+        'exits' => ['north', 'west']
+        ];
+    $index['stellar-area-3'] = [
+        'name' => 'STELLAR Area 3',
+        'subname' => 'Revolution',
+        'position' => '23-1',
+        'level' => 160,
+        'element' => 'space',
+        'field' => 'stardroid-base',
+        'encounters' => ['sunstar@center'],
+        'encounters2' => ['novamite', 'malmet'],
+        'items' => ['cosmo-circuit@center-up'],
+        'tags' => ['upper', 'special'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['lofi-area-1'] = [
+        'name' => 'LoFi Area 1',
+        'subname' => 'A-Side',
+        'position' => '4-4',
+        'level' => 100,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['heel-bot'],
+        'tags' => ['upper', 'path'],
+        'exits' => ['north', 'east']
+        ];
+    $index['lofi-area-2'] = [
+        'name' => 'LoFi Area 2',
+        'subname' => 'B-Side',
+        'position' => '4-3',
+        'level' => 100,
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['heel-bot', 'heel-bot_alt2'],
+        'tags' => ['upper', 'path'],
+        'exits' => ['north', 'south']
+        ];
+    //--------------------------//
+    $index['paradox-area-1'] = [
+        'name' => 'PARADOX Area 1',
+        'subname' => 'Lorem',
+        'position' => '2-2',
+        'level' => 120,
+        'element' => 'shadow',
+        'field' => 'prototype-complete',
+        'encounters' => ['piano'],
+        'tags' => ['upper', 'special', 'main'],
+        'exits' => ['east', 'west']
+        ];
+    $index['paradox-area-2'] = [
+        'name' => 'PARADOX Area 2',
+        'subname' => 'Ipsum',
+        'position' => '1-2',
+        'level' => 140,
+        'element' => 'shadow',
+        'field' => 'prototype-complete',
+        'encounters' => [],
+        'tags' => ['upper', 'special'],
+        'exits' => ['north', 'east']
+        ];
+    $index['paradox-area-3'] = [
+        'name' => 'PARADOX Area 3',
+        'subname' => 'Dolor',
+        'position' => '1-1',
+        'level' => 160,
+        'element' => 'shadow',
+        'field' => 'prototype-complete',
+        'encounters' => ['quint@center'],
+        'items' => ['gambit-module@center-up'],
+        'tags' => ['upper', 'special'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['explode-area-1'] = [
+        'name' => 'EXPLODE Area 1',
+        'position' => '15-8',
+        'level' => 30,
+        'element' => 'explode',
+        'field' => 'pipe-station',
+        'encounters' => ['crash-man'],
+        'encounters2' => ['killer-bullet', 'prop-top', 'spring-head', 'crazy-cannon'],
+        'items' => ['mecha-whistle'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['east', 'south', 'west']
+        ];
+    $index['explode-area-1e'] = [
+        'name' => 'EXPLODE Area 1E',
+        'position' => '16-8',
+        'level' => 40,
+        'element' => 'explode',
+        'field' => 'forgotten-themepark',
+        'encounters' => ['blast-man'],
+        'encounters2' => ['shimobey', 'killer-bullet', 'oni-robo', 'bikky-bomb'],
+        'items' => ['extra-life'],
+        'abilities' => ['explode-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['explode-area-1s'] = [
+        'name' => 'EXPLODE Area 1S',
+        'position' => '15-9',
+        'level' => 40,
+        'element' => 'explode',
+        'field' => 'trenchwork-depot',
+        'encounters' => ['napalm-man', 'grenade-man'],
+        'encounters2' => ['bombardier', 'molier', 'kakinba-tank'],
+        'items' => ['xtreme-module'],
+        'abilities' => ['explode-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north']
+        ];
+    $index['explode-area-1w'] = [
+        'name' => 'EXPLODE Area 1W',
+        'position' => '14-8',
+        'level' => 20,
+        'element' => 'explode',
+        'field' => 'orb-city',
+        'encounters' => ['bomb-man'],
+        'encounters2' => ['bombomb', 'killer-bullet', 'met'],
+        'items' => ['energy-tank'],
+        'abilities' => ['explode-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['impact-area-1'] = [
+        'name' => 'IMPACT Area 1',
+        'position' => '12-11',
+        'level' => 30,
+        'element' => 'impact',
+        'field' => 'rocky-plateau',
+        'encounters' => ['hard-man'],
+        'encounters2' => ['monking-r', 'hammer-joe', 'needle-ned'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'south', 'west']
+        ];
+    $index['impact-area-1n'] = [
+        'name' => 'IMPACT Area 1N',
+        'position' => '12-10',
+        'level' => 20,
+        'element' => 'impact',
+        'field' => 'mountain-mines',
+        'encounters' => ['guts-man'],
+        'encounters2' => ['picket-man', 'met', 'killer-bullet', 'bunby-heli'],
+        'items' => ['guard-module'],
+        'abilities' => ['impact-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['impact-area-1e'] = [
+        'name' => 'IMPACT Area 1E',
+        'position' => '13-11',
+        'level' => 40,
+        'element' => 'impact',
+        'field' => 'striker-stadium',
+        'encounters' => ['strike-man'],
+        'encounters2' => ['pitchan', 'monking-r', 'goriblue'],
+        'items' => ['weapon-upgrade'],
+        'abilities' => ['impact-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['west']
+        ];
+    $index['impact-area-1w'] = [
+        'name' => 'IMPACT Area 1W',
+        'position' => '11-11',
+        'level' => 40,
+        'element' => 'impact',
+        'field' => 'waterworks-dam',
+        'encounters' => ['concrete-man', 'impact-man'],
+        'encounters2' => ['bombomboy', 'picket-man'],
+        'items' => ['energy-upgrade'],
+        'abilities' => ['impact-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east']
+        ];
+    //--------------------------//
+    $index['cutter-area-1'] = [
+        'name' => 'CUTTER Area 1',
+        'position' => '9-8',
+        'level' => 30,
+        'element' => 'cutter',
+        'field' => 'industrial-facility',
+        'encounters' => ['metal-man'],
+        'encounters2' => ['pierrobot', 'arc-weldy', 'spring-head', 'drill-mole'],
+        'items' => ['mecha-whistle'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['east', 'south', 'west']
+        ];
+    $index['cutter-area-1e'] = [
+        'name' => 'CUTTER Area 1E',
+        'position' => '10-8',
+        'level' => 20,
+        'element' => 'cutter',
+        'field' => 'abandoned-warehouse',
+        'encounters' => ['cut-man', 'big-eye'],
+        'encounters2' => ['flea', 'adhering-suzy', 'beak', 'met', 'spine', 'killer-bullet'],
+        'items' => ['weapon-tank'],
+        'abilities' => ['cutter-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['cutter-area-1s'] = [
+        'name' => 'CUTTER Area 1S',
+        'position' => '9-9',
+        'level' => 40,
+        'element' => 'cutter',
+        'field' => 'medieval-castle',
+        'encounters' => ['blade-man', 'yamato-man', 'knight-man'],
+        'encounters2' => ['merserker', 'molier', 'kabuton', 'ben-k', 'shield-attacker-gtr'],
+        'items' => ['repair-module'],
+        'abilities' => ['cutter-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north']
+        ];
+    $index['cutter-area-1w'] = [
+        'name' => 'CUTTER Area 1W',
+        'position' => '8-8',
+        'level' => 40,
+        'element' => 'cutter',
+        'field' => 'construction-site',
+        'encounters' => ['needle-man'],
+        'encounters2' => ['needle-ned', 'hammer-joe', 'elec-n'],
+        'items' => ['extra-life'],
+        'abilities' => ['cutter-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['flame-area-1'] = [
+        'name' => 'FLAME Area 1',
+        'position' => '18-8',
+        'level' => 60,
+        'element' => 'flame',
+        'field' => 'atomic-furnace',
+        'encounters' => ['heat-man'],
+        'encounters2' => ['telly', 'popo-heli', 'nitron-r'],
+        'hazards' => ['flame-pillar'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'south', 'west']
+        ];
+    $index['flame-area-1e'] = [
+        'name' => 'FLAME Area 1E',
+        'position' => '19-8',
+        'level' => 70,
+        'element' => 'flame',
+        'field' => 'egyptian-excavation',
+        'encounters' => ['pharaoh-man', 'sword-man'],
+        'encounters2' => ['pyre-fly', 'mummira', 'shield-attacker'],
+        'hazards' => ['flame-pillar'],
+        'items' => ['forge-circuit'],
+        'abilities' => ['flame-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['flame-area-1s'] = [
+        'name' => 'FLAME Area 1S',
+        'position' => '18-9',
+        'level' => 70,
+        'element' => 'flame',
+        'field' => 'solar-inferno',
+        'encounters' => ['solar-man'],
+        'encounters2' => ['sola-rei', 'petal-anne_alt2', 'shield-attacker-trl', 'cline_alt'],
+        'hazards' => ['flame-pillar'],
+        'items' => ['mecha-whistle'],
+        'abilities' => ['flame-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['flame-area-1w'] = [
+        'name' => 'FLAME Area 1W',
+        'position' => '17-8',
+        'level' => 50,
+        'element' => 'flame',
+        'field' => 'steel-mill',
+        'encounters' => ['fire-man', 'torch-man'],
+        'encounters2' => ['tackle-fire', 'bombomb', 'telly', 'arc-weldy'],
+        'hazards' => ['flame-pillar'],
+        'items' => ['uptick-module'],
+        'abilities' => ['flame-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['swift-area-1'] = [
+        'name' => 'SWIFT Area 1',
+        'position' => '12-13',
+        'level' => 50,
+        'element' => 'swift',
+        'field' => 'spinning-greenhouse',
+        'encounters' => ['top-man', 'spring-man'],
+        'encounters2' => ['spin-fiend', 'peterchy'],
+        'items' => ['persist-module'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'south', 'west']
+        ];
+    $index['swift-area-1n'] = [
+        'name' => 'SWIFT Area 1N',
+        'position' => '12-12',
+        'level' => 40,
+        'element' => 'swift',
+        'field' => 'underground-laboratory',
+        'encounters' => ['quick-man'],
+        'encounters2' => ['spring-head', 'tackle-fire'],
+        'items' => ['mecha-whistle'],
+        'abilities' => ['swift-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['swift-area-1e'] = [
+        'name' => 'SWIFT Area 1E',
+        'position' => '13-13',
+        'level' => 60,
+        'element' => 'swift',
+        'field' => 'balloon-playground',
+        'encounters' => ['bounce-man'],
+        'encounters2' => ['tosanaizer-v', 'ballonboo', 'pukapunter', 'coiln'],
+        'items' => ['weapon-tank'],
+        'abilities' => ['swift-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['swift-area-1w'] = [
+        'name' => 'SWIFT Area 1W',
+        'position' => '11-13',
+        'level' => 60,
+        'element' => 'swift',
+        'field' => 'sonic-highway',
+        'encounters' => ['turbo-man', 'nitro-man'],
+        'encounters2' => ['robo-transport', 'cannon-roader', 'trio-the-wheel'],
+        'items' => ['energy-tank'],
+        'abilities' => ['swift-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['freeze-area-1'] = [
+        'name' => 'FREEZE Area 1',
+        'position' => '6-8',
+        'level' => 60,
+        'element' => 'freeze',
+        'field' => 'frozen-boulevard',
+        'encounters' => ['tundra-man'],
+        'encounters2' => ['nitron-b', 'curlinger', 'bomb-sleigh', 'peng'],
+        'hazards' => ['frozen-foothold'],
+        'items' => ['bulwark-module'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'south', 'west']
+        ];
+    $index['freeze-area-1e'] = [
+        'name' => 'FREEZE Area 1E',
+        'position' => '7-8',
+        'level' => 50,
+        'element' => 'freeze',
+        'field' => 'arctic-jungle',
+        'encounters' => ['ice-man', 'blizzard-man', 'big-eye'],
+        'encounters2' => ['peng', 'foot-holder', 'adhering-suzy', 'nitron-b'],
+        'hazards' => ['frozen-foothold'],
+        'items' => ['charge-module'],
+        'abilities' => ['freeze-shot'],
+        'tags' => ['central', 'elemental', 'water'],
+        'exits' => ['east', 'west']
+        ];
+    $index['freeze-area-1s'] = [
+        'name' => 'FREEZE Area 1S',
+        'position' => '6-9',
+        'level' => 70,
+        'element' => 'freeze',
+        'field' => 'frosty-slopes',
+        'encounters' => ['cold-man', 'frost-man'],
+        'encounters2' => ['penpen-ev', 'frosty-throwman', 'nitron-b', 'peng'],
+        'hazards' => ['frozen-foothold'],
+        'items' => ['mecha-whistle'],
+        'abilities' => ['freeze-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['freeze-area-1w'] = [
+        'name' => 'FREEZE Area 1W',
+        'position' => '5-8',
+        'level' => 70,
+        'element' => 'freeze',
+        'field' => 'glacier-cradle',
+        'encounters' => ['chill-man', 'freeze-man'],
+        'encounters2' => ['frosty-throwman', 'tel-tel', 'mokumokumo', 'skullmet'],
+        'hazards' => ['frozen-foothold'],
+        'items' => ['resetchi'],
+        'abilities' => ['freeze-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['wind-area-1'] = [
+        'name' => 'WIND Area 1',
+        'position' => '18-6',
+        'level' => 80,
+        'element' => 'wind',
+        'field' => 'thunder-tornado',
+        'encounters' => ['tornado-man', 'cloud-man'],
+        'encounters2' => ['ballonboo', 'skater-boy', 'parabeak', 'tel-tel'],
+        'hazards' => ['woolly-clouds'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['east', 'south', 'west']
+        ];
+    $index['wind-area-1e'] = [
+        'name' => 'WIND Area 1E',
+        'position' => '19-6',
+        'level' => 90,
+        'element' => 'wind',
+        'field' => 'ancient-temple',
+        'encounters' => ['wind-man', 'gyro-man'],
+        'encounters2' => ['pandeeta', 'krushdiver', 'bombardier', 'pukapunter'],
+        'rescues' => ['quake-woman'],
+        'items' => ['transport-module'],
+        'abilities' => ['wind-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'west']
+        ];
+    $index['wind-area-1s'] = [
+        'name' => 'WIND Area 1S',
+        'position' => '18-7',
+        'level' => 70,
+        'element' => 'wind',
+        'field' => 'sky-ridge',
+        'encounters' => ['air-man'],
+        'encounters2' => ['fan-fiend', 'foot-holder', 'parabeak'],
+        'items' => ['resetchi'],
+        'abilities' => ['wind-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['wind-area-1w'] = [
+        'name' => 'WIND Area 1W',
+        'position' => '17-6',
+        'level' => 90,
+        'element' => 'wind',
+        'field' => 'rusty-scrapheap',
+        'encounters' => ['dust-man', 'junk-man'],
+        'encounters2' => ['lady-blader', 'upndown', 'gockroach-s'],
+        'items' => ['salvage-module'],
+        'abilities' => ['wind-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east']
+        ];
+    //--------------------------//
+    $index['shadow-area-1'] = [
+        'name' => 'SHADOW Area 1',
+        'position' => '21-8',
+        'level' => 90,
+        'element' => 'shadow',
+        'field' => 'robosaur-boneyard',
+        'encounters' => ['skull-man'],
+        'encounters2' => ['skullmet', 'skeleton-joe'],
+        'items' => ['overkill-module'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['west', 'north', 'south']
+        ];
+    $index['shadow-area-1n'] = [
+        'name' => 'SHADOW Area 1N',
+        'position' => '21-7',
+        'level' => 100,
+        'element' => 'shadow',
+        'field' => 'haunted-mansion',
+        'encounters' => ['shade-man'],
+        'encounters2' => ['astro-zombieg', 'batton', 'anti-eddie'],
+        'items' => ['siphon-module'],
+        'abilities' => ['shadow-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'south']
+        ];
+    $index['shadow-area-1s'] = [
+        'name' => 'SHADOW Area 1S',
+        'position' => '21-9',
+        'level' => 100,
+        'element' => 'shadow',
+        'field' => 'twilight-carnival',
+        'encounters' => ['magic-man', 'clown-man'],
+        'encounters2' => ['romper', 'pierrobot', 'shimobey'],
+        'items' => ['weapon-tank'],
+        'abilities' => ['shadow-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'north']
+        ];
+    $index['shadow-area-1w'] = [
+        'name' => 'SHADOW Area 1W',
+        'position' => '20-8',
+        'level' => 80,
+        'element' => 'shadow',
+        'field' => 'septic-system',
+        'encounters' => ['shadow-man'],
+        'encounters2' => ['ribbitron', 'hammer-joe', 'spin-fiend'],
+        'hazards' => ['toxic-sludge'],
+        'items' => ['super-capsule'],
+        'abilities' => ['shadow-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['electric-area-1'] = [
+        'name' => 'ELECTRIC Area 1',
+        'position' => '18-11',
+        'level' => 90,
+        'element' => 'electric',
+        'field' => 'power-plant',
+        'encounters' => ['spark-man', 'plug-man', 'giant-spring-head'],
+        'encounters2' => ['elec-n', 'nitron-y', 'hammer-joe', 'peterchy'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['electric-area-1n'] = [
+        'name' => 'ELECTRIC Area 1N',
+        'position' => '18-10',
+        'level' => 80,
+        'element' => 'electric',
+        'field' => 'electrical-tower',
+        'encounters' => ['elec-man', 'big-eye'],
+        'encounters2' => ['spine', 'flea', 'beak', 'adhering-suzy'],
+        'hazards' => ['woolly-clouds'],
+        'items' => ['copycat-module'],
+        'abilities' => ['electric-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['electric-area-1e'] = [
+        'name' => 'ELECTRIC Area 1E',
+        'position' => '19-11',
+        'level' => 100,
+        'element' => 'electric',
+        'field' => 'voltage-regulator',
+        'encounters' => ['dynamo-man', 'fuse-man'],
+        'encounters2' => ['electriri', 'plasma-plus', 'elec-n'],
+        'hazards' => ['woolly-clouds'],
+        'items' => ['resetchi'],
+        'abilities' => ['electric-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['south', 'west']
+        ];
+    $index['electric-area-1w'] = [
+        'name' => 'ELECTRIC Area 1W',
+        'position' => '17-11',
+        'level' => 100,
+        'element' => 'electric',
+        'field' => 'virtual-dreamscape',
+        'encounters' => ['gravity-man', 'sheep-man'],
+        'encounters2' => ['pointan', 'flipping-suzy', 'pukapunter'],
+        'hazards' => ['gravity-well', 'woolly-clouds'],
+        'items' => ['battery-circuit'],
+        'abilities' => ['electric-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east']
+        ];
+    //--------------------------//
+    $index['crystal-area-1'] = [
+        'name' => 'CRYSTAL Area 1',
+        'position' => '15-13',
+        'level' => 80,
+        'element' => 'crystal',
+        'field' => 'sparkling-grotto',
+        'encounters' => ['trill'],
+        'encounters2' => [
+            'diaymon', 'diaymon_alt', 'diaymon_alt2',
+            'diaymon_alt3', 'diaymon_alt4', 'diaymon_alt5',
+            'diaymon_alt6', 'diaymon_alt7', 'diaymon_alt8'
+            ],
+        'rescues' => ['meddy'],
+        'items' => ['super-capsule'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'south', 'west']
+        ];
+    $index['crystal-area-1n'] = [
+        'name' => 'CRYSTAL Area 1N',
+        'position' => '15-12',
+        'level' => 90,
+        'element' => 'crystal',
+        'field' => 'gemstone-cavern',
+        'encounters' => ['jewel-man'],
+        'encounters2' => ['diaymon', 'spike-pusher', 'crystal-joe'],
+        'items' => ['distill-module'],
+        'abilities' => ['crystal-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['south']
+        ];
+    $index['crystal-area-1s'] = [
+        'name' => 'CRYSTAL Area 1S',
+        'position' => '15-14',
+        'level' => 90,
+        'element' => 'crystal',
+        'field' => 'reflection-chamber',
+        'encounters' => ['gemini-man'],
+        'encounters2' => ['nitron-r', 'nitron-b', 'nitron-y', 'ribbitron'],
+        'items' => ['mecha-whistle'],
+        'abilities' => ['crystal-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'east']
+        ];
+    $index['crystal-area-1w'] = [
+        'name' => 'CRYSTAL Area 1W',
+        'position' => '14-13',
+        'level' => 70,
+        'element' => 'crystal',
+        'field' => 'crystal-catacombs',
+        'encounters' => ['crystal-man'],
+        'encounters2' => ['crystal-joe', 'tatepakkan', 'diaymon'],
+        'items' => ['hyperscan-module'],
+        'abilities' => ['crystal-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    //--------------------------//
+    $index['time-area-1'] = [
+        'name' => 'TIME Area 1',
+        'position' => '12-15',
+        'level' => 80,
+        'element' => 'time',
+        'field' => 'photon-collider',
+        'encounters' => ['flash-man'],
+        'encounters2' => ['crazy-cannon', 'blocky'],
+        'items' => ['chrono-circuit'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['time-area-1n'] = [
+        'name' => 'TIME Area 1N',
+        'position' => '12-14',
+        'level' => 70,
+        'element' => 'time',
+        'field' => 'clock-citadel',
+        'encounters' => ['time-man'],
+        'encounters2' => ['flutter-fly', 'fooley'],
+        'items' => ['extra-life'],
+        'abilities' => ['time-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['time-area-1e'] = [
+        'name' => 'TIME Area 1E',
+        'position' => '13-15',
+        'level' => 90,
+        'element' => 'time',
+        'field' => 'sunken-metropolis',
+        'encounters' => ['centaur-man'],
+        'encounters2' => ['pelicanu', 'pooker', 'kabuton'],
+        'items' => ['hourglass-module'],
+        'abilities' => ['time-buster'],
+        'tags' => ['central', 'elemental', 'water'],
+        'exits' => ['south', 'west']
+        ];
+    $index['time-area-1w'] = [
+        'name' => 'TIME Area 1W',
+        'position' => '11-15',
+        'level' => 90,
+        'element' => 'time',
+        'field' => 'lighting-control',
+        'encounters' => ['bright-man', 'gachappon'],
+        'encounters2' => ['bulb-blaster', 'electriri'],
+        'items' => ['resetchi'],
+        'abilities' => ['time-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'south']
+        ];
+    //--------------------------//
+    $index['missile-area-1'] = [
+        'name' => 'MISSILE Area 1',
+        'position' => '9-13',
+        'level' => 80,
+        'element' => 'missile',
+        'field' => 'military-hideout',
+        'encounters' => ['search-man'],
+        'encounters2' => ['goriblue', 'ribbitron_alt2', 'eggalodon'],
+        'items' => ['super-capsule'],
+        'hazards' => ['bramble-patch'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'south']
+        ];
+    $index['missile-area-1n'] = [
+        'name' => 'MISSILE Area 1N',
+        'position' => '9-12',
+        'level' => 90,
+        'element' => 'missile',
+        'field' => 'submerged-armory',
+        'encounters' => ['dive-man'],
+        'encounters2' => ['manta-missile', 'covercannon', 'robo-fishtot_alt'],
+        'items' => ['mecha-whistle'],
+        'abilities' => ['missile-shot'],
+        'tags' => ['central', 'elemental', 'water'],
+        'exits' => ['south']
+        ];
+    $index['missile-area-1e'] = [
+        'name' => 'MISSILE Area 1E',
+        'position' => '10-13',
+        'level' => 70,
+        'element' => 'missile',
+        'field' => 'magnetic-generator',
+        'encounters' => ['magnet-man'],
+        'encounters2' => ['mag-fly', 'elec-n', 'peterchy'],
+        'items' => ['magnet-module'],
+        'abilities' => ['missile-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['missile-area-1s'] = [
+        'name' => 'MISSILE Area 1S',
+        'position' => '9-14',
+        'level' => 90,
+        'element' => 'missile',
+        'field' => 'minefield-dunes',
+        'encounters' => ['commando-man'],
+        'encounters2' => ['antlin-g', 'bombardier', 'dodonpa-cannon'],
+        'items' => ['target-module'],
+        'abilities' => ['missile-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'west']
+        ];
+    //--------------------------//
+    $index['nature-area-1'] = [
+        'name' => 'NATURE Area 1',
+        'position' => '6-6',
+        'level' => 80,
+        'element' => 'nature',
+        'field' => 'serpent-column',
+        'encounters' => ['snake-man'],
+        'encounters2' => ['petit-snakey', 'ribbitron'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['east', 'south', 'west']
+        ];
+    $index['nature-area-1e'] = [
+        'name' => 'NATURE Area 1E',
+        'position' => '7-6',
+        'level' => 90,
+        'element' => 'nature',
+        'field' => 'savage-menagerie',
+        'encounters' => ['slash-man', 'tengu-man'],
+        'encounters2' => ['eggalodon', 'cline', 'shururun', 'bombomboy'],
+        'hazards' => ['bramble-patch'],
+        'items' => ['sapling-circuit'],
+        'abilities' => ['nature-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['west']
+        ];
+    $index['nature-area-1s'] = [
+        'name' => 'NATURE Area 1S',
+        'position' => '6-7',
+        'level' => 70,
+        'element' => 'nature',
+        'field' => 'preserved-forest',
+        'encounters' => ['wood-man', 'burner-man'],
+        'encounters2' => ['batton', 'kabuton', 'tank-oven', 'blocky'],
+        'hazards' => ['bramble-patch'],
+        'items' => ['resetchi'],
+        'abilities' => ['nature-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    $index['nature-area-1w'] = [
+        'name' => 'NATURE Area 1W',
+        'position' => '5-6',
+        'level' => 90,
+        'element' => 'nature',
+        'field' => 'verdant-rainforest',
+        'encounters' => ['plant-man', 'hornet-man'],
+        'encounters2' => ['petal-anne', 'kabuton', 'propeller-eye'],
+        'hazards' => ['bramble-patch'],
+        'rescues' => ['vesper-woman'],
+        'items' => ['growth-module'],
+        'abilities' => ['nature-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'east']
+        ];
+    //--------------------------//
+    $index['water-area-1'] = [
+        'name' => 'WATER Area 1',
+        'position' => '6-11',
+        'level' => 90,
+        'element' => 'water',
+        'field' => 'rainy-sewers',
+        'encounters' => ['toad-man', 'pump-man'],
+        'encounters2' => ['robo-fishtot', 'piper-n', 'lady-blader', 'upndown'],
+        'hazards' => ['foamy-bubbles'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['water-area-1n'] = [
+        'name' => 'WATER Area 1N',
+        'position' => '6-10',
+        'level' => 80,
+        'element' => 'water',
+        'field' => 'waterfall-institute',
+        'encounters' => ['bubble-man'],
+        'encounters2' => ['snapper', 'octone', 'robo-fishtot'],
+        'hazards' => ['foamy-bubbles'],
+        'items' => ['spreader-module'],
+        'abilities' => ['water-shot'],
+        'tags' => ['central', 'elemental', 'water'],
+        'exits' => ['north', 'south']
+        ];
+    $index['water-area-1e'] = [
+        'name' => 'WATER Area 1E',
+        'position' => '7-11',
+        'level' => 100,
+        'element' => 'water',
+        'field' => 'chemical-zone',
+        'encounters' => ['burst-man', 'aqua-man', 'acid-man'],
+        'encounters2' => ['pipetto', 'shelln', 'bombomb'],
+        'hazards' => ['foamy-bubbles'],
+        'items' => ['alchemy-module'],
+        'abilities' => ['water-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['west']
+        ];
+    $index['water-area-1w'] = [
+        'name' => 'WATER Area 1W',
+        'position' => '5-11',
+        'level' => 100,
+        'element' => 'water',
+        'field' => 'deep-ocean',
+        'encounters' => ['splash-woman', 'wave-man', 'pirate-man'],
+        'encounters2' => ['octone', 'bui-boi', 'ballonboo'],
+        'hazards' => ['foamy-bubbles', 'toxic-sludge'],
+        'items' => ['sponge-circuit'],
+        'abilities' => ['water-overdrive'],
+        'tags' => ['central', 'elemental', 'water'],
+        'exits' => ['east', 'south']
+        ];
+    //--------------------------//
+    $index['earth-area-1'] = [
+        'name' => 'EARTH Area 1',
+        'position' => '3-8',
+        'level' => 90,
+        'element' => 'earth',
+        'field' => 'secluded-summit',
+        'encounters' => ['block-man', 'stone-man'],
+        'encounters2' => ['rockscotch', 'air-stone', 'beetle-borg'],
+        'tags' => ['central', 'elemental', 'main'],
+        'exits' => ['north', 'east', 'south']
+        ];
+    $index['earth-area-1n'] = [
+        'name' => 'EARTH Area 1N',
+        'position' => '3-7',
+        'level' => 100,
+        'element' => 'earth',
+        'field' => 'mineral-quarry',
+        'encounters' => ['drill-man', 'ground-man'],
+        'encounters2' => ['drill-mole', 'molier'],
+        'hazards' => ['crude-oil'],
+        'items' => ['fortune-module'],
+        'abilities' => ['earth-shot'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['south', 'west']
+        ];
+    $index['earth-area-1e'] = [
+        'name' => 'EARTH Area 1E',
+        'position' => '4-8',
+        'level' => 80,
+        'element' => 'earth',
+        'field' => 'oil-wells',
+        'encounters' => ['oil-man', 'flame-man'],
+        'encounters2' => ['beetle-borg', 'gockroach-s', 'antlin-g', 'pooker'],
+        'hazards' => ['crude-oil', 'flame-pillar'],
+        'items' => ['super-capsule'],
+        'abilities' => ['earth-buster'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['earth-area-1s'] = [
+        'name' => 'EARTH Area 1S',
+        'position' => '3-9',
+        'level' => 100,
+        'element' => 'earth',
+        'field' => 'sunset-gulch',
+        'encounters' => ['tomohawk-man', 'charge-man', 'magma-man'],
+        'encounters2' => ['colton', 'merserker', 'power-muscler'],
+        'hazards' => ['shifting-sands', 'flame-pillar'],
+        'items' => ['energy-tank'],
+        'abilities' => ['earth-overdrive'],
+        'tags' => ['central', 'elemental'],
+        'exits' => ['north', 'west']
+        ];
+    //--------------------------//
+    $index['space-area-1'] = [
+        'name' => 'SPACE Area 1',
+        'position' => '12-5',
+        'level' => 100,
+        'element' => 'space',
+        'field' => 'space-simulator',
+        'encounters' => ['ring-man', 'trill'],
+        'encounters2' => ['ring-ring', 'pukapunter', 'adamski'],
+        'rescues' => ['rush'],
+        'items' => ['reverse-module'],
+        'abilities' => ['space-shot'],
+        'tags' => ['upper', 'elemental', 'main'],
+        'exits' => ['north', 'south']
+        ];
+    //--------------------------//
+    $index['space-area-1e'] = [
+        'name' => 'SPACE Area 1E',
+        'subname' => 'Zone 1',
+        'position' => '13-4',
+        'level' => 110,
+        'element' => 'space',
+        'field' => 'satellite-deck',
+        'encounters' => ['star-man@west'],
+        'encounters2' => ['novamite', 'shururun', 'malmet', 'pukapunter'],
+        'abilities' => ['space-buster@east'],
+        'barriers' => ['red-vert@center'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['space-area-1e2'] = [
+        'name' => 'SPACE Area 1E2',
+        'subname' => 'Zone 2',
+        'position' => '14-4',
+        'level' => 120,
+        'element' => 'space',
+        'field' => 'satellite-deck',
+        'encounters' => ['astro-man@east-exit', 'gachappon@west'],
+        'encounters2' => ['novamite', 'shururun', 'flipping-suzy', 'pukapunter'],
+        'barriers' => ['purple-vert@center'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['space-area-1e3'] = [
+        'name' => 'SPACE Area 1E3',
+        'subname' => 'Zone 3',
+        'position' => '15-4',
+        'level' => 130,
+        'element' => 'space',
+        'field' => 'satellite-deck',
+        'encounters2' => ['novamite', 'shururun', 'malmet', 'flipping-suzy', 'trille-bot'],
+        'encounters' => ['terra@north-exit'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    //--------------------------//
+    $index['space-area-1w'] = [
+        'name' => 'SPACE Area 1W',
+        'subname' => 'Zone 1',
+        'position' => '11-4',
+        'level' => 110,
+        'element' => 'space',
+        'field' => 'galaxy-fantasy',
+        'encounters' => ['galaxy-man@east'],
+        'encounters2' => ['novamite', 'ring-ring', 'adamski', 'tamp'],
+        'abilities' => ['space-buster@west'],
+        'barriers' => ['purple-vert@center'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['space-area-1w2'] = [
+        'name' => 'SPACE Area 1W2',
+        'subname' => 'Zone 2',
+        'position' => '10-4',
+        'level' => 120,
+        'element' => 'space',
+        'field' => 'galaxy-fantasy',
+        'encounters' => ['astro-man@west-exit', 'gachappon@east'],
+        'encounters2' => ['novamite', 'ring-ring', 'malmet', 'tamp'],
+        'barriers' => ['red-vert@center'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['space-area-1w3'] = [
+        'name' => 'SPACE Area 1W3',
+        'subname' => 'Zone 3',
+        'position' => '9-4',
+        'level' => 130,
+        'element' => 'space',
+        'field' => 'galaxy-fantasy',
+        'encounters' => ['ra-thor@north-exit'],
+        'encounters2' => ['novamite', 'ring-ring', 'adamski', 'malmet', 'trille-bot'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    //--------------------------//
+    $index['space-area-2'] = [
+        'name' => 'SPACE Area 2',
+        'position' => '12-2',
+        'level' => 200,
+        'element' => 'space',
+        'field' => 'final-destination-3',
+        'encounters' => ['slur@north-exit', 'trill@north'],
+        'encounters2' => ['trill', 'trille-bot'],
+        'pickups' => ['energy-capsule', 'weapon-capsule', 'attack-capsule', 'defense-capsule', 'speed-capsule'],
+        'tags' => ['upper', 'elemental', 'main', 'final'],
+        'exits' => ['north', 'east', 'west']
+        ];
+    $index['space-area-2n'] = [
+        'name' => 'SPACE Area 2N',
+        'subname' => 'Backdoor',
+        'position' => '12-1',
+        'level' => 999,
+        'element' => 'space',
+        'field' => 'final-destination-3',
+        'encounters' => ['proxy'],
+        'items' => ['empty-core'],
+        'abilities' => ['space-overdrive'],
+        'tags' => ['upper', 'elemental', 'postgame'],
+        'exits' => ['south']
+        ];
+    //--------------------------//
+    $index['space-area-2e'] = [
+        'name' => 'SPACE Area 2E',
+        'position' => '14-2',
+        'level' => 150,
+        'element' => 'space',
+        'field' => 'final-destination-2',
+        'encounters' => ['dark-man-4@west-exit'],
+        'encounters2' => ['trille-bot', 'shimobey', 'romper', 'shururun'],
+        'barriers' => ['green-vert@west'],
+        'abilities' => ['experience-booster'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['space-area-2e2'] = [
+        'name' => 'SPACE Area 2E2',
+        'position' => '15-2',
+        'level' => 140,
+        'element' => 'space',
+        'field' => 'final-destination',
+        'encounters' => ['dark-man@south-exit', 'dark-man-2@center', 'dark-man-3@west-exit'],
+        'encounters2' => ['trille-bot', 'shimobey', 'romper', 'shururun'],
+        'abilities' => ['recovery-booster', 'recovery-breaker'],
+        'barriers' => ['blue-vert@west'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['south', 'west']
+        ];
+    //--------------------------//
+    $index['space-area-2w'] = [
+        'name' => 'SPACE Area 2W',
+        'position' => '10-2',
+        'level' => 150,
+        'element' => 'space',
+        'field' => 'final-destination-2',
+        'encounters' => ['quake-woman-ds@east-exit'],
+        'encounters2' => ['trille-bot', 'mummira', 'astro-zombieg', 'ring-ring'],
+        'barriers' => ['blue-vert@east'],
+        'abilities' => ['experience-booster'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'west']
+        ];
+    $index['space-area-2w2'] = [
+        'name' => 'SPACE Area 2W2',
+        'position' => '9-2',
+        'level' => 140,
+        'element' => 'space',
+        'field' => 'final-destination',
+        'encounters' => ['mega-man-ds@south-exit', 'bass-ds@center', 'proto-man-ds@east-exit'],
+        'encounters2' => ['trille-bot', 'mummira', 'astro-zombieg', 'ring-ring'],
+        'barriers' => ['green-vert@east'],
+        'abilities' => ['damage-booster', 'damage-breaker'],
+        'tags' => ['upper', 'elemental'],
+        'exits' => ['east', 'south']
+        ];
+    //--------------------------//
+    $index['laser-area-1'] = [
+        'name' => 'LASER Area 1',
+        'position' => '21-16',
+        'level' => 300,
+        'element' => 'laser',
+        'field' => '',
+        'encounters' => ['laser-man'],
+        'encounters2' => ['sola-rei', 'beak', 'propeller-eye', 'malmet'],
+        'items' => ['hyper-screw'],
+        'abilities' => ['laser-overdrive'],
+        'tags' => ['outer', 'special', 'elemental', 'main'],
+        'exits' => ['east']
+        ];
+    $index['laser-area-1e'] = [
+        'name' => 'LASER Area 1E',
+        'position' => '22-16',
+        'level' => 250,
+        'element' => 'laser',
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['sola-rei', 'beak'],
+        'abilities' => ['laser-buster'],
+        'tags' => ['outer', 'special', 'elemental'],
+        'exits' => ['north', 'west']
+        ];
+    $index['laser-area-1ne'] = [
+        'name' => 'LASER Area 1NE',
+        'position' => '22-15',
+        'level' => 200,
+        'element' => 'laser',
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['beak'],
+        'items' => ['extra-life'],
+        'abilities' => ['laser-shot'],
+        'tags' => ['outer', 'special', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    //--------------------------//
+    $index['shield-area-1'] = [
+        'name' => 'SHIELD Area 1',
+        'position' => '3-16',
+        'level' => 300,
+        'element' => 'shield',
+        'field' => '',
+        'encounters' => ['shield-man'],
+        'encounters2' => ['vavaliant', 'shield-attacker', 'shield-attacker-gtr', 'shield-attacker-trl'],
+        'items' => ['hyper-screw'],
+        'abilities' => ['shield-overdrive'],
+        'tags' => ['outer', 'special', 'elemental', 'main'],
+        'exits' => ['west']
+        ];
+    $index['shield-area-1w'] = [
+        'name' => 'SHIELD Area 1W',
+        'position' => '2-16',
+        'level' => 250,
+        'element' => 'shield',
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['shield-attacker', 'shield-attacker-gtr'],
+        'abilities' => ['shield-buster'],
+        'tags' => ['outer', 'special', 'elemental'],
+        'exits' => ['north', 'east']
+        ];
+    $index['shield-area-1nw'] = [
+        'name' => 'SHIELD Area 1NW',
+        'position' => '2-15',
+        'level' => 200,
+        'element' => 'shield',
+        'field' => '',
+        'encounters' => [],
+        'encounters2' => ['shield-attacker'],
+        'items' => ['extra-life'],
+        'abilities' => ['shield-shot'],
+        'tags' => ['outer', 'special', 'elemental'],
+        'exits' => ['north', 'south']
+        ];
+    //--------------------------//
+    $index['star-gate-10'] = [
+        'name' => 'STAR Gate 10',
+        'position' => '12-6',
+        'level' => 10,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-20n'] = [
+        'name' => 'STAR Gate 20N',
+        'position' => '12-4',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'south', 'west']
+        ];
+    $index['star-gate-20e'] = [
+        'name' => 'STAR Gate 20E',
+        'position' => '22-7',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-20se'] = [
+        'name' => 'STAR Gate 20SE',
+        'position' => '19-12',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-20sse'] = [
+        'name' => 'STAR Gate 20SSE',
+        'position' => '16-14',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-20w'] = [
+        'name' => 'STAR Gate 20W',
+        'position' => '2-7',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-20sw'] = [
+        'name' => 'STAR Gate 20SW',
+        'position' => '5-12',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-20ssw'] = [
+        'name' => 'STAR Gate 20SSW',
+        'position' => '8-14',
+        'level' => 20,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-30ne'] = [
+        'name' => 'STAR Gate 30NE',
+        'position' => '15-3',
+        'level' => 30,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-30e'] = [
+        'name' => 'STAR Gate 30E',
+        'position' => '22-9',
+        'level' => 30,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-30se'] = [
+        'name' => 'STAR Gate 30SE',
+        'position' => '13-16',
+        'level' => 30,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south', 'east']
+        ];
+    $index['star-gate-30nw'] = [
+        'name' => 'STAR Gate 30NW',
+        'position' => '9-3',
+        'level' => 30,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-30w'] = [
+        'name' => 'STAR Gate 30W',
+        'position' => '2-9',
+        'level' => 30,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-30sw'] = [
+        'name' => 'STAR Gate 30SW',
+        'position' => '11-16',
+        'level' => 30,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south', 'west']
+        ];
+    $index['star-gate-40ne'] = [
+        'name' => 'STAR Gate 40NE',
+        'position' => '13-2',
+        'level' => 40,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-40e'] = [
+        'name' => 'STAR Gate 40E',
+        'position' => '19-5',
+        'level' => 40,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-40se'] = [
+        'name' => 'STAR Gate 40SE',
+        'position' => '13-17',
+        'level' => 40,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'west']
+        ];
+    $index['star-gate-40nw'] = [
+        'name' => 'STAR Gate 40NW',
+        'position' => '11-2',
+        'level' => 40,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-40w'] = [
+        'name' => 'STAR Gate 40W',
+        'position' => '5-5',
+        'level' => 40,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'south']
+        ];
+    $index['star-gate-40sw'] = [
+        'name' => 'STAR Gate 40SW',
+        'position' => '11-17',
+        'level' => 40,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['north', 'east']
+        ];
+    $index['star-gate-50e'] = [
+        'name' => 'STAR Gate 50E',
+        'position' => '19-4',
+        'level' => 50,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'south']
+        ];
+    $index['star-gate-50w'] = [
+        'name' => 'STAR Gate 50W',
+        'position' => '5-4',
+        'level' => 50,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['south', 'west']
+        ];
+    $index['star-gate-60e'] = [
+        'name' => 'STAR Gate 60E',
+        'position' => '20-2',
+        'level' => 60,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'south']
+        ];
+    $index['star-gate-60w'] = [
+        'name' => 'STAR Gate 60W',
+        'position' => '4-2',
+        'level' => 60,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['south', 'west']
+        ];
+    $index['star-gate-70ne'] = [
+        'name' => 'STAR Gate 70NE',
+        'position' => '21-2',
+        'level' => 70,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-70se'] = [
+        'name' => 'STAR Gate 70SE',
+        'position' => '20-14',
+        'level' => 70,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-70nw'] = [
+        'name' => 'STAR Gate 70NW',
+        'position' => '3-2',
+        'level' => 70,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-70sw'] = [
+        'name' => 'STAR Gate 70SW',
+        'position' => '4-14',
+        'level' => 70,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-80ne'] = [
+        'name' => 'STAR Gate 80NE',
+        'position' => '16-4',
+        'level' => 80,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-80se'] = [
+        'name' => 'STAR Gate 80SE',
+        'position' => '21-14',
+        'level' => 80,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-80nw'] = [
+        'name' => 'STAR Gate 80NW',
+        'position' => '8-4',
+        'level' => 80,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-80sw'] = [
+        'name' => 'STAR Gate 80SW',
+        'position' => '3-14',
+        'level' => 80,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'west']
+        ];
+    $index['star-gate-90e'] = [
+        'name' => 'STAR Gate 90E',
+        'position' => '22-14',
+        'level' => 90,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['south', 'west']
+        ];
+    $index['star-gate-90w'] = [
+        'name' => 'STAR Gate 90W',
+        'position' => '2-14',
+        'level' => 90,
+        'element' => 'space',
+        'field' => 'prototype-subspace',
+        'tags' => ['stargate'],
+        'exits' => ['east', 'south']
+        ];
+    //--------------------------//
+    // Automatically append any data that's common for all of them
+    foreach ($index AS $token => $info){
+        $info['world'] = $world;
+        $index[$token] = $info;
+    }
+    //--------------------------//
+}
+mmrpg_prototype_world_areas($this_world, $mmrpg_worlds[$this_world]['areas']);
+
+// Ensure we have data to work with before continuing with the parsing logic
+if (!empty($mmrpg_worlds[$this_world]['areas'])){
+
+    // Predefine some helpers for auto-completing certain fields more easily
+    $elemental_area_stat_prefs = array();
+    $elemental_area_stat_prefs['attack'] = array('impact', 'freeze', 'wind', 'shadow', 'electric', 'laser');
+    $elemental_area_stat_prefs['defense'] = array('explode', 'swift', 'nature', 'earth', 'water', 'shield');
+    $elemental_area_stat_prefs['speed'] = array('cutter', 'flame', 'crystal', 'time', 'missile');
+    $button_area_colours = array('research' => 'green', 'security' => 'blue', 'control' => 'purple', 'storage' => 'red');
+    // Apply logic to discern which checklist items are needed for each area
+    foreach ($mmrpg_worlds[$this_world]['areas'] AS $token => $info){
+        // collect info we need before starting
+        $tags = !empty($info['tags']) ? $info['tags'] : array();
+        $level = !empty($info['level']) ? $info['level'] : 1;
+        $element = !empty($info['element']) ? $info['element'] : '';
+        $stat = !empty($info['stat']) ? $info['stat'] : '';
+        $objects = !empty($info['objects']) ? $info['objects'] : array();
+        $pickups = !empty($info['pickups']) ? $info['pickups'] : array();
+        $checklist = !empty($info['checklist']) ? $info['checklist'] : array();
+        // dynamically add to arrays based on this area's tags and properties
+        if (in_array('elemental', $tags) && !in_array('final', $tags)){
+            if (empty($stat)){
+                list($type) = explode('-', $token);
+                if (in_array($type, $elemental_area_stat_prefs['attack'])){ $stat = 'attack'; }
+                if (in_array($type, $elemental_area_stat_prefs['defense'])){ $stat = 'defense'; }
+                if (in_array($type, $elemental_area_stat_prefs['speed'])){ $stat = 'speed'; }
+                }
+            if (in_array('main', $tags)){ $objects[] = 'quanta-flower'; }
+            if (!empty($stat)){ $pickups[] = $stat.'-pellet'; }
+            if (!empty($stat) && in_array('main', $tags)){ $pickups[] = $stat.'-capsule'; }
+            if ($level >= 10){ $pickups[] = 'small-screw'; }
+            if ($level >= 20 && in_array('main', $tags)){ $pickups[] = 'large-screw'; }
+            if (!empty($element)){
+                if (in_array('main', $tags)){ $pickups[] = $element.'-core'; }
+                else { $pickups[] = $element.'-shard'; }
+            }
+        }
+        if (in_array('stargate', $tags)){ $objects[] = 'star-gate'; }
+        if (in_array('button', $tags)){
+            $frag = explode('-', $token)[0];
+            if (isset($button_area_colours[$frag])){
+                $colour = $button_area_colours[$frag];
+                $objects[] = 'big-'.$colour.'-button';
+            } else {
+                $objects[] = 'big-button';
+            }
+        }
+        // update all the info variables and write back to the main index
+        $info['stat'] = $stat;
+        $info['objects'] = $objects;
+        $info['pickups'] = $pickups;
+        $info['tags'] = $tags;
+        // update the checklist variable with everything we've learned
+        $checklist[] = $info['name'].' ('.$info['position'].')';
+        $checklist[] = 'field:   '.(!empty($info['field']) ? $info['field'] : '[unknown]').' @ Lv.'.$level;
+        $checklist[] = 'objects: '.(!empty($info['objects']) ? implode(', ', $info['objects']) : '-');
+        $checklist[] = 'robots:  '.(!empty($info['encounters']) ? implode(', ', $info['encounters']) : '-');
+        $checklist[] = 'mechas:  '.(!empty($info['encounters2']) ? implode(', ', $info['encounters2']) : '-');
+        $checklist[] = 'items:   '.(!empty($info['items']) ? implode(', ', $info['items']) : '-');
+        $checklist[] = 'pickups: '.(!empty($info['pickups']) ? implode(', ', $info['pickups']) : '-');
+        $checklist[] = 'exits: '.(!empty($info['exits']) ? implode(', ', $info['exits']) : '-');
+        $info['checklist'] = $checklist;
+        // write back to main index
+        $mmrpg_worlds[$this_world]['areas'][$token] = $info;
+    }
+
+}
+
+?>

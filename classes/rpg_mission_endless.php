@@ -41,8 +41,9 @@ class rpg_mission_endless extends rpg_mission {
             // Sort the robot masters into lists of their core types
             $mmrpg_items_index_bykind = array();
             foreach ($mmrpg_items_index AS $item_token => $item_info){
-                if ($item_token == 'extra-life' || $item_token == 'yashichi'){ continue; } // we don't want cheap items
-                list($item_subkind1, $item_subkind2) = explode('-', $item_token);
+                if ($item_token == 'extra-life' || $item_token == 'yashichi' || $item_token = 'resetchi'){ continue; } // we don't want cheap items
+                if (strstr($item_token, '-')){ list($item_subkind1, $item_subkind2) = explode('-', $item_token); }
+                else { $item_subkind1 = $item_token; $item_subkind2 = ''; }
                 $item_subkind2 .= substr($item_subkind2, -1, 1) == 's' ? 'es' : 's';
                 if (!isset($mmrpg_items_index_bykind[$item_subkind2])){ $mmrpg_items_index_bykind[$item_subkind2] = array(); }
                 $mmrpg_items_index_bykind[$item_subkind2][] = $item_token;
@@ -133,7 +134,10 @@ class rpg_mission_endless extends rpg_mission {
 
         // Combine all possible items into a single list and then shuffle it
         $possible_item_tokens = array();
-        foreach ($possible_item_kinds AS $kind){ $possible_item_tokens = array_merge($possible_item_tokens, $mmrpg_items_index_bykind[$kind]); }
+        foreach ($possible_item_kinds AS $kind){
+            if (!isset($mmrpg_items_index_bykind[$kind])){ continue; }
+            $possible_item_tokens = array_merge($possible_item_tokens, $mmrpg_items_index_bykind[$kind]);
+            }
         shuffle($possible_item_tokens);
 
         // Define which robots will appear based on typelist and phasearray_unique($mission_data['targets'])

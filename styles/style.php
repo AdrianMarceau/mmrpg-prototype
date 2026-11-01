@@ -1,7 +1,12 @@
 <?
 // Require the application top
+define('READ_ONLY_SESSION', true);
 define('MMRPG_INDEX_STYLES', true);
 require_once('../top.php');
+session_write_close();
+
+// Sets the maximum execution time to 5 minutes (300 seconds)
+set_time_limit(300);
 
 // Change the content header to that of CSS
 $cache_time = 60 * 60 * 24;

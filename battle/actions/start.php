@@ -100,6 +100,52 @@ if (!empty($_SESSION['ROBOTS_PRELOAD'][$this_battle->battle_token])){
 
 }
 
+// If this is a WORLD BATTLE, we should check robot sessions for persistent damage, etc.
+if (!empty($this_battle->flags['world_battle'])){
+
+    // Collect reference to the world session and the robot sessions within
+    rpg_world::init_session();
+    $WORLD_SESSION = &$_SESSION['WORLD'];
+    $WORLD_ROBOT_SESSIONS = &$WORLD_SESSION['robot_sessions'];
+
+    // Loop through the player's robot's one-by-one and apply any session data
+    $apply_session_mods = function($battle, $player, $key, $info) use ($WORLD_ROBOT_SESSIONS){
+        //error_log('$apply_session_mods() w/ $player = '.$player->player_token.' and $key = '.$key.' and $info = '.print_r($info, true));
+        $robot = rpg_game::get_robot($battle, $player, $info);
+        if (empty($robot->robot_base_id)){ return; }
+        $robot_id = $robot->robot_base_id;
+        $robot_token = $robot->robot_token;
+        if (empty($robot_id) || empty($robot_token)){ return; }
+        $robot_session_token = $robot_id.'_'.$robot_token;
+        if (!isset($WORLD_ROBOT_SESSIONS[$robot_session_token])){ return; }
+        //error_log('-> now loading WORLD data for '.$robot_session_token.' ...');
+        //error_log('-> now loading WORLD data for '.$robot_session_token.' ... w/ '.print_r($WORLD_ROBOT_SESSIONS[$robot_session_token], true));
+        $robot->robot_energy += $WORLD_ROBOT_SESSIONS[$robot_session_token]['energy'];
+        $robot->robot_weapons += $WORLD_ROBOT_SESSIONS[$robot_session_token]['weapons'];
+        if (!empty($WORLD_ROBOT_SESSIONS[$robot_session_token]['attack'])){ $robot->counters['attack_mods'] += $WORLD_ROBOT_SESSIONS[$robot_session_token]['attack']; }
+        if (!empty($WORLD_ROBOT_SESSIONS[$robot_session_token]['defense'])){ $robot->counters['defense_mods'] += $WORLD_ROBOT_SESSIONS[$robot_session_token]['defense']; }
+        if (!empty($WORLD_ROBOT_SESSIONS[$robot_session_token]['speed'])){ $robot->counters['speed_mods'] += $WORLD_ROBOT_SESSIONS[$robot_session_token]['speed']; }
+        // Update the session with any changes
+        $robot->update_session();
+        };
+    foreach ($this_player->values['robots_active'] AS $key => $info){ $apply_session_mods($this_battle, $this_player, $key, $info); }
+    $this_robot->robot_reload();
+
+}
+
+// Loop through player robots and enforce disabled status if energy was depleted by session state
+foreach ($this_player->values['robots_active'] AS $key => $info){
+    if ($this_robot->robot_id == $info['robot_id']){ $temp_robot = $this_robot; }
+    else { $temp_robot = rpg_game::get_robot($this_battle, $this_player, $info); }
+    if ($temp_robot->robot_energy <= 0){
+        $temp_robot->flags['apply_disabled_state'] = true;
+        $temp_robot->robot_status = 'disabled';
+        $temp_robot->robot_energy = 0;
+        $temp_robot->update_session();
+    }
+}
+$this_robot->robot_reload();
+
 // Check if this is a player battle
 $flag_player_battle = $target_player_id != MMRPG_SETTINGS_TARGET_PLAYERID ? true : false;
 

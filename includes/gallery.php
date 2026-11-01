@@ -53,7 +53,8 @@ else {
 }
 
 // Sort the full gallery paths with the newest ones first
-sort($raw_gallery_paths, SORT_REGULAR);
+if (!empty($raw_gallery_paths)){ sort($raw_gallery_paths, SORT_REGULAR); }
+else { $raw_gallery_paths = array(); }
 $raw_gallery_paths = array_reverse($raw_gallery_paths); // newest first
 
 //$screenshots_index = rpg_game::get_gallery_index('screenshots');

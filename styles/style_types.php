@@ -21,6 +21,7 @@ foreach ($mmrpg_index_types AS $type_token => $type_info){
     <?
     // Loop through all the types again for the dual-type ability styles
     foreach ($mmrpg_index_types AS $type2_token => $type2_info){
+        if ($type2_token === $type_token){ continue; }
         ?>
         #mmrpg .type.<?= $type_info['type_token'] ?>.<?= $type2_info['type_token'] ?>,
         #mmrpg .type.<?= $type_info['type_token'] ?>_<?= $type2_info['type_token'] ?>,

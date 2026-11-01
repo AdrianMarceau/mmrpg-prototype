@@ -81,6 +81,14 @@
     $stat_mod_kinds = array('attack', 'defense', 'speed');
     $stat_mod_values = array(5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5);
 
+    // Define the challenge difficulty levels
+    $challenge_difficulties = array(
+        0 => array('stars' => '★', 'label' => 'Easy (Base)'),
+        1 => array('stars' => '★★', 'label' => 'Normal (Bronze)'),
+        2 => array('stars' => '★★★', 'label' => 'Hard (Silver)'),
+        3 => array('stars' => '★★★★', 'label' => 'Extreme (Gold)')
+        );
+
 
     /* -- Generate Select Option Markup -- */
 
@@ -276,6 +284,7 @@
         $search_data['challenge_content'] = !empty($_GET['challenge_content']) && preg_match('/[-_0-9a-z\.\*\s\{\}]+/i', $_GET['challenge_content']) ? trim($_GET['challenge_content']) : '';
         $search_data['challenge_kind'] = !empty($_GET['challenge_kind']) && preg_match('/[-_0-9a-z]+/i', $_GET['challenge_kind']) ? trim(strtolower($_GET['challenge_kind'])) : '';
         $search_data['challenge_creator'] = !empty($_GET['challenge_creator']) && is_numeric($_GET['challenge_creator']) ? (int)($_GET['challenge_creator']) : '';
+        $search_data['challenge_difficulty'] = isset($_GET['challenge_difficulty']) && $_GET['challenge_difficulty'] !== '' && is_numeric($_GET['challenge_difficulty']) ? (int)($_GET['challenge_difficulty']) : '';
         $search_data['challenge_flag_hidden'] = isset($_GET['challenge_flag_hidden']) && $_GET['challenge_flag_hidden'] !== '' ? (!empty($_GET['challenge_flag_hidden']) ? 1 : 0) : '';
         $search_data['challenge_flag_published'] = isset($_GET['challenge_flag_published']) && $_GET['challenge_flag_published'] !== '' ? (!empty($_GET['challenge_flag_published']) ? 1 : 0) : '';
         if ($this_challenge_kind === 'event'){
@@ -336,6 +345,12 @@
         if ($search_data['challenge_creator'] !== ''){
             $challenge_id = $search_data['challenge_id'];
             $search_query .= "AND challenge_creator = {$search_data['challenge_creator']} ";
+            $search_results_limit = false;
+        }
+
+        // If the challenge difficulty was provided, search by exact match
+        if ($search_data['challenge_difficulty'] !== ''){
+            $search_query .= "AND challenge_difficulty = {$search_data['challenge_difficulty']} ";
             $search_results_limit = false;
         }
 
@@ -409,6 +424,7 @@
                 'challenge_creator' => 0,
                 'challenge_name' => '',
                 'challenge_description' => '',
+                'challenge_difficulty' => 0,
                 'challenge_field_data' => '',
                 'challenge_target_data' => '',
                 'challenge_reward_data' => '',
@@ -455,6 +471,7 @@
             $form_data['challenge_creator'] = !empty($_POST['challenge_creator']) && is_numeric($_POST['challenge_creator']) ? (int)(trim($_POST['challenge_creator'])) : 0;
             $form_data['challenge_name'] = !empty($_POST['challenge_name']) && !is_numeric($_POST['challenge_name']) && strlen($_POST['challenge_name']) >= 2 ? strip_tags(trim($_POST['challenge_name'])) : '';
             $form_data['challenge_description'] = !empty($_POST['challenge_description']) ? preg_replace('/\s+/', ' ', trim(strip_tags($_POST['challenge_description']))) : '';
+            $form_data['challenge_difficulty'] = !empty($_POST['challenge_difficulty']) && is_numeric($_POST['challenge_difficulty']) ? (int)(trim($_POST['challenge_difficulty'])) : 0;
             $form_data['challenge_robot_limit'] = !empty($_POST['challenge_robot_limit']) && is_numeric($_POST['challenge_robot_limit']) ? (int)(trim($_POST['challenge_robot_limit'])) : 0;
             $form_data['challenge_turn_limit'] = !empty($_POST['challenge_turn_limit']) && is_numeric($_POST['challenge_turn_limit']) ? (int)(trim($_POST['challenge_turn_limit'])) : 0;
 
@@ -657,6 +674,16 @@
                         <input class="textbox" type="text" name="challenge_content" placeholder="" value="<?= !empty($search_data['challenge_content']) ? htmlentities($search_data['challenge_content'], ENT_QUOTES, 'UTF-8', true) : '' ?>" />
                     </div>
 
+                    <div class="field">
+                        <strong class="label">By Difficulty</strong>
+                        <select class="select" name="challenge_difficulty"><option value=""></option><?
+                            foreach ($challenge_difficulties AS $diff_val => $diff_info){
+                                $diff_text = $diff_info['stars'].' '.$diff_info['label'];
+                                ?><option value="<?= $diff_val ?>"<?= $search_data['challenge_difficulty'] !== '' && $search_data['challenge_difficulty'] === $diff_val ? ' selected="selected"' : '' ?>><?= $diff_text ?></option><?
+                                } ?>
+                        </select><span></span>
+                    </div>
+
                     <? if ($this_challenge_kind === 'user'){ ?>
                         <div class="field">
                             <strong class="label">By Creator</strong>
@@ -719,6 +746,7 @@
                                 <col class="creator" width="160" />
                             <? } ?>
                             <col class="kind" width="85" />
+                            <col class="difficulty" width="80" />
                             <col class="date created" width="90" />
                             <col class="date modified" width="90" />
                             <col class="flag published" width="80" />
@@ -733,6 +761,7 @@
                                     <th class="creator"><?= cms_admin::get_sort_link('challenge_creator', 'Creator') ?></th>
                                 <? } ?>
                                 <th class="kind"><?= cms_admin::get_sort_link('challenge_kind', 'Kind') ?></th>
+                                <th class="difficulty"><?= cms_admin::get_sort_link('challenge_difficulty', 'Difficulty') ?></th>
                                 <th class="date created"><?= cms_admin::get_sort_link('challenge_date_created', 'Created') ?></th>
                                 <th class="date modified"><?= cms_admin::get_sort_link('challenge_date_modified', 'Modified') ?></th>
                                 <th class="flag published"><?= cms_admin::get_sort_link('challenge_flag_published', 'Published') ?></th>
@@ -746,6 +775,7 @@
                                     <th class="head creator"></th>
                                 <? } ?>
                                 <th class="head kind"></th>
+                                <th class="head difficulty"></th>
                                 <th class="head date created"></th>
                                 <th class="head date modified"></th>
                                 <th class="head flag published"></th>
@@ -761,6 +791,7 @@
                                     <td class="foot creator"></td>
                                 <? } ?>
                                 <td class="foot kind"></td>
+                                <td class="foot difficulty"></td>
                                 <td class="foot date created"></td>
                                 <td class="foot date modified"></td>
                                 <td class="foot flag published"></td>
@@ -788,6 +819,9 @@
                                 }
                                 $challenge_date_created = !empty($challenge_data['challenge_date_created']) ? date('Y-m-d', $challenge_data['challenge_date_created']) : '-';
                                 $challenge_date_modified = !empty($challenge_data['challenge_date_modified']) ? date('Y-m-d', $challenge_data['challenge_date_modified']) : '-';
+                                $challenge_difficulty = isset($challenge_data['challenge_difficulty']) ? $challenge_data['challenge_difficulty'] : 0;
+                                $diff_info = isset($challenge_difficulties[$challenge_difficulty]) ? $challenge_difficulties[$challenge_difficulty] : $challenge_difficulties[0];
+                                $challenge_difficulty_span = '<span title="'.$diff_info['stars'].' '.$diff_info['label'].'">'.$diff_info['stars'].'</span>';
                                 $challenge_flag_published = !empty($challenge_data['challenge_flag_published']) ? '<i class="fas fa-check-square"></i>' : '-';
                                 $challenge_flag_hidden = !empty($challenge_data['challenge_flag_hidden']) ? '<i class="fas fa-eye-slash"></i>' : '-';
 
@@ -808,6 +842,7 @@
                                         echo '<td class="creator"><div class="wrap">'.$challenge_creator_span.'</div></td>'.PHP_EOL;
                                     }
                                     echo '<td class="kind"><div class="wrap">'.$challenge_kind_span.'</div></td>'.PHP_EOL;
+                                    echo '<td class="difficulty"><div class="wrap">'.$challenge_difficulty_span.'</div></td>'.PHP_EOL;
                                     echo '<td class="date created"><div>'.$challenge_date_created.'</div></td>'.PHP_EOL;
                                     echo '<td class="date modified"><div>'.$challenge_date_modified.'</div></td>'.PHP_EOL;
                                     echo '<td class="flag published"><div>'.$challenge_flag_published.'</div></td>'.PHP_EOL;
@@ -923,26 +958,43 @@
 
                                     <div class="panel active" data-tab="main">
 
-                                        <div class="field">
-                                            <strong class="label">Challenge ID</strong>
-                                            <input type="hidden" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" />
-                                            <input class="textbox" type="text" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" disabled="disabled" />
-                                        </div>
+                                        <div class="field fullsize has4cols">
 
-                                        <div class="field">
-                                            <div class="label">
-                                                <strong>Robot Limit</strong>
-                                                <em>use zero for auto</em>
+                                            <div class="subfield">
+                                                <strong class="label">Challenge ID</strong>
+                                                <input type="hidden" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" />
+                                                <input class="textbox" type="text" name="challenge_id" value="<?= $challenge_data['challenge_id'] ?>" disabled="disabled" />
                                             </div>
-                                            <input class="textbox" type="number" name="challenge_robot_limit" value="<?= $challenge_data['challenge_robot_limit'] ?>" min="0" max="8" />
-                                        </div>
 
-                                        <div class="field">
-                                            <div class="label">
-                                                <strong>Turn Limit</strong>
-                                                <em>use zero for auto</em>
+                                            <div class="subfield">
+                                                <div class="label">
+                                                    <strong>Robot Limit</strong>
+                                                    <em>use zero for auto</em>
+                                                </div>
+                                                <input class="textbox" type="number" name="challenge_robot_limit" value="<?= $challenge_data['challenge_robot_limit'] ?>" min="0" max="8" />
                                             </div>
-                                            <input class="textbox" type="number" name="challenge_turn_limit" value="<?= $challenge_data['challenge_turn_limit'] ?>" min="0" max="99" />
+
+                                            <div class="subfield">
+                                                <div class="label">
+                                                    <strong>Turn Limit</strong>
+                                                    <em>use zero for auto</em>
+                                                </div>
+                                                <input class="textbox" type="number" name="challenge_turn_limit" value="<?= $challenge_data['challenge_turn_limit'] ?>" min="0" max="99" />
+                                            </div>
+
+                                            <div class="subfield">
+                                                <div class="label">
+                                                    <strong>Challenge Difficulty</strong>
+                                                    <em>select one</em>
+                                                </div>
+                                                <select class="select" name="challenge_difficulty">
+                                                    <? foreach ($challenge_difficulties AS $diff_val => $diff_info){ ?>
+                                                        <? $diff_text = $diff_info['stars'].' '.$diff_info['label']; ?>
+                                                        <option value="<?= $diff_val ?>"<?= isset($challenge_data['challenge_difficulty']) && $challenge_data['challenge_difficulty'] == $diff_val ? ' selected="selected"' : '' ?>><?= $diff_text ?></option>
+                                                    <? } ?>
+                                                </select><span></span>
+                                            </div>
+
                                         </div>
 
                                         <div class="field halfsize">
