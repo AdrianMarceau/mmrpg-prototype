@@ -147,16 +147,6 @@
         ]
       }
     },
-  "trill": {
-    "name": "Trill",
-    "type": "none",
-    "colour": "space",
-    "messages": {
-      "default": [
-        "For the master!"
-        ]
-      }
-    },
   "proxy": {
     "name": "Proxy",
     "type": "none",
