@@ -1598,9 +1598,9 @@ class rpg_world {
         // Define a quick matrix for the level-range values per class
         //$robot_level = mt_rand(ceil($map_level * 1.2), ceil($map_level * 1.4));
         $levels_matrix = array(
-            'mecha' => array('min' => ceil($map_level * 0.6), 'max' => ceil($map_level * 0.8)),
-            'master' => array('min' => ceil($map_level * 1.0), 'max' => ceil($map_level * 1.0)),
-            'boss' => array('min' => ceil($map_level * 1.2), 'max' => ceil($map_level * 1.4))
+            'mecha' => array('min' => ceil($map_level * 0.6), 'max' => ceil($map_level * 0.7)),
+            'master' => array('min' => ceil($map_level * 0.8), 'max' => ceil($map_level * 0.9)),
+            'boss' => array('min' => ceil($map_level * 1.0), 'max' => ceil($map_level * 1.0))
             );
 
         // Pull the list of robots unlocked already overall, so that we do not need to keep checking the session
@@ -3991,8 +3991,10 @@ class rpg_world {
                 $left = ($col - 1) * $map_tile_width + $map_spritesize_offset[1];
                 $z_index = $top + 1;
                 $data = array_values($actor_data);
-                $actor_info = !empty($mmrpg_index_actors[$sprite]) ? $mmrpg_index_actors[$sprite] : array();
+                $actor_info = array();
                 $index_info = array();
+                if (!empty($mmrpg_index_actors[$actor_namekey])){ $actor_info = $mmrpg_index_actors[$actor_namekey]; }
+                else if (!empty($mmrpg_index_actors[$sprite])){ $actor_info = $mmrpg_index_actors[$sprite]; }
                 if ($kind === 'object' || $kind === 'actor'){ $index_info = !empty($mmrpg_index_actors[$sprite]) ? $mmrpg_index_actors[$sprite] : array(); }
                 elseif ($kind === 'player'){ $index_info = !empty($mmrpg_index_players[$sprite]) ? $mmrpg_index_players[$sprite] : array(); }
                 elseif ($kind === 'robot'){ $index_info = !empty($mmrpg_index_robots[$sprite]) ? $mmrpg_index_robots[$sprite] : array(); }
