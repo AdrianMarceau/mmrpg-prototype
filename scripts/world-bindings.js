@@ -911,6 +911,7 @@ function bindEventsToInputs($thisWorld){
             else if (sideButtonsMaybe && (activeInputs.Left || activeInputs.Right)){
                 if (event){ event.preventDefault(); }
                 if ($sideButtons.is('.busy')){ return false; }
+                else { return true; }
                 }
             }
         // If a popup iframe is currenty active, process relevant shortcut keys
