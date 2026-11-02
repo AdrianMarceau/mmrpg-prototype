@@ -361,6 +361,10 @@ class rpg_world {
                         if (isset($data['attackMods'])){ $robotSession['attack'] = intval($data['attackMods']); }
                         if (isset($data['defenseMods'])){ $robotSession['defense'] = intval($data['defenseMods']); }
                         if (isset($data['speedMods'])){ $robotSession['speed'] = intval($data['speedMods']); }
+                        // Check for base stat bonuses and update reward values accordingly
+                        if (isset($data['attackBonus'])){ $robotRewards['robot_attack'] = intval($data['attackBonus']); }
+                        if (isset($data['defenseBonus'])){ $robotRewards['robot_defense'] = intval($data['defenseBonus']); }
+                        if (isset($data['speedBonus'])){ $robotRewards['robot_speed'] = intval($data['speedBonus']); }
                         // Check for settings changes and update session values accordingly
                         if (isset($data['item'])){ $robotSettings['robot_item'] = trim($data['item']); }
                         if (isset($data['abilities'])){
