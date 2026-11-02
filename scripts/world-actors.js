@@ -81,9 +81,48 @@ function prepareActorEventOptions(firstEvent, options){
                 let price = typeof action[4] !== 'undefined' && action[4] ? action[4] : false;
                 let innerHtml = '<span>' + label + '</span>';
 
+                // Check if we need to disable the button because our lead robot is already maxed
+                if (token.indexOf('boost-robot-') !== -1){
+                    let statToken = token.replace('boost-robot-', '');
+                    let statBonusKey = statToken + 'Bonus';
+                    let currentBonus = _firstPlayerRobot[statBonusKey] || 0;
+                    let baseToken = _firstPlayerRobot.personaActive ? _firstPlayerRobot.persona : _firstPlayerRobot.token;
+                    let baseIndexInfo = _indexes.robots[baseToken];
+                    let robotBaseStats = {
+                        token: baseToken,
+                        energy: baseIndexInfo.energy || 0,
+                        weapons: baseIndexInfo.weapons || 0,
+                        attack: baseIndexInfo.attack || 0,
+                        defense: baseIndexInfo.defense || 0,
+                        speed: baseIndexInfo.speed || 0,
+                        };
+                    // Map the 'Bonus' variables to their raw stat keys for the calculator
+                    let robotBonusStats = {
+                        token: _firstPlayerRobot.token,
+                        energy: _firstPlayerRobot.energyBonus || 0,
+                        weapons: _firstPlayerRobot.weaponsBonus || 0,
+                        attack: _firstPlayerRobot.attackBonus || 0,
+                        defense: _firstPlayerRobot.defenseBonus || 0,
+                        speed: _firstPlayerRobot.speedBonus || 0,
+                        };
+                    // Run a dry calculation to extract our strict bonusMax threshold
+                    let robotStatsPreview = _self.calculateStatValues(
+                        _firstPlayerRobot.level,
+                        robotBaseStats,
+                        robotBonusStats,
+                        false,
+                        _firstPlayerRobot.personaActive ? 'copy' : (_firstPlayerRobot.core || ''),
+                        _worldPlayer.starForce || {}
+                        );
+                    if (currentBonus >= robotStatsPreview[statToken].bonusMax) {
+                        enabled = false;
+                        label += ' (Maxed)';
+                        }
+                    }
+
                 if (currency && price){
                     let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
-                    enabled = currencyCheck.hasEnough;
+                    enabled = enabled && currencyCheck.hasEnough;
                     innerHtml = '<span class="has-sprite">'
                         + '<strong>' + label + '</strong> '
                         + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
@@ -132,10 +171,12 @@ function handleActorActionClick(action, $button, firstEvent){
     let _playerToken = _config.playerToken;
     let $thisWorld = _elements.world;
     let $thisCanvas = _elements.canvas;
+    let $canvasMap = _elements.map;
 
     let isShop = action.indexOf('-shop') !== -1 || action.indexOf('shop-') !== -1;
     let isAdvice = action.indexOf('-advice') !== -1 || action.indexOf('advice-') !== -1;
     let isReset = action === 'reset-world-pickups' || action === 'reset-world-encounters';
+    let isBoost = action === 'boost-robot-attack' || action === 'boost-robot-defense' || action === 'boost-robot-speed';
 
     let $actorEvent = $(firstEvent.sprite);
     let dataActor = $actorEvent.attr('data-actor') || false;
@@ -328,6 +369,140 @@ function handleActorActionClick(action, $button, firstEvent){
                 $thisWorld.addClass('hidden');
                 });
             }
+        }
+    else if (isBoost){
+        let actorsIndex = _config.mapActorsIndex;
+        let actorName = $button.attr('data-actor') || false;
+        let actorInfo = actorName && (actorsIndex && actorsIndex[actorName]) ? actorsIndex[actorName] : false;
+        if (!actorName || !actorInfo){ console.error('-> actor name or info not found, cannot trigger actions!'); return false; }
+
+        let actionList = typeof actorInfo.actions === 'object' && actorInfo.actions.length ? actorInfo.actions : false;
+        if (!actionList){ console.error('-> actor actionlist is empty, nothing to trigger!'); return false; }
+
+        let actionListKeys = (function(list){ let keys = []; for (let i = 0; i < list.length; i++){ keys.push(list[i][1]); } return keys; })(actionList);
+        let actionInfoData = actionListKeys.indexOf(action) !== -1 ? actionList[actionListKeys.indexOf(action)] : false;
+        if (!actionInfoData){ console.error('-> actor action info could not be found!'); return false; }
+
+        let currency = actionInfoData[3], price = actionInfoData[4];
+        let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
+
+        if (!currencyCheck.hasEnough){
+            _self.playSoundEffect('error-sound');
+            return false;
+            }
+
+        let leadRobotString = _worldPlayer.team[0];
+        let leadRobotData = _worldPlayer.robots[leadRobotString];
+        let statToken = action.replace('boost-robot-', '');
+        let statBonusKey = statToken + 'Bonus';
+
+        let baseToken = leadRobotData.personaActive ? leadRobotData.persona : leadRobotData.token;
+        let baseIndexInfo = _self.indexes.robots[baseToken];
+
+        let robotBaseStats = {
+            token: baseToken,
+            energy: baseIndexInfo.energy || 0,
+            weapons: baseIndexInfo.weapons || 0,
+            attack: baseIndexInfo.attack || 0,
+            defense: baseIndexInfo.defense || 0,
+            speed: baseIndexInfo.speed || 0,
+            };
+
+        // Map the 'Bonus' variables to their raw stat keys for the calculator
+        let robotBonusStats = {
+            token: leadRobotData.token,
+            energy: leadRobotData.energyBonus || 0,
+            weapons: leadRobotData.weaponsBonus || 0,
+            attack: leadRobotData.attackBonus || 0,
+            defense: leadRobotData.defenseBonus || 0,
+            speed: leadRobotData.speedBonus || 0,
+            };
+
+        let robotStarforce = _worldPlayer.starForce || {};
+
+        // Calculate our stats to extract the hard ceiling
+        let newRobotStats = _self.calculateStatValues(
+            leadRobotData.level,
+            robotBaseStats,
+            robotBonusStats,
+            true,
+            leadRobotData.personaActive ? 'copy' : (leadRobotData.core || ''),
+            robotStarforce
+            );
+
+        // Fallback: If we are already at or above our max bonus, abort before deducting currency
+        let currentBonus = leadRobotData[statBonusKey] || 0;
+        let robotNameTextSpan = _self.getRobotNameSpan(leadRobotData.token, leadRobotData.name);
+
+        if (currentBonus >= newRobotStats[statToken].bonusMax){
+            _self.playSoundEffect('error-sound');
+            _self.hideActionDropdown(false);
+            _self.showWorldMessage([robotNameTextSpan + '&#39;s ' + statToken + ' is already at maximum!']);
+            return false;
+            }
+
+        // Deduct our capsules now that we know we have room to grow
+        let currencyKind = currencyCheck.kind, currencySubKind = currencyCheck.subKind;
+        if (currencyKind === 'items' && currencySubKind && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
+            _worldPlayer.items[currencySubKind] -= price;
+            if (_worldPlayer.items[currencySubKind] < 0){ _worldPlayer.items[currencySubKind] = 0; }
+            }
+
+        // Capture our old stat before we do any recalculations
+        let oldStatValue = leadRobotData[statToken] || 0;
+
+        // Apply our stat boost
+        let boostAmount = price * 10;
+        leadRobotData[statBonusKey] = currentBonus + boostAmount;
+
+        // Re-run the limit-capped calculation to ensure we do not overshoot our bonusMax
+        robotBonusStats[statToken] = leadRobotData[statBonusKey];
+
+        newRobotStats = _self.calculateStatValues(
+            leadRobotData.level,
+            robotBaseStats,
+            robotBonusStats,
+            true,
+            leadRobotData.personaActive ? 'copy' : (leadRobotData.core || ''),
+            robotStarforce
+            );
+
+        leadRobotData[statToken] = newRobotStats[statToken].current;
+        leadRobotData[statBonusKey] = newRobotStats[statToken].bonus; // Sync back the correctly clamped bonus
+
+        // Re-apply our player type boosts
+        let playerIndexInfo = _self.indexes.players[_worldPlayer.token];
+        if (playerIndexInfo && playerIndexInfo.player_type === statToken){
+            leadRobotData[statToken] = Math.ceil(leadRobotData[statToken] * 1.25);
+            }
+
+        if (_self.robotsOverviewAPI && typeof _self.robotsOverviewAPI.refreshDetailsPanel === 'function'){
+            _self.robotsOverviewAPI.refreshDetailsPanel();
+            _self.robotsOverviewAPI.refreshRobotsDiv();
+            }
+
+        // Grab a reference to our lead robot's map sprite so we can animate it
+        let $robotSprite = $('.sprite[data-sprite="team-robot"][data-robot="' + leadRobotString + '"]', $canvasMap);
+
+        // Apply our celebration frame and zoom class immediately upon clicking
+        $robotSprite.attr('data-frame', '01');
+        $robotSprite.addClass('zoom');
+
+        // Auto-dismiss the action dropdown after a short delay so the button has time to flash
+        setTimeout(function(){
+            _self.hideActionDropdown(false);
+            _self.playSoundEffect('recovery-stats');
+            _self.showWorldMessage([
+                robotNameTextSpan + '&#39;s base ' + statToken + ' grew by ' + boostAmount + '!',
+                oldStatValue + ' &rarr; ' + leadRobotData[statToken]
+                ]);
+            // Revert our animation frame and remove the zoom classes once the message fires
+            $robotSprite.attr('data-frame', '00');
+            $robotSprite.removeClass('zoom');
+            }, 1800);
+
+        _self.saveWorldState();
+
         }
 
     return true;

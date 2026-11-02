@@ -6,6 +6,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
     let _self = this;
     let _config = _self.config;
     let _world = _self.state;
+    let _indexes = _self.indexes;
     let _worldPlayer = _world.player;
     let _worldCursor = _world.cursor;
     let _worldToken = _config.mapWorld;
