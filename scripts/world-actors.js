@@ -66,19 +66,21 @@ function prepareActorEventOptions(firstEvent, options){
                 if (!label || !token){ continue; }
 
                 if (token === 'reset-world-pickups'){
-                    //console.log('checking if reset-world-pickups allowed ...');
-                    //console.log('_config.mapHasPickups =', _config.mapHasPickups);
+                    // Check if we allow reset-world-pickups ...
                     if (!_config.mapHasPickups){ continue; }
                     }
                 else if (token === 'reset-world-encounters'){
-                    //console.log('checking if reset-world-encounters allowed ...');
-                    //console.log('_config.mapHasEncounters =', _config.mapHasEncounters);
+                    // Check if we allow reset-world-encounters ...
                     if (!_config.mapHasEncounters){ continue; }
                     }
 
                 let enabled = true;
                 let currency = typeof action[3] !== 'undefined' && action[3] ? action[3] : false;
                 let price = typeof action[4] !== 'undefined' && action[4] ? action[4] : false;
+
+                // We extract our new adjustable flag from the action array (index 5)
+                let adjustable = typeof action[5] !== 'undefined' && action[5] === true ? true : false;
+
                 let innerHtml = '<span>' + label + '</span>';
 
                 // Check if we need to disable the button because our lead robot is already maxed
@@ -122,7 +124,8 @@ function prepareActorEventOptions(firstEvent, options){
 
                 if (currency && price){
                     let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
-                    enabled = enabled && currencyCheck.hasEnough;
+                    // We only disable the button if we cannot afford the minimum price
+                    if (!currencyCheck.hasEnough){ enabled = false; }
                     innerHtml = '<span class="has-sprite">'
                         + '<strong>' + label + '</strong> '
                         + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
@@ -130,8 +133,20 @@ function prepareActorEventOptions(firstEvent, options){
                         + '</span>';
                     }
 
-                if (enabled){ actionData.sideButtonsMarkup += '<a class="button big-button'+(colour ? ' type '+colour : '')+'" data-actor="'+dataActor+'" data-action="'+token+'">' + innerHtml + '</a>'; }
-                else { actionData.sideButtonsMarkup += '<a class="button big-button'+(colour ? ' type '+colour : '')+' disabled">' + innerHtml + '</a>'; }
+                // We construct our button classes and data attributes
+                let buttonClasses = 'button big-button' + (colour ? ' type ' + colour : '') + (!enabled ? ' disabled' : '');
+                if (adjustable){ buttonClasses += ' has-inner-buttons'; }
+                let buttonAttrs = ' data-actor="' + dataActor + '" data-action="' + token + '"';
+                if (adjustable){ buttonAttrs += ' data-price="' + price + '"'; }
+
+                // We build the final anchor tag, injecting our arrow spans if adjustable is true
+                let buttonMarkup = '<a class="' + buttonClasses + '"' + buttonAttrs + '>';
+                if (adjustable){ buttonMarkup += '<span class="inner-button decrement"><i class="fa fas fa-caret-left"></i></span>'; }
+                buttonMarkup += innerHtml;
+                if (adjustable){ buttonMarkup += '<span class="inner-button increment"><i class="fa fas fa-caret-right"></i></span>'; }
+                buttonMarkup += '</a>';
+                actionData.sideButtonsMarkup += buttonMarkup;
+
                 }
             }
 
@@ -383,22 +398,15 @@ function handleActorActionClick(action, $button, firstEvent){
         let actionInfoData = actionListKeys.indexOf(action) !== -1 ? actionList[actionListKeys.indexOf(action)] : false;
         if (!actionInfoData){ console.error('-> actor action info could not be found!'); return false; }
 
-        let currency = actionInfoData[3], price = actionInfoData[4];
-        let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
-
-        if (!currencyCheck.hasEnough){
-            _self.playSoundEffect('error-sound');
-            return false;
-            }
-
+        // Determine which robot and which stat we are modifying
         let leadRobotString = _worldPlayer.team[0];
         let leadRobotData = _worldPlayer.robots[leadRobotString];
         let statToken = action.replace('boost-robot-', '');
         let statBonusKey = statToken + 'Bonus';
 
+        // Gather base stats for the calculator
         let baseToken = leadRobotData.personaActive ? leadRobotData.persona : leadRobotData.token;
         let baseIndexInfo = _self.indexes.robots[baseToken];
-
         let robotBaseStats = {
             token: baseToken,
             energy: baseIndexInfo.energy || 0,
@@ -430,29 +438,50 @@ function handleActorActionClick(action, $button, firstEvent){
             robotStarforce
             );
 
-        // Fallback: If we are already at or above our max bonus, abort before deducting currency
+        // Fallback: If we are already at or above our max bonus, abort entirely
         let currentBonus = leadRobotData[statBonusKey] || 0;
         let robotNameTextSpan = _self.getRobotNameSpan(leadRobotData.token, leadRobotData.name);
 
         if (currentBonus >= newRobotStats[statToken].bonusMax){
             _self.playSoundEffect('error-sound');
-            _self.hideActionDropdown(false);
             _self.showWorldMessage([robotNameTextSpan + '&#39;s ' + statToken + ' is already at maximum!']);
             return false;
             }
 
-        // Deduct our capsules now that we know we have room to grow
+        // Retrieve our currency, base price, and the newly added multiplier
+        let currency = actionInfoData[3], basePrice = actionInfoData[4];
+        let multiplier = parseInt($button.attr('data-multiplier') || '1');
+
+        // We determine how many multipliers are actually needed to max the stat
+        let spaceRemaining = newRobotStats[statToken].bonusMax - currentBonus;
+        let maxUsableMultiplier = Math.ceil(spaceRemaining / (basePrice * 10));
+
+        // We clamp the multiplier so the user doesn't accidentally waste capsules over the limit
+        if (multiplier > maxUsableMultiplier) {
+            multiplier = maxUsableMultiplier;
+            }
+
+        // Calculate the effective price and verify we can afford it
+        let effectivePrice = basePrice * multiplier;
+        let currencyCheck = _self.checkMenuButtonCurrency(currency, effectivePrice);
+
+        if (!currencyCheck.hasEnough){
+            _self.playSoundEffect('error-sound');
+            return false;
+            }
+
+        // Deduct our capsules
         let currencyKind = currencyCheck.kind, currencySubKind = currencyCheck.subKind;
         if (currencyKind === 'items' && currencySubKind && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
-            _worldPlayer.items[currencySubKind] -= price;
+            _worldPlayer.items[currencySubKind] -= effectivePrice;
             if (_worldPlayer.items[currencySubKind] < 0){ _worldPlayer.items[currencySubKind] = 0; }
             }
 
         // Capture our old stat before we do any recalculations
         let oldStatValue = leadRobotData[statToken] || 0;
 
-        // Apply our stat boost
-        let boostAmount = price * 10;
+        // Apply our stat boost (multiplied by our clamped multiplier)
+        let boostAmount = effectivePrice * 10;
         leadRobotData[statBonusKey] = currentBonus + boostAmount;
 
         // Re-run the limit-capped calculation to ensure we do not overshoot our bonusMax

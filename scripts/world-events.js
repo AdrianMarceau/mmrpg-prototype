@@ -1134,6 +1134,82 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
             $('.button[data-action]', $sideButtons).bind('mouseleave', unhoverActionButton);
             $('.button[data-action]', $sideButtons).bind('click', onActionButtonClick);
 
+            // We bind click events to the inner increment/decrement buttons so they don't trigger the parent
+            $('.button[data-action] .inner-button', $sideButtons).bind('click', function(e){
+                e.preventDefault();
+                e.stopPropagation(); // We prevent the event from bubbling up to the main button
+
+                let $innerButton = $(this);
+                let $parentButton = $innerButton.closest('.button[data-action]');
+                let actionToken = $parentButton.attr('data-action');
+                let direction = $innerButton.hasClass('increment') ? 'increment' : 'decrement';
+
+                // We retrieve or initialize our multiplier and base price
+                let currentMultiplier = parseInt($parentButton.attr('data-multiplier') || '1');
+                let basePrice = parseInt($parentButton.attr('data-price') || '1');
+
+                // We grab the <sup> tag and parse the total amount the player currently owns
+                let $supTag = $parentButton.find('sup.no-strike');
+                let ownedAmount = 0;
+                if ($supTag.length){ ownedAmount = parseInt($supTag.text().split('/')[0].trim()); }
+
+                // We increment or decrement our multiplier based on bounds
+                if (direction === 'increment'){
+                    if ((currentMultiplier + 1) * basePrice <= ownedAmount){
+                        currentMultiplier++;
+                        _self.playSoundEffect('icon-hover');
+                        } else {
+                        // Abort and play error if we try to increment past what we own
+                        _self.playSoundEffect('error-sound');
+                        return;
+                        }
+                    }
+                else if (direction === 'decrement'){
+                    if (currentMultiplier > 1){
+                        currentMultiplier--;
+                        _self.playSoundEffect('icon-hover');
+                        } else {
+                        // Abort and play error if we try to decrement below 1
+                        _self.playSoundEffect('error-sound');
+                        return;
+                        }
+                    }
+
+                // We update the custom data attribute on the parent button
+                $parentButton.attr('data-multiplier', currentMultiplier);
+
+                // We calculate the new total price
+                let newTotalPrice = basePrice * currentMultiplier;
+
+                // We update the visual text inside our <sup class="no-strike"> tag
+                if ($supTag.length){
+                    let currentText = $supTag.text();
+                    // We replace the "/ [number]" portion with our new total price
+                    let newText = currentText.replace(/\/\s\d+/, '/ ' + newTotalPrice);
+                    // We handle pluralization of the currency name (e.g., Capsule vs Capsules)
+                    if (newTotalPrice > 1 && !newText.endsWith('s')) {
+                        newText += 's';
+                        } else if (newTotalPrice === 1 && newText.endsWith('s')) {
+                        newText = newText.slice(0, -1);
+                        }
+                    $supTag.text(newText);
+                    }
+
+                //console.log('-> ' + actionToken + ' multiplier updated to: ' + currentMultiplier);
+
+                });
+
+            // We also bind hover events so the inner buttons feel responsive without triggering the parent's hover sounds
+            $('.button[data-action] .inner-button', $sideButtons).bind('mouseenter', function(e){
+                e.stopPropagation();
+                _self.playSoundEffect('icon-hover');
+                $(this).addClass('hovered');
+                });
+            $('.button[data-action] .inner-button', $sideButtons).bind('mouseleave', function(e){
+                e.stopPropagation();
+                $(this).removeClass('hovered');
+                });
+
             // Bind an event to the side-button area itself for showing/hiding action labels on hover
             $sideButtons.bind('mouseenter', function(e){ $actionDropdown.addClass('hover'); });
             $sideButtons.bind('mouseleave', function(e){ $actionDropdown.removeClass('hover'); });

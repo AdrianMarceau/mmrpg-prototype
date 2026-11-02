@@ -5429,6 +5429,36 @@ display: block;
     background-size: 40px 40px;
 }
 
+#world #canvas #side-buttons .big-button.has-inner-buttons {
+    position: relative;
+    margin-right: 35px;
+}
+#world #canvas #side-buttons .big-button.has-inner-buttons .inner-button {
+    display: block;
+    box-sizing: border-box;
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    height: auto;
+    width: 20px;
+    font-size: 19px;
+    line-height: 1;
+    border: inherit;
+    background: inherit;
+}
+#world #canvas #side-buttons .big-button.has-inner-buttons .inner-button i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#world #canvas #side-buttons .big-button.has-inner-buttons .inner-button.decrement {
+    left: -15px;
+}
+#world #canvas #side-buttons .big-button.has-inner-buttons .inner-button.increment {
+    right: -15px;
+}
+
 
 /* #world #canvas #side-buttons .big-button:not(.disabled):hover, */
 #world #canvas #side-buttons .big-button:not(.disabled).hovered {

@@ -907,11 +907,21 @@ function bindEventsToInputs($thisWorld){
                         }
                     }
                 }
-            // Else if the player has pressed left/right, we do nothing if the panel is busy
+            // Else if the player has pressed left/right, we check for inner-buttons on the highlighted action
             else if (sideButtonsMaybe && (activeInputs.Left || activeInputs.Right)){
                 if (event){ event.preventDefault(); }
                 if ($sideButtons.is('.busy')){ return false; }
-                else { return true; }
+                let $maybeButton = $('.button[data-action].maybe', $sideButtons);
+                if ($maybeButton.length && $maybeButton.hasClass('has-inner-buttons')) {
+                    if (activeInputs.Left) {
+                        $maybeButton.find('.inner-button.decrement').trigger('click');
+                        } else if (activeInputs.Right) {
+                        $maybeButton.find('.inner-button.increment').trigger('click');
+                        }
+                    // Add a small delay so we don't spin through the numbers too fast
+                    ignoreInputFor(150);
+                    }
+                return true;
                 }
             }
         // If a popup iframe is currenty active, process relevant shortcut keys
