@@ -115,6 +115,26 @@
             "Subspace area has me curious about what lies beyond the portals, deep in the pitch black darkness."
             ]
         },
+    "plum": {
+        "name": "Plum",
+        "type": "none",
+        "colour": "crystal",
+        "messages": {
+            "default": [
+                "{player_name}, we meet again! Good to see you. | Have you come to have {robot_name}'s base stats boosted?"
+                ],
+            "first-encounter": [
+                "{player_name}! What a relief to see a familiar face. | How about I boost {robot_name}'s base stats for you?"
+                ]
+            },
+        "actions": {
+            "default": [
+                ["Boost Base Attack", "boost-robot-attack", "attack", "items:attack-capsule", 1],
+                ["Boost Base Defense", "boost-robot-defense", "defense", "items:defense-capsule", 1],
+                ["Boost Base Speed", "boost-robot-speed", "speed", "items:speed-capsule", 1]
+                ]
+            }
+        },
     "anti-eddie": {
         "name": "Anti Eddie",
         "type": "none",
