@@ -9,7 +9,13 @@ function prepareActorEventOptions(firstEvent, options){
     let _world = _self.state;
     let _worldPlayer = _world.player;
     let _indexes = _self.indexes;
+
     let _playerIndexInfo = _indexes.players[_worldPlayer.token];
+
+    let firstRobotToken = _worldPlayer.team[0];
+    let _worldPlayerRobots = _worldPlayer.robots;
+    let _firstPlayerRobot = _worldPlayerRobots[firstRobotToken];
+    let _firstPlayerRobotIndexInfo = _indexes.robots[_firstPlayerRobot.token];
 
     options = options || {};
 
@@ -43,6 +49,7 @@ function prepareActorEventOptions(firstEvent, options){
             // Join the array strings directly with HTML linebreaks
             let messagesText = typeof actorInfo.messages === 'object' ? actorInfo.messages.join('<br />') : actorInfo.messages;
             messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
+            messagesText = messagesText.replaceAll('{robot_name}', _firstPlayerRobotIndexInfo['name']);
             actionData.sideButtonsMarkup += '<div class="button-title big-button-title'+(dataColour ? ' type '+dataColour : '')+'">';
                 actionData.sideButtonsMarkup += '<i class="icon">' + avatarSprite + '</i>';
                 actionData.sideButtonsMarkup += '<p class="text typewriter" style="opacity: 0;">' + messagesText + '</p>';

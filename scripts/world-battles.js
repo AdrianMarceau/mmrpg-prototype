@@ -16,6 +16,11 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
 
     let _playerIndexInfo = _mmrpgPlayersIndex[_worldPlayer.token];
 
+    let firstRobotToken = _worldPlayer.team[0];
+    let _worldPlayerRobots = _worldPlayer.robots;
+    let _firstPlayerRobot = _worldPlayerRobots[firstRobotToken];
+    let _firstPlayerRobotIndexInfo = _indexes.robots[_firstPlayerRobot.token];
+
     options = options || {};
 
     let actionData = {
@@ -132,6 +137,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
             let avatarSprite = _self.getRobotSpriteMarkup(firstBattleInfo.token, {alt: firstBattleInfo.alt, kind: 'mug'});
             let messagesText = firstBattleInfo.messages.join('<br />');
             messagesText = messagesText.replaceAll('{player_name}', _playerIndexInfo['name']);
+            messagesText = messagesText.replaceAll('{robot_name}', _firstPlayerRobotIndexInfo['name']);
             // Determine dialogue box color based on the robot's core typing
             let dataColour = firstBattleRobot.core || 'none';
             if (firstBattleRobot.core2) { dataColour += '_' + firstBattleRobot.core2; }
