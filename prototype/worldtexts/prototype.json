@@ -121,7 +121,7 @@
         "colour": "crystal",
         "messages": {
             "default": [
-                "{player_name}, we meet again! Good to see you. | Have you come to have {robot_name}'s base stats boosted?"
+                "{player_name}, we meet again! Good to see you. | Is {robot_name} here for a tune‑up?"
                 ],
             "first-encounter": [
                 "{player_name}! What a relief to see a familiar face. | How about I boost {robot_name}'s base stats for you?"
@@ -186,10 +186,8 @@
                 "Wish me... \"luck\"."
                 ],
             "default": [
-                "Again, congratulations on your victory.",
-                "Please allow me some time to prepare for our next phase...",
-                "||",
-                "I have a long journey ahead."
+                "Again, congratulations on your victory. Please allow me some time to prepare for our next phase...",
+                "| I have a long journey ahead."
                 ]
             },
         "alt9_colour": "laser",
