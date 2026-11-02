@@ -625,10 +625,8 @@ echo('<pre>'.PHP_EOL);
                 $auto_x = $area_padding + 2;
                 $auto_y = $area_size_height - $area_padding - 1;
                 $auto_pos = $auto_x.'-'.$auto_y;
-                // Determine the correct version to display based on the area's objects
-                $auto_ver = in_array('start', $area_tags) ? 'first-encounter' : 'default';
                 // Add the actor string using syntax from the debug map
-                $actor_strings[] = '@actors[]   = good-guy-auto('.$auto_pos.', robot, auto, -, '.$auto_ver.')';
+                $actor_strings[] = '@actors[]   = good-guy-auto('.$auto_pos.', robot, auto, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['good-guy-auto-buffer'] = $auto_pos;
             }
@@ -639,10 +637,8 @@ echo('<pre>'.PHP_EOL);
                 $reggae_x = $area_padding + 2;
                 $reggae_y = $area_size_height - $area_padding - 1;
                 $reggae_pos = $reggae_x.'-'.$reggae_y;
-                // Determine the correct version to display based on the area's objects
-                $reggae_ver = in_array('start', $area_tags) ? 'first-encounter' : 'default';
                 // Add the actor string using syntax from the debug map
-                $actor_strings[] = '@actors[]   = weird-bird-reggae('.$reggae_pos.', robot, reggae, -, '.$reggae_ver.')';
+                $actor_strings[] = '@actors[]   = weird-bird-reggae('.$reggae_pos.', robot, reggae, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['weird-bird-reggae-buffer'] = $reggae_pos;
             }
@@ -653,12 +649,22 @@ echo('<pre>'.PHP_EOL);
                 $kalinka_x = $area_padding + 2;
                 $kalinka_y = $area_size_height - $area_padding - 1;
                 $kalinka_pos = $kalinka_x.'-'.$kalinka_y;
-                // Determine the correct version to display based on the area's objects
-                $kalinka_ver = in_array('start', $area_tags) ? 'first-encounter' : 'default';
                 // Add the actor string using syntax from the debug map
-                $actor_strings[] = '@actors[]   = star-gazer-kalinka('.$kalinka_pos.', player, kalinka, -, '.$kalinka_ver.')';
+                $actor_strings[] = '@actors[]   = star-gazer-kalinka('.$kalinka_pos.', player, kalinka, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['star-gazer-kalinka-buffer'] = $kalinka_pos;
+            }
+
+            // Pre-place the "Field Reporter Plum" (the trainer)
+            if ($area_token === 'lalinde-area-1'){
+                // Calculate the bottom-left corner of the walkable area
+                $plum_x = $area_padding + 2;
+                $plum_y = $area_size_height - $area_padding - 1;
+                $plum_pos = $plum_x.'-'.$plum_y;
+                // Add the actor string using syntax from the debug map
+                $actor_strings[] = '@actors[]   = field-reporter-plum('.$plum_pos.', robot, plum, -, default)';
+                // Add him to the protected zones so nothing else spawns on his tile
+                $protected_zones['field-reporter-plum-buffer'] = $plum_pos;
             }
 
             // Extract anchored pickups vs regular pickups
