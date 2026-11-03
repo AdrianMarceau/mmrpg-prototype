@@ -21,7 +21,8 @@
 #---------------------------#
 @pickups    = defense-pellet(3),small-screw(2),swift-shard(1)
 #---------------------------#
-@items[]    = static-pickup-1(7-9, energy-tank)
+@items[]    = static-pickup-1(7-9, tinker-codes)
+@items[]    = static-pickup-2(6-6, energy-tank)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(6-6...16-16)
 @groups[]   = no-encounters_spawn-buffer(11-11...11-11)
@@ -67,7 +68,7 @@
 @blocks[]   = super-block-27(7-6, super-block)
 @blocks[]   = super-block-28(8-8, super-block)
 #---------------------------#
-@abilities[]  = swift-overdrive-pickup(6-6, swift-overdrive)
+@abilities[]  = swift-overdrive-pickup(8-10, swift-overdrive)
 #---------------------------#
 @layer = 0
 #---------------------------#

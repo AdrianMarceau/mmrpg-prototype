@@ -868,7 +868,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => 'sonic-highway',
         'encounters' => ['turbo-man', 'nitro-man'],
         'encounters2' => ['robo-transport', 'cannon-roader', 'trio-the-wheel'],
-        'items' => ['energy-tank'],
+        'items' => ['tinker-codes', 'energy-tank'],
         'abilities' => ['swift-overdrive'],
         'tags' => ['central', 'elemental'],
         'exits' => ['east', 'west']
