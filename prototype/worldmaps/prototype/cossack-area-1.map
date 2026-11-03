@@ -14,7 +14,7 @@
 @aliases[]  = 20:type-copy
 @aliases[]  = 30:cossack-citadel
 #---------------------------#
-@portals[]  = spawn(8-8)
+@portals[]  = spawn(8-8, hidden)
 #---------------------------#
 @portals[]  = north-exit(8-1, cossack-area-1n__south-exit, up-only)
 @portals[]  = west-exit(1-8, star-gate-70sw__east-exit, left-only)

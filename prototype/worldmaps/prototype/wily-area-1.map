@@ -14,7 +14,7 @@
 @aliases[]  = 20:type-copy
 @aliases[]  = 30:wily-castle
 #---------------------------#
-@portals[]  = spawn(8-8)
+@portals[]  = spawn(8-8, hidden)
 #---------------------------#
 @portals[]  = north-exit(8-1, wily-area-1n__south-exit, up-only)
 @portals[]  = west-exit(1-8, wily-area-1w__east-exit, left-only)

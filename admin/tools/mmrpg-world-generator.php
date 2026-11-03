@@ -213,12 +213,42 @@ echo('<pre>'.PHP_EOL);
             $area_size_xy = explode(' x ', $area_size);
             $area_size_width = intval($area_size_xy[0]);
             $area_size_height = intval($area_size_xy[1]);
-            $area_middle_col = ceil($area_size_width / 2);
-            $area_middle_row = ceil($area_size_height / 2);
-            $area_spawn = $area_middle_col.'-'.$area_middle_row;
-            $area_spawn_visible = in_array('start', $area_tags) || in_array('player-platform', $area_objects) ? true : false;
+            $area_middle_col = (int)ceil($area_size_width / 2);
+            $area_middle_row = (int)ceil($area_size_height / 2);
             $area_padding = !empty($area_info['padding']) ? intval($area_info['padding']) : 3;
             if (in_array('elemental', $area_tags)){ $area_padding += 1;  }
+
+            // Helper function to translate @location tags into absolute grid coordinates
+            // (Moved to the top so we can use it for custom spawn points too!)
+            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $area_padding) {
+                $loc = trim($loc, '! ');
+                if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
+                if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
+                if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
+                if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
+                if ($loc === 'north-exit') return $area_middle_col . '-' . $area_padding;
+                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - $area_padding + 1);
+                if ($loc === 'east-exit') return ($area_size_width - $area_padding + 1) . '-' . $area_middle_row;
+                if ($loc === 'west-exit') return $area_padding . '-' . $area_middle_row;
+                if ($loc === 'north') return $area_middle_col . '-' . ($area_padding + 2);
+                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - $area_padding - 1);
+                if ($loc === 'east') return ($area_size_width - $area_padding - 1) . '-' . $area_middle_row;
+                if ($loc === 'west') return ($area_padding + 2) . '-' . $area_middle_row;
+                if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
+                if ($loc === 'center-left') return ($area_middle_col - 1) . '-' . $area_middle_row;
+                if ($loc === 'center-right') return ($area_middle_col + 1) . '-' . $area_middle_row;
+                if ($loc === 'center-up') return $area_middle_col . '-' . ($area_middle_row - 1);
+                if ($loc === 'center-down') return $area_middle_col . '-' . ($area_middle_row + 1);
+                return null;
+                };
+
+            // Set the default spawn to center, but override it if 'spawn' is defined in worldinfo
+            $area_spawn = $area_middle_col.'-'.$area_middle_row;
+            if (!empty($area_info['spawn'])) {
+                $custom_spawn = $getLocationCoords($area_info['spawn']);
+                $area_spawn = $custom_spawn ? $custom_spawn : trim($area_info['spawn']);
+            }
+            $area_spawn_visible = false; //in_array('start', $area_tags) || in_array('player-platform', $area_objects) ? true : false;
             $area_field = !empty($area_info['field']) ? $area_info['field'] : 'field';
             $area_field_tile = $area_field === 'field' ? 'plain-field' : $area_field;
             $area_field_tile = str_replace('-1', '-i', $area_field_tile);
@@ -413,28 +443,59 @@ echo('<pre>'.PHP_EOL);
                 $protected_zones['stargate-healpad-buffer'] = $healpad_pos;
             }
             // If this area is the START area, generate all the parallel quanta flowers here!
-            if (in_array('start', $area_tags) && !empty($quanta_positions_index)){
-                $vertical_offset = 4;
+            if (in_array('start', $area_tags)){
+                // Adjust these variables to shift the ENTIRE network of portals (Doctors + Quanta Flowers)
+                $network_x_offset = 0;
+                $network_y_offset = -1; // (Changed from 4 so Dr. Light no longer overlaps the center spawn)
                 $area_file_markup[] = '#---------------------------#';
-                foreach ($quanta_positions_index AS $world_pos => $flower_type){
-                    // Translate world coordinates to local coordinates (accounting for padding)
-                    list($world_x, $world_y) = explode('-', $world_pos);
-                    $local_x = intval($world_x) + $area_padding;
-                    $local_y = intval($world_y) + $area_padding + $vertical_offset;
-                    $local_pos = $local_x.'-'.$local_y;
-                    // Get the destination area token based on the world position
-                    $dest_area_token = isset($area_positions_index[$world_pos]) ? $area_positions_index[$world_pos] : '';
-                    if (!empty($dest_area_token)){
-                        // Determine the correct colour for this element
-                        $portal_colour = 'black';
-                        foreach ($portal_colour_index AS $colour => $types){ if (in_array($flower_type, $types)){ $portal_colour = $colour; break; } }
-                        // Register this position so other objects don't spawn on it
-                        $protected_zones[$flower_type.'-flower-buffer'] = $local_pos;
-                        // Add the portal and lock to the markup
-                        $portal_name = $flower_type.'-portal';
-                        $exit_destination = $dest_area_token.'__subspace-portal';
-                        $area_file_markup[] = '@portals[]  = '.$portal_name.'('.$local_pos.', '.$exit_destination.', '.$portal_colour.'-alt)';
-                        $area_file_markup[] = '@locks[]    = '.$flower_type.'-portal-flower('.$local_pos.', portal-flower, '.$flower_type.', items:'.$flower_type.'-core, x10, locked)';
+                // 1. Generate the Quanta Flowers
+                if (!empty($quanta_positions_index)){
+                    foreach ($quanta_positions_index AS $world_pos => $flower_type){
+                        // Translate world coordinates to local coordinates (accounting for padding and offsets)
+                        list($world_x, $world_y) = explode('-', $world_pos);
+                        $local_x = intval($world_x) + $area_padding + $network_x_offset;
+                        $local_y = intval($world_y) + $area_padding + $network_y_offset;
+                        $local_pos = $local_x.'-'.$local_y;
+                        // Get the destination area token based on the world position
+                        $dest_area_token = isset($area_positions_index[$world_pos]) ? $area_positions_index[$world_pos] : '';
+                        if (!empty($dest_area_token)){
+                            // Determine the correct colour for this element
+                            $portal_colour = 'black';
+                            foreach ($portal_colour_index AS $colour => $types){ if (in_array($flower_type, $types)){ $portal_colour = $colour; break; } }
+                            // Register this position so other objects don't spawn on it
+                            $protected_zones[$flower_type.'-flower-buffer'] = $local_pos;
+                            // Add the portal and lock to the markup
+                            $portal_name = $flower_type.'-portal';
+                            $exit_destination = $dest_area_token.'__subspace-portal';
+                            $area_file_markup[] = '@portals[]  = '.$portal_name.'('.$local_pos.', '.$exit_destination.', '.$portal_colour.'-alt)';
+                            $area_file_markup[] = '@locks[]    = '.$flower_type.'-portal-flower('.$local_pos.', portal-flower, '.$flower_type.', items:'.$flower_type.'-core, x10, locked)';
+                        }
+                    }
+                }
+                // 2. Generate fast-travel portals to the four main Doctor hubs
+                $doctor_hubs = [
+                    'light-area-1' => 'blue',
+                    'wily-area-1' => 'red',
+                    'cossack-area-1' => 'purple',
+                    'lalinde-area-1' => 'green'
+                    ];
+                $area_file_markup[] = '#---------------------------#';
+                foreach ($doctor_hubs as $hub_token => $hub_colour) {
+                    // Find where this hub sits on the global world grid
+                    $hub_world_pos = array_search($hub_token, $area_positions_index);
+                    if ($hub_world_pos !== false) {
+                        // Translate world coordinates to local coordinates using the EXACT same offset math
+                        list($world_x, $world_y) = explode('-', $hub_world_pos);
+                        $local_x = intval($world_x) + $area_padding + $network_x_offset;
+                        $local_y = intval($world_y) + $area_padding + $network_y_offset;
+                        $local_pos = $local_x.'-'.$local_y;
+                        $hub_prefix = explode('-', $hub_token)[0];
+                        $portal_name = $hub_prefix.'-home-portal';
+                        $exit_destination = $hub_token.'__spawn';
+                        // Register this position so items/encounters don't spawn on top of it
+                        $protected_zones[$portal_name.'-buffer'] = $local_pos;
+                        // Output the standard portal markup
+                        $area_file_markup[] = '@portals[]  = '.$portal_name.'('.$local_pos.', '.$exit_destination.', '.$hub_colour.'-alt, confirm)';
                     }
                 }
             }
@@ -482,33 +543,6 @@ echo('<pre>'.PHP_EOL);
                 $protected_zones['player-resetpad-buffer'] = $resetpad_pos;
                 $protected_zones['player-exit-portal-buffer'] = $portal_pos;
             }
-
-            // Helper function to translate @location tags into absolute grid coordinates
-            $getLocationCoords = function($loc) use ($area_middle_col, $area_middle_row, $area_size_width, $area_size_height, $area_padding) {
-                $loc = trim($loc, '! '); // Strip any misplaced anchor tags just in case
-                // Portal locations (exact outer edges of the map)
-                if ($loc === 'north-exit-portal') return $area_middle_col . '-1';
-                if ($loc === 'south-exit-portal') return $area_middle_col . '-' . $area_size_height;
-                if ($loc === 'east-exit-portal') return $area_size_width . '-' . $area_middle_row;
-                if ($loc === 'west-exit-portal') return '1-' . $area_middle_row;
-                // Exit path locations (Directly on the path, right before the main platform)
-                if ($loc === 'north-exit') return $area_middle_col . '-' . $area_padding;
-                if ($loc === 'south-exit') return $area_middle_col . '-' . ($area_size_height - $area_padding + 1);
-                if ($loc === 'east-exit') return ($area_size_width - $area_padding + 1) . '-' . $area_middle_row;
-                if ($loc === 'west-exit') return $area_padding . '-' . $area_middle_row;
-                // Inner perimeter locations (1 tile safely inside the main room, completely off the path)
-                if ($loc === 'north') return $area_middle_col . '-' . ($area_padding + 2);
-                if ($loc === 'south') return $area_middle_col . '-' . ($area_size_height - $area_padding - 1);
-                if ($loc === 'east') return ($area_size_width - $area_padding - 1) . '-' . $area_middle_row;
-                if ($loc === 'west') return ($area_padding + 2) . '-' . $area_middle_row;
-                // Center and Center-Offset locations
-                if ($loc === 'center') return $area_middle_col . '-' . $area_middle_row;
-                if ($loc === 'center-left') return ($area_middle_col - 1) . '-' . $area_middle_row;
-                if ($loc === 'center-right') return ($area_middle_col + 1) . '-' . $area_middle_row;
-                if ($loc === 'center-up') return $area_middle_col . '-' . ($area_middle_row - 1);
-                if ($loc === 'center-down') return $area_middle_col . '-' . ($area_middle_row + 1);
-                return null;
-            };
 
             // Initialize exact protected coordinates early so we can add barriers to it
             $exact_protected_coords = [];
