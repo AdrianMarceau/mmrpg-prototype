@@ -107,4 +107,34 @@ if ($this_current_map === 'cossack-area-1'){
 
 }
 
+// If we are on the main hub map (PROTOTYPE Area 0)
+if ($this_current_map === 'prototype-area-0') {
+
+    // Define the unlock tokens required for each portal to appear
+    $doctor_unlock_tokens = [
+        'light' => 'dr-light',
+        'wily' => 'dr-wily',
+        'cossack' => 'dr-cossack',
+        'lalinde' => 'dr-lalinde'
+        ];
+
+    // Loop through and hide portals if the player hasn't unlocked the doctor yet
+    foreach ($doctor_unlock_tokens as $prefix => $player_token) {
+        $portal_namekey = $prefix.'-home-portal';
+
+        // If this portal exists in the generated map data
+        if (isset($map_data_parsed['portals'][$portal_namekey])) {
+
+            // Check if the player has actually unlocked this doctor
+            // (Note: If you track area unlocks instead of player unlocks, you can swap this function!)
+            $is_unlocked = mmrpg_prototype_player_unlocked($player_token);
+
+            // If they haven't traveled there / unlocked them yet, push 'hidden' into the portal's arg array
+            if (!$is_unlocked) {
+                $map_data_parsed['portals'][$portal_namekey][] = 'hidden';
+            }
+        }
+    }
+}
+
 ?>
