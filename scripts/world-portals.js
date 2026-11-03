@@ -67,6 +67,8 @@ function preparePortalEventOptions(firstEvent, options){
 
     if (portalInfo && goToDestination){
 
+        console.log('portalInfo =', portalInfo);
+
         actionData.showActionArea = true;
         if (!dataLabel){ dataLabel = 'Portal Options'; }
         actionData.actionAreaMarkup = '<strong class="label">' + dataLabel + '</strong>';
@@ -75,7 +77,8 @@ function preparePortalEventOptions(firstEvent, options){
         if (dataPortal === 'exit'){
             actionData.sideButtonsMarkup += '<a class="button big-button' + btnType + '" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>';
             } else {
-            actionData.sideButtonsMarkup += '<a class="button big-button' + btnType + '" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>';
+            let enterTheWhat = portalInfo.colour === 'void' ? 'Void' : 'Teleport';
+            actionData.sideButtonsMarkup += '<a class="button big-button' + btnType + '" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter ' + enterTheWhat + '</span></a>';
             }
         actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
         actionData.showActionAreaType = 'portal';

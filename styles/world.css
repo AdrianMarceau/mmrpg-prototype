@@ -5615,6 +5615,11 @@ display: block;
     background-color: #a24d1e !important;
     border-color: #c66e34 !important;
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].void,
+#world #canvas #side-buttons .button[data-action="push-button"].void {
+    background-color: #242424 !important;
+    border-color: #3b3b3b !important;
+}
 #world #canvas #side-buttons .button[data-action="toggle-switch"].black-white {
     background-color: #4f5861 !important;
     border-color: #2a3744 !important;
