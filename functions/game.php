@@ -1126,7 +1126,7 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
         $console_replace[] = rpg_type::print_span(array($item_info['item_type'], $item_info['item_type2']), $console_shop_name);
 
         // Print out the parsed event text and the item database markup
-        $headline_text = ($is_shop_item ? 'You Got A New Shop' : 'You Got A New Item').'!';
+        $headline_text = !empty($shop_info['shop_unlock_message']) ? $shop_info['shop_unlock_message'] : ($is_shop_item ? 'You Got A New Shop' : 'You Got A New Item').'!';
         $quotetext_color = $player_type;
         if (strstr($item_token, 'light-')){ $quotetext_color = 'defense'; }
         elseif (strstr($item_token, 'wily-')){ $quotetext_color = 'attack'; }
@@ -1155,7 +1155,12 @@ function mmrpg_game_unlock_item($item_token, $print_options = array()){
                     $temp_console_markup .= 'The doctor feels strong enough to bring <strong>'.$temp_limit_hearts.' robots '.$temp_limit_hearts_icons.'</strong> into battle now!';
                     }
                 elseif ($is_shop_item){
-                    $temp_console_markup .= 'Check the <strong><i class="fa fas fa-shopping-cart"></i> <ins>shop</ins></strong> tab to see what\'s available!';
+                    if (!empty($shop_info['shop_has_frame'])){
+                        $temp_console_markup .= 'Check the <strong><i class="fa fas fa-shopping-cart"></i> <ins>shop</ins></strong> tab to see what\'s available!';
+                        }
+                    elseif (!empty($shop_info['shop_in_overworld'])){
+                        $temp_console_markup .= 'Find them in the <strong><i class="fa fas fa-map"></i> <ins>overworld</ins></strong> to see what they do!';
+                        }
                     }
                 else {
                     $temp_console_markup .= 'Check the <strong><i class="fa fas fa-briefcase"></i> <ins>items</ins></strong> tab for more info!';

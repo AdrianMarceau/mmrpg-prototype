@@ -9,7 +9,7 @@ $this_shop_index['auto'] = array(
     'shop_source' => 'robots',
     'shop_name' => 'Auto\'s Shop',
     'shop_owner' => 'Auto',
-    'shop_unlock' => 'Complete the first chapter as Dr. Light or find one of his codes.',
+    'shop_unlock' => 'Find a piece of Auto\'s source code in Free-Roam.',
     'shop_seeking' => 'screws',
     'shop_seeking_text' => 'Junk Lover',
     'shop_seeking_image' => 'large-screw',
@@ -30,7 +30,9 @@ $this_shop_index['auto'] = array(
         'items_buying' => array()
         ),
     'shop_max_level' => 10,
-    'shop_base_cost' => 1000
+    'shop_base_cost' => 1000,
+    'shop_has_frame' => true,
+    'shop_in_overworld' => true
     );
 
 // REGGAE'S SHOP
@@ -39,7 +41,7 @@ $this_shop_index['reggae'] = array(
     'shop_source' => 'robots',
     'shop_name' => 'Reggae\'s Shop',
     'shop_owner' => 'Reggae',
-    'shop_unlock' => 'Complete the first chapter as Dr. Wily or find one of his codes.',
+    'shop_unlock' => 'Find a piece of Reggae\'s source code in Free-Roam.',
     'shop_seeking' => 'cores',
     'shop_seeking_text' => 'Core Expert',
     'shop_seeking_image' => 'none-core',
@@ -62,7 +64,9 @@ $this_shop_index['reggae'] = array(
         'items_buying' => array()
         ),
     'shop_max_level' => 20,
-    'shop_base_cost' => 15000
+    'shop_base_cost' => 15000,
+    'shop_has_frame' => true,
+    'shop_in_overworld' => true
     );
 
 
@@ -72,7 +76,7 @@ $this_shop_index['kalinka'] = array(
     'shop_source' => 'players',
     'shop_name' => 'Kalinka\'s Shop',
     'shop_owner' => 'Kalinka',
-    'shop_unlock' => 'Complete the first chapter as Dr. Cossack or find one of his codes.',
+    'shop_unlock' => 'Find a piece of Kalinka\'s source code in Free-Roam.',
     'shop_seeking' => 'stars',
     'shop_seeking_text' => 'Star Seeker',
     'shop_seeking_image' => 'field-star',
@@ -86,7 +90,36 @@ $this_shop_index['kalinka'] = array(
     'shop_quote_buying' => array(),
     'shop_alts' => array(),
     'shop_max_level' => 30,
-    'shop_base_cost' => 30000
+    'shop_base_cost' => 30000,
+    'shop_has_frame' => true,
+    'shop_in_overworld' => true
+    );
+
+
+// PLUM'S GARAGE
+$this_shop_index['plum'] = array(
+    'shop_token' => 'plum',
+    'shop_source' => 'robots',
+    'shop_name' => 'Plum\'s Garage',
+    'shop_owner' => 'Plum',
+    'shop_unlock' => 'Find a piece of Plum\'s source code in Free-Roam.',
+    'shop_unlock_message' => 'You Unlocked Plum\'s Garage!',
+    'shop_seeking' => 'pellets',
+    'shop_seeking_text' => 'Stat Mechanic',
+    'shop_seeking_image' => 'super-pellet',
+    'shop_colour' => 'crystal',
+    'shop_field' => 'sonic-highway',
+    'shop_player' => 'dr-lalinde',
+    'shop_number' => 'SHOP-004',
+    'shop_kind_selling' => array(),
+    'shop_kind_buying' => array(),
+    'shop_quote_selling' => array(),
+    'shop_quote_buying' => array(),
+    'shop_alts' => array(),
+    'shop_max_level' => 99,
+    'shop_base_cost' => 999999,
+    'shop_has_frame' => false,
+    'shop_in_overworld' => true
     );
 
 
