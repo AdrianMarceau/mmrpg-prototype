@@ -3179,7 +3179,7 @@ class rpg_world {
                 $sprite = 'portal';
                 if (!empty($direction)){ $sprite .= '-'.$direction; }
                 if (!empty($colour)){ $sprite .= ' portal-'.$colour; }
-                $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ('World '.ucwords(str_replace('-', ' ', $portal_name)));
+                $label = preg_match('/^goto__/i', $portal_name) ? strtoupper(preg_replace('/^goto__/i', '', $portal_name)) : ucwords(str_replace('-', ' ', $portal_name));
                 $attrs = 'data-portal="'.$portal_name.'" data-label="'.$label.'" data-pos="'.$pos.'" data-col="'.$col.'" data-row="'.$row.'"';
                 $classes = 'sprite tile '.$sprite.' '.($portal_name !== 'spawn' && !$hidden && !$locked  ? ' pulse' : '').($hidden ? ' hidden' : '').($locked ? ' locked' : '');
                 $style = 'top: '.$top.'px; left: '.$left.'px; z-index: '.$z_index.';';
@@ -3192,6 +3192,7 @@ class rpg_world {
                     'col' => $col,
                     'row' => $row,
                     'label' => $label,
+                    'colour' => $colour,
                     'hidden' => $hidden,
                     'locked' => $locked,
                     'direction' => $direction,

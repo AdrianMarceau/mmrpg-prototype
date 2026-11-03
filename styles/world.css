@@ -5584,27 +5584,33 @@ display: block;
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].red,
 #world #canvas #side-buttons .button[data-action="push-button"].red {
     background-color: #8b1d1d !important;
     border-color: #b23333 !important;
 
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].blue,
 #world #canvas #side-buttons .button[data-action="push-button"].blue {
-    background-color: #1e2736 !important;
-    border-color: #354d75 !important;
+    background-color: #3a5889 !important;
+    border-color: #5d7db1 !important;
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].yellow,
 #world #canvas #side-buttons .button[data-action="push-button"].yellow {
     background-color: #b3871f !important;
     border-color: #8e6609 !important;
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].green,
 #world #canvas #side-buttons .button[data-action="push-button"].green {
     background-color: #3e7a2e !important;
     border-color: #50b236 !important;
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].purple,
 #world #canvas #side-buttons .button[data-action="push-button"].purple {
     background-color: #4d3da2 !important;
     border-color: #6e5dc6 !important;
 }
+#world #canvas #side-buttons .button[data-action="enter-portal"].orange,
 #world #canvas #side-buttons .button[data-action="push-button"].orange {
     background-color: #a24d1e !important;
     border-color: #c66e34 !important;

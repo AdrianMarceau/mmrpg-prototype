@@ -66,11 +66,17 @@ function preparePortalEventOptions(firstEvent, options){
     goToSamePosition = goToSameWorld && goToSameMap && goToPosition === _worldCursor.position ? true : false;
 
     if (portalInfo && goToDestination){
+
         actionData.showActionArea = true;
         if (!dataLabel){ dataLabel = 'Portal Options'; }
         actionData.actionAreaMarkup = '<strong class="label">' + dataLabel + '</strong>';
-        if (dataPortal === 'exit'){ actionData.sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>'; }
-        else { actionData.sideButtonsMarkup += '<a class="button big-button" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>'; }
+        // Dynamically inject the portal's colour as a CSS type class
+        let btnType = portalInfo.colour ? ' type ' + portalInfo.colour : '';
+        if (dataPortal === 'exit'){
+            actionData.sideButtonsMarkup += '<a class="button big-button' + btnType + '" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Return Home</span></a>';
+            } else {
+            actionData.sideButtonsMarkup += '<a class="button big-button' + btnType + '" data-action="enter-portal" data-portal="'+dataPortal+'"><span><sup>Ready To</sup> Enter Teleport</span></a>';
+            }
         actionData.sideButtonsMarkup += '<a class="button sub-button" data-action="dismiss"><span>Dismiss</span></a>';
         actionData.showActionAreaType = 'portal';
         actionData.zoomTimeoutDuration = 500;
