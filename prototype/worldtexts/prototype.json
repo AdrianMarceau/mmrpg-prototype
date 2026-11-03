@@ -129,9 +129,9 @@
             },
         "actions": {
             "default": [
-                ["Boost Base Attack", "boost-robot-attack", "attack", "items:attack-capsule", 1, true],
-                ["Boost Base Defense", "boost-robot-defense", "defense", "items:defense-capsule", 1, true],
-                ["Boost Base Speed", "boost-robot-speed", "speed", "items:speed-capsule", 1, true]
+                ["Boost Base Attack", "boost-robot-attack", "attack", "items:attack-pellet", 1, true],
+                ["Boost Base Defense", "boost-robot-defense", "defense", "items:defense-pellet", 1, true],
+                ["Boost Base Speed", "boost-robot-speed", "speed", "items:speed-pellet", 1, true]
                 ]
             }
         },
