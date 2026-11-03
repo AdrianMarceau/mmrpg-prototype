@@ -46,7 +46,7 @@ if (!empty($map_data_parsed['actors'])
     if (!$actor_is_unlocked){ unset($map_data_parsed['actors'][$actor_namekey]); }
     //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
 
-    // If Reggae has not been interacted with yet, make sure we set it to first-encounter
+    // If Reggae has not been interacted with yet, make sure we set him to first-encounter
     $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
     //error_log('$world_map_actors = '.print_r($world_map_actors, true));
@@ -65,6 +65,24 @@ if (!empty($map_data_parsed['actors'])
     //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
 
     // If Kalinka has not been interacted with yet, make sure we set her to first-encounter
+    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
+    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
+
+}
+
+// If the mechanic PLUM is currently on this map
+$actor_token = 'plum';
+$actor_namekey = 'field-reporter-plum';
+if (!empty($map_data_parsed['actors'])
+    && !empty($map_data_parsed['actors'][$actor_namekey])){
+
+    // Check to see if Plum is unlocked yet via the Plum Link
+    $actor_is_unlocked = mmrpg_prototype_item_unlocked($actor_token.'-link');
+    if (!$actor_is_unlocked){ unset($map_data_parsed['actors'][$actor_namekey]); }
+    //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
+
+    // If Plum has not been interacted with yet, make sure we set her to first-encounter
     $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
     //error_log('$world_map_actors = '.print_r($world_map_actors, true));
