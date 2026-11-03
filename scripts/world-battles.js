@@ -179,10 +179,12 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
         let showBattleButton = true;
         let showRecruitButton = false;
         let showWhistleButton = false;
-        let showPelletButton = false;
-        let pelletStat = '';
-        let pelletToken = '';
-        let pelletType = '';
+        let showThrowButton = false;
+        let throwKind = '';
+        let throwItem = '';
+        let throwStat = '';
+        let throwToken = '';
+        let throwType = '';
 
         if (!playerIsCursor && isSoloMechaBattle){
             if (isSoloMechaRescue){
@@ -191,24 +193,20 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
             } else {
                 if (_worldPlayer.token === 'dr-lalinde'){
                     showWhistleButton = true;
-                } else if (_worldPlayer.token === 'dr-light'){
-                    showPelletButton = true;
-                    pelletStat = 'Defense';
-                    pelletToken = 'defense-pellet';
-                    pelletType = 'defense';
-                } else if (_worldPlayer.token === 'dr-wily'){
-                    showPelletButton = true;
-                    pelletStat = 'Attack';
-                    pelletToken = 'attack-pellet';
-                    pelletType = 'attack';
-                } else if (_worldPlayer.token === 'dr-cossack'){
-                    showPelletButton = true;
-                    pelletStat = 'Speed';
-                    pelletToken = 'speed-pellet';
-                    pelletType = 'speed';
+                    }
+                else if (_worldPlayer.token === 'dr-light'
+                    || _worldPlayer.token === 'dr-wily'
+                    || _worldPlayer.token === 'dr-cossack'){
+                    showThrowButton = true;
+                    throwKind = 'Capsule';
+                    throwItem = 'capsule';
+                    if (_worldPlayer.token === 'dr-light'){ throwType = 'defense'; throwStat = 'Defense'; }
+                    else if (_worldPlayer.token === 'dr-wily'){ throwType = 'attack'; throwStat = 'Attack'; }
+                    else if (_worldPlayer.token === 'dr-cossack'){ throwType = 'speed'; throwStat = 'Speed'; }
+                    throwToken = throwType + '-' + throwItem;
+                    }
                 }
             }
-        }
 
         if (showBattleButton){
             if (playerActiveRobots >= 1){
@@ -218,7 +216,7 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                 }
             }
 
-        if (showRecruitButton || showWhistleButton || showPelletButton){
+        if (showRecruitButton || showWhistleButton || showThrowButton){
             let playerHasTeamSlot = _worldPlayer.team.length < _config.maxRobotsPerPlayer ? true : false;
             let mechaBattleEvent = firstBattleEvent;
             let mechaTarget = mechaBattleEvent.token;
@@ -251,18 +249,17 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
                     actionData.sideButtonsMarkup += '</a>';
                     }
                 }
-            else if (showPelletButton && typeof _worldPlayer.items[pelletToken] !== 'undefined'){
-                let pelletQuantity = _self.getItemQuantity(pelletToken);
-                let pelletSpriteMarkup = _self.getItemSpriteMarkup(pelletToken);
-                //let pelletSpanLabel = '<sup>Throw</sup> ' + pelletStat + ' Pellet <sub>&times; ' + pelletQuantity + '</sub>';
-                let pelletSpanLabel = '<sup>Throw</sup> Stat Pellet <sub>&times; ' + pelletQuantity + '</sub>';
-                if (pelletQuantity > 0){
-                    actionData.sideButtonsMarkup += '<a class="button big-button type ' + pelletType + '" data-action="throw-stat-pellet" data-target="' + mechaTarget + '" data-pellet="' + pelletToken + '">';
-                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + pelletSpanLabel + pelletSpriteMarkup + '</span>';
+            else if (showThrowButton && typeof _worldPlayer.items[throwToken] !== 'undefined'){
+                let throwItemQuantity = _self.getItemQuantity(throwToken);
+                let throwItemSpriteMarkup = _self.getItemSpriteMarkup(throwToken);
+                let throwSpanLabel = '<sup>Throw</sup> Stat ' + throwKind + ' <sub>&times; ' + throwItemQuantity + '</sub>';
+                if (throwItemQuantity > 0){
+                    actionData.sideButtonsMarkup += '<a class="button big-button type ' + throwType + '" data-action="throw-stat-' + throwItem + '" data-target="' + mechaTarget + '" data-throw="' + throwToken + '">';
+                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + throwSpanLabel + throwItemSpriteMarkup + '</span>';
                     actionData.sideButtonsMarkup += '</a>';
                     } else {
                     actionData.sideButtonsMarkup += '<a class="button big-button disabled">';
-                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + pelletSpanLabel + pelletSpriteMarkup + '</span>';
+                    actionData.sideButtonsMarkup += '<span class="has-sprite">' + throwSpanLabel + throwItemSpriteMarkup + '</span>';
                     actionData.sideButtonsMarkup += '</a>';
                     }
                 }
@@ -371,27 +368,27 @@ function handleBattleActionClick(action, $button, firstEvent){
             _self.playSoundEffect('small-debuff-received');
             }
         }
-    else if (action === 'throw-stat-pellet'){
+    else if (action === 'throw-stat-pellet' || action === 'throw-stat-capsule'){
         let delayMessageFor = 300;
         let delayDismissFor = 1200;
         let delayEffectFor = 2100;
         let playerToken = _worldPlayer.token;
         let playerNameSpan = _self.getPlayerNameSpan(playerToken);
         let battleTarget = $button.attr('data-target') || false;
-        let pelletToken = $button.attr('data-pellet') || false;
-        let itemNameSpan = _self.getItemNameSpan(pelletToken);
-        //console.log('Action: throw-stat-pellet | Target: ' + battleTarget + ' | Pellet: ' + pelletToken);
+        let throwToken = $button.attr('data-throw') || false;
+        let itemNameSpan = _self.getItemNameSpan(throwToken);
+        //console.log('Action: ' + action + ' | Target: ' + battleTarget + ' | Pellet: ' + throwToken);
         _self.playSoundEffect('get-weird-item');
-        _self.showWorldMessage(playerNameSpan + ' throws ' + (pelletToken.match(/^[aeiou]+/) ? 'an' : 'a') + ' ' + itemNameSpan + '!', delayMessageFor);
+        _self.showWorldMessage(playerNameSpan + ' throws ' + (throwToken.match(/^[aeiou]+/) ? 'an' : 'a') + ' ' + itemNameSpan + '!', delayMessageFor);
         if (true){
             _self.showWorldMessage('...the mecha accepted the bribe!', delayDismissFor);
-            //console.warn('disabled _self.decrementItemQuantity(pelletToken);');
-            _self.decrementItemQuantity(pelletToken);
+            //console.warn('disabled _self.decrementItemQuantity(throwToken);');
+            _self.decrementItemQuantity(throwToken);
             setTimeout(function(){ _self.hideActionDropdown(false); }, delayDismissFor);
             setTimeout(function(){
                 let $eventSprite = $('.sprite.battle[data-battle="' + battleTarget + '"]');
                 $eventSprite.attr('data-frame', '02').addClass('zoom');
-                let bribeHref = 'world.php?bribe=' + battleTarget + '&item=' + pelletToken;
+                let bribeHref = 'world.php?bribe=' + battleTarget + '&item=' + throwToken;
                 if (bribeHref){
                     _self.playSoundEffect('get-big-item');
                     _self.incZoomLevel();
