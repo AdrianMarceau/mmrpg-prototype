@@ -809,6 +809,33 @@ if (mmrpg_prototype_complete('dr-cossack')
 
 
 /*
+ * DR. LALINDE EVENT ITEMS
+ */
+
+// Unlock the PLUM LINK after Dr. LaLinde has found one of her codes
+if (!mmrpg_prototype_item_unlocked('plum-link')
+    && mmrpg_prototype_item_unlocked('tinker-codes')
+    ){
+
+    // Unlock the Plum Link and generate the required event details
+    error_log('unlocking the Plum Link!');
+    mmrpg_game_unlock_item('plum-link', array(
+        'event_text' => '{player} made contact! <br /> The {item} has been established!',
+        'player_token' => 'dr-lalinde',
+        'shop_token' => 'plum',
+        'show_images' => array('robot', 'shop'),
+        'field_background' => 'sonic-highway',
+        'field_foreground' => 'sonic-highway',
+        'force_event' => true
+        ));
+
+    // Make sure Plum pops up in the ready-room with the rest of her family
+    rpg_prototype::mark_robot_as_pending_entrance_animation('plum');
+
+}
+
+
+/*
  * MULTI DR. EVENT ITEMS
  */
 
