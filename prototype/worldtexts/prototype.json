@@ -135,6 +135,26 @@
                 ]
             }
         },
+    "eddie": {
+        "name": "Eddie",
+        "type": "none",
+        "colour": "flame",
+        "messages": {
+            "default": [
+                "Hi {player_name}! It's great to see you again! Is there anything you wanted to trade for today?"
+                ],
+            "first-encounter": [
+                "Wow, I can't believe it's you! Long time no see, {player_name}! Wanna trade for some rare items?"
+                ]
+            },
+        "actions": {
+            "default": [
+                ["Trade for Extra Life", "trade-for-extra-life", "none", "items:large-screw", 10],
+                ["Trade for Energy Tank", "trade-for-energy-tank", "energy", "items:energy-pellet", 10],
+                ["Trade for Weapon Tank", "trade-for-weapon-tank", "weapons", "items:weapon-pellet", 10]
+                ]
+            }
+        },
     "anti-eddie": {
         "name": "Anti Eddie",
         "type": "none",
