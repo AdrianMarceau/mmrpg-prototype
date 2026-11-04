@@ -30,7 +30,7 @@
 @groups[]   = no-encounters_south-exit-buffer(7-14...9-15)
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
 @groups[]   = no-encounters_east-exit-buffer(14-7...15-9)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(3-11...5-13)
 #---------------------------#
 @encounters = bunby-heli(4),flutter-fly(3),petit-snakey(2),batton(1)
 #---------------------------#
@@ -38,7 +38,7 @@
 #---------------------------#
 @rescues[]  = rescue-robo-1(8-7, beat)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(4-12, robot, anti-eddie, -, default)
 #---------------------------#
 @layer = 0
 #---------------------------#

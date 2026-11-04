@@ -39,7 +39,7 @@
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_south-exit-buffer(7-14...9-15)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(11-3...13-5)
 #---------------------------#
 @encounters = blocky(4),robo-transport(3),trio-the-wheel(2),power-muscler(1)
 @population = 60%
@@ -48,7 +48,7 @@
 #---------------------------#
 @rescues[]  = rescue-robo-1(5-8, treble)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(12-4, robot, anti-eddie, -, default)
 #---------------------------#
 @layer = 0
 #---------------------------#

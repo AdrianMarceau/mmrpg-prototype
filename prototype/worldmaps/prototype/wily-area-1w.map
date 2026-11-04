@@ -26,15 +26,15 @@
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
 @groups[]   = no-encounters_east-exit-buffer(14-7...15-9)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(3-3...5-5)
 #---------------------------#
 @encounters = met(2),skeleton-joe(1)
 #---------------------------#
-@bosses[]   = boss-boss-1(7-8, trill)
+@bosses[]   = boss-boss-1(8-9, trill)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(4-4, robot, anti-eddie, -, default)
 #---------------------------#
-@abilities[]  = wily-buster-pickup(8-5, wily-buster)
+@abilities[]  = wily-buster-pickup(5-8, wily-buster)
 #---------------------------#
 @layer = 0
 #---------------------------#

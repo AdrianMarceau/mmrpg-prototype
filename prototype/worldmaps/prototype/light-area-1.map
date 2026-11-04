@@ -32,8 +32,8 @@
 @mechas[]   = light-guard-east(13-8, sniper-joe, 2)
 @mechas[]   = light-guard-south(8-13, sniper-joe, 3)
 #---------------------------#
-@items[]    = light-init-program(10-9, light-program, anchored)
-@items[]    = light-init-heart(7-8, light-heart, anchored)
+@items[]    = light-init-program(7-8, light-program, anchored)
+@items[]    = light-init-heart(11-7, light-heart, anchored)
 @items[]    = light-init-core(5-7, light-core, anchored)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
@@ -48,10 +48,12 @@
 @groups[]   = no-encounters_player-resetpad-buffer(10-4...12-6)
 @groups[]   = no-encounters_player-exit-portal-buffer(7-10...9-12)
 @groups[]   = no-encounters_good-guy-auto-buffer(4-10...6-12)
+@groups[]   = no-encounters_good-boy-rush-buffer(10-10...12-12)
 #---------------------------#
 @encounters = met(1)
 #---------------------------#
 @actors[]   = good-guy-auto(5-11, robot, auto, -, default)
+@rescues[]  = good-boy-rush(11-11, rush)
 #---------------------------#
 @layer = 0
 #---------------------------#

@@ -38,7 +38,7 @@
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(11-3...13-5)
 #---------------------------#
 @encounters = tatepakkan_alt2(4),dodonpa-cannon_alt(3),hammer-joe(2),vavaliant(1)
 @population = 60%
@@ -47,7 +47,7 @@
 #---------------------------#
 @rescues[]  = rescue-robo-1(11-8, heel-bot)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(12-4, robot, anti-eddie, -, default)
 #---------------------------#
 @layer = 0
 #---------------------------#

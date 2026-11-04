@@ -22,7 +22,7 @@
 #---------------------------#
 @pickups    = small-screw(3),weapon-pellet(2),weapon-capsule(1)
 #---------------------------#
-@items[]    = static-pickup-1(10-8, weapon-codes)
+@items[]    = static-pickup-1(9-7, weapon-codes)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)

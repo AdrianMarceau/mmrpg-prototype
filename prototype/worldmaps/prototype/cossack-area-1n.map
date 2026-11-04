@@ -22,17 +22,17 @@
 #---------------------------#
 @pickups    = small-screw(3),energy-pellet(2),energy-capsule(1)
 #---------------------------#
-@items[]    = static-pickup-1(5-11, master-codes)
+@items[]    = static-pickup-1(10-7, master-codes)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_north-exit-buffer(7-1...9-2)
 @groups[]   = no-encounters_south-exit-buffer(7-14...9-15)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(3-3...5-5)
 #---------------------------#
 @encounters = met(2),crystal-joe(1)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(4-4, robot, anti-eddie, -, default)
 #---------------------------#
 @layer = 0
 #---------------------------#

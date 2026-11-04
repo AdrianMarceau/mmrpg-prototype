@@ -26,27 +26,25 @@
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_south-exit-buffer(7-14...9-15)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(3-11...5-13)
 #---------------------------#
 @encounters = beak(4),pooker(3),shield-attacker-gtr(2),propeller-eye(1)
 #---------------------------#
 @bosses[]   = boss-boss-1(8-8, hyper-storm-h)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(4-12, robot, anti-eddie, -, default)
 #---------------------------#
-@blocks[]   = super-block-1(11-8, super-block)
-@blocks[]   = super-block-2(5-4, super-block)
-@blocks[]   = super-block-3(10-5, super-block)
-@blocks[]   = super-block-4(4-9, super-block)
-@blocks[]   = super-block-5(12-10, super-block)
-@blocks[]   = super-block-6(9-9, super-block)
-@blocks[]   = super-block-7(6-11, super-block)
-@blocks[]   = super-block-8(7-7, super-block)
-@blocks[]   = super-block-9(8-10, super-block)
-@blocks[]   = super-block-10(10-10, super-block)
-@blocks[]   = super-block-11(12-6, super-block)
-@blocks[]   = super-block-12(4-4, super-block)
-@blocks[]   = super-block-13(7-8, super-block)
+@blocks[]   = super-block-1(8-10, super-block)
+@blocks[]   = super-block-2(7-11, super-block)
+@blocks[]   = super-block-3(11-12, super-block)
+@blocks[]   = super-block-4(10-9, super-block)
+@blocks[]   = super-block-5(6-7, super-block)
+@blocks[]   = super-block-6(4-8, super-block)
+@blocks[]   = super-block-7(9-12, super-block)
+@blocks[]   = super-block-8(8-11, super-block)
+@blocks[]   = super-block-9(6-12, super-block)
+@blocks[]   = super-block-10(5-7, super-block)
+@blocks[]   = super-block-11(10-6, super-block)
 #---------------------------#
 @layer = 0
 #---------------------------#
@@ -54,13 +52,13 @@
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[__],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[__],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[__],[30],[30],[30],[__],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[__],[30],[30],[30],[__],[__],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[__],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[__],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[__],[__],[__],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[30],[30],[30],[30],[__],[__],[30],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
-[__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
+[__],[__],[__],[30],[__],[30],[30],[__],[__],[30],[__],[30],[__],[__],[__]
+[__],[__],[__],[30],[__],[__],[30],[30],[__],[__],[__],[30],[__],[__],[__]
+[__],[__],[__],[30],[30],[__],[30],[30],[30],[30],[__],[30],[__],[__],[__]
 [__],[__],[__],[30],[30],[30],[30],[30],[30],[30],[30],[30],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__]
 [__],[__],[__],[__],[__],[__],[__],[30],[__],[__],[__],[__],[__],[__],[__]

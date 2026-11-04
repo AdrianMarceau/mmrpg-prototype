@@ -26,15 +26,15 @@
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
 @groups[]   = no-encounters_east-exit-buffer(14-7...15-9)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(3-11...5-13)
 #---------------------------#
 @encounters = met(2),crystal-joe(1)
 #---------------------------#
 @bosses[]   = boss-boss-1(7-8, trill)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(4-12, robot, anti-eddie, -, default)
 #---------------------------#
-@abilities[]  = cossack-buster-pickup(8-11, cossack-buster)
+@abilities[]  = cossack-buster-pickup(8-9, cossack-buster)
 #---------------------------#
 @layer = 0
 #---------------------------#

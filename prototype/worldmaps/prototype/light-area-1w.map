@@ -23,19 +23,19 @@
 @pickups    = small-screw(3),weapon-pellet(2),weapon-capsule(1)
 #---------------------------#
 @items[]    = static-pickup-1(13-8, equip-codes)
-@items[]    = static-pickup-2(9-10, mecha-whistle)
+@items[]    = static-pickup-2(11-11, mecha-whistle)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
 @groups[]   = no-encounters_west-exit-buffer(1-7...2-9)
 @groups[]   = no-encounters_east-exit-buffer(14-7...15-9)
-@groups[]   = no-encounters_purple-reset-dude-buffer(11-11...13-13)
+@groups[]   = no-encounters_purple-reset-dude-buffer(3-11...5-13)
 #---------------------------#
 @encounters = met(3),sniper-joe(2),flea(1)
 #---------------------------#
-@actors[]   = purple-reset-dude(12-12, robot, anti-eddie, -, default)
+@actors[]   = purple-reset-dude(4-12, robot, anti-eddie, -, default)
 #---------------------------#
-@abilities[]  = light-buster-pickup(9-8, light-buster)
+@abilities[]  = light-buster-pickup(8-10, light-buster)
 #---------------------------#
 @layer = 0
 #---------------------------#
