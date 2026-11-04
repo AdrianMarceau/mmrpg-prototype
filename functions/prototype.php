@@ -5958,6 +5958,24 @@ function mmrpg_get_robot_database_records_markup($robot_class, $record_limit = 1
 
 }
 
+// Define a quick function that reviews a player's current level stats (min, max, average)
+function mmrpg_prototype_get_player_robot_level_stats($player_token) {
+    $player_rewards = mmrpg_prototype_player_rewards($player_token);
+    if (empty($player_rewards['player_robots'])) {
+        return array('min' => 0, 'max' => 0, 'average' => 0);
+        }
+    $levels = array();
+    foreach ($player_rewards['player_robots'] as $robot_key => $robot_info) {
+        // Fallback to level 1 if not set
+        $levels[] = !empty($robot_info['robot_level']) ? $robot_info['robot_level'] : 1;
+        }
+    return array(
+        'min' => min($levels),
+        'max' => max($levels),
+        'average' => floor(array_sum($levels) / count($levels))
+        );
+}
+
 // Define a function for pulling the list of contributors from the global index
 function mmrpg_prototype_contributor_index(){
 
