@@ -637,24 +637,72 @@ echo('<pre>'.PHP_EOL);
             // Create an array to hold any actor strings we want to add
             $actor_strings = [];
 
-            // Pre-place the "Purple Reset Guy" (Anti-Eddie) if the area has random encounters and isn't a player area
+            // Define the 4 corners of the walkable area (used by NPCs like Eddie and Anti-Eddie)
+            $corner_min_x = $area_padding + 1;
+            $corner_max_x = $area_size_width - $area_padding;
+            $corner_min_y = $area_padding + 1;
+            $corner_max_y = $area_size_height - $area_padding;
+            if (in_array('player-platform', $area_objects)){
+                // Pull corners in slightly if there's a bulky player platform in the room
+                $corner_min_x += 1; $corner_max_x -= 1;
+                $corner_min_y += 1; $corner_max_y -= 1;
+            }
+            $walkable_corners = array(
+                'top-left' => $corner_min_x.'-'.$corner_min_y,
+                'top-right' => $corner_max_x.'-'.$corner_min_y,
+                'bottom-left' => $corner_min_x.'-'.$corner_max_y,
+                'bottom-right' => $corner_max_x.'-'.$corner_max_y
+            );
+
+            // In NON-PLAYER Areas w/ random encounters, pre-place
+            // + "Purple Reset Dude" (Anti-Eddie, the resetter)
+            $has_anti_eddie = false;
+            $anti_eddie_corner = '';
             $has_encounters = !empty($area_static_encounters) || !empty($area_random_encounters) || !empty($area_static_rescues);
             if ($has_encounters && !in_array('player-platform', $area_objects)){
-                // Calculate the bottom-right corner of the walkable area
-                $npc_x = $area_size_width - $area_padding;
-                $npc_y = $area_size_height - $area_padding;
-                if (in_array('player-platform', $area_objects)){
-                    $npc_x -= 1;
-                    $npc_y -= 1;
-                }
-                $npc_pos = $npc_x.'-'.$npc_y;
+
+                // Randomly choose one of the four corners for Anti-Eddie
+                $anti_eddie_corner = array_rand($walkable_corners);
+                $npc_pos = $walkable_corners[$anti_eddie_corner];
+
                 $actor_strings[] = '@actors[]   = purple-reset-dude('.$npc_pos.', robot, anti-eddie, -, default)';
                 // Add him to the protected zones so encounters/items don't spawn on him
                 $protected_zones['purple-reset-dude-buffer'] = $npc_pos;
+
+                // Update the flag now that we've placed the actor
+                $has_anti_eddie = true;
+
             }
 
-            // Pre-place "Good Guy Auto" (the shopkeeper) in LIGHT Area 1 specifically
+            // In main ELEMENTAL AREAS w/ quanta flowers, pre-place
+            // + "Flip Top Eddie" (Eddie, the trader)
+            if (in_array('elemental', $area_tags) && in_array('quanta-flower', $area_objects)){
+
+                // Place Eddie opposite of Anti-Eddie, or in a random corner if Anti-Eddie is not on the map
+                if ($has_anti_eddie && !empty($anti_eddie_corner)){
+                    $opposites = array(
+                        'top-left' => 'bottom-right',
+                        'top-right' => 'bottom-left',
+                        'bottom-left' => 'top-right',
+                        'bottom-right' => 'top-left'
+                        );
+                    $eddie_corner = $opposites[$anti_eddie_corner];
+                    $eddie_pos = $walkable_corners[$eddie_corner];
+                } else {
+                    $eddie_pos = $walkable_corners[array_rand($walkable_corners)];
+                }
+
+                $actor_strings[] = '@actors[]   = flip-top-eddie('.$eddie_pos.', robot, eddie, -, default)';
+                $protected_zones['flip-top-eddie-buffer'] = $eddie_pos;
+
+            }
+
+
+            // In LIGHT Area 1 specifically, pre-place
+            // + "Good Guy Auto" (the shopkeeper)
+            // + "Good Boy Rush" (the animal companion)
             if ($area_token === 'light-area-1'){
+
                 // Calculate the bottom-left corner of the walkable area
                 $auto_x = $area_padding + 2;
                 $auto_y = $area_size_height - $area_padding - 1;
@@ -663,10 +711,21 @@ echo('<pre>'.PHP_EOL);
                 $actor_strings[] = '@actors[]   = good-guy-auto('.$auto_pos.', robot, auto, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['good-guy-auto-buffer'] = $auto_pos;
+
+                // Add "good-boy-rush" (rescue) to the bottom-right corner of the walkable area
+                $rush_x = $area_size_width - $area_padding - 1;
+                $rush_y = $area_size_height - $area_padding - 1;
+                $rush_pos = $rush_x.'-'.$rush_y;
+                $actor_strings[] = '@rescues[]  = good-boy-rush('.$rush_pos.', rush)';
+                $protected_zones['good-boy-rush-buffer'] = $rush_pos;
+
             }
 
-            // Pre-place "Weird Bird Reggae" (the shopkeeper) in WILY Area 1 specifically
+            // In WILY Area 1 specifically, pre-place
+            // + "Weird Bird Reggae" (the shopkeeper)
+            // + "Loyal Wolf Treble" (the animal companion)
             if ($area_token === 'wily-area-1'){
+
                 // Calculate the bottom-left corner of the walkable area
                 $reggae_x = $area_padding + 2;
                 $reggae_y = $area_size_height - $area_padding - 1;
@@ -675,10 +734,20 @@ echo('<pre>'.PHP_EOL);
                 $actor_strings[] = '@actors[]   = weird-bird-reggae('.$reggae_pos.', robot, reggae, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['weird-bird-reggae-buffer'] = $reggae_pos;
+
+                // Add "loyal-wolf-treble" (rescue) to the bottom-right corner of the walkable area
+                $treble_x = $area_size_width - $area_padding - 1;
+                $treble_y = $area_size_height - $area_padding - 1;
+                $treble_pos = $treble_x.'-'.$treble_y;
+                $actor_strings[] = '@rescues[]  = loyal-wolf-treble('.$treble_pos.', treble)';
+                $protected_zones['loyal-wolf-treble-buffer'] = $treble_pos;
             }
 
-            // Pre-place "Star Gazer Kalinka" (the shopkeeper) in COSSACK Area 1 specifically
+            // In COSSACK Area 1 specifically, pre-place
+            // + "Star Gazer Kalinka" (the shopkeeper)
+            // + "Frisky Feline Tango" (the animal companion)
             if ($area_token === 'cossack-area-1'){
+
                 // Calculate the bottom-left corner of the walkable area
                 $kalinka_x = $area_padding + 2;
                 $kalinka_y = $area_size_height - $area_padding - 1;
@@ -687,10 +756,20 @@ echo('<pre>'.PHP_EOL);
                 $actor_strings[] = '@actors[]   = star-gazer-kalinka('.$kalinka_pos.', player, kalinka, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['star-gazer-kalinka-buffer'] = $kalinka_pos;
+
+                // Add "frisky-feline-tango" (rescue) to the bottom-right corner of the walkable area
+                $tango_x = $area_size_width - $area_padding - 1;
+                $tango_y = $area_size_height - $area_padding - 1;
+                $tango_pos = $tango_x.'-'.$tango_y;
+                $actor_strings[] = '@rescues[]  = frisky-feline-tango('.$tango_pos.', tango)';
+                $protected_zones['frisky-feline-tango-buffer'] = $tango_pos;
             }
 
-            // Pre-place the "Field Reporter Plum" (the trainer)
+            // In LALINDE Area 1 specifically, pre-place
+            // + "Field Reporter Plum" (the trainer)
+            // + "Barrier Bird Beat" (the animal companion)
             if ($area_token === 'lalinde-area-1'){
+
                 // Calculate the bottom-left corner of the walkable area
                 $plum_x = $area_padding + 2;
                 $plum_y = $area_size_height - $area_padding - 1;
@@ -699,6 +778,14 @@ echo('<pre>'.PHP_EOL);
                 $actor_strings[] = '@actors[]   = field-reporter-plum('.$plum_pos.', robot, plum, -, default)';
                 // Add him to the protected zones so nothing else spawns on his tile
                 $protected_zones['field-reporter-plum-buffer'] = $plum_pos;
+
+                // Add "barrier-bird-beat" (rescue) to the bottom-right corner of the walkable area
+                $beat_x = $area_size_width - $area_padding - 1;
+                $beat_y = $area_size_height - $area_padding - 1;
+                $beat_pos = $beat_x.'-'.$beat_y;
+                $actor_strings[] = '@rescues[]  = barrier-bird-beat('.$beat_pos.', beat)';
+                $protected_zones['barrier-bird-beat-buffer'] = $beat_pos;
+
             }
 
             // Extract anchored pickups vs regular pickups
