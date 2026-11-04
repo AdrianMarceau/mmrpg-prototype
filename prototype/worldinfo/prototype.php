@@ -14,12 +14,12 @@ function mmrpg_prototype_world_areas($world, &$index){
         'level' => 1,
         'element' => 'space',
         'field' => 'prototype-subspace',
-        'encounters' => ['trill@north-exit'],
+        'encounters' => ['trill@north-exit^10'],
         'encounters2' => ['dark-frag'],
         'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
         'items' => ['item-codes@south-exit'],
         'tags' => ['start'],
-        'exits' => ['north'], //, 'south'
+        'exits' => ['north'],
         'spawn' => 'south'
         ];
     //--------------------------//
