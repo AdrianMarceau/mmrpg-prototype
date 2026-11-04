@@ -658,8 +658,8 @@ echo('<pre>'.PHP_EOL);
             // + "Purple Reset Dude" (Anti-Eddie, the resetter)
             $has_anti_eddie = false;
             $anti_eddie_corner = '';
-            $has_encounters = !empty($area_static_encounters) || !empty($area_random_encounters) || !empty($area_static_rescues);
-            if ($has_encounters && !in_array('player-platform', $area_objects)){
+            $has_encounters = !empty($area_static_encounters) || !empty($area_random_encounters);
+            if ($has_encounters && !in_array('player-platform', $area_objects) && !in_array('stargate', $area_tags)){
 
                 // Randomly choose one of the four corners for Anti-Eddie
                 $anti_eddie_corner = array_rand($walkable_corners);
