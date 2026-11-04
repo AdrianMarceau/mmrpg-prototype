@@ -821,7 +821,21 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
         //error_log('-> $mecha_battle_settings_array = '.print_r($mecha_battle_settings_array, true));
         //error_log('-> $new_last_robots = '.print_r($new_last_robots, true));
         // Add the generated session arrays to their parents for persistent keeping
-        rpg_battle::unset_index_info($battle_index_token);
+        // Check if this encounter was anchored before we unset it
+        $is_anchored = false;
+        if (!empty($world_map_encounters)){
+            foreach ($world_map_encounters AS $encounter_data){
+                if (is_string($encounter_data)){ $encounter_data = json_decode($encounter_data, true); }
+                if (!empty($encounter_data[4]) && $encounter_data[4] === $battle_index_token){
+                    $is_anchored = isset($encounter_data[6]) ? $encounter_data[6] : false;
+                    break;
+                }
+            }
+        }
+        // Only unset the battle index info if it is NOT anchored
+        if (!$is_anchored){
+            rpg_battle::unset_index_info($battle_index_token);
+        }
         $WORLD_PLAYER_SESSION['last_robots'] = $new_last_robots;
         $WORLD_SESSION['robot_sessions'][$mecha_session_key] = $mecha_world_session_array;
         $GAME_SESSION['values']['battle_rewards'][$this_player_token]['player_robots'][$mecha_session_key] = $mecha_battle_rewards_array;
@@ -913,6 +927,12 @@ foreach ($world_map_encounters AS $namekey => $encounter){
         $kind = $encounter[0]; $subkind = '';
         if (strstr($kind, '/')){ list($kind, $subkind) = explode('/', $kind, 2); }
         $token = $encounter[1]; $alt = $encounter[2]; $pos = $encounter[3]; $battle = $encounter[4]; $name = $encounter[5];
+        $is_anchored = isset($encounter[6]) ? $encounter[6] : false;
+        $map_namekey = isset($encounter[7]) ? $encounter[7] : '';
+        $is_hidden = false;
+        if (!empty($map_namekey) && isset(rpg_world::$encounter_overrides[$subkind][$map_namekey]['hidden'])){ $is_hidden = rpg_world::$encounter_overrides[$subkind][$map_namekey]['hidden']; }
+        elseif (isset(rpg_world::$encounter_overrides[$subkind][$token]['hidden'])){ $is_hidden = rpg_world::$encounter_overrides[$subkind][$token]['hidden']; }
+        if ($is_hidden){ continue; }
         //error_log('-> processing battle w/'.PHP_EOL.'-> $token ='.' '.$token.PHP_EOL.'-> $kind = '.$kind.PHP_EOL.'-> $subkind = '.$subkind.PHP_EOL.'-> $alt = '.$alt.PHP_EOL.'-> $pos = '.$pos.PHP_EOL.'-> $battle = '.$battle);
         if (!rpg_battle::has_index_info($battle)){ continue; }
         if ($subkind === 'rescue' && mmrpg_prototype_robot_unlocked('', $token)){ continue; }

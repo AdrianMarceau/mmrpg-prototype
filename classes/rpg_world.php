@@ -1765,7 +1765,7 @@ class rpg_world {
             //error_log('RANDOM ENCOUNTERS ('.$robot_class.') // $battle_music = '.print_r($battle_music, true));
             $battle_turns = $rewards_matrix[$robot_class]['turns'];
             $battle_zenny = $rewards_matrix[$robot_class]['zenny'];
-            $world_map_encounters[] = array('robot/'.$robot_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label);
+            $world_map_encounters[] = array('robot/'.$robot_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label, false, '');
             $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                 'token' => $battle_token,
                 'name' => $battle_name,
@@ -1810,6 +1810,9 @@ class rpg_world {
                     //error_log('-> next $robot_data = '.print_r($robot_data, true));
                     //error_log('-> next $robot_key = '.$robot_key.PHP_EOL.'---> w/ $robot_data = '.print_r($robot_data, true));
                     $robot_key = $static_encounter_key[$encounter_class]++;
+                    $is_anchored = in_array('anchored', $robot_data) ? true : false;
+                    if ($is_anchored){ unset($robot_data[array_search('anchored', $robot_data)]); }
+                    $robot_data = array_values($robot_data);
                     $robot_pos = $robot_data[0]; unset($robot_data[0]);
                     $robot_token = !empty($robot_data[1]) ? $robot_data[1] : 'robot'; unset($robot_data[1]);
                     $level = !empty($robot_data[2]) ? $robot_data[2] : ''; unset($robot_data[2]);
@@ -1825,7 +1828,11 @@ class rpg_world {
                         $robot_alt = explode('_', $robot_token)[1];
                         $real_robot_token = explode('_', $robot_token)[0];
                     }
-                    $encounter_override = !empty(self::$encounter_overrides[$encounter_class][$real_robot_token]) ? self::$encounter_overrides[$encounter_class][$real_robot_token] : array();
+                    // --- CHECK FOR ENCOUNTER OVERRIDES ---
+                    $encounter_override = array();
+                    if (!empty(self::$encounter_overrides[$encounter_class][$key])){ $encounter_override = self::$encounter_overrides[$encounter_class][$key]; }
+                    elseif (!empty(self::$encounter_overrides[$encounter_class][$real_robot_token])){ $encounter_override = self::$encounter_overrides[$encounter_class][$real_robot_token]; }
+                    if (array_key_exists('anchored', $encounter_override)){ $is_anchored = $encounter_override['anchored']; }
                     $robot_pos_terrain = rpg_world::get_map_position_terrain($robot_pos, $map_data_parsed);
                     $robot_info = $mmrpg_index_robots[$real_robot_token];
                     if (empty($robot_info)){ error_log('generate_worldmap_encounters() cannot find robot_info for "'.$real_robot_token.'"'); continue; }
@@ -1954,7 +1961,7 @@ class rpg_world {
                         $target_robot['abilities'] = $encounter_override['abilities'];
                     }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
-                    $world_map_encounters[] = array('robot/'.$encounter_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label);
+                    $world_map_encounters[] = array('robot/'.$encounter_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label, $is_anchored, $key);
                     //error_log('w/ '.print_r($world_map_encounters[count($world_map_encounters) - 1], true));
                     $battle_omega = rpg_mission::generate_mission($this_prototype_data, $battle_token, array(
                         'token' => $battle_token,
@@ -3882,6 +3889,12 @@ class rpg_world {
             $pos = $encounter_data[3];
             $battle = $encounter_data[4];
             $name = $encounter_data[5];
+            $is_anchored = isset($encounter_data[6]) ? $encounter_data[6] : false;
+            $map_namekey = isset($encounter_data[7]) ? $encounter_data[7] : '';
+            $is_hidden = false;
+            if (!empty($map_namekey) && isset(self::$encounter_overrides[$subkind][$map_namekey]['hidden'])){ $is_hidden = self::$encounter_overrides[$subkind][$map_namekey]['hidden']; }
+            elseif (isset(self::$encounter_overrides[$subkind][$token]['hidden'])){ $is_hidden = self::$encounter_overrides[$subkind][$token]['hidden']; }
+            if ($is_hidden){ continue; }
             //error_log('-> processing battle w/'.PHP_EOL.'-> $token ='.' '.$token.PHP_EOL.'-> $kind = '.$kind.PHP_EOL.'-> $subkind = '.$subkind.PHP_EOL.'-> $alt = '.$alt.PHP_EOL.'-> $pos = '.$pos.PHP_EOL.'-> $battle = '.$battle);
             if (!rpg_battle::has_index_info($battle)){ continue; }
             if (in_array($battle, self::$skip_worldmap_encounters)){ continue; }
@@ -3892,7 +3905,7 @@ class rpg_world {
             //error_log('-> w/ $robot = '.print_r($robot, true));
             $rinfo = rpg_robot::get_index_info($token);
             if (empty($rinfo)){ continue; }
-            if ($subkind === 'rescue' && mmrpg_prototype_robot_unlocked('', $token)){ continue; }
+            if ($subkind === 'rescue' && !$is_anchored && mmrpg_prototype_robot_unlocked('', $token)){ continue; }
             if (!empty($world_map_encounter_symbols[$encounter_namekey])){ $pos = $world_map_encounter_symbols[$encounter_namekey]; }
             list($col, $row) = explode('-', $pos);
             $maxcols = $map_col_size;
