@@ -716,7 +716,7 @@ echo('<pre>'.PHP_EOL);
                 $rush_x = $area_size_width - $area_padding - 1;
                 $rush_y = $area_size_height - $area_padding - 1;
                 $rush_pos = $rush_x.'-'.$rush_y;
-                $actor_strings[] = '@rescues[]  = good-boy-rush('.$rush_pos.', rush)';
+                $actor_strings[] = '@rescues[]  = good-boy-rush('.$rush_pos.', rush, anchored)';
                 $protected_zones['good-boy-rush-buffer'] = $rush_pos;
 
             }
@@ -739,7 +739,7 @@ echo('<pre>'.PHP_EOL);
                 $treble_x = $area_size_width - $area_padding - 1;
                 $treble_y = $area_size_height - $area_padding - 1;
                 $treble_pos = $treble_x.'-'.$treble_y;
-                $actor_strings[] = '@rescues[]  = loyal-wolf-treble('.$treble_pos.', treble)';
+                $actor_strings[] = '@rescues[]  = loyal-wolf-treble('.$treble_pos.', treble, anchored)';
                 $protected_zones['loyal-wolf-treble-buffer'] = $treble_pos;
             }
 
@@ -761,7 +761,7 @@ echo('<pre>'.PHP_EOL);
                 $tango_x = $area_size_width - $area_padding - 1;
                 $tango_y = $area_size_height - $area_padding - 1;
                 $tango_pos = $tango_x.'-'.$tango_y;
-                $actor_strings[] = '@rescues[]  = frisky-feline-tango('.$tango_pos.', tango)';
+                $actor_strings[] = '@rescues[]  = frisky-feline-tango('.$tango_pos.', tango, anchored)';
                 $protected_zones['frisky-feline-tango-buffer'] = $tango_pos;
             }
 
@@ -783,7 +783,7 @@ echo('<pre>'.PHP_EOL);
                 $beat_x = $area_size_width - $area_padding - 1;
                 $beat_y = $area_size_height - $area_padding - 1;
                 $beat_pos = $beat_x.'-'.$beat_y;
-                $actor_strings[] = '@rescues[]  = barrier-bird-beat('.$beat_pos.', beat)';
+                $actor_strings[] = '@rescues[]  = barrier-bird-beat('.$beat_pos.', beat, anchored)';
                 $protected_zones['barrier-bird-beat-buffer'] = $beat_pos;
 
             }
@@ -1162,7 +1162,7 @@ echo('<pre>'.PHP_EOL);
                 }
             }
             // Generate the ENCOUNTERS for this area along with their map positions where relevant
-            if (!empty($area_random_encounters) || !empty($area_static_encounters)){
+            if (!empty($area_random_encounters) || !empty($area_static_encounters) || !empty($area_static_rescues)){
 
                 // Add the basic encounters string for randomized support mecha if it exists
                 $random_encounters_string = array();
