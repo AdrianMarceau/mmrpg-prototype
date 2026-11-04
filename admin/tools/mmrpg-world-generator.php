@@ -859,6 +859,10 @@ echo('<pre>'.PHP_EOL);
             // If the user requested a specific tile for an encounter/item/rescue, make it solid ground.
             $entities_to_scan = array_merge($regular_pickups, $area_static_encounters, $area_static_rescues);
             foreach ($entities_to_scan as $entity_str) {
+                // If a manual level tag is attached, strip it out before parsing location
+                if (strpos($entity_str, '^') !== false) {
+                    list($entity_str, $discard_level) = explode('^', $entity_str);
+                }
                 if (strpos($entity_str, '@') !== false) {
                     list($entity_token, $location) = explode('@', trim($entity_str));
                     $pos = !empty($location) ? $getLocationCoords($location) : null;
@@ -1187,9 +1191,14 @@ echo('<pre>'.PHP_EOL);
                 $zone_min_y = 1 + $encounter_inset;
                 $zone_max_y = $area_size_height - $encounter_inset;
                 foreach ($area_static_encounters AS $key => $encounter){
+                    // Parse out any anchored level tags (e.g., trill@north-exit^10)
+                    $level = '';
+                    $encounter_clean = trim($encounter);
+                    if (strpos($encounter_clean, '^') !== false){
+                        list($encounter_clean, $level) = explode('^', $encounter_clean);
+                    }
                     // Parse out any anchored location tags (e.g., trill@north-exit)
                     $location = '';
-                    $encounter_clean = trim($encounter);
                     if (strpos($encounter_clean, '@') !== false){
                         list($encounter_token, $location) = explode('@', $encounter_clean);
                     } else {
@@ -1207,14 +1216,14 @@ echo('<pre>'.PHP_EOL);
                     $robot_info = $mmrpg_index_robots[$robot];
                     $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
                     $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
-                    //if ($robot_core === 'copy' && $robot_class === 'master'){ continue; }
+                    $level_arg = !empty($level) ? ', '.$level : '';
                     if ($robot_class === 'master'){
-                        $static_encounter_strings[] = '@bosses[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter_token.')';
+                        $static_encounter_strings[] = '@bosses[]  = boss-robo-'.$robot_num.'('.$position.', '.$encounter_token.$level_arg.')';
                         if (!empty($robot_core)){ $static_encounter_strings[] = '@items[]    = boss-star-'.$robot_num.'('.$position.', '.$robot_core.'-star, '.$encounter_token.')'; }
                     } elseif ($robot_class === 'mecha'){
-                        $static_encounter_strings[] = '@bosses[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter_token.')';
+                        $static_encounter_strings[] = '@bosses[]   = boss-mech-'.$robot_num.'('.$position.', '.$encounter_token.$level_arg.')';
                     } elseif ($robot_class === 'boss'){
-                        $static_encounter_strings[] = '@bosses[]   = boss-boss-'.$robot_num.'('.$position.', '.$encounter_token.')';
+                        $static_encounter_strings[] = '@bosses[]   = boss-boss-'.$robot_num.'('.$position.', '.$encounter_token.$level_arg.')';
                     }
                 }
                 if (!empty($static_encounter_strings)){
@@ -1226,9 +1235,14 @@ echo('<pre>'.PHP_EOL);
                 $static_rescue_strings = array();
                 $num_static_rescues = count($area_static_rescues);
                 foreach ($area_static_rescues AS $key => $rescue){
+                    // Parse out any anchored level tags (e.g., roll@center^10)
+                    $level = '';
+                    $rescue_raw = trim($rescue);
+                    if (strpos($rescue_raw, '^') !== false){
+                        list($rescue_raw, $level) = explode('^', $rescue_raw);
+                    }
                     // Parse out any anchored location tags (e.g., roll@center)
                     $location = '';
-                    $rescue_raw = trim($rescue);
                     if (strpos($rescue_raw, '@') !== false){
                         list($rescue_token, $location) = explode('@', $rescue_raw);
                     } else {
@@ -1246,8 +1260,9 @@ echo('<pre>'.PHP_EOL);
                     $robot_info = $mmrpg_index_robots[$robot];
                     $robot_class = !empty($robot_info['robot_class']) ? $robot_info['robot_class'] : '';
                     $robot_core = !empty($robot_info['robot_core']) ? $robot_info['robot_core'] : '';
+                    $level_arg = !empty($level) ? ', '.$level : '';
                     // Make sure to use $rescue_token here so the @location string doesn't get printed into the map file
-                    $static_rescue_strings[] = '@rescues[]  = rescue-robo-'.$robot_num.'('.$position.', '.$rescue_token.')';
+                    $static_rescue_strings[] = '@rescues[]  = rescue-robo-'.$robot_num.'('.$position.', '.$rescue_token.$level_arg.')';
                 }
                 if (!empty($static_rescue_strings)){
                     $area_file_markup[] = '#---------------------------#';
