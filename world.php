@@ -848,6 +848,13 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
             if (!isset($GAME_SESSION['values']['battle_items'][$this_mecha_item_equipped])){ $GAME_SESSION['values']['battle_items'][$this_mecha_item_equipped] = 0; }
             $GAME_SESSION['values']['battle_items'][$this_mecha_item_equipped] += 1;
         }
+        if (!isset($GAME_SESSION['values']['robot_database'][$this_mecha_token])){
+            $mecha_encounter_data = array('robot_token' => $this_mecha_token, 'robot_encountered' => 0, 'robot_defeated' => 0, 'robot_unlocked' => 0, 'robot_summoned' => 0, 'robot_scanned' => 0);
+            $GAME_SESSION['values']['robot_database'][$this_mecha_token] = $mecha_encounter_data;
+        }
+        $GAME_SESSION['values']['robot_database'][$this_mecha_token]['robot_encountered'] += 1;
+        $GAME_SESSION['values']['robot_database'][$this_mecha_token]['robot_unlocked'] += 1;
+        $GAME_SESSION['values']['robot_database'][$this_mecha_token]['robot_scanned'] += 1;
     }
     header('Location: world.php');
     exit();
