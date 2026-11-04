@@ -1077,7 +1077,7 @@ async function refreshMapPositionEvents(timeoutMultiplier, forceRefresh){
                 let isAbility = action.indexOf('-ability') !== -1 || action.indexOf('ability-') !== -1;
                 let isMechanism = action === 'push-button' || action === 'toggle-switch';
                 let isObstacle = action === 'open-gate' || action === 'open-lock' || action === 'remove-block' || action === 'remove-hazard';
-                let isActorAction = action.indexOf('shop-with-') !== -1 || action.indexOf('advice-from-') !== -1 || action.indexOf('reset-world-') !== -1 || action.indexOf('boost-robot-') !== -1;
+                let isActorAction = action.indexOf('shop-with-') !== -1 || action.indexOf('advice-from-') !== -1 || action.indexOf('reset-world-') !== -1 || action.indexOf('boost-robot-') !== -1 || action.indexOf('trade-for-') !== -1;
                 let isDismiss = action === 'dismiss';
 
                 if (!isDismiss){ $button.addClass('clicked'); }

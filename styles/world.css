@@ -5385,6 +5385,10 @@ display: block;
     text-align: left;
     padding-right: 40px;
 }
+#world #canvas #side-buttons .big-button > span.has-double-sprites,
+#world #canvas #side-buttons .big-button-title > span.has-double-sprites {
+    padding-right: 80px;
+}
 #world #canvas #side-buttons .big-button > span.has-sprite.one-row,
 #world #canvas #side-buttons .big-button-title > span.has-sprite.one-row {
     line-height: 2;
@@ -5411,6 +5415,30 @@ display: block;
     left: auto;
     right: 6px;
     bottom: 9px;
+}
+
+#world #canvas #side-buttons .big-button > span.has-sprite .sprite-wrapper {
+    position: absolute;
+    display: block;
+    right: 10px;
+    bottom: 10px;
+    width: 40px;
+    height: 40px;
+}
+#world #canvas #side-buttons .big-button > span.has-sprite .sprite-wrapper .sprite[data-sprite] {
+    position: static;
+    display: block;
+    float: left;
+    margin: 0;
+}
+#world #canvas #side-buttons .big-button > span.has-sprite .sprite-wrapper .trade-arrow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#world #canvas #side-buttons .big-button > span.has-double-sprites .sprite-wrapper {
+    width: auto;
 }
 
 #world #canvas #side-buttons .big-button > span > .sprite[data-sprite="item"],

@@ -122,6 +122,7 @@ function prepareActorEventOptions(firstEvent, options){
                         }
                     }
 
+                /*
                 if (currency && price){
                     let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
                     // We only disable the button if we cannot afford the minimum price
@@ -145,6 +146,54 @@ function prepareActorEventOptions(firstEvent, options){
                 buttonMarkup += innerHtml;
                 if (adjustable){ buttonMarkup += '<span class="inner-button increment"><i class="fa fas fa-caret-right"></i></span>'; }
                 buttonMarkup += '</a>';
+                actionData.sideButtonsMarkup += buttonMarkup;
+                */
+
+                let isTrade = token.indexOf('trade-for-') !== -1;
+
+                if (currency && price){
+                    let currencyCheck = _self.checkMenuButtonCurrency(currency, price);
+                    // We only disable the button if we cannot afford the minimum price
+                    if (!currencyCheck.hasEnough){ enabled = false; }
+
+                    // Check if this is a trade or not before generating anything
+                    if (isTrade){
+                        let receiveItemToken = token.replace('trade-for-', '');
+                        // Generate the sprite for the item we are receiving
+                        let receiveSpriteMarkup = _self.getItemSpriteMarkup(receiveItemToken, {dir: 'right', frame: '00'});
+                        innerHtml = '<span class="has-sprite has-double-sprites">'
+                            + '<strong>' + label + '</strong> '
+                            + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
+                            + '<div class="sprite-wrapper trade-sprites">'
+                                + currencyCheck.spriteMarkup
+                                + '<i class="fa fas fa-caret-right trade-arrow"></i>'
+                                + receiveSpriteMarkup
+                            + '</div>'
+                            + '</span>';
+                        } else {
+                        innerHtml = '<span class="has-sprite">'
+                            + '<strong>' + label + '</strong> '
+                            + '<br /><sup class="no-strike">' + currencyCheck.countLabel + '</sup> '
+                            + currencyCheck.spriteMarkup
+                            + '</span>';
+                        }
+                    }
+
+                // We construct our button classes and data attributes
+                let buttonClasses = 'button big-button' + (colour ? ' type ' + colour : '') + (!enabled ? ' disabled' : '');
+                if (adjustable){ buttonClasses += ' has-inner-buttons'; }
+                if (isTrade){ buttonClasses += ' is-trade-action'; }
+
+                let buttonAttrs = ' data-actor="' + dataActor + '" data-action="' + token + '"';
+                if (adjustable){ buttonAttrs += ' data-price="' + price + '"'; }
+
+                // We build the final anchor tag, injecting our arrow spans if adjustable is true
+                let buttonMarkup = '<a class="' + buttonClasses + '"' + buttonAttrs + '>';
+                if (adjustable){ buttonMarkup += '<span class="inner-button decrement"><i class="fa fas fa-caret-left"></i></span>'; }
+                buttonMarkup += innerHtml;
+                if (adjustable){ buttonMarkup += '<span class="inner-button increment"><i class="fa fas fa-caret-right"></i></span>'; }
+                buttonMarkup += '</a>';
+
                 actionData.sideButtonsMarkup += buttonMarkup;
 
                 }
@@ -192,6 +241,7 @@ function handleActorActionClick(action, $button, firstEvent){
     let isAdvice = action.indexOf('-advice') !== -1 || action.indexOf('advice-') !== -1;
     let isReset = action === 'reset-world-pickups' || action === 'reset-world-encounters';
     let isBoost = action === 'boost-robot-attack' || action === 'boost-robot-defense' || action === 'boost-robot-speed';
+    let isTrade = action.indexOf('trade-for-') !== -1;
 
     let $actorEvent = $(firstEvent.sprite);
     let dataActor = $actorEvent.attr('data-actor') || false;
@@ -531,7 +581,96 @@ function handleActorActionClick(action, $button, firstEvent){
             }, 1800);
 
         _self.saveWorldState();
+        }
+    else if (isTrade){
+        let actorsIndex = _config.mapActorsIndex;
+        let actorName = $button.attr('data-actor') || false;
+        let actorInfo = actorName && (actorsIndex && actorsIndex[actorName]) ? actorsIndex[actorName] : false;
+        if (!actorName || !actorInfo){ console.error('-> actor name or info not found, cannot trigger actions!'); return false; }
 
+        let actionList = typeof actorInfo.actions === 'object' && actorInfo.actions.length ? actorInfo.actions : false;
+        if (!actionList){ console.error('-> actor actionlist is empty, nothing to trigger!'); return false; }
+
+        let actionListKeys = (function(list){ let keys = []; for (let i = 0; i < list.length; i++){ keys.push(list[i][1]); } return keys; })(actionList);
+        let actionInfoData = actionListKeys.indexOf(action) !== -1 ? actionList[actionListKeys.indexOf(action)] : false;
+        if (!actionInfoData){ console.error('-> actor action info could not be found!'); return false; }
+
+        // Retrieve currency requirements and handle our multiplier
+        let currency = actionInfoData[3], basePrice = actionInfoData[4];
+        let multiplier = parseInt($button.attr('data-multiplier') || '1');
+        let effectivePrice = basePrice * multiplier;
+        let receiveQuantity = 1 * multiplier;
+
+        let currencyCheck = _self.checkMenuButtonCurrency(currency, effectivePrice);
+
+        if (!currencyCheck.hasEnough){
+            _self.playSoundEffect('error-sound');
+            return false;
+            }
+
+        // Determine what item we are receiving
+        let receiveItemToken = action.replace('trade-for-', '');
+        let receiveItemInfo = _self.indexes.items.getByToken(receiveItemToken);
+        let receiveItemName = receiveItemInfo && receiveItemInfo.name ? receiveItemInfo.name : receiveItemToken;
+
+        // Deduct the required currency
+        let currencyKind = currencyCheck.kind, currencySubKind = currencyCheck.subKind;
+        if (currencyKind === 'items' && currencySubKind && typeof _worldPlayer.items[currencySubKind] !== 'undefined'){
+            _worldPlayer.items[currencySubKind] -= effectivePrice;
+            if (_worldPlayer.items[currencySubKind] < 0){ _worldPlayer.items[currencySubKind] = 0; }
+            } else if (currencyKind === 'zenny') {
+            _worldPlayer.zenny -= effectivePrice;
+            if (_worldPlayer.zenny < 0) { _worldPlayer.zenny = 0; }
+            let $progressTracker = $('#progress-tracker', $thisCanvas);
+            let $zennyCounter = $('.counter.zenny', $progressTracker);
+            $('.count', $zennyCounter).html(_worldPlayer.zenny.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            }
+
+        // Add the received items to our inventory
+        if (typeof _worldPlayer.items[receiveItemToken] === 'undefined'){
+            if (typeof _self.addItemToInventory === 'function') {
+                _self.addItemToInventory(receiveItemToken, receiveQuantity, false, false);
+                } else {
+                _worldPlayer.items[receiveItemToken] = receiveQuantity;
+                }
+            } else {
+            _worldPlayer.items[receiveItemToken] += receiveQuantity;
+            }
+
+        // Update the storage UI if the overview is currently expanded
+        let $robotsOverview = _elements.robotsOverview;
+        let updateStorageItemQty = function(itemToken) {
+            let $itemInStorage = $('.storage-items .team-item[data-item="' + itemToken + '"]', $robotsOverview);
+            if ($itemInStorage && $itemInStorage.length){
+                let currentQuantity = _worldPlayer.items[itemToken] || 0;
+                $itemInStorage.attr('data-quantity', currentQuantity);
+                $itemInStorage.find('.quantity').html('&times; ' + currentQuantity);
+                }
+            };
+
+        if (currencySubKind) { updateStorageItemQty(currencySubKind); }
+        updateStorageItemQty(receiveItemToken);
+
+        if (_self.robotsOverviewAPI && typeof _self.robotsOverviewAPI.refreshDetailsPanel === 'function'){
+            _self.robotsOverviewAPI.refreshDetailsPanel();
+            }
+
+        // Format our read-out message
+        let msgReceive = receiveQuantity + ' ' + receiveItemName + (receiveQuantity > 1 && !receiveItemName.endsWith('s') ? 's' : '');
+        let msgCost = effectivePrice + ' ' + (currencySubKind ? currencySubKind.replace(/-/g, ' ') : currencyKind);
+        msgCost = msgCost.replace(/\b\w/g, l => l.toUpperCase()) + (effectivePrice > 1 && !msgCost.endsWith('s') ? 's' : '');
+
+        // Auto-dismiss the action dropdown after a short delay so the button has time to flash
+        setTimeout(function(){
+            _self.hideActionDropdown(false);
+            _self.playSoundEffect('get-item');
+            _self.showWorldMessage([
+                'Trade successful!',
+                'Traded ' + msgCost + ' for ' + msgReceive + '.'
+                ]);
+            }, 600);
+
+        _self.saveWorldState();
         }
 
     return true;
