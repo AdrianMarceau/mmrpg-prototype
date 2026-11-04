@@ -164,20 +164,60 @@ rpg_world::$encounter_overrides['boss']['trill'] = array(
         'space-shot', 'space-overdrive',
         'attack-boost', 'attack-break',
         'defense-boost', 'defense-break',
-        'speed-boost', 'speed-break'
+        'speed-boost', 'speed-break',
+        'mecha-support',
         )
-    // 'level' => 100, // optional loose syntax
-    // 'image' => 'trill_alt' // optional loose syntax
     );
-
-
-/*
 rpg_world::$encounter_overrides['boss']['slur'] = array(
+    'level' => 250,
+    'item' => 'persist-module',
     'abilities' => array(
         'space-shot', 'space-buster', 'space-overdrive',
-        'time-shot', 'time-buster', time-overdrive'
-        )
+        'time-buster', 'shadow-buster', 'flame-buster', 'freeze-buster',
+        'attack-break', 'defense-break', 'speed-break', 'energy-break',
+        'mecha-support', 'energy-boost'
+        ),
     );
-*/
+
+// -- WORLD STATIC RESCUES -- //
+
+// Check to see if anyone has had any of the animation companions at least one
+$database_robot_records = mmrpg_prototype_database_records();
+$anyone_had_rush = !empty($database_robot_records['rush']['robot_unlocked']) || !empty($database_robot_records['rush']['robot_summoned']);
+$anyone_had_treble = !empty($database_robot_records['treble']['robot_unlocked']) || !empty($database_robot_records['treble']['robot_summoned']);
+$anyone_had_tango = !empty($database_robot_records['tango']['robot_unlocked']) || !empty($database_robot_records['tango']['robot_summoned']);
+$anyone_had_beat = !empty($database_robot_records['beat']['robot_unlocked']) || !empty($database_robot_records['beat']['robot_summoned']);
+
+// Check to see if anyone already has any of the animal companions beforehand
+$unlocked_robot_counters = mmrpg_prototype_robots_unlocked_counters();
+$anyone_has_rush = !empty($unlocked_robot_counters['rush']);
+$anyone_has_treble = !empty($unlocked_robot_counters['treble']);
+$anyone_has_tango = !empty($unlocked_robot_counters['tango']);
+$anyone_has_beat = !empty($unlocked_robot_counters['beat']);
+//error_log('$unlocked_robot_counters = '.print_r($unlocked_robot_counters, true));
+
+// Dynamically set the level for the Rush rescue mission
+rpg_world::$encounter_overrides['rescue']['good-boy-rush'] = array(
+    'level' => mmrpg_prototype_get_player_robot_level_stats('dr-light')['average'],
+    'hidden' => !$anyone_had_rush || $anyone_has_rush
+    );
+
+// Dynamically set the level for the Treble rescue mission
+rpg_world::$encounter_overrides['rescue']['loyal-wolf-treble'] = array(
+    'level' => mmrpg_prototype_get_player_robot_level_stats('dr-wily')['average'],
+    'hidden' => !$anyone_had_treble || $anyone_has_treble
+    );
+
+// Dynamically set the level for the Tango rescue mission
+rpg_world::$encounter_overrides['rescue']['frisky-cat-tango'] = array(
+    'level' => mmrpg_prototype_get_player_robot_level_stats('dr-cossack')['average'],
+    'hidden' => !$anyone_had_tango || $anyone_has_tango
+    );
+
+// Dynamically set the level for the Beat rescue mission
+rpg_world::$encounter_overrides['rescue']['barrier-bird-beat'] = array(
+    'level' => mmrpg_prototype_get_player_robot_level_stats('dr-lalinde')['average'],
+    'hidden' => !$anyone_had_beat || $anyone_has_beat
+    );
 
 ?>
