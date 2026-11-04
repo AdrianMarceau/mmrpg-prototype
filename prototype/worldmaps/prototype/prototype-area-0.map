@@ -93,7 +93,7 @@
 #---------------------------#
 @encounters = dark-frag(1)
 #---------------------------#
-@bosses[]   = boss-boss-1(15-3, trill)
+@bosses[]   = boss-boss-1(15-3, trill, 10)
 #---------------------------#
 @actors[]   = purple-reset-dude(26-4, robot, anti-eddie, -, default)
 #---------------------------#
