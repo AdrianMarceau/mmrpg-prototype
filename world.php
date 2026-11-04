@@ -531,6 +531,15 @@ $map_sprite_sheet = !empty($map_data_parsed) && !empty($map_data_parsed['sheet']
 if (empty($map_data_parsed)){ error_log('MMRPG World Fatal Error - No world data defined for map "'.$world_map_token.'"!'); die(); }
 if (empty($map_sprite_sheet)){ error_log('MMRPG World Fatal Error - No sprite sheet defined for map "'.$world_map_token.'"!'); die(); }
 
+// Pull the actors session early so the world progression script can reference it
+$world_actors = !empty($WORLD_SESSION['world_actors']) ? $WORLD_SESSION['world_actors'] : array();
+$world_map_actors = !empty($world_actors[$world_map_token]) ? $world_actors[$world_map_token] : array();
+
+// Include the world progression script so it can review and update where necessary
+$worldprog_token = $this_prototype_data['this_current_world'];
+$worldprog_filepath = 'prototype/worldprogs/'.$worldprog_token.'.php';
+if (file_exists(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath)){ require(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath); }
+
 // Update the saved last-world and last-map tokens in the world session and track if they've changed
 $prev_world_token = !empty($WORLD_SESSION['last_world_token']) ? $WORLD_SESSION['last_world_token'] : '';
 $prev_map_token = !empty($WORLD_SESSION['last_map_token']) ? $WORLD_SESSION['last_map_token'] : '';
@@ -920,9 +929,9 @@ $map_data_parsed['battles'] = $battles_remaining;
 rpg_world::refresh_world_map($this_prototype_data, $map_data_parsed);
 
 // Include the world progression script so it can review and update where necessary
-$worldprog_token = $this_prototype_data['this_current_world'];
-$worldprog_filepath = 'prototype/worldprogs/'.$worldprog_token.'.php';
-if (file_exists(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath)){ require(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath); }
+//$worldprog_token = $this_prototype_data['this_current_world'];
+//$worldprog_filepath = 'prototype/worldprogs/'.$worldprog_token.'.php';
+//if (file_exists(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath)){ require(MMRPG_CONFIG_ROOTDIR.$worldprog_filepath); }
 
 // Now that we have encounter and other data, let's see if we should change the music at all
 if (!empty($map_data_parsed['music'])){

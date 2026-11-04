@@ -155,4 +155,29 @@ if ($this_current_map === 'prototype-area-0') {
     }
 }
 
+// -- WORLD STATIC ENCOUNTERS -- //
+
+// Manually define specific encounter parameters for unique bosses
+rpg_world::$encounter_overrides['boss']['trill'] = array(
+    'item' => 'super-capsule',
+    'abilities' => array(
+        'space-shot', 'space-overdrive',
+        'attack-boost', 'attack-break',
+        'defense-boost', 'defense-break',
+        'speed-boost', 'speed-break'
+        )
+    // 'level' => 100, // optional loose syntax
+    // 'image' => 'trill_alt' // optional loose syntax
+    );
+
+
+/*
+rpg_world::$encounter_overrides['boss']['slur'] = array(
+    'abilities' => array(
+        'space-shot', 'space-buster', 'space-overdrive',
+        'time-shot', 'time-buster', time-overdrive'
+        )
+    );
+*/
+
 ?>

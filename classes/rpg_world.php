@@ -18,6 +18,7 @@ class rpg_world {
     // Define some static variables we can use later
     static $skip_worldmap_encounters = array();
     static $skip_worldmap_actors = array();
+    static $encounter_overrides = array();
 
     // -- PREDEFINED CONSTANTS -- //
 
@@ -1824,6 +1825,7 @@ class rpg_world {
                         $robot_alt = explode('_', $robot_token)[1];
                         $real_robot_token = explode('_', $robot_token)[0];
                     }
+                    $encounter_override = !empty(self::$encounter_overrides[$encounter_class][$real_robot_token]) ? self::$encounter_overrides[$encounter_class][$real_robot_token] : array();
                     $robot_pos_terrain = rpg_world::get_map_position_terrain($robot_pos, $map_data_parsed);
                     $robot_info = $mmrpg_index_robots[$real_robot_token];
                     if (empty($robot_info)){ error_log('generate_worldmap_encounters() cannot find robot_info for "'.$real_robot_token.'"'); continue; }
@@ -1832,8 +1834,11 @@ class rpg_world {
                     //error_log('-> $robot_info = '.print_r($robot_info, true));
                     if (!empty($level) && is_numeric($level) && intval($level) > 0){ $robot_level = $level; }
                     else { $robot_level = mt_rand($levels_matrix[$robot_class]['min'], $levels_matrix[$robot_class]['max']); }
+                    if (!empty($encounter_override['level'])){ $robot_level = $encounter_override['level']; }
                     $robot_item = mt_rand(1, 100) <= 50 ? $get_random_allowed_item() : '';
+                    if (array_key_exists('item', $encounter_override)){ $robot_item = $encounter_override['item']; }
                     if (!empty($robot_alt) && !empty($mmrpg_index_types[$robot_alt])){ $robot_item = $robot_alt.'-core'; }
+                    if (!empty($encounter_override['image'])){ $robot_token = $encounter_override['image']; }
                     $robot_name = $robot_info['robot_name'];
                     $robot_label = $robot_name.' (Lv. '.$robot_level.')';
                     $robot_flags = array();
@@ -1935,6 +1940,19 @@ class rpg_world {
                             $battle_flags['remove_on_complete'] = false;
                         }
                     }
+                    // Build the base target robot configuration
+                    $target_robot = array(
+                        'token' => $real_robot_token,
+                        'image' => $robot_token,
+                        'level' => $robot_level,
+                        'item' => $robot_item,
+                        'flags' => $robot_flags,
+                        'values' => $robot_values,
+                        );
+                    // Inject predefined abilities if an override was provided
+                    if (!empty($encounter_override['abilities'])){
+                        $target_robot['abilities'] = $encounter_override['abilities'];
+                    }
                     //error_log('-> generating '.$robot_class.' battle "'.$battle_token.'" ('.$battle_name.')');
                     $world_map_encounters[] = array('robot/'.$encounter_class, $real_robot_token, $robot_alt, $robot_pos, $battle_token, $robot_label);
                     //error_log('w/ '.print_r($world_map_encounters[count($world_map_encounters) - 1], true));
@@ -1946,14 +1964,7 @@ class rpg_world {
                         'music' => $battle_music,
                         'turns' => $battle_turns,
                         'zenny' => $battle_zenny,
-                        'target' => array('robots' => array(array(
-                            'token' => $real_robot_token,
-                            'image' => $robot_token,
-                            'level' => $robot_level,
-                            'item' => $robot_item,
-                            'flags' => $robot_flags,
-                            'values' => $robot_values,
-                            ))),
+                        'target' => array('robots' => array($target_robot)),
                         'rewards' => $battle_rewards,
                         'flags' => $battle_flags,
                         ), true);
