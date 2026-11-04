@@ -380,11 +380,12 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
         $support_count = count($this_robot_abilities_addons['support']);
         $max_count = max($weapons_count, $support_count);
         for ($i = 0; $i < $max_count; $i++) {
-            if (isset($this_robot_abilities_addons['support'][$i])) {
-                $temp_addons_final[] = $this_robot_abilities_addons['support'][$i];
-            }
+            // Inject weapons first so they take priority in limited slots
             if (isset($this_robot_abilities_addons['weapons'][$i])) {
                 $temp_addons_final[] = $this_robot_abilities_addons['weapons'][$i];
+            }
+            if (isset($this_robot_abilities_addons['support'][$i])) {
+                $temp_addons_final[] = $this_robot_abilities_addons['support'][$i];
             }
         }
 
@@ -398,6 +399,59 @@ function mmrpg_prototype_generate_abilities($robot_info, $robot_level = 1, $abil
 
     // If this robot truly has no abilities (which is bad), give them the buster shot
     if (empty($this_robot_abilities)){ $this_robot_abilities[] = 'buster-shot'; error_log('-> no abilities! compensating w/ buster-shot'); }
+
+    // Ensure the final selection contains at least one damage-dealing ability
+    $has_damage_ability = false;
+    foreach ($this_robot_abilities AS $token) {
+        $ability_info = isset($this_ability_index[$token]) ? $this_ability_index[$token] : array();
+        if (!empty($ability_info['ability_damage'])) {
+            $has_damage_ability = true;
+            break;
+        }
+    }
+
+    // Determine the base fallback weapon based on the robot's core type
+    $fallback_weapon = 'buster-shot';
+    if (!empty($robot_core_type) && $robot_core_type !== 'empty'){
+        $temp_fallback = $robot_core_type . '-shot';
+        // Verify the dynamically generated shot actually exists in the database
+        if (isset($this_ability_index[$temp_fallback])) {
+            $fallback_weapon = $temp_fallback;
+        }
+    }
+
+    // If this robot truly has no abilities (which is bad), give them their default shot
+    if (empty($this_robot_abilities)){
+        $this_robot_abilities[] = $fallback_weapon;
+        //error_log('-> no abilities! compensating w/ ' . $fallback_weapon);
+    }
+
+    // Ensure the final selection contains at least one damage-dealing ability
+    $has_damage_ability = false;
+    foreach ($this_robot_abilities AS $token){
+        $ability_info = isset($this_ability_index[$token]) ? $this_ability_index[$token] : array();
+        if (!empty($ability_info['ability_damage'])) {
+            $has_damage_ability = true;
+            break;
+        }
+    }
+
+    // If no damage abilities made the cut, compensate by replacing the first slot
+    if (!$has_damage_ability) {
+        // Scan the weapon addons array for an ability that actually deals damage to use instead
+        if (!empty($this_robot_abilities_addons['weapons'])){
+            foreach ($this_robot_abilities_addons['weapons'] AS $weapon_token){
+                $weapon_info = isset($this_ability_index[$weapon_token]) ? $this_ability_index[$weapon_token] : array();
+                if (!empty($weapon_info['ability_damage'])){
+                    $fallback_weapon = $weapon_token;
+                    break;
+                }
+            }
+        }
+        // Overwrite the first ability slot with the guaranteed weapon
+        $this_robot_abilities[0] = $fallback_weapon;
+        //error_log('-> no damage abilities! compensating w/ ' . $fallback_weapon);
+    }
 
     // Return the ability array, whatever it was
     //error_log('-> '.$image.($image_alt ? '_'.$image_alt : '').' abilities >> '.implode(', ', $this_robot_abilities));
