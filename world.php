@@ -751,7 +751,30 @@ $recruit_from_battle = !empty($_GET['recruit']) && strstr($_GET['recruit'], 'wor
 if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_battle)){
     //error_log('recruiting from battle `'.print_r($recruit_from_battle, true).'` !');
     $battle_index_token = $recruit_from_battle;
+    // Find both the anchored flag and the battle namekey from the map encounters
+    $is_anchored = false;
+    $battle_namekey = false;
+    $world_encounters = !empty($WORLD_SESSION['world_encounters']) ? $WORLD_SESSION['world_encounters'] : array();
+    $world_map_encounters = !empty($world_encounters[$world_map_token]) ? $world_encounters[$world_map_token] : array();
+    if (!empty($world_map_encounters)){
+        foreach ($world_map_encounters AS $encounter_data){
+            if (is_string($encounter_data)){ $encounter_data = json_decode($encounter_data, true); }
+            if (!empty($encounter_data[4]) && $encounter_data[4] === $battle_index_token){
+                $is_anchored = isset($encounter_data[6]) ? $encounter_data[6] : false;
+                $battle_namekey = isset($encounter_data[7]) ? $encounter_data[7] : false;
+                break;
+            }
+        }
+    }
     $battle_index_info = rpg_battle::get_index_info($battle_index_token);
+    // Apply the dynamic level override right before extracting the target robot
+    if (!empty($battle_namekey) && isset(rpg_world::$encounter_overrides['rescue'][$battle_namekey]['level'])){
+        $dynamic_level = rpg_world::$encounter_overrides['rescue'][$battle_namekey]['level'];
+        if (isset($battle_index_info['battle_target_player']['player_robots'][0]['robot_level'])){
+            $battle_index_info['battle_target_player']['player_robots'][0]['robot_level'] = $dynamic_level;
+        }
+        $battle_index_info['battle_level'] = $dynamic_level;
+    }
     $battle_target_player = !empty($battle_index_info) && !empty($battle_index_info['battle_target_player']) ? $battle_index_info['battle_target_player'] : false;
     $battle_target_robot = !empty($battle_target_player) && !empty($battle_target_player['player_robots']) ? $battle_target_player['player_robots'][0] : false;
     //error_log('-> $battle_index_info = '.print_r($battle_index_info, true));
@@ -821,21 +844,8 @@ if (!empty($recruit_from_battle) && rpg_battle::has_index_info($recruit_from_bat
         //error_log('-> $mecha_battle_settings_array = '.print_r($mecha_battle_settings_array, true));
         //error_log('-> $new_last_robots = '.print_r($new_last_robots, true));
         // Add the generated session arrays to their parents for persistent keeping
-        // Check if this encounter was anchored before we unset it
-        $is_anchored = false;
-        if (!empty($world_map_encounters)){
-            foreach ($world_map_encounters AS $encounter_data){
-                if (is_string($encounter_data)){ $encounter_data = json_decode($encounter_data, true); }
-                if (!empty($encounter_data[4]) && $encounter_data[4] === $battle_index_token){
-                    $is_anchored = isset($encounter_data[6]) ? $encounter_data[6] : false;
-                    break;
-                }
-            }
-        }
         // Only unset the battle index info if it is NOT anchored
-        if (!$is_anchored){
-            rpg_battle::unset_index_info($battle_index_token);
-        }
+        if (!$is_anchored){ rpg_battle::unset_index_info($battle_index_token); }
         $WORLD_PLAYER_SESSION['last_robots'] = $new_last_robots;
         $WORLD_SESSION['robot_sessions'][$mecha_session_key] = $mecha_world_session_array;
         $GAME_SESSION['values']['battle_rewards'][$this_player_token]['player_robots'][$mecha_session_key] = $mecha_battle_rewards_array;
