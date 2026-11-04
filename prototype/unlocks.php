@@ -818,7 +818,6 @@ if (!mmrpg_prototype_item_unlocked('plum-link')
     ){
 
     // Unlock the Plum Link and generate the required event details
-    error_log('unlocking the Plum Link!');
     mmrpg_game_unlock_item('plum-link', array(
         'event_text' => '{player} made contact! <br /> The {item} has been established!',
         'player_token' => 'dr-lalinde',

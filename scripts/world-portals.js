@@ -67,7 +67,7 @@ function preparePortalEventOptions(firstEvent, options){
 
     if (portalInfo && goToDestination){
 
-        console.log('portalInfo =', portalInfo);
+        //console.log('portalInfo =', portalInfo);
 
         actionData.showActionArea = true;
         if (!dataLabel){ dataLabel = 'Portal Options'; }
