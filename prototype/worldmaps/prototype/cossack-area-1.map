@@ -55,7 +55,7 @@
 @rescues[]  = rescue-robo-1(11-8, heal-bot)
 #---------------------------#
 @actors[]   = star-gazer-kalinka(5-11, player, kalinka, -, default)
-@rescues[]  = frisky-feline-tango(11-11, tango)
+@rescues[]  = frisky-feline-tango(11-11, tango, anchored)
 #---------------------------#
 @layer = 0
 #---------------------------#

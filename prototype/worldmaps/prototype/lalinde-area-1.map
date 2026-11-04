@@ -39,7 +39,7 @@
 @bosses[]   = boss-boss-3(1-8, trill)
 #---------------------------#
 @actors[]   = field-reporter-plum(5-11, robot, plum, -, default)
-@rescues[]  = barrier-bird-beat(11-11, beat)
+@rescues[]  = barrier-bird-beat(11-11, beat, anchored)
 #---------------------------#
 @layer = 0
 #---------------------------#

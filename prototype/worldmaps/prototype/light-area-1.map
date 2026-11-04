@@ -53,7 +53,7 @@
 @encounters = met(1)
 #---------------------------#
 @actors[]   = good-guy-auto(5-11, robot, auto, -, default)
-@rescues[]  = good-boy-rush(11-11, rush)
+@rescues[]  = good-boy-rush(11-11, rush, anchored)
 #---------------------------#
 @layer = 0
 #---------------------------#

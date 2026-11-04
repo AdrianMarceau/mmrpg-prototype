@@ -55,7 +55,7 @@
 @rescues[]  = rescue-robo-1(5-8, heel-bot)
 #---------------------------#
 @actors[]   = weird-bird-reggae(5-11, robot, reggae, -, default)
-@rescues[]  = loyal-wolf-treble(11-11, treble)
+@rescues[]  = loyal-wolf-treble(11-11, treble, anchored)
 #---------------------------#
 @layer = 0
 #---------------------------#
