@@ -209,7 +209,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'field' => '',
         'objects' => ['player-platform'],
         'encounters' => ['trill@north-exit-portal', 'trill@east-exit-portal', 'trill@west-exit-portal'],
-        'items' => ['lalinde-program!!', 'empty-heart!!', 'empty-core!!', 'mecha-whistle'],
+        'items' => ['lalinde-program@center-down!!', 'empty-heart@center-right!!', 'empty-core@center-left!!', 'mecha-whistle@north-exit'],
         'tags' => ['central', 'player', 'main', 'spawn', 'intro'],
         'exits' => ['north', 'east', 'west']
         ];
