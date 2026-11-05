@@ -517,8 +517,11 @@ echo('<pre>'.PHP_EOL);
                 $area_file_markup[] = '#---------------------------#';
                 $ptoken = explode('-', $area_token)[0];
                 $itoken1 = trim($area_static_pickups[0], '! ');
+                if (strpos($itoken1, '@') !== false) { list($itoken1) = explode('@', $itoken1); }
                 $itoken2 = trim($area_static_pickups[1], '! ');
+                if (strpos($itoken2, '@') !== false) { list($itoken2) = explode('@', $itoken2); }
                 $itoken3 = trim($area_static_pickups[2], '! ');
+                if (strpos($itoken3, '@') !== false) { list($itoken3) = explode('@', $itoken3); }
                 $positionx = $area_middle_col;
                 $positiony = $area_middle_row - 2;
                 $position1 = ($positionx - 1).'-'.($positiony);
