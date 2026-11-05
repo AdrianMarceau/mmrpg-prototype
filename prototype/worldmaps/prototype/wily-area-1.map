@@ -28,9 +28,9 @@
 #---------------------------#
 @portals[]  = exit-portal-void(8-11, prototype-area-0__spawn, void-alt, confirm)
 #---------------------------#
-@mechas[]   = wily-guard-west(3-8, skeleton-joe, 1)
-@mechas[]   = wily-guard-east(13-8, skeleton-joe, 2)
-@mechas[]   = wily-guard-north(8-3, skeleton-joe, 3)
+@mechas[]   = wily-guard-west(3-8, skeleton-joe, 20)
+@mechas[]   = wily-guard-east(13-8, skeleton-joe, 20)
+@mechas[]   = wily-guard-north(8-3, skeleton-joe, 20)
 #---------------------------#
 @items[]    = wily-init-program(6-9, wily-program, anchored)
 @items[]    = wily-init-heart(9-9, wily-heart, anchored)

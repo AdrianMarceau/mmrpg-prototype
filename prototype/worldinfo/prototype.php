@@ -19,7 +19,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'pickups' => ['attack-pellet', 'defense-pellet', 'speed-pellet'],
         'items' => ['item-codes@south-exit'],
         'tags' => ['start'],
-        'exits' => ['north'],
+        'exits' => ['north', 'south'],
         'spawn' => 'south'
         ];
     //--------------------------//
@@ -36,7 +36,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'rescues' => [],
         'items' => ['light-program!!', 'light-heart!!', 'light-core!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
-        'exits' => ['east', 'south', 'west'] // 'north',
+        'exits' => ['north', 'east', 'south', 'west']
         ];
     $index['light-area-1e'] = [
         'name' => 'LIGHT Area 1E',

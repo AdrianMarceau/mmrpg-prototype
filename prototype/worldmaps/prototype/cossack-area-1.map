@@ -28,9 +28,9 @@
 #---------------------------#
 @portals[]  = exit-portal-void(8-11, prototype-area-0__spawn, void-alt, confirm)
 #---------------------------#
-@mechas[]   = cossack-guard-west(3-8, crystal-joe, 1)
-@mechas[]   = cossack-guard-east(13-8, crystal-joe, 2)
-@mechas[]   = cossack-guard-north(8-3, crystal-joe, 3)
+@mechas[]   = cossack-guard-west(3-8, crystal-joe, 20)
+@mechas[]   = cossack-guard-east(13-8, crystal-joe, 20)
+@mechas[]   = cossack-guard-north(8-3, crystal-joe, 20)
 #---------------------------#
 @items[]    = cossack-init-program(10-8, cossack-program, anchored)
 @items[]    = cossack-init-heart(10-9, cossack-heart, anchored)

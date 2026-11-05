@@ -298,6 +298,7 @@ echo('<pre>'.PHP_EOL);
             $area_file_markup[] = '@aliases[]  = 10:plain';
             $area_file_markup[] = '@aliases[]  = 20:type-'.$area_type;
             $area_file_markup[] = '@aliases[]  = 30:'.$area_field_tile;
+            if ($area_token === 'light-area-1'){ $area_file_markup[] = '@aliases[]  = 40:prototype-subspace'; }
             if (in_array('water', $area_tags)){ $area_file_markup[] = '@aliases[]  = 90:water'; }
             $area_file_markup[] = '#---------------------------#';
             $area_file_markup[] = '@portals[]  = spawn('.$area_spawn.(!$area_spawn_visible ? ', hidden' : '').')';
@@ -559,19 +560,19 @@ echo('<pre>'.PHP_EOL);
             } elseif ($area_token === 'wily-area-1'){
                 $area_file_markup[] = '#---------------------------#';
                 $west_pos = $getLocationCoords('west-exit');
-                if ($west_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-west('.$west_pos.', skeleton-joe, 1)'; $exact_protected_coords[] = $west_pos; }
+                if ($west_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-west('.$west_pos.', skeleton-joe, 20)'; $exact_protected_coords[] = $west_pos; }
                 $east_pos = $getLocationCoords('east-exit');
-                if ($east_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-east('.$east_pos.', skeleton-joe, 2)'; $exact_protected_coords[] = $east_pos; }
+                if ($east_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-east('.$east_pos.', skeleton-joe, 20)'; $exact_protected_coords[] = $east_pos; }
                 $north_pos = $getLocationCoords('north-exit');
-                if ($north_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-north('.$north_pos.', skeleton-joe, 3)'; $exact_protected_coords[] = $north_pos; }
+                if ($north_pos) { $area_file_markup[] = '@mechas[]   = wily-guard-north('.$north_pos.', skeleton-joe, 20)'; $exact_protected_coords[] = $north_pos; }
             } elseif ($area_token === 'cossack-area-1'){
                 $area_file_markup[] = '#---------------------------#';
                 $west_pos = $getLocationCoords('west-exit');
-                if ($west_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-west('.$west_pos.', crystal-joe, 1)'; $exact_protected_coords[] = $west_pos; }
+                if ($west_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-west('.$west_pos.', crystal-joe, 20)'; $exact_protected_coords[] = $west_pos; }
                 $east_pos = $getLocationCoords('east-exit');
-                if ($east_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-east('.$east_pos.', crystal-joe, 2)'; $exact_protected_coords[] = $east_pos; }
+                if ($east_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-east('.$east_pos.', crystal-joe, 20)'; $exact_protected_coords[] = $east_pos; }
                 $north_pos = $getLocationCoords('north-exit');
-                if ($north_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-north('.$north_pos.', crystal-joe, 3)'; $exact_protected_coords[] = $north_pos; }
+                if ($north_pos) { $area_file_markup[] = '@mechas[]   = cossack-guard-north('.$north_pos.', crystal-joe, 20)'; $exact_protected_coords[] = $north_pos; }
             }
 
             // If this area has a BUTTON, add it to the very center with a U-shaped barrier
@@ -1296,6 +1297,7 @@ echo('<pre>'.PHP_EOL);
             }
 
             // Generate layer tiles for LAYER 0 and LAYER -1
+            // Generate layer tiles for LAYER 0, LAYER 1, and LAYER -1
             if (!empty($area_size_width) && !empty($area_size_height)){
                 $area_file_markup[] = '#---------------------------#';
 
@@ -1310,10 +1312,12 @@ echo('<pre>'.PHP_EOL);
                 $padding = $area_padding - 1;
 
                 $layer_0_tiles = [];
+                $layer_1_tiles = [];
                 $layer_minus_1_tiles = [];
 
                 for ($r = 1; $r <= $area_size_height; $r++) {
                     $row_0 = [];
+                    $row_1 = [];
                     $row_minus_1 = [];
                     for ($c = 1; $c <= $area_size_width; $c++) {
 
@@ -1324,58 +1328,79 @@ echo('<pre>'.PHP_EOL);
                         // Determine the base terrain type for this cell
                         $isEdge = ($distY === 0 || $distX === 0);
                         $isPadding = (!$isEdge && ($distY <= $padding || $distX <= $padding));
-
                         $tile_0 = '[__]';
+                        $tile_1 = '[__]';
                         $tile_minus_1 = '[__]';
-
                         if ($isEdge) {
                             $tile_minus_1 = '[20]'; // 1-tile outer border moved to layer -1
                         } elseif (!$isPadding) {
                             $tile_0 = '[30]'; // Inner walkable field stays on layer 0
                         }
-
                         // Punch holes in the field if this coordinate was flagged as a void
                         if (in_array($c.'-'.$r, $map_holes)) {
                             $tile_0 = '[__]';
+                            $tile_1 = '[__]';
                             $tile_minus_1 = '[__]';
                         }
-
                         // Check if we are aligned with the middle row or column
                         $isMiddleRow = ($r === $area_middle_row);
                         $isMiddleCol = ($c === $area_middle_col);
-
                         // Override tiles to create paths and gaps if they connect to a valid exit
                         $isPath = false;
+                        $isNorthPath = false;
+                        $isNorthPathOverlap = false;
                         if ($isMiddleCol) {
-                            if ($r <= $padding + 1 && in_array('north', $clean_area_exits)) $isPath = true;
+                            if ($r <= $padding + 1 && in_array('north', $clean_area_exits)) {
+                                $isPath = true;
+                                $isNorthPath = true;
+                            }
+                            // Extend the path by 1 tile specifically for LIGHT Area 1's overlap effect
+                            if ($area_token === 'light-area-1' && $r === $padding + 2 && in_array('north', $clean_area_exits)) {
+                                $isPath = true;
+                                $isNorthPathOverlap = true;
+                            }
                             if ($r >= $area_size_height - $padding && in_array('south', $clean_area_exits)) $isPath = true;
                         }
                         if ($isMiddleRow) {
                             if ($c <= $padding + 1 && in_array('west', $clean_area_exits)) $isPath = true;
                             if ($c >= $area_size_width - $padding && in_array('east', $clean_area_exits)) $isPath = true;
                         }
-
                         if ($isPath) {
-                            $tile_0 = '[30]'; // Draw the path on layer 0
-                            $tile_minus_1 = '[__]'; // Create a gap in the layer -1 border
+                            // Hardcode exception: elevate LIGHT Area 1's north exit to layer 1 using subspace tiles
+                            if ($area_token === 'light-area-1' && ($isNorthPath || $isNorthPathOverlap)) {
+                                $tile_1 = '[40]';
+                                // If it's the overlapping tile, keep the Layer 0 floor underneath it intact
+                                if (!$isNorthPathOverlap) {
+                                    $tile_0 = '[__]';
+                                    $tile_minus_1 = '[__]';
+                                }
+                            } else {
+                                $tile_0 = '[30]'; // Draw the path on layer 0
+                                $tile_minus_1 = '[__]'; // Create a gap in the layer -1 border
+                            }
                         }
-
                         // Push the tiles to their respective rows
                         $row_0[] = $tile_0;
+                        $row_1[] = $tile_1;
                         $row_minus_1[] = $tile_minus_1;
                     }
-
                     // Implode the rows and push them to the layer arrays
                     $layer_0_tiles[] = implode(',', $row_0);
+                    $layer_1_tiles[] = implode(',', $row_1);
                     $layer_minus_1_tiles[] = implode(',', $row_minus_1);
                 }
-
                 // Append Layer 0 to markup
                 $area_file_markup[] = '@layer = 0';
                 $area_file_markup[] = '#---------------------------#';
                 $area_file_markup = array_merge($area_file_markup, $layer_0_tiles);
                 $area_file_markup[] = '#---------------------------#';
-
+                // Append Layer 1 to markup (specifically for light-area-1's elevated path)
+                if ($area_token === 'light-area-1') {
+                    $area_file_markup[] = '@layer = 1';
+                    $area_file_markup[] = '#---------------------------#';
+                    $area_file_markup = array_merge($area_file_markup, $layer_1_tiles);
+                    $area_file_markup[] = '#---------------------------#';
+                }
                 // Append Layer -1 to markup
                 $area_file_markup[] = '@layer = -1';
                 $area_file_markup[] = '#---------------------------#';
