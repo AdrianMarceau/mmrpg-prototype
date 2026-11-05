@@ -4,6 +4,18 @@
 $this_current_world = $this_prototype_data['this_current_world'];
 $this_current_map = $this_prototype_data['this_current_map'];
 
+// Collected all world actor timestamps into a single array
+$all_world_actors = array();
+foreach ($world_actors AS $area => $actors){
+    foreach ($actors AS $name => $time){
+        if (isset($all_world_actors[$name]) && $all_world_actors[$name] < $time){ continue; }
+        $all_world_actors[$name] = $time;
+    }
+}
+//error_log('$world_actors = '.print_r($world_actors, true));
+//error_log('$world_map_actors = '.print_r($world_map_actors, true));
+//error_log('$all_world_actors = '.print_r($all_world_actors, true));
+
 // If the shopkeeper AUTO is currently on this map
 $actor_token = 'auto';
 $actor_namekey = 'good-guy-auto';
@@ -16,9 +28,8 @@ if (!empty($map_data_parsed['actors'])
     //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
 
     // If Auto has not been interacted with yet, make sure we set him to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
-    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }
 
@@ -34,9 +45,8 @@ if (!empty($map_data_parsed['actors'])
     //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
 
     // If Reggae has not been interacted with yet, make sure we set him to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
-    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }
 
@@ -52,9 +62,8 @@ if (!empty($map_data_parsed['actors'])
     //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
 
     // If Kalinka has not been interacted with yet, make sure we set her to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
-    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }
 
@@ -70,9 +79,8 @@ if (!empty($map_data_parsed['actors'])
     //error_log('$map_data_parsed[\'actors\'] = '.print_r($map_data_parsed['actors'], true));
 
     // If Plum has not been interacted with yet, make sure we set her to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
     if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
-    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }
 
@@ -87,10 +95,8 @@ if (!empty($map_data_parsed['actors'])
     $actor_is_unlocked = true;
 
     // If Anti-Eddie has not been interacted with yet, make sure we set him to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
-    if ($actor_is_unlocked && !$actor_interacted_with){
-        $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter';
-    }
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
+    if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
 
 }
 
@@ -105,10 +111,8 @@ if (!empty($map_data_parsed['actors'])
     $actor_is_unlocked = true;
 
     // If Eddie has not been interacted with yet, make sure we set him to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
-    if ($actor_is_unlocked && !$actor_interacted_with){
-        $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter';
-    }
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
+    if ($actor_is_unlocked && !$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
 
 }
 
@@ -119,9 +123,8 @@ if (!empty($map_data_parsed['actors'])
     && !empty($map_data_parsed['actors'][$actor_namekey])){
 
     // If Auto has not been interacted with yet, make sure we set him to first-encounter
-    $actor_interacted_with = !empty($world_map_actors[$actor_namekey]) ? true : false;
+    $actor_interacted_with = !empty($all_world_actors[$actor_namekey]) ? true : false;
     if (!$actor_interacted_with){ $map_data_parsed['actors'][$actor_namekey][4] = 'first-encounter'; }
-    //error_log('$world_map_actors = '.print_r($world_map_actors, true));
 
 }
 
