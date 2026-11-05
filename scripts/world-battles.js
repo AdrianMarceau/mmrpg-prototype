@@ -17,10 +17,10 @@ function prepareBattleEventOptions(firstEvent, eventsAtPosition, starsNearPositi
 
     let _playerIndexInfo = _mmrpgPlayersIndex[_worldPlayer.token];
 
-    let firstRobotToken = _worldPlayer.team[0];
-    let _worldPlayerRobots = _worldPlayer.robots;
-    let _firstPlayerRobot = _worldPlayerRobots[firstRobotToken];
-    let _firstPlayerRobotIndexInfo = _indexes.robots[_firstPlayerRobot.token];
+    let firstRobotToken = _worldPlayer.team.length ? _worldPlayer.team[0] : false;
+    let _worldPlayerRobots = firstRobotToken && Object.keys(_worldPlayer.robots).length ? _worldPlayer.robots : false;
+    let _firstPlayerRobot = _worldPlayerRobots && typeof _worldPlayerRobots[firstRobotToken] !== 'undefined' ? _worldPlayerRobots[firstRobotToken] : false;
+    let _firstPlayerRobotIndexInfo = _firstPlayerRobot && typeof _indexes.robots[_firstPlayerRobot.token] !== 'undefined' ? _indexes.robots[_firstPlayerRobot.token] : false;
 
     options = options || {};
 
