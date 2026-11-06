@@ -4896,10 +4896,18 @@ function mmrpg_prototype_get_player_boss_music($player_token, $session_token = '
 // Define a function for determining a robot's boss music given its source game
 function mmrpg_prototype_get_robot_boss_music($robot_token){
     if (empty($robot_token) || !is_string($robot_token)){ return false; }
+    static $killer_tokens = array('enker', 'punk', 'ballade', 'quint');
+    static $genesis_tokens = array('buster-rod-g', 'mega-water-s', 'hyper-storm-h');
+    static $darksoul_tokens = array('mega-man-ds', 'bass-ds', 'protoman-ds', 'quake-woman-ds');
+    static $stardroid_tokens = array('terra', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto', 'sunstar');
     $robot_info = rpg_robot::get_index_info($robot_token);
     if (empty($robot_info)){ return false; }
     if ($robot_token === 'trill'){ return 'sega-remix/wily-fortress-5-mm10'; }
     else if ($robot_token === 'slur'){ return 'sega-remix/wily-fortress-1-mm7'; }
+    else if (in_array($robot_token, $killer_tokens)){ return 'sega-remix/boss-theme-mm10'; }
+    else if (in_array($robot_token, $genesis_tokens)){ return 'sega-remix/mr-x-fortress-mm06'; }
+    else if (in_array($robot_token, $darksoul_tokens)){ return 'sega-remix/wily-fortress-1-mm9'; }
+    else if (in_array($robot_token, $stardroid_tokens)){ return 'sega-remix/wily-machine-8-mm8'; }
     $robot_game = !empty($robot_info['robot_game']) ? strtolower($robot_info['robot_game']) : 'mm1';
     $music_path = 'sega-remix/boss-theme-'.$robot_game;
     if (rpg_game::sound_exists('sounds/'.$music_path)){ return $music_path; }
