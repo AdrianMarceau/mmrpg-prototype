@@ -295,6 +295,10 @@ echo('<pre>'.PHP_EOL);
             $area_file_markup[] = '#---------------------------#';
             $area_file_markup[] = '@field      = '.$area_field;
             $area_file_markup[] = '#---------------------------#';
+            if (in_array('player-platform', $area_objects)){
+                $area_file_markup[] = '@music[]    = safezone(opening-1-mm9)';
+                $area_file_markup[] = '#---------------------------#';
+            }
             $area_file_markup[] = '@aliases[]  = 10:plain';
             $area_file_markup[] = '@aliases[]  = 20:type-'.$area_type;
             $area_file_markup[] = '@aliases[]  = 30:'.$area_field_tile;

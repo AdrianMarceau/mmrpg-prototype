@@ -10,6 +10,8 @@
 #---------------------------#
 @field      = lalinde-academy
 #---------------------------#
+@music[]    = safezone(opening-1-mm9)
+#---------------------------#
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-copy
 @aliases[]  = 30:lalinde-academy
