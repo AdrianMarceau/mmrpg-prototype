@@ -212,7 +212,7 @@ $anyone_had_rush = !empty($database_robot_records['rush']['robot_unlocked']) || 
 $anyone_had_treble = !empty($database_robot_records['treble']['robot_unlocked']) || !empty($database_robot_records['treble']['robot_summoned']);
 $anyone_had_tango = !empty($database_robot_records['tango']['robot_unlocked']) || !empty($database_robot_records['tango']['robot_summoned']);
 $anyone_had_beat = !empty($database_robot_records['beat']['robot_unlocked']) || !empty($database_robot_records['beat']['robot_summoned']);
-error_log('$database_robot_records = '.print_r($database_robot_records, true));
+//error_log('$database_robot_records = '.print_r($database_robot_records, true));
 
 // Check to see if anyone already has any of the animal companions beforehand
 $unlocked_robot_counters = mmrpg_prototype_robots_unlocked_counters();
@@ -220,7 +220,7 @@ $anyone_has_rush = !empty($unlocked_robot_counters['rush']);
 $anyone_has_treble = !empty($unlocked_robot_counters['treble']);
 $anyone_has_tango = !empty($unlocked_robot_counters['tango']);
 $anyone_has_beat = !empty($unlocked_robot_counters['beat']);
-error_log('$unlocked_robot_counters = '.print_r($unlocked_robot_counters, true));
+//error_log('$unlocked_robot_counters = '.print_r($unlocked_robot_counters, true));
 
 // Dynamically set the level for the Rush rescue mission
 rpg_world::$encounter_overrides['rescue']['good-boy-rush'] = array(
