@@ -800,7 +800,7 @@ class rpg_world {
         static $map_custval_parser;
         if (!$map_custval_parser){
             $map_custval_parser = function($custval_kind, $raw_strings, $include_keys = false) use ($map_tiles_custval_regex, $map_other_custval_regex, $map_listval_custval_regex){
-                if (empty($raw_strings)){ return array(); }
+                if (empty($raw_strings) || !is_array($raw_strings)){ return array(); }
                 $parsed_keys = array();
                 $parsed_tiles = array();
                 foreach ($raw_strings AS $line){
