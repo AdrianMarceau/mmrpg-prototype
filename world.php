@@ -196,10 +196,31 @@ if (empty($request_player_token) && !empty($WORLD_SESSION['player_sessions']['la
 if (!empty($request_player_token) && in_array($request_player_token, $allowed_player_tokens)){ $this_prototype_data['this_current_player'] = $request_player_token; }
 if (empty($this_prototype_data['this_current_player'])){ $this_prototype_data['this_current_player'] = $default_player_token; }
 //$WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
+
+// Collect the current world version and compare it to the player's
 $new_world_version = MMRPG_VERSION;
 $old_world_version = !empty($WORLD_SESSION['world_version']) ? $WORLD_SESSION['world_version'] : '';
 $diff_world_version = $old_world_version !== $new_world_version;
 $WORLD_SESSION['world_version'] = $new_world_version;
+
+// Immediately clear all saved map states if the version has changed
+if ($diff_world_version) {
+    // Clear map-specific entity data
+    $WORLD_SESSION['world_encounters'] = array();
+    $WORLD_SESSION['world_pickups'] = array();
+    // $WORLD_SESSION['world_gates'] = array();
+    // $WORLD_SESSION['world_locks'] = array();
+    // $WORLD_SESSION['world_actors'] = array();
+    // Clear outdated world battles from the global battle index
+    if (!empty($GAME_SESSION['values']['battle_index'])){
+        foreach ($GAME_SESSION['values']['battle_index'] AS $battle_token => $battle_data){
+            if (strpos($battle_token, 'world-battle_') === 0){
+                unset($GAME_SESSION['values']['battle_index'][$battle_token]);
+            }
+        }
+    }
+}
+
 $WORLD_SESSION['last_player_token'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['last_player'] = $this_prototype_data['this_current_player'];
 $WORLD_SESSION['player_sessions']['allowed'] = implode(',', $allowed_player_tokens); // store the allowed player tokens in the session
