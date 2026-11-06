@@ -979,6 +979,7 @@ if (!empty($map_data_parsed['music'])){
     elseif (!empty($music_tracks['mecha-nearby']) && !empty($battles_remaining['mecha'])){ $map_field_music = $music_tracks['mecha-nearby'][0]; }
     elseif (!empty($music_tracks['default'])){ $map_field_music = $music_tracks['default'][0]; }
     //error_log('$music_tracks = '.print_r($music_tracks, true));
+    //error_log('$map_field_music = '.print_r($map_field_music, true));
     }
 if (!strstr($map_field_music, '/')){ $map_field_music = 'sega-remix/'.$map_field_music; }
 //error_log('$map_field_music = '.print_r($map_field_music, true));
