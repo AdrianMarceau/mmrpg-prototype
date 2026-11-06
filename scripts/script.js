@@ -1660,8 +1660,8 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (gameSettings.indexLoaded){
         if (typeof gameSettings.musicHasStarted === 'undefined'){ gameSettings.musicHasStarted = false; }
         if (!gameSettings.musicHasStarted && mmrpgMusicSound.playing()){ gameSettings.musicHasStarted = true; }
-        if (!gameSettings.musicVolumeEnabled){ console.warn('ccc', effectName, gameSettings); return false; }
-        if (mmrpgMusicSound === false){ console.warn('ddd(1)', effectName, gameSettings); return false; }
+        if (!gameSettings.musicVolumeEnabled){ return false; } //console.warn('ccc', effectName, gameSettings);
+        if (mmrpgMusicSound === false){ return false; } //console.warn('ddd(1)', effectName, gameSettings);
         else if (gameSettings.gameHasStarted && !gameSettings.musicHasStarted){ console.error('ddd(2)', effectName, gameSettings); return false; }
     }
 
