@@ -32,9 +32,9 @@
 @mechas[]   = cossack-guard-east(13-8, crystal-joe, 20)
 @mechas[]   = cossack-guard-north(8-3, crystal-joe, 20)
 #---------------------------#
-@items[]    = cossack-init-program(10-8, cossack-program, anchored)
-@items[]    = cossack-init-heart(10-9, cossack-heart, anchored)
-@items[]    = cossack-init-core(11-9, cossack-core, anchored)
+@items[]    = cossack-init-program(11-8, cossack-program, anchored)
+@items[]    = cossack-init-heart(5-8, cossack-heart, anchored)
+@items[]    = cossack-init-core(8-5, cossack-core, anchored)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
@@ -52,7 +52,7 @@
 #---------------------------#
 @encounters = met(1)
 #---------------------------#
-@rescues[]  = rescue-robo-1(11-8, heal-bot)
+@rescues[]  = rescue-robo-1(5-9, heal-bot)
 #---------------------------#
 @actors[]   = star-gazer-kalinka(5-11, player, kalinka, -, default)
 @rescues[]  = frisky-feline-tango(11-11, tango, anchored)

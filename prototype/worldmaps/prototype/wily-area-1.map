@@ -32,9 +32,9 @@
 @mechas[]   = wily-guard-east(13-8, skeleton-joe, 20)
 @mechas[]   = wily-guard-north(8-3, skeleton-joe, 20)
 #---------------------------#
-@items[]    = wily-init-program(6-9, wily-program, anchored)
-@items[]    = wily-init-heart(9-9, wily-heart, anchored)
-@items[]    = wily-init-core(6-8, wily-core, anchored)
+@items[]    = wily-init-program(5-8, wily-program, anchored)
+@items[]    = wily-init-heart(11-8, wily-heart, anchored)
+@items[]    = wily-init-core(8-5, wily-core, anchored)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
@@ -52,7 +52,7 @@
 #---------------------------#
 @encounters = met(1)
 #---------------------------#
-@rescues[]  = rescue-robo-1(5-8, heel-bot)
+@rescues[]  = rescue-robo-1(9-9, heel-bot)
 #---------------------------#
 @actors[]   = weird-bird-reggae(5-11, robot, reggae, -, default)
 @rescues[]  = loyal-wolf-treble(11-11, treble, anchored)

@@ -34,7 +34,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'encounters' => [], //'sniper-joe@west-exit', 'sniper-joe@east-exit', 'sniper-joe@south-exit'
         'encounters2' => ['met'],
         'rescues' => [],
-        'items' => ['light-program!!', 'light-heart!!', 'light-core!!'],
+        'items' => ['light-program@center-down!!', 'light-heart@east!!', 'light-core@west!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'south', 'west']
         ];
@@ -95,7 +95,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         //'encounters' => ['dr-wily', 'bass'],
         'encounters2' => ['met'],
         'rescues' => ['heel-bot'],
-        'items' => ['wily-program!!', 'wily-heart!!', 'wily-core!!'],
+        'items' => ['wily-program@west!!', 'wily-heart@east!!', 'wily-core@north!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -153,7 +153,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         //'encounters' => ['dr-cossack', 'proto-man'],
         'encounters2' => ['met'],
         'rescues' => ['heal-bot'],
-        'items' => ['cossack-program!!', 'cossack-heart!!', 'cossack-core!!'],
+        'items' => ['cossack-program@east!!', 'cossack-heart@west!!', 'cossack-core@north!!'],
         'tags' => ['central', 'player', 'main', 'spawn'],
         'exits' => ['north', 'east', 'west']
         ];
@@ -208,7 +208,7 @@ function mmrpg_prototype_world_areas($world, &$index){
         'element' => 'copy',
         'field' => 'lalinde-academy',
         'objects' => ['player-platform'],
-        'encounters' => ['trill@north-exit-portal', 'trill@east-exit-portal', 'trill@west-exit-portal'],
+        'encounters' => ['trill@north-exit-portal^30', 'trill@east-exit-portal^20', 'trill@west-exit-portal^10'],
         'items' => ['lalinde-program@center-down!!', 'empty-heart@center-right!!', 'empty-core@center-left!!', 'mecha-whistle@north-exit'],
         'tags' => ['central', 'player', 'main', 'spawn', 'intro'],
         'exits' => ['north', 'east', 'west']

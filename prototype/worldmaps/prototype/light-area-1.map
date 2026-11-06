@@ -34,9 +34,9 @@
 @mechas[]   = light-guard-east(13-8, sniper-joe, 2)
 @mechas[]   = light-guard-south(8-13, sniper-joe, 3)
 #---------------------------#
-@items[]    = light-init-program(7-8, light-program, anchored)
-@items[]    = light-init-heart(11-7, light-heart, anchored)
-@items[]    = light-init-core(5-7, light-core, anchored)
+@items[]    = light-init-program(8-9, light-program, anchored)
+@items[]    = light-init-heart(11-8, light-heart, anchored)
+@items[]    = light-init-core(5-8, light-core, anchored)
 #---------------------------#
 @groups[]   = encounter-zone_main-area(5-5...11-11)
 @groups[]   = no-encounters_spawn-buffer(8-8...8-8)
