@@ -9,11 +9,11 @@
 @size       = 15 x 15
 @sheet      = mmrpg-overworld-2k25-v6
 #---------------------------#
-@field      = field
+@field      = emerald-terraces
 #---------------------------#
 @aliases[]  = 10:plain
 @aliases[]  = 20:type-copy
-@aliases[]  = 30:plain-field
+@aliases[]  = 30:emerald-terraces
 #---------------------------#
 @portals[]  = spawn(8-8, hidden)
 #---------------------------#
