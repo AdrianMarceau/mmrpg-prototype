@@ -1647,7 +1647,7 @@ gameSettings.soundEffectSources = [];
 gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
 gameSettings.soundEffectPoolKey = 0;
-gameSettings.soundEffectPoolLimit = 10;
+gameSettings.soundEffectPoolLimit = 30;
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
 async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
@@ -1734,8 +1734,7 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             let playId = sound.play(effectName);
             // Apply rate and volume strictly to this playId so it doesn't corrupt others
             sound.rate(effectRate, playId);
-            //sound.volume(effectVolume, playId);
-            sound.fade(0, effectVolume, 10, playId);
+            sound.volume(effectVolume, playId); // Restored direct volume application
             // Store the id back into your effect object for if we need to manipulate it later
             effect.id = playId;
             };
@@ -1747,7 +1746,7 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
             playSound(sound);
             }
         return true;
-    };
+        };
 
     if (effectDelay){ setTimeout(function(){ playSoundWhenReady(effectName, effectVolume, effectRate); }, effectDelay); }
     else { playSoundWhenReady(effectName, effectVolume, effectRate); }
