@@ -180,7 +180,7 @@
         "colour": "space",
         "messages": {
             "default": [
-                "Quit wasting my time and let's battle! I should end you right here for your insolence..."
+                "Quit wasting my time and let's battle! I should end you right here for testing my patience..."
                 ],
             "first-encounter": [
                 "Welcome, {player_name}! I'm impressed you got this far! | Unfortunately, this is where your journey ends."
