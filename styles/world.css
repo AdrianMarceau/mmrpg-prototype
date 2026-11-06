@@ -712,12 +712,14 @@ html, body {
 #world #map .sprite.block.super-block.fence { background-image: url("../content/fields/gentle-countryside/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.field { background-image: url("../content/fields/plain-field/sprites/battle-field_block.png"); }
 
+#world #map .sprite.block.super-block.emerald-terraces { background-image: url("../content/fields/emerald-terraces/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.gentle-countryside { background-image: url("../content/fields/gentle-countryside/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.maniacal-hideaway { background-image: url("../content/fields/maniacal-hideaway/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.wintry-forefront { background-image: url("../content/fields/wintry-forefront/sprites/battle-field_block.png"); }
 
-#world #map .sprite.block.super-block.wily-castle { background-image: url("../content/fields/wily-castle/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.lalinde-academy { background-image: url("../content/fields/lalinde-academy/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.light-laboratory { background-image: url("../content/fields/light-laboratory/sprites/battle-field_block.png"); }
+#world #map .sprite.block.super-block.wily-castle { background-image: url("../content/fields/wily-castle/sprites/battle-field_block.png"); }
 #world #map .sprite.block.super-block.cossack-citadel { background-image: url("../content/fields/cossack-citadel/sprites/battle-field_block.png"); }
 
 #world #map .sprite.block.super-block.prototype-subspace { background-image: url("../content/fields/prototype-subspace/sprites/battle-field_block.png"); }
