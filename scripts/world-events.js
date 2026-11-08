@@ -42,6 +42,7 @@ function triggerWorldEvent(eventAction, eventData, $eventSprite){
             //let _allPlayerRobots = Object.keys(_playerRobots) + Object.keys(_playerRobotsIndex);
             let _allPlayerRobots = [...new Set([...Object.keys(_playerRobots), ...Object.keys(_playerRobotsIndex)])];
             let playerIsCursor = _worldPlayer.token === 'player' ? true : false;
+            let soundHasPlayed = false;
             let eventEffects = Object.values(eventData);
             for (let i = 0; i < eventEffects.length; i++){
                 let effect = eventEffects[i];
@@ -61,40 +62,40 @@ function triggerWorldEvent(eventAction, eventData, $eventSprite){
                         if (effect === 'restore-team-energy'
                             && robotInfo.energyPercent !== 100){
                             //console.log('%c' + '-> restoring energy for ' + robotString + ' via event panel', 'color: #64a455;');
-                            _self.restoreRobotEnergy(robotString, true);
-                            _self.playSoundEffect('recovery-energy');
+                            _self.restoreRobotEnergy(robotString, true, false);
+                            if (!soundHasPlayed){ _self.playSoundEffect('recovery-energy'); soundHasPlayed = true; }
                             actionsCompleted++;
                             }
                         // If this is a RESTORE TEAM WEAPONS effect, let's process that now
                         if (effect === 'restore-team-weapons'
                             && robotInfo.weaponsPercent !== 100){
                             //console.log('%c' + '-> restoring weapons for ' + robotString + ' via event panel', 'color: #3d7cbe;');
-                            _self.restoreRobotWeapons(robotString, true);
-                            _self.playSoundEffect('recovery-weapons');
+                            _self.restoreRobotWeapons(robotString, true, false);
+                            if (!soundHasPlayed){ _self.playSoundEffect('recovery-weapons'); soundHasPlayed = true; }
                             actionsCompleted++;
                             }
                         // If this is a RESET TEAM ATTACK effect, let's process that now
                         if (effect === 'reset-team-attack'
                             && robotInfo.attackMods !== 0){
                             //console.log('%c' + '-> resetting attack for ' + robotString + ' via event panel', 'color: #8b5050;');
-                            _self.resetRobotAttack(robotString, false);
-                            _self.playSoundEffect('small-buff-received');
+                            _self.resetRobotAttack(robotString, false, true);
+                            if (!soundHasPlayed){ _self.playSoundEffect('small-buff-received'); soundHasPlayed = true; }
                             actionsCompleted++;
                             }
                         // If this is a RESET TEAM DEFENSE effect, let's process that now
                         if (effect === 'reset-team-defense'
                             && robotInfo.defenseMods !== 0){
                             //console.log('%c' + '-> resetting ' + robotString + ' defense for event panel', 'color: #50638a;');
-                            _self.resetRobotDefense(robotString, false);
-                            _self.playSoundEffect('small-buff-received');
+                            _self.resetRobotDefense(robotString, false, true);
+                            if (!soundHasPlayed){ _self.playSoundEffect('small-buff-received'); soundHasPlayed = true; }
                             actionsCompleted++;
                             }
                         // If this is a RESET TEAM SPEED effect, let's process that now
                         if (effect === 'reset-team-speed'
                             && robotInfo.speedMods !== 0){
                             //console.log('%c' + '-> resetting ' + robotString + ' speed for event panel', 'color: #8b739b;');
-                            _self.resetRobotSpeed(robotString, false);
-                            _self.playSoundEffect('small-buff-received');
+                            _self.resetRobotSpeed(robotString, false, true);
+                            if (!soundHasPlayed){ _self.playSoundEffect('small-buff-received'); soundHasPlayed = true; }
                             actionsCompleted++;
                             }
                         }
