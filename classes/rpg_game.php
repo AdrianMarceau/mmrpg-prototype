@@ -1367,6 +1367,13 @@ class rpg_game {
             asort($this_star_force);
             $this_star_force = array_reverse($this_star_force);
 
+            // Loop through the generated starforce array and apply a hard limit on starforce power per element
+            $max_power = 100; // equal to +1000 for each stat
+            foreach ($this_star_force AS $type => $power){
+                if ($power <= $max_power){ continue; }
+                $this_star_force[$type] = $max_power;
+            }
+
             // Check to see if a Rogue Star is currently in orbit
             $this_rogue_star = mmrpg_prototype_get_current_rogue_star();
             if (!empty($this_rogue_star)){
