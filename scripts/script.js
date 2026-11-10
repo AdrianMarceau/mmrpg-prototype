@@ -1403,29 +1403,14 @@ function mmrpg_reset_music_volume(fadeDuration){
     if (fadeDuration > 0){ mmrpgMusicSound.fade(currentMusicVolume, relativeMusicVolume, fadeDuration);  }
     else { mmrpgMusicSound.volume(relativeMusicVolume); }
 }
-// Define a function for adjusting the volume if in-game sound effects
+// Define a function for adjusting the volume of in-game sound effects
 function mmrpg_sound_effect_volume(newVolume, saveToSettings){
     if (!gameSettings.soundEffectPool){ return false; }
-    //console.log('%cmmrpg_sound_effect_volume', 'color: green', '(newVolume:', newVolume, 'saveToSettings:', saveToSettings, ')');
     if (typeof saveToSettings !== 'boolean'){ saveToSettings = true; }
     if (newVolume < 0){ newVolume = 0; }
     if (newVolume > 1){ newVolume = 1; }
     if (saveToSettings){ gameSettings.effectVolume = newVolume; }
-    //console.log('mmrpg_sound_effect_volume // adjusted newVolume =', newVolume);
-    var relativeEffectVolume = newVolume * gameSettings.masterVolume;
-    var currentEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
-    //console.log('mmrpg_sound_effect_volume // relativeEffectVolume =', relativeEffectVolume);
-    if (gameSettings.soundEffectPool.length){
-        var soundIDs = Object.keys(gameSettings.soundEffectPool);
-        //console.log('gameSettings.soundEffectPool =', gameSettings.soundEffectPool);
-        //console.log('soundIDs =', soundIDs);
-        for (var i = 0; i < soundIDs.length; i++){
-            var soundID = soundIDs[i];
-            var soundObj = gameSettings.soundEffectPool[soundID];
-            //console.log('soundID =', soundID, '| soundObj =', soundObj);
-            soundObj.sound.volume(relativeEffectVolume);
-        }
-    }
+    return true;
 }
 
 // Define a function for toggling the music player
@@ -1648,10 +1633,39 @@ gameSettings.soundEffectSprites = {};
 gameSettings.soundEffectPool = [];
 gameSettings.soundEffectPoolKey = 0;
 gameSettings.soundEffectPoolLimit = 30;
+gameSettings.soundEffectActiveIds = {};
+gameSettings.soundEffectLastPlayed = {};
+gameSettings.soundEffectMinCooldown = 35; // ms minimum gap between identical sound effects
+gameSettings.soundEffectLimiterReady = false;
 gameSettings.customIndex.soundsIndex = {};
 gameSettings.customIndex.soundsAliasesIndex = {};
+
+// Helper to attach a transparent peak limiter to Howler's master Web Audio bus to prevent multi-sound clipping pops
+function mmrpg_init_audio_limiter(){
+    if (gameSettings.soundEffectLimiterReady){ return true; }
+    if (typeof window.Howler === 'undefined' || !window.Howler.ctx || !window.Howler.masterGain){ return false; }
+    try {
+        let ctx = window.Howler.ctx;
+        let masterGain = window.Howler.masterGain;
+        let limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.setValueAtTime(-2.0, ctx.currentTime); // Catch peaks just below 0dBFS
+        limiter.knee.setValueAtTime(0.0, ctx.currentTime);       // Hard knee for transparent limiting
+        limiter.ratio.setValueAtTime(20.0, ctx.currentTime);     // Brickwall ratio
+        limiter.attack.setValueAtTime(0.001, ctx.currentTime);   // 1ms fast attack for transients
+        limiter.release.setValueAtTime(0.050, ctx.currentTime);  // 50ms quick release
+        masterGain.disconnect();
+        masterGain.connect(limiter);
+        limiter.connect(ctx.destination);
+        gameSettings.soundEffectLimiterReady = true;
+        return true;
+        } catch (e) {
+        return false;
+        }
+}
+
+// Define a function for playing a MMRPG sound effect (supports aliases and effect config object)
 async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
-    if (typeof effectConfig !== 'object'){ effectConfig = {}; }
+    if (typeof effectConfig !== 'object' || effectConfig === null){ effectConfig = {}; }
     if (typeof isMenuSound !== 'boolean'){ isMenuSound = true; }
 
     if (!gameSettings.gameHasLoaded){ console.warn('aaa', effectName, gameSettings); return false; }
@@ -1659,15 +1673,13 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
 
     if (gameSettings.indexLoaded){
         if (typeof gameSettings.musicHasStarted === 'undefined'){ gameSettings.musicHasStarted = false; }
-        if (!gameSettings.musicHasStarted && mmrpgMusicSound.playing()){ gameSettings.musicHasStarted = true; }
-        if (!gameSettings.musicVolumeEnabled){ return false; } //console.warn('ccc', effectName, gameSettings);
-        if (mmrpgMusicSound === false){ return false; } //console.warn('ddd(1)', effectName, gameSettings);
+        if (!gameSettings.musicHasStarted && mmrpgMusicSound && mmrpgMusicSound.playing()){ gameSettings.musicHasStarted = true; }
+        if (!gameSettings.musicVolumeEnabled){ return false; }
+        if (mmrpgMusicSound === false){ return false; }
         else if (gameSettings.gameHasStarted && !gameSettings.musicHasStarted){ console.error('ddd(2)', effectName, gameSettings); return false; }
-    }
+        }
 
     if (!gameSettings.soundEffectSources.length){ console.warn('eee', effectName, gameSettings); return false; }
-
-    // FIX 1: Correctly check if the sprite object is actually empty
     if (Object.keys(gameSettings.soundEffectSprites).length === 0){ console.warn('fff', effectName, gameSettings); return false; }
 
     var baseEffectVolume = gameSettings.effectVolume * gameSettings.masterVolume;
@@ -1675,69 +1687,161 @@ async function mmrpg_play_sound_effect(effectName, effectConfig, isMenuSound){
     if (typeof gameSettings.customIndex.soundsAliasesIndex !== 'undefined'
         && typeof gameSettings.customIndex.soundsAliasesIndex[effectName] !== 'undefined'){
         effectName = gameSettings.customIndex.soundsAliasesIndex[effectName];
-    } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
+        } else if (typeof gameSettings.customIndex.soundsIndex !== 'undefined'
         && typeof gameSettings.customIndex.soundsIndex.sprite[effectName] !== 'undefined'){
         // Valid
-    } else {
+        } else {
         return false;
-    }
+        }
 
     var effectVolume = baseEffectVolume;
     var effectRate = 1.0;
     var effectLoop = false;
     var effectDelay = 0;
+    var effectCooldown = gameSettings.soundEffectMinCooldown;
+    var allowOverlap = false;
 
     if (isMenuSound === true){ effectVolume *= gameSettings.menuEffectVolume; }
     if (typeof effectConfig.volume === 'number'){ effectVolume *= effectConfig.volume; }
     if (typeof effectConfig.rate === 'number'){ effectRate = effectConfig.rate; }
     if (typeof effectConfig.loop === 'boolean'){ effectLoop = effectConfig.loop; }
     if (typeof effectConfig.delay === 'number'){ effectDelay = effectConfig.delay; }
+    if (typeof effectConfig.cooldown === 'number'){ effectCooldown = effectConfig.cooldown; }
+    if (typeof effectConfig.overlap === 'boolean'){ allowOverlap = effectConfig.overlap; }
     if (!gameSettings.effectVolumeEnabled){ effectVolume = 0; }
     if (effectVolume < 0){ effectVolume = 0; }
     if (effectVolume > 1){ effectVolume = 1; }
     effectVolume = (Math.round(effectVolume * 1000) / 1000);
+    if (effectVolume <= 0){ return false; }
 
     let sound;
     let soundEffectPoolKey = gameSettings.soundEffectPoolKey;
 
     if (typeof gameSettings.soundEffectPool[soundEffectPoolKey] === 'undefined'
         || typeof gameSettings.soundEffectPool[soundEffectPoolKey].sound === 'undefined'){
-
+        // Disable autoSuspend on both the active Howler singleton and constructor
+        if (typeof window.Howler !== 'undefined'){ window.Howler.autoSuspend = false; }
         if (typeof window.HowlerGlobal !== 'undefined'){ window.HowlerGlobal.autoSuspend = false; }
-
         sound = new Howl({
             src: gameSettings.soundEffectSources,
             sprite: gameSettings.soundEffectSprites,
             pool: gameSettings.soundEffectPoolLimit,
             autoplay: false,
-            volume: 1.0,
+            volume: 0.0001, // Start silent so pooled nodes never burst at 1.0 on play()
             rate: 1.0,
             loop: false,
             html5: false,
             });
-
         gameSettings.soundEffectPool[soundEffectPoolKey] = {
             key: soundEffectPoolKey,
             name: effectName,
             sound: sound,
             time: Date.now()
-        };
-    }
+            };
+        }
 
     let effect = gameSettings.soundEffectPool[soundEffectPoolKey];
     effect.time = Date.now();
     sound = effect.sound;
 
+    // Helper to smoothly fade out and recycle a currently playing instance of the same sound
+    let fadeOutAndStopPlayId = function(targetSound, playId, fadeMs){
+        if (!playId || !targetSound.playing(playId)){ return; }
+        let ctx = (typeof window.Howler !== 'undefined' && window.Howler.ctx) ? window.Howler.ctx : null;
+        let soundNode = typeof targetSound._soundById === 'function' ? targetSound._soundById(playId) : null;
+        let fadeSec = (fadeMs || 15) / 1000;
+        if (ctx && soundNode && soundNode._node && soundNode._node.gain){
+            let now = ctx.currentTime;
+            let gainParam = soundNode._node.gain;
+            if (typeof gainParam.cancelAndHoldAtTime === 'function'){
+                gainParam.cancelAndHoldAtTime(now);
+                } else {
+                let currentVal = Math.max(gainParam.value || 0.0001, 0.0001);
+                gainParam.cancelScheduledValues(now);
+                gainParam.setValueAtTime(currentVal, now);
+                }
+            gainParam.linearRampToValueAtTime(0.0001, now + fadeSec);
+            } else {
+            targetSound.fade(targetSound.volume(playId) || effectVolume, 0, (fadeMs || 15), playId);
+            }
+        setTimeout(function(){
+            if (targetSound.playing(playId)){ targetSound.stop(playId); }
+            }, (fadeMs || 15) + 4);
+        };
+
     let playSoundWhenReady = function(effectName, effectVolume, effectRate){
         let playSound = function(sound){
-            // Trigger play FIRST to get the unique ID for this specific playback
+            let nowMs = Date.now();
+
+            // 1. Debounce identical sound effects triggered within a few milliseconds of each other
+            if (effectCooldown > 0 && typeof gameSettings.soundEffectLastPlayed[effectName] === 'number'){
+                if ((nowMs - gameSettings.soundEffectLastPlayed[effectName]) < effectCooldown){
+                    return false;
+                    }
+                }
+            gameSettings.soundEffectLastPlayed[effectName] = nowMs;
+
+            // Ensure the Web Audio safety limiter is attached once context is active
+            mmrpg_init_audio_limiter();
+
+            // 2. If a previous instance of this exact sound is still playing, smoothly micro-fade it out
+            // so rapid footsteps / blips don't stack, phase-cancel, or exhaust the pool
+            if (!allowOverlap && gameSettings.soundEffectActiveIds[effectName]){
+                let prevPlayId = gameSettings.soundEffectActiveIds[effectName];
+                if (sound.playing(prevPlayId)){
+                    fadeOutAndStopPlayId(sound, prevPlayId, 15);
+                    }
+                }
+
+            // 3. Pre-configure rate and silent start volume BEFORE calling sound.play()
+            // This prevents Howler from starting the buffer at volume 1.0 and eliminates post-play rate() timer resets
+            sound._rate = effectRate;
+            sound._volume = 0.0001;
+            if (Array.isArray(sound._sounds)){
+                for (let i = 0; i < sound._sounds.length; i++){
+                    if (sound._sounds[i]._ended){
+                        sound._sounds[i]._rate = effectRate;
+                        sound._sounds[i]._volume = 0.0001;
+                        }
+                    }
+                }
+
+            // 4. Trigger play and capture the unique playId
             let playId = sound.play(effectName);
-            // Apply rate and volume strictly to this playId so it doesn't corrupt others
-            sound.rate(effectRate, playId);
-            sound.volume(effectVolume, playId); // Restored direct volume application
-            // Store the id back into your effect object for if we need to manipulate it later
             effect.id = playId;
+            gameSettings.soundEffectActiveIds[effectName] = playId;
+
+            // 5. Apply a hardware-scheduled Web Audio gain envelope (4ms attack, 12ms release before sprite end)
+            let ctx = (typeof window.Howler !== 'undefined' && window.Howler.ctx) ? window.Howler.ctx : null;
+            let soundNode = typeof sound._soundById === 'function' ? sound._soundById(playId) : null;
+            if (ctx && soundNode && soundNode._node && soundNode._node.gain){
+                let now = ctx.currentTime;
+                let gainParam = soundNode._node.gain;
+                let targetVol = Math.max(effectVolume, 0.0001);
+                let fadeInSec = 0.004;  // 4ms de-click attack
+                let fadeOutSec = 0.012; // 12ms de-click release
+
+                soundNode._volume = effectVolume;
+                gainParam.cancelScheduledValues(now);
+                gainParam.setValueAtTime(0.0001, now);
+                gainParam.linearRampToValueAtTime(targetVol, now + fadeInSec);
+
+                let spriteData = gameSettings.soundEffectSprites[effectName];
+                if (!effectLoop && spriteData && spriteData[1]){
+                    let spriteDurationSec = (spriteData[1] / 1000) / Math.abs(effectRate);
+                    if (spriteDurationSec > (fadeInSec + fadeOutSec + 0.005)){
+                        let fadeOutStart = now + spriteDurationSec - fadeOutSec;
+                        gainParam.setValueAtTime(targetVol, fadeOutStart);
+                        gainParam.linearRampToValueAtTime(0.0001, now + spriteDurationSec);
+                        }
+                    }
+                } else {
+                // Fallback if Web Audio node is unavailable
+                if (effectRate !== 1.0){ sound.rate(effectRate, playId); }
+                sound.volume(effectVolume, playId);
+                }
             };
+
         if (sound.state() !== 'loaded'){
             sound.once('load', function(){
                 playSound(sound);
