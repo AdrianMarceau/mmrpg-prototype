@@ -206,7 +206,7 @@ if (true){
                         foreach ($core_type_list AS $type_key => $type_token){
                             $core_name = $type_token === 'none' ? 'Neutral' : ucfirst($type_token);
                             $core_level = !empty($core_level_index[$type_token]) ? $core_level_index[$type_token] : 0;
-                            $core_max_level = !empty($core_max_levels[$type_token]) ? $core_max_levels[$type_token]['core_max'] : 9;
+                            $core_max_level = isset($core_max_levels[$type_token]) ? $core_max_levels[$type_token]['core_max'] : 9;
                             $core_opacity = 0.1 + (($core_level < 3 ? $core_level / 3 : 1) * 0.9);
                             $core_item_token = $type_token.'-core';
                             $core_sprite_offset = !empty($composite_sprite_index[$core_item_token]['offset']) ? $composite_sprite_index[$core_item_token]['offset'] : array('x' => 9999, 'y' => 9999);

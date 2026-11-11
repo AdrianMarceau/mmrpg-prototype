@@ -627,7 +627,10 @@ if (!empty($this_shop_index['reggae'])){
         }
         //error_log('$core_max_levels = '.print_r($core_max_levels, true));
         //error_log('$unlocked_weapons (B) = '.print_r($unlocked_weapons, true));
-        $unlocked_weapons = !empty($unlocked_weapons) ? array_filter($unlocked_weapons, function($info) use ($level, $levels){
+        $unlocked_weapons = !empty($unlocked_weapons) ? array_filter($unlocked_weapons, function($info) use ($level, $levels, $unlocked_ability_tokens){
+            $token = $info['ability_token'];
+            // Bypass the core level requirement if the player already owns this weapon
+            if (in_array($token, $unlocked_ability_tokens)){ return true; }
             $type = !empty($info['ability_type']) ? $info['ability_type'] : 'none';
             $required = !empty($info['ability_shop_level']) ? $info['ability_shop_level'] : 0;
             $current = !empty($levels[$type]) ? $levels[$type] : 0;
