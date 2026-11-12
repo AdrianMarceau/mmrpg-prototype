@@ -3526,7 +3526,8 @@ class rpg_battle extends rpg_object {
 
         // If a string argument was provided in left/right, search that way
         if (is_string($side_or_id) && in_array($side_or_id, array('left', 'right'))){ $target_side = $side_or_id; }
-        elseif (is_numeric($side_or_id) && !empty($side_or_id)){ $target_id = $side_or_id; }
+        // If the argument is numeric or a string (and not left/right), treat it as an ID
+        elseif ((is_numeric($side_or_id) || is_string($side_or_id)) && !empty($side_or_id)){ $target_id = $side_or_id; }
         else { return false; }
 
         // Define the target player variable to start
@@ -3552,11 +3553,11 @@ class rpg_battle extends rpg_object {
 
             // If the ID was empty, return false
             if (empty($target_id)){ return false; }
-            // If the player does not exists in the battle, return false
+            // If the player does not exist in the battle, return false
             elseif (!isset($this->values['players'][$target_id])){ return false; }
             // Otherwise collect the player info from the battle
             $player_info = $this->values['players'][$target_id];
-            // Create the robot object and return to caller
+            // Create the player object and return to caller
             $target_player = rpg_game::get_player($this, $player_info);
         }
 
@@ -3569,7 +3570,8 @@ class rpg_battle extends rpg_object {
 
         // If a string argument was provided in left/right, search that way
         if (is_string($side_or_id_or_player) && in_array($side_or_id_or_player, array('left', 'right'))){ $target_side = $side_or_id_or_player; }
-        elseif (is_numeric($side_or_id_or_player) && !empty($side_or_id_or_player)){ $target_id = $side_or_id_or_player; }
+        // If the argument is numeric or a string (and not left/right), treat it as an ID
+        elseif ((is_numeric($side_or_id_or_player) || is_string($side_or_id_or_player)) && !empty($side_or_id_or_player)){ $target_id = $side_or_id_or_player; }
         elseif (is_object($side_or_id_or_player) && !empty($side_or_id_or_player)){
             $target_player = $side_or_id_or_player;
             $target_side = $target_player->player_side;
