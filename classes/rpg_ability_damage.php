@@ -528,6 +528,22 @@ class rpg_ability_damage extends rpg_damage {
             $this_ability->damage_options['failure_rate'] = ceil($this_ability->damage_options['failure_rate'] * 2);
         }
 
+        // If the target robot has a lock-on attachment, force the success rate to 100% and failure to 0%
+        $target_is_locked_on = false;
+        $this_robot_attachments = $this_robot->get_current_attachments();
+        if (!empty($this_robot_attachments)){
+            foreach ($this_robot_attachments AS $temp_token => $temp_info){
+                if (!empty($temp_info['attachment_target_lockon'])){
+                    $target_is_locked_on = true;
+                    break;
+                }
+            }
+        }
+        if ($target_is_locked_on){
+            $this_ability->damage_options['success_rate'] = 100;
+            $this_ability->damage_options['failure_rate'] = 0;
+        }
+
         // If success rate is at 100%, auto-set the result to success
         if ($this_ability->damage_options['success_rate'] == 100){
             // Set this ability result as a success
