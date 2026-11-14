@@ -31,6 +31,13 @@ ob_start();
         }
     }
 
+    /*
+    // TEMP TEMP TEMP for TESTING
+    $show_star_support = true;
+    $star_support_cooldown = 0;
+    $star_support_charge = 100;
+    */
+
     // Pre-collect the bulwark robots from the players to see if the bench is protected
     $temp_thisplayer_bulwark_robots = $this_player->get_value('bulwark_robots');
     $temp_targetplayer_bulwark_robots = $target_player->get_value('bulwark_robots');
@@ -83,7 +90,7 @@ ob_start();
 
         if (!empty($this_robot->robot_abilities)){
             $formatted_abilities = array();
-            $raw_abilities = array_slice($this_robot->robot_abilities, 0, 8);
+            $raw_abilities = array_slice($this_robot->robot_abilities, 0, MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX);
             foreach ($raw_abilities AS $key => $token){ $formatted_abilities[$token] = array('ability_token' => $token); }
             $current_robot_abilities = $formatted_abilities;
         } elseif (!empty($this_robot_settings['robot_abilities'])){
@@ -94,8 +101,8 @@ ob_start();
         //error_log('$current_robot_abilities = '.print_r($current_robot_abilities, true));
 
         // If this robot has more than eight abilities, slice to only eight
-        if (count($current_robot_abilities) > 8){
-            $current_robot_abilities = array_slice($current_robot_abilities, 0, 8);
+        if (count($current_robot_abilities) > MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){
+            $current_robot_abilities = array_slice($current_robot_abilities, 0, MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX);
             $ptoken = $this_player->player_token;
             $rid = $this_robot->robot_base_id;
             $rtoken = $this_robot->robot_token;
@@ -113,10 +120,13 @@ ob_start();
         $current_robot_abilities = array();
         foreach ($this_robot->robot_abilities AS $token){
             $current_robot_abilities[$token] = array('ability_token' => $token);
-            if (count($current_robot_abilities)){ break; }
+            if (count($current_robot_abilities) >= MMRPG_SETTINGS_BATTLEABILITIES_PERROBOT_MAX){ break; }
         }
 
     }
+
+    //error_log('$this_robot->robot_abilities = '.print_r($this_robot->robot_abilities, true));
+    //error_log('$current_robot_abilities = '.print_r($current_robot_abilities, true));
 
     // Collect the robot's held item if any
     $current_robot_item = $this_robot->robot_item;
