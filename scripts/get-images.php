@@ -113,8 +113,8 @@ $sprite_object_dir = $root_content_dir.$request_type.'/';
 //$sprite_object_dir = MMRPG_CONFIG_CONTENT_PATH.$request_type.'/';
 
 // Collect the global cache time and break it down to an exact time
-list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
-//list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours')));
+//list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
+list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours')));
 $yyyy = (int)substr($new_cache_date, 0, 4);
 $mm = (int)substr($new_cache_date, 4, 2);
 $dd = (int)substr($new_cache_date, 6, 2);
