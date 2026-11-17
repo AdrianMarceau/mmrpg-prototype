@@ -1211,6 +1211,13 @@ if (!defined('MMRPG_SCRIPT_REQUEST') ||
         $this_group_name = $new_group_name();
         $new_battle_options_group($this_group_name);
 
+        // Before starting, clear any existing starfield battles from the index
+        $temp_battle_tokens = rpg_battle::get_index_tokens();
+        foreach ($temp_battle_tokens AS $key => $token){
+            if (strpos($token, 'starfield-') !== 0){ continue; }
+            rpg_battle::unset_index_info($token);
+        }
+
         // Define how many fields we should show at once
         $star_fields_to_show = 12;
 
