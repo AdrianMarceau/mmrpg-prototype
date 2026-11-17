@@ -113,15 +113,19 @@ $sprite_object_dir = $root_content_dir.$request_type.'/';
 //$sprite_object_dir = MMRPG_CONFIG_CONTENT_PATH.$request_type.'/';
 
 // Collect the global cache time and break it down to an exact time
+$web_root = trim(dirname(dirname(__FILE__)), '/').'/';
+$cache_file = $web_root.'.cache/.modtime';
+$cache_modtime = file_exists($cache_file) ? file_get_contents($cache_file) : 0;
+if ($cache_modtime){ list($new_cache_date, $new_cache_time) = explode('-', $cache_modtime); }
+else { list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours'))); }
 //list($new_cache_date, $new_cache_time) = explode('-', MMRPG_CONFIG_CACHE_DATE);
-list($new_cache_date, $new_cache_time) = explode('-', date('Ymd-Hi', strtotime('-6 hours')));
 $yyyy = (int)substr($new_cache_date, 0, 4);
 $mm = (int)substr($new_cache_date, 4, 2);
 $dd = (int)substr($new_cache_date, 6, 2);
 $hh = (int)substr($new_cache_time, 0, 2);
 $ii = (int)substr($new_cache_time, 2, 2);
 $mmrpg_config_cache_time = mktime($hh, $ii, 0, $mm, $dd, $yyyy);
-//error_log('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
+//exit('$mmrpg_config_cache_time = '.print_r($mmrpg_config_cache_time, true));
 
 // If the files already exists but they're too old, delete them
 $delete_existing = false;
