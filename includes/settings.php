@@ -2,9 +2,15 @@
 
 // Define the cache timestamp now if not already done so
 if (!defined('MMRPG_CONFIG_CACHE_DATE')){
-    $cache_info = $db->table_exists('mmrpg_config') ? $db->get_array_list("SELECT config_name, config_value FROM mmrpg_config WHERE config_group = 'global' && config_name IN ('cache_date', 'cache_time');", 'config_name') : false;
+    $cache_file = MMRPG_CONFIG_ROOTDIR.'.cache/.modtime';
+    $cache_modtime = file_exists($cache_file) ? file_get_contents($cache_file) : 0;
+    if (empty($cache_modtime)){
+        $cache_info = $db->table_exists('mmrpg_config') ? $db->get_array_list("SELECT config_name, config_value FROM mmrpg_config WHERE config_group = 'global' && config_name IN ('cache_date', 'cache_time');", 'config_name') : false;
+        if (!empty($cache_info)){ $cache_modtime = $cache_info['cache_date']['config_value'].'-'.$cache_info['cache_time']['config_value']; }
+    }
+    //echo('$cache_modtime = '.$cache_modtime);
     //echo('<pre>$cache_info = '.print_r($cache_info, true).'</pre>');
-    if (!empty($cache_info)){ define('MMRPG_CONFIG_CACHE_DATE', $cache_info['cache_date']['config_value'].'-'.$cache_info['cache_time']['config_value']); }
+    if (!empty($cache_modtime)){ define('MMRPG_CONFIG_CACHE_DATE', $cache_modtime); }
     elseif (defined('MMRPG_CONFIG_CACHE_DATE_FALLBACK')){ define('MMRPG_CONFIG_CACHE_DATE', MMRPG_CONFIG_CACHE_DATE_FALLBACK); }
     else { define('MMRPG_CONFIG_CACHE_DATE', date('Ymd').'-0000'); }
     //echo('MMRPG_CONFIG_CACHE_DATE = '. MMRPG_CONFIG_CACHE_DATE);
