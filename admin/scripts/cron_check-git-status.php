@@ -16,12 +16,7 @@ if (!file_exists($list_file)) {
 }
 
 // Automatically increment the config timestamp to force-refresh assets
-if ($list_status === 'completed'){
-    list($date, $time) = explode('-', date('Ymd-Hi'));
-    $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
-    $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
-    //echo('Cache timestamp updated to '.$date.'-'.$time.PHP_EOL);
-}
+if ($list_status === 'completed'){ cms_admin::refresh_global_cache(); }
 
 // Exit now that we're done checking (simple, right?)
 exit($list_status);
