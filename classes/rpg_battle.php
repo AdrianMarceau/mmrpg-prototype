@@ -48,6 +48,12 @@ class rpg_battle extends rpg_object {
         return $this_battle;
     }
 
+    // Define a public function that returns the list of battle tokens in the battle index
+    public static function get_index_tokens(){
+        if (empty($_SESSION['GAME']['values']['battle_index'])){ return array(); }
+        return array_keys($_SESSION['GAME']['values']['battle_index']);
+    }
+
     // Define a public function for updating index info
     public static function update_index_info($battle_token, &$battle_info){
         global $db;
