@@ -1403,6 +1403,18 @@ class cms_admin {
 
     }
 
+    // Define a function for updating the cache_date and cache_time in the database and static file
+    public static function refresh_global_cache(){
+        global $db;
+        list($date, $time) = explode('-', date('Ymd-Hi'));
+        $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
+        $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
+        $file = fopen(MMRPG_CONFIG_ROOTDIR.'.cache/.modtime', 'w');
+        fwrite($file, $date.'-'.$time);
+        fclose($file);
+        return true;
+    }
+
     // Define a function for pulling object groups from the database (will be used post-migration)
     public static function get_object_groups_from_database($kind, $class = '', $filter_empty = false){
 
