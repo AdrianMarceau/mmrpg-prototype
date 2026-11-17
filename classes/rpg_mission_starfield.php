@@ -155,9 +155,13 @@ class rpg_mission_starfield extends rpg_mission {
                     if (!isset($bonus_robot_info['robot_core'])){ $bonus_robot_info['robot_core'] = ''; }
                     if ($bonus_robot_info['robot_core'] == $temp_option_field['field_type']){
                         if (!in_array($bonus_robot_info['robot_token'], $temp_robot_master_tokens)){
-                            $bonus_robot_info['flags']['hide_from_mission_select'] = true;
-                            $temp_battle_omega['battle_target_player']['player_robots'][] = $bonus_robot_info;
+                            $bonus_robot_data = array();
+                            $bonus_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $bonus_robot_info['robot_id'], (2 + $temp_counter));
+                            $bonus_robot_data['robot_token'] = $bonus_robot_info['robot_token'];
+                            $bonus_robot_data['flags']['hide_from_mission_select'] = true;
+                            $temp_battle_omega['battle_target_player']['player_robots'][] = $bonus_robot_data;
                             $temp_robot_master_tokens[] = $bonus_robot_info['robot_token'];
+                            $temp_counter++;
                         }
                     }
                 }
@@ -699,6 +703,7 @@ class rpg_mission_starfield extends rpg_mission {
             }
             // Shuffle the bonus robots section of the list
             shuffle($temp_factors_list[1]);
+            //error_log('$temp_factors_list = '.print_r($temp_factors_list, true));
             //$debug_backup = 'initial:count = '.count($temp_option_battle['battle_target_player']['player_robots']).' // ';
             // Loop through and add the robots
             $temp_counter = 0;
@@ -718,14 +723,20 @@ class rpg_mission_starfield extends rpg_mission {
                         if (!isset($temp_types_counter[$bonus_robot_info['robot_core']])){ $temp_types_counter[$bonus_robot_info['robot_core']] = 0; }
                         if (!in_array($bonus_robot_info['robot_token'], $temp_robot_master_tokens)
                             && $temp_types_counter[$bonus_robot_info['robot_core']] < $temp_types_limit){
-                            $bonus_robot_info['flags']['hide_from_mission_select'] = true;
-                            $temp_option_battle['battle_target_player']['player_robots'][] = $bonus_robot_info;
+                            $bonus_robot_data = array();
+                            $bonus_robot_data['robot_id'] = rpg_game::unique_robot_id($temp_player_id, $bonus_robot_info['robot_id'], (3 + $temp_counter));
+                            $bonus_robot_data['robot_token'] = $bonus_robot_info['robot_token'];
+                            $bonus_robot_data['flags']['hide_from_mission_select'] = true;
+                            $temp_option_battle['battle_target_player']['player_robots'][] = $bonus_robot_data;
                             $temp_robot_master_tokens[] = $bonus_robot_info['robot_token'];
                             $temp_types_counter[$bonus_robot_info['robot_core']] += 1;
+                            $temp_counter++;
                         }
                     }
                 }
             }
+            //error_log('$temp_robot_master_tokens = '.print_r($temp_robot_master_tokens, true));
+            //error_log('$temp_types_counter = '.print_r($temp_types_counter, true));
             //$debug_backup .= 'before:count = '.count($temp_option_battle['battle_target_player']['player_robots']).' // ';
             $temp_slice_limit = 4; //2 + $temp_option_battle['battle_complete'];
             //if ($temp_slice_limit >= (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 2)){ $temp_slice_limit = (MMRPG_SETTINGS_BATTLEROBOTS_PERSIDE_MAX / 2); }
