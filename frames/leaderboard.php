@@ -23,17 +23,15 @@ $session_token = mmrpg_game_token();
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/leaderboard.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?endif;?>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
+<? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
-// Update game settings for this page
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
 gameSettings.fadeIn = <?= $this_start_key == 0 ? 'true' : 'false' ?>;
 // Generate the document ready events for this page
 var thisBody = false;
@@ -142,24 +140,47 @@ function windowResizeLeaderboard(){
                     // Define the start key for the next batch of players
                     $start_key = $last_key + 1;
 
-                    // Print out the opening tag for the container dig
-                    echo '<div class="container">';
+                    // Calculate pagination variables
+                    $total_pages = ceil($this_leaderboard_count / $this_display_limit_default);
+                    $current_page = floor($this_start_key / $this_display_limit_default) + 1;
+                    $window = 2; // Adjust this to show more/fewer pages around the current page
 
-                    // If not displaying all players, create a link to show more
-                    if ($this_display_limit > $this_display_limit_default){
-                        $new_display_limit = $this_display_limit - $this_display_limit_default;
-                        $new_start_key = $start_key - $this_display_limit_default - $this_display_limit_default;
-                        if ($new_display_limit < $this_display_limit_default){ $new_display_limit = 0; }
-                        if ($new_start_key < 0){ $new_start_key = 0; }
-                        echo '<a class="more" name="more_link" href="frames/leaderboard.php?'.(!empty($new_start_key) ? 'start='.$new_start_key.'&amp;' : '').(!empty($new_start_key) ? 'limit='.$new_display_limit : '').'" >&laquo; Previous Page</a>';
+                    // Print out the opening tag for the container div
+                    echo '<div class="container" style="text-align: center; margin: 10px 0;">';
+
+                    // Previous Page Link
+                    if ($current_page > 1){
+                        $prev_start = ($current_page - 2) * $this_display_limit_default;
+                        $prev_limit = ($current_page - 1) * $this_display_limit_default;
+                        echo '<a class="more prev" href="frames/leaderboard.php?start='.$prev_start.'&amp;limit='.$prev_limit.'">&laquo; Prev</a> ';
                     }
-                    if ($this_display_limit < $this_leaderboard_count){
-                        $new_display_limit = $this_display_limit + $this_display_limit_default;
-                        if ($new_display_limit > $this_leaderboard_count){ $new_display_limit = $this_leaderboard_count; }
-                        echo '<a class="more" name="more_link" href="frames/leaderboard.php?start='.$start_key.'&amp;limit='.$new_display_limit.'" >Next Page &raquo;</a>';
+
+                    // Numbered Page Links
+                    for ($i = 1; $i <= $total_pages; $i++){
+                        // Show first, last, and window around the current page
+                        if ($i == 1 || $i == $total_pages
+                            || ($i >= $current_page - $window && $i <= $current_page + $window)){
+                            $page_start = ($i - 1) * $this_display_limit_default;
+                            $page_limit = $i * $this_display_limit_default;
+                            if ($i == $current_page){
+                                // Current page styling
+                                echo '<span class="more current" style="opacity: 0.5; cursor: default;">'.$i.'</span> ';
+                            } else {
+                                // Link to other pages
+                                echo '<a class="more page" href="frames/leaderboard.php?start='.$page_start.'&amp;limit='.$page_limit.'">'.$i.'</a> ';
+                            }
+                        } elseif ($i == $current_page - $window - 1
+                            || $i == $current_page + $window + 1){
+                            // Ellipsis for skipped pages
+                            echo '<span class="more ellipsis" style="opacity: 0.5; cursor: default; border: none; background: transparent;">...</span> ';
+                        }
                     }
-                    if ($this_display_limit >= $this_leaderboard_count){
-                        echo '<a class="more" name="more_link" href="frames/leaderboard.php?start=0&amp;limit='.$this_display_limit_default.'">&laquo; First Page</a>';
+
+                    // Next Page Link
+                    if ($current_page < $total_pages){
+                        $next_start = $current_page * $this_display_limit_default;
+                        $next_limit = ($current_page + 1) * $this_display_limit_default;
+                        echo '<a class="more next" href="frames/leaderboard.php?start='.$next_start.'&amp;limit='.$next_limit.'">Next &raquo;</a>';
                     }
 
                     // Print out the scroll padding
@@ -182,7 +203,107 @@ function windowResizeLeaderboard(){
 <script type="text/javascript">
 $(document).ready(function(){
 
+    // Sync mouse hovering with keyboard/gamepad navigation
+    // We explicitly target a.file[data-player] so we don't accidentally hover the hidden padding div
+    $('.leaderboard .wrapper a.file[data-player]').live('mouseenter', function(){
+        $('.leaderboard .wrapper a.file[data-player]').removeClass('hovered');
+        $(this).addClass('hovered');
+        });
+
+    $('.leaderboard .wrapper').live('mouseleave', function(){
+        $('.leaderboard .wrapper a.file[data-player]').removeClass('hovered');
+        });
+
 });
+
+// Define the polling function expected by prototype.js for the leaderboard iframe
+window.checkUserInputsForLeaderboardFrame = function(kind, event, activeInputs, userInputs){
+
+    let $thisPrototype = $('#prototype');
+    let $leaderboardCanvas = $('.leaderboard .wrapper', $thisPrototype);
+    if (!$leaderboardCanvas.is(':visible')){ return; }
+
+    let $allEntries = $('a.file[data-player]', $leaderboardCanvas);
+    if (!$allEntries.length) { return; }
+
+    let $hoveredEntry = $allEntries.filter('.hovered');
+    let hasHover = $hoveredEntry.length > 0;
+
+    // Default to the first entry if nothing is hovered (so the A button has a fallback)
+    if (!hasHover) { $hoveredEntry = $allEntries.first(); }
+
+    // Use -1 as our index if nothing is actually hovered so the first directional press selects index 0
+    let currentIndex = hasHover ? $allEntries.index($hoveredEntry) : -1;
+
+    // Define a quick local function for routing sound effects up to the parent window
+    let playSoundEffect = function(soundName, options){
+        if (typeof top.mmrpg_play_sound_effect !== 'undefined'){
+            top.mmrpg_play_sound_effect(soundName, options);
+            }
+        };
+
+    // -- L2/R2 or LEFT/RIGHT: SWITCH PAGES -- //
+    if (activeInputs.L2 || activeInputs.R2 || activeInputs.Left || activeInputs.Right){
+        if (event){ event.preventDefault(); }
+        let isNext = activeInputs.R2 || activeInputs.Right;
+        let $pageLink = isNext ? $('a.more.next', $leaderboardCanvas) : $('a.more.prev', $leaderboardCanvas);
+        if ($pageLink.length){
+            playSoundEffect('icon-click', {volume: 1.0});
+            // Execute the native page jump
+            window.location.href = $pageLink.attr('href');
+            }
+        return;
+        }
+
+    // -- UP/DOWN: VERTICAL LIST NAVIGATION -- //
+    if (activeInputs.Up || activeInputs.Down){
+        if (event){ event.preventDefault(); }
+        let nextIndex = currentIndex;
+        if (!hasHover) {
+            nextIndex = 0; // First press always highlights the top entry
+            } else if (activeInputs.Up){
+            nextIndex = currentIndex - 1;
+            if (nextIndex < 0) nextIndex = 0; // Clamp to the top
+            } else if (activeInputs.Down){
+            nextIndex = currentIndex + 1;
+            if (nextIndex >= $allEntries.length) nextIndex = $allEntries.length - 1; // Clamp to the bottom
+            }
+        let $nextEntry = $allEntries.eq(nextIndex);
+        // Since currentIndex is -1 on the first press, 0 !== -1 will pass and apply the class!
+        if ($nextEntry.length && nextIndex !== currentIndex){
+            $allEntries.removeClass('hovered');
+            $nextEntry.addClass('hovered');
+            // Handle scrolling natively within the wrapper container
+            let containerScrollTop = $leaderboardCanvas.scrollTop();
+            let containerHeight = $leaderboardCanvas.height();
+            let elementTop = $nextEntry.position().top;
+            let elementHeight = $nextEntry.outerHeight(true);
+            // Compensate for the fixed header over the scroll area
+            let headerOffset = $('.header', $thisPrototype).outerHeight(true) || 50;
+            // Add a tiny 5px buffer so the entry doesn't press against the exact pixel edge of the header
+            let topPadding = headerOffset + 5;
+            // Use the topPadding to trigger the scroll early and offset the final position
+            if (elementTop < topPadding){
+                $leaderboardCanvas.scrollTop(containerScrollTop + elementTop - topPadding);
+                } else if (elementTop + elementHeight > containerHeight){
+                $leaderboardCanvas.scrollTop(containerScrollTop + elementTop + elementHeight - containerHeight);
+                }
+            playSoundEffect('icon-hover', {volume: 0.5});
+            }
+        return;
+        }
+
+    // -- A BUTTON: SELECT HIGHLIGHTED ENTRY -- //
+    if (activeInputs.A){
+        if (event){ event.preventDefault(); }
+        if ($hoveredEntry.length){
+            playSoundEffect('icon-click', {volume: 1.0});
+            $hoveredEntry.trigger('click');
+            }
+        return;
+        }
+
+};
 </script>
 <?
 

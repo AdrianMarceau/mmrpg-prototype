@@ -28,6 +28,12 @@
     transition: opacity 1s, filter 0.2s, height 0.3s;
     /* filter: brightness(0.8); */
 }
+@media (min-width: 1120px){
+    #mmrpg .ready_room {
+        max-width: 1102px;
+        max-height: 192px;
+    }
+}
 #mmrpg .ready_room.hidden {
     opacity: 0;
 }
@@ -51,7 +57,14 @@
     /* filter: blur(1px); */
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0);
+    contain: layout paint;
+}
+@media (min-width: 1120px){
+    #mmrpg .ready_room .wrapper.inner {
+        width: 1100px;
+        max-height: 190px;
+    }
 }
 @keyframes ready-room-scanline-scroll {
     0% { background-position: 0 0; }
@@ -208,12 +221,16 @@
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
     -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+    will-change: transform, opacity, left, bottom, z-index;
 }
 #mmrpg .ready_room .team .sprite .sprite {
     position: relative;
     overflow: hidden;
     transform: scale(2);
     transform-origin: bottom center;
+    animation: none;
+}
+#mmrpg .ready_room.animating .team .sprite .sprite {
     animation: ready-room-sprite-bounce 0.3s steps(1) infinite;
 }
 #mmrpg .ready_room .team .sprite .sprite[data-size="40"] {

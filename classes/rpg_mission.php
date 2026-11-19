@@ -12,6 +12,175 @@ class rpg_mission {
      */
     public function __construct(){ }
 
+    // Define a function for generating the BONUS missions
+    public static function generate_mission($this_prototype_data, $battle_token, $battle_config, $save_to_index = true){
+        //error_log('rpg_mission::generate_mission($this_prototype_data, \''.$battle_token.'\', $battle_config, '.($save_to_index ? 'true' : 'false').')');
+        if (empty($battle_token) || empty($battle_config) || !is_array($battle_config)){ return false; }
+
+        // Collect the session token
+        $session_token = mmrpg_game_token();
+
+        // Pull in global variables for this function
+        global $db;
+        global $this_omega_factors_one;
+        global $this_omega_factors_two;
+        global $this_omega_factors_three;
+        global $this_omega_factors_four;
+        global $this_omega_factors_five;
+        global $this_omega_factors_six;
+        global $this_omega_factors_seven;
+        global $this_omega_factors_eight;
+        global $this_omega_factors_eight_two;
+        global $this_omega_factors_nine;
+        global $this_omega_factors_ten;
+        global $this_omega_factors_eleven;
+
+        // Collect the types index for calculation purposes
+        $mmrpg_index_players = rpg_player::get_index();
+        $mmrpg_index_robots = rpg_robot::get_index(true);
+        $mmrpg_index_types = rpg_type::get_index();
+
+        $temp_target_userid = MMRPG_SETTINGS_TARGET_PLAYERID;
+        $temp_target_playerid = rpg_game::unique_player_id($temp_target_userid, 0);
+
+        $battle_omega = array();
+        $battle_omega['flags'] = !empty($battle_config['flags']) ? $battle_config['flags'] : array();
+        $battle_omega['counters'] = !empty($battle_config['counters']) ? $battle_config['counters'] : array();
+        $battle_omega['values'] = !empty($battle_config['values']) ? $battle_config['values'] : array();
+        $battle_omega['battle_token'] = !empty($battle_config['token']) ? $battle_config['token'] : $battle_token;
+        $battle_omega['battle_size'] = !empty($battle_config['size']) ? $battle_config['size'] : '1x4';
+        $battle_omega['battle_phase'] = !empty($battle_config['phase']) ? $battle_config['phase'] : '';
+        $battle_omega['battle_name'] = !empty($battle_config['name']) ? $battle_config['name'] : 'Undefined Battle';
+        $battle_omega['battle_description'] = !empty($battle_config['description']) ? $battle_config['description'] : '';
+        $battle_omega['battle_description2'] = !empty($battle_config['description2']) ? $battle_config['description2'] : '';
+        $battle_omega['battle_field_base'] = array(); //$battle_config['field'] || array();
+        $battle_omega['battle_target_player'] = array(); //$battle_config['target'] || array();
+        $battle_omega['battle_rewards'] = !empty($battle_config['rewards']) ? $battle_config['rewards'] : array();
+        $battle_omega['battle_turns'] = !empty($battle_config['turns']) ? $battle_config['turns'] : 0;
+        $battle_omega['battle_zenny'] = !empty($battle_config['zenny']) ? $battle_config['zenny'] : 0;
+        $battle_omega['battle_complete'] = isset($battle_config['complete']) ? $battle_config['complete'] : false;
+        $battle_omega['battle_counts'] = isset($battle_config['counts']) ? $battle_config['counts'] : false;
+        //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $battle_omega = '.print_r($battle_omega, true));
+
+        $field_config = array();
+        if (!empty($battle_config['battle_field_base'])){ $field_config = $battle_config['battle_field_base']; }
+        elseif (!empty($battle_config['field_base'])){ $field_config = $battle_config['field_base']; }
+        elseif (!empty($battle_config['field'])){ $field_config = $battle_config['field']; }
+        $field_base = array();
+        $field_base['field_id'] = 100;
+        $field_base['field_token'] = 'field';
+        if (!empty($field_config)){
+            if (is_string($field_config)){
+                if (strstr($field_config, '/')){
+                    list($background, $foreground) = explode('/', $field_config);
+                    $field_base['field_token'] = $background;
+                    $field_base['field_background'] = $background;
+                    $field_base['field_foreground'] = $foreground;
+                } else {
+                    $field_base['field_token'] = $field_config;
+                }
+            } elseif (is_array($field_config)){
+                if (isset($field_config['id'])){ $field_base['field_id'] = $field_config['id']; }
+                if (isset($field_config['token'])){ $field_base['field_token'] = $field_config['token']; }
+                if (isset($field_config['multipliers'])){ $field_base['field_multipliers'] = $field_config['multipliers']; }
+                if (isset($field_config['foreground'])){ $field_base['field_foreground'] = $field_config['foreground']; }
+                if (isset($field_config['background'])){ $field_base['field_background'] = $field_config['background']; }
+            }
+        }
+        if (!empty($battle_config['music']) && is_string($battle_config['music'])){
+            $field_music = $battle_config['music'];
+            if (!strstr($battle_config['music'], '/')){ $field_music = 'sega-remix/'.$field_music; }
+            $field_base['field_music'] = $field_music;
+        }
+        $battle_omega['battle_field_base'] = $field_base;
+        //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $field_base = '.print_r($field_base, true));
+        //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $battle_omega = '.print_r($battle_omega, true));
+
+        $target_config = array();
+        if (!empty($battle_config['battle_target_player'])){ $target_config = $battle_config['battle_target_player']; }
+        elseif (!empty($battle_config['target_player'])){ $target_config = $battle_config['target_player']; }
+        elseif (!empty($battle_config['target'])){ $target_config = $battle_config['target']; }
+        $target_player = array();
+        $target_player['user_id'] = $temp_target_userid;
+        $target_player['player_id'] = $temp_target_playerid;
+        $target_player['player_token'] = 'player';
+        $target_player['player_name'] = 'Player';
+        $target_player['player_robots'] = array();
+        if (!empty($target_config)){
+            if (is_string($target_config)){
+                $target_player['player_token'] = $target_config;
+            } elseif (is_array($target_config)){
+                if (isset($target_config['id'])){ $target_player['player_id'] = $target_config['id']; }
+                if (isset($target_config['token'])){ $target_player['player_token'] = $target_config['token']; }
+                if (isset($target_config['image'])){ $target_player['player_image'] = $target_config['image']; }
+                if (isset($target_config['name'])){ $target_player['player_name'] = $target_config['name']; }
+                if (isset($target_config['flags'])){ $target_player['flags'] = $target_config['flags']; }
+                if (isset($target_config['counters'])){ $target_player['counters'] = $target_config['counters']; }
+                if (isset($target_config['values'])){ $target_player['values'] = $target_config['values']; }
+                if (isset($target_config['robots'])){
+                    foreach ($target_config['robots'] AS $key => $robot){
+                        $robot_config = $robot;
+                        $robot_data = array();
+                        $robot_data['robot_id'] = 0;
+                        $robot_data['robot_token'] = '';
+                        $robot_data['robot_item'] = '';
+                        $robot_data['robot_level'] = 1;
+                        $robot_data['robot_abilities'] = array();
+                        if (!empty($robot_config)){
+                            if (is_string($robot_config)){
+                                $robot_data['robot_token'] = $robot_config;
+                                } elseif (is_array($robot_config)){
+                                if (isset($robot_config['id'])){ $robot_data['robot_id'] = $robot_config['id']; }
+                                if (isset($robot_config['token'])){ $robot_data['robot_token'] = $robot_config['token']; }
+                                if (isset($robot_config['image'])){ $robot_data['robot_image'] = $robot_config['image']; }
+                                if (isset($robot_config['name'])){ $robot_data['robot_name'] = $robot_config['name']; }
+                                if (isset($robot_config['item'])){ $robot_data['robot_item'] = $robot_config['item']; }
+                                if (isset($robot_config['level'])){ $robot_data['robot_level'] = $robot_config['level']; }
+                                if (isset($robot_config['abilities'])){ $robot_data['robot_abilities'] = $robot_config['abilities']; }
+                                if (isset($robot_config['flags'])){ $robot_data['flags'] = $robot_config['flags']; }
+                                if (isset($robot_config['counters'])){ $robot_data['counters'] = $robot_config['counters']; }
+                                if (isset($robot_config['values'])){ $robot_data['values'] = $robot_config['values']; }
+                            }
+                        }
+                        if (empty($robot_data['robot_token'])){ continue; }
+                        $target_player['player_robots'][] = $robot_data;
+                    }
+                }
+            }
+        }
+        if (!empty($target_player['player_robots'])){
+            foreach ($target_player['player_robots'] AS $robot_key => $robot_data){
+                $robot_token = $robot_data['robot_token'];
+                $robot_level = $robot_data['robot_level'];
+                $robot_item = $robot_data['robot_item'];
+                $robot_info = $mmrpg_index_robots[$robot_token];
+                $robot_native_abilities = isset($robot_info['robot_rewards']['abilities']) ? $robot_info['robot_rewards']['abilities'] : array();
+                $robot_info_plus_data = array_merge($robot_info, $robot_data);
+                //error_log('$robot_info ='.print_r($robot_info, true));
+                //error_log('$robot_native_abilities ='.print_r($robot_native_abilities, true));
+                if (empty($robot_data['robot_id'])){
+                    $auto_robot_id = rpg_game::unique_robot_id($temp_target_playerid, $robot_info['robot_id'], $robot_key);
+                    $robot_data['robot_id'] = $auto_robot_id;
+                    }
+                if (empty($robot_data['robot_abilities'])){
+                    $auto_ability_min = max(count($robot_native_abilities), 1);
+                    $auto_ability_num = ($auto_ability_min + round(($robot_level/100) * (8 - $auto_ability_min)));
+                    $auto_ability_list = mmrpg_prototype_generate_abilities($robot_info_plus_data, $robot_level, $auto_ability_num, $robot_item);
+                    $robot_data['robot_abilities'] = $auto_ability_list;
+                    }
+                $target_player['player_robots'][$robot_key] = $robot_data;
+            }
+        }
+        $battle_omega['battle_target_player'] = $target_player;
+        //error_log('rpg_mission::generate_mission()::'.__LINE__.' | $battle_omega = '.print_r($battle_omega, true));
+
+        if ($save_to_index){ rpg_battle::update_index_info($battle_token, $battle_omega); }
+
+        // Return the generated battle data
+        return $battle_omega;
+
+    }
+
     // Define a function for recalculation a mission's battle zenny and turns
     public static function calculate_mission_zenny_and_turns(&$this_battle_omega, $this_prototype_data, $this_start_level = 1, $mmrpg_robots_index = array()){
 

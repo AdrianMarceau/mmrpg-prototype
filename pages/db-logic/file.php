@@ -855,6 +855,7 @@ while ($this_action == 'exit'){
 
     // Exit the game and enter demo mode
     rpg_game::exit_session();
+    rpg_world::reset_session();
 
     // Clear the community thread tracker
     $_SESSION['COMMUNITY']['threads_viewed'] = array();

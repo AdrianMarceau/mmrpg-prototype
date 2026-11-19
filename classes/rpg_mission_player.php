@@ -127,7 +127,8 @@ class rpg_mission_player extends rpg_mission {
             // Loop through the reward robots and append their info
             $temp_counter = 1;
             foreach ($temp_player_robot_tokens AS $key => $token){
-                $temp_robotinfo = array('robot_token' => $token);
+                $id = 0; if (strstr($token, '_')){ $id = intval(explode('_', $token)[0]); $token = explode('_', $token)[1]; }
+                $temp_robotinfo = array('robot_id' => $id, 'robot_token' => $token);
                 // Skip if does not exist
                 if (empty($temp_robotinfo['robot_token'])){ continue; }
                 // Collect this robot's settings if they exist
@@ -341,7 +342,12 @@ class rpg_mission_player extends rpg_mission {
         // QUOTES for now, we should just generate some fun filler until later when they're able to be custom
         $human_robots_unlocked = count($this_user_robots_unlocked);
         $human_robots_unlocked_text = $human_robots_unlocked.' '.($human_robots_unlocked === 1 ? 'robot' : 'different robots');
+        $first_robot_id = 0;
         $first_robot_token = $this_user_robots[0]['robot_token'];
+        if (strstr($first_robot_token, '_')){
+            $first_robot_id = intval(explode('_', $first_robot_token)[0]);
+            $first_robot_token = explode('_', $first_robot_token)[1];
+        }
         $first_robot_info = $this_robot_index[$first_robot_token];
         $possible_intro_quotes = array(
             rpg_battle::random_positive_word().' The name\'s {name}! Don\'t wear it out!',

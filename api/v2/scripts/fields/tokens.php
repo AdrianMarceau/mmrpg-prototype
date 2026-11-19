@@ -5,9 +5,8 @@ $api_request_path = 'fields';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for fields and then parse necessary data
-$mmrpg_database_fields_filter = "AND field_flag_published = 1 ";
-if (!$api_include_hidden){ $mmrpg_database_fields_filter = "AND field_flag_hidden = 0 "; }
-if (!$api_include_incomplete){ $mmrpg_database_fields_filter = "AND field_flag_complete = 1 "; }
+define('FORCE_INCLUDE_HIDDEN_FIELDS', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_FIELDS', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/fields.php');
 if (empty($mmrpg_database_fields)){ print_error_and_quit('The field database could not be loaded'); }

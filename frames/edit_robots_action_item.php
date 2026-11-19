@@ -27,36 +27,30 @@ $temp_robot_info = $allowed_edit_data[$temp_player]['player_robots'][$temp_robot
 // If player or robot info was not found, kill the script in error
 if (empty($temp_player_info) || empty($temp_robot_info)){ die('error|request-notfound|'.preg_replace('/\s+/', ' ', print_r($_REQUEST, true))); }
 
-// If the robot is already holding an item, remove previous and add back to inventory
+// If the robot is already holding an item, remove previous and decrement its equipped count
 $temp_item_current = mmrpg_prototype_get_robot_battle_item($temp_player, $temp_robot);
 if (!empty($temp_item_current)){
-    mmrpg_prototype_inc_battle_item_count($temp_item_current, 1);
-    mmrpg_prototype_unset_robot_battle_item($temp_player, $temp_robot);
-    // If the item we added to the inventory was a shard, we may need to generate a new core
-    if (strstr($temp_item_current, '-shard')){
-        //error_log('returned '.$temp_item_current.' to inventory');
-        $type_token = str_replace('-shard', '', $temp_item_current);
-        $shard_token = $type_token.'-shard';
-        $core_token = $type_token.'-core';
-        $num_shards = mmrpg_prototype_get_battle_item_count($shard_token);
-        $num_cores = mmrpg_prototype_get_battle_item_count($core_token);
-        //error_log('$num_'.$type_token.'_shards = '.$num_shards);
-        //error_log('$num_'.$type_token.'cores = '.$num_cores);
-        while ($num_shards >= MMRPG_SETTINGS_SHARDS_MAXQUANTITY){
-            //error_log('create new '.$type_token.' core from '.$type_token.' shards...');
-            mmrpg_prototype_dec_battle_item_count($shard_token, MMRPG_SETTINGS_SHARDS_MAXQUANTITY);
-            mmrpg_prototype_inc_battle_item_count($core_token, 1);
-            $num_shards = mmrpg_prototype_get_battle_item_count($shard_token);
-            $num_cores = mmrpg_prototype_get_battle_item_count($core_token);
-            //error_log('$num_'.$type_token.'shards = '.$num_shards);
-            //error_log('$num_'.$type_token.'cores = '.$num_cores);
-        }
+    // Decrement the equipped counter instead of adding back to main inventory
+    $equipped_token = $temp_item_current . '__equipped';
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$equipped_token])){
+        $_SESSION[$session_token]['values']['battle_items'][$equipped_token] = 0;
     }
+    $_SESSION[$session_token]['values']['battle_items'][$equipped_token] -= 1;
+    // Ensure we don't drop below zero just in case
+    if ($_SESSION[$session_token]['values']['battle_items'][$equipped_token] < 0){
+        $_SESSION[$session_token]['values']['battle_items'][$equipped_token] = 0;
+    }
+    mmrpg_prototype_unset_robot_battle_item($temp_player, $temp_robot);
 }
 
-// If the new hold item was not empty, remove from inventory and attach to robot
+// If the new hold item was not empty, increment its equipped count and attach to robot
 if (!empty($temp_item)){
-    mmrpg_prototype_dec_battle_item_count($temp_item, 1);
+    // Increment the equipped counter instead of removing from main inventory
+    $equipped_token = $temp_item . '__equipped';
+    if (!isset($_SESSION[$session_token]['values']['battle_items'][$equipped_token])){
+        $_SESSION[$session_token]['values']['battle_items'][$equipped_token] = 0;
+    }
+    $_SESSION[$session_token]['values']['battle_items'][$equipped_token] += 1;
     mmrpg_prototype_set_robot_battle_item($temp_player, $temp_robot, $temp_item);
 }
 

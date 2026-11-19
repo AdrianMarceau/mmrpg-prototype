@@ -67,6 +67,9 @@ if ($form_action === 'edit_groups'){
     $form_messages[] = array('success', ucfirst(strtolower($object_group_editor_name)).' updated successfully');
     exit_group_edit_action();
 
+    // Update cache timestamp if changes were successful
+    if ($form_success){ cms_admin::refresh_global_cache(); }
+
 }
 
 ?>

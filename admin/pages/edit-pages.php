@@ -397,11 +397,7 @@
             }
 
             // Update cache timestamp if changes were successful
-            if ($form_success){
-                list($date, $time) = explode('-', date('Ymd-Hi'));
-                $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
-                $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
-            }
+            if ($form_success){ cms_admin::refresh_global_cache(); }
 
             // If successful, we need to update the JSON and HTML files
             if ($form_success){

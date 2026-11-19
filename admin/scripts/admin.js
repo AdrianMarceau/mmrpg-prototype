@@ -1490,6 +1490,7 @@ $(document).ready(function(){
                     moveTimeout = false;
                     resetGroupStyles($thisGroupList, $thisGroup, $prevGroup);
                     $thisGroup.insertBefore($prevGroup);
+                    $thisGroup.addClass('moved');
                     updateParentGroupDivs();
                     }, 400);
                 } else if (thisDirection === 'down'){
@@ -1502,6 +1503,47 @@ $(document).ready(function(){
                     moveTimeout = false;
                     resetGroupStyles($thisGroupList, $thisGroup, $nextGroup);
                     $thisGroup.insertAfter($nextGroup);
+                    $thisGroup.addClass('moved');
+                    updateParentGroupDivs();
+                    }, 400);
+                } else if (thisDirection === 'top'){
+                var $firstGroup = $thisGroup.siblings('li.group[data-key]').not('.template').first();
+                var firstGroupHeight = $firstGroup.outerHeight(true);
+                //console.log('thisGroupHeight = ', thisGroupHeight, '| firstGroupHeight =', firstGroupHeight);
+                $thisGroup.addClass('moving').css({
+                    transform: 'translate(0,' + (-1 * firstGroupHeight) + 'px)',
+                    opacity: 0
+                    });
+                moveTimeout = setTimeout(function(){
+                    moveTimeout = false;
+                    resetGroupStyles($thisGroupList, $thisGroup, $());
+                    $thisGroup.prependTo($thisGroupList);
+                    $thisGroup.css({ opacity: 0 }); // Start at 0 opacity
+                    setTimeout(function(){
+                        $thisGroup.css({ opacity: 1 }); // Fade back in
+                        }, 100); // Add slight delay for fade-in
+                    $thisGroup.addClass('moved');
+                    updateParentGroupDivs();
+                    }, 400);
+                } else if (thisDirection === 'bottom'){
+                var $nonExcludedGroups = $thisGroup.siblings('li.group[data-key]').not('.template').not('.unlisted');
+                var $lastGroup = $nonExcludedGroups.last();
+                var lastGroupHeight = $lastGroup.outerHeight(true);
+                //console.log('thisGroupHeight = ', thisGroupHeight, '| lastGroupHeight =', lastGroupHeight);
+                $thisGroup.addClass('moving').css({
+                    transform: 'translate(0,' + lastGroupHeight + 'px)',
+                    opacity: 0
+                    });
+                moveTimeout = setTimeout(function(){
+                    moveTimeout = false;
+                    resetGroupStyles($thisGroupList, $thisGroup, $());
+                    if ($lastGroup.length > 0) { $thisGroup.insertAfter($lastGroup); }
+                    else { $thisGroup.appendTo($thisGroupList); }
+                    $thisGroup.css({ opacity: 0 }); // Start at 0 opacity
+                    setTimeout(function(){
+                        $thisGroup.css({ opacity: 1 }); // Fade back in
+                        }, 100); // Add slight delay for fade-in
+                    $thisGroup.addClass('moved');
                     updateParentGroupDivs();
                     }, 400);
                 }
@@ -1543,8 +1585,14 @@ $(document).ready(function(){
                 var $thisGroup = $(this);
                 var $moveHandles = $thisGroup.find('.move-handle[data-direction]');
                 $moveHandles.removeClass('hidden');
-                if ($thisGroup.is($firstGroup)){ $moveHandles.filter('[data-direction="up"]').addClass('hidden'); }
-                else if ($thisGroup.is($lastGroup)){ $moveHandles.filter('[data-direction="down"]').addClass('hidden'); }
+                if ($thisGroup.is($firstGroup)){
+                    $moveHandles.filter('[data-direction="up"]').addClass('hidden');
+                    $moveHandles.filter('[data-direction="top"]').addClass('hidden');
+                    }
+                else if ($thisGroup.is($lastGroup)){
+                    $moveHandles.filter('[data-direction="down"]').addClass('hidden');
+                    $moveHandles.filter('[data-direction="bottom"]').addClass('hidden');
+                    }
                 });
             };
 

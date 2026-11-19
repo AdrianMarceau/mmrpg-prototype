@@ -347,7 +347,7 @@ class rpg_item_recovery extends rpg_recovery {
             }
 
             // Loop through all the other type multipliers one by one if this item has a type
-            $skip_types = array('recovery', 'recovery', 'experience');
+            $skip_types = array('recovery', 'damage', 'experience');
             foreach ($field_multipliers AS $temp_type => $temp_multiplier){
                 // Skip non-type and special fields for this calculation
                 if (in_array($temp_type, $skip_types)){ continue; }
@@ -1063,6 +1063,22 @@ class rpg_item_recovery extends rpg_recovery {
 
             }
 
+            // Check to see if affection values play into this at all (being healed builds infatuation in the robot)
+            if ($this_robot->robot_id != $target_robot->robot_id){
+                //error_log('this robot ('.$this_robot->robot_string.') is being healed by the target robot ('.$target_robot->robot_string.')');
+
+                // (does this robot like the target robot? THEY DO NOW!)
+                $old_affection_value = !empty($this_robot->counters['affection'][$target_robot->robot_token]) ? $this_robot->counters['affection'][$target_robot->robot_token] : 0;
+                //error_log('$old_affection_value = '.$old_affection_value);
+
+                // this robot is being healed by the target, which increases the affection value toward them
+                $new_affection_value = $old_affection_value + $this_item->item_results['this_amount'];
+                //error_log('$new_affection_value = '.$new_affection_value);
+
+                $this_robot->counters['affection'][$target_robot->robot_token] = $new_affection_value;
+                //error_log('affection '.($old_affection_value == 0 ? 'created' : 'increased'));
+            }
+
             // Define the print variables to return
             $this_item->item_results['print_strikes'] = '<span class="recovery_strikes">'.(!empty($this_item->item_results['total_strikes']) ? $this_item->item_results['total_strikes'] : 0).'</span>';
             $this_item->item_results['print_misses'] = '<span class="recovery_misses">'.(!empty($this_item->item_results['total_misses']) ? $this_item->item_results['total_misses'] : 0).'</span>';
@@ -1190,13 +1206,13 @@ class rpg_item_recovery extends rpg_recovery {
             $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
             $temp_event_body = str_replace('{this_robot}', $this_robot->print_name(), $temp_event_body);
             $temp_event_body = str_replace('{target_robot}', $target_robot->print_name(), $temp_event_body);
-            $this_robot->battle->events_create($target_robot, $this_robot, $this_item->recovery_options['recovery_header'], $this_item->item_results['this_text'], $event_options);
+            $this_robot->battle->events_create($target_robot, $this_robot, $this_item->recovery_options['recovery_header'], $temp_event_body, $event_options);
         } else {
             $event_options['console_show_target'] = false;
             $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
             $temp_event_body = str_replace('{this_robot}', $target_robot->print_name(), $temp_event_body);
             $temp_event_body = str_replace('{target_robot}', $this_robot->print_name(), $temp_event_body);
-            $this_robot->battle->events_create($this_robot, $target_robot, $this_item->recovery_options['recovery_header'], $this_item->item_results['this_text'], $event_options);
+            $this_robot->battle->events_create($this_robot, $target_robot, $this_item->recovery_options['recovery_header'], $temp_event_body, $event_options);
         }
 
         // Restore this and the target robot's frames to their backed up state
@@ -1269,7 +1285,6 @@ class rpg_item_recovery extends rpg_recovery {
                                     $attachment_info['flags']['is_attachment'] = true;
                                     if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
                                     if (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
-                                    elseif (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
                                     elseif (isset($attachment_info['skill_token'])){ $temp_attachment = rpg_game::get_skill($this_robot->battle, $this_robot->player, $this_robot, array('skill_token' => $attachment_info['skill_token'])); }
                                     else { continue; }
                                     $temp_trigger_type = !empty($attachment_destroy_info['trigger']) ? $attachment_destroy_info['trigger'] : 'damage';

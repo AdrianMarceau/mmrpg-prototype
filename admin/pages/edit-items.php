@@ -531,11 +531,7 @@
             }
 
             // Update cache timestamp if changes were successful
-            if ($form_success){
-                list($date, $time) = explode('-', date('Ymd-Hi'));
-                $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
-                $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
-            }
+            if ($form_success){ cms_admin::refresh_global_cache(); }
 
             // If the item tokens have changed, we must move the entire folder
             if ($form_success
@@ -1056,7 +1052,7 @@
                                     <div class="field halfsize">
                                         <strong class="label">Required Shop Level <em>min shop level attained before available</em></strong>
                                         <input class="hidden" type="hidden" name="ability_shop_level" value="0" />
-                                        <input class="textbox" type="number" name="item_shop_level" value="<?= !empty($item_data['item_shop_level']) ? $item_data['item_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="10" />
+                                        <input class="textbox" type="number" name="item_shop_level" value="<?= !empty($item_data['item_shop_level']) ? $item_data['item_shop_level'] : 0 ?>" maxlength="3" min="0" max="100" step="1" />
                                     </div>
 
                                     <div class="field halfsize">

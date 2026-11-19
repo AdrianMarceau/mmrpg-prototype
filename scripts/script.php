@@ -1,7 +1,11 @@
 <?php
 
 // Require the global config file
-require('../includes/config.php');
+//require('../includes/config.php');
+
+// Require the global top file
+define('MMRPG_EXTERNAL_TOP_INCLUDE', true);
+require('../top.php');
 
 // Collect the POST header type
 $request_type = !empty($_POST['requestType']) ? $_POST['requestType'] : false;
@@ -12,7 +16,7 @@ $request_data = !empty($_POST['requestData']) ? $_POST['requestData'] : false;
 if ($request_type == 'session' && $request_data !== false){
 
     // Start the session object
-    session_start();
+    //session_start();
 
     // Trim the request data for extra semicolons
     $request_data = trim($request_data, ';');

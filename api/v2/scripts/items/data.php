@@ -5,6 +5,8 @@ $api_request_path = 'items/index/{token}';
 require(MMRPG_CONFIG_API_ROOTDIR.'api-common.php');
 
 // Include the database file for items and then parse necessary data
+define('FORCE_INCLUDE_HIDDEN_ITEMS', $api_include_hidden);
+define('FORCE_INCLUDE_INCOMPLETE_ITEMS', $api_include_incomplete);
 require_once(MMRPG_CONFIG_ROOTDIR.'database/types.php');
 require_once(MMRPG_CONFIG_ROOTDIR.'database/items.php');
 if (empty($mmrpg_database_items)){ print_error_and_quit('The item database could not be loaded'); }

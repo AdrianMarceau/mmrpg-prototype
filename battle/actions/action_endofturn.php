@@ -2,6 +2,21 @@
 
 // -- END OF TURN ACTIONS -- //
 
+// If the battle has not concluded, check if it should based on rescue robot statuses
+if ($this_battle->battle_status != 'complete'){
+
+    // If the player has only rescue robot(s) left active
+    //error_log('$target_player->player_token = '.$target_player->player_token);
+    //error_log('$target_player->counters[\'robots_active\'] = '.$target_player->counters['robots_active']);
+    //error_log('$target_player->counters[\'robots_to_rescue\'] = '.$target_player->counters['robots_to_rescue']);
+    if ($target_player->counters['robots_active'] == $target_player->counters['robots_to_rescue']){
+        //error_log('All of '.$target_player->player_name.'\'s remaining robots are rescue units!');
+        // Trigger the battle complete action to update status and result
+        $this_battle->battle_complete_trigger($this_player, $this_robot, $target_player, $target_robot, '', '');
+    }
+
+}
+
 // If the battle has not concluded, check the robot attachments
 if ($this_battle->battle_status != 'complete'){
 
@@ -121,8 +136,11 @@ if ($this_battle->battle_status != 'complete'){
                 if (!empty($attachments)){
                     foreach ($attachments AS $key2 => $attachment){
                         if (isset($attachment['attachment_duration'])){ $attachment['attachment_duration'] -= 1; }
-                        if ($attachment['attachment_duration'] > 0){ $this_battle->battle_attachments[$static_key][$key2] = $attachment; }
-                        else { unset($this_battle->battle_attachments[$static_key][$key2]); }
+                        if (!isset($attachment['attachment_duration']) || $attachment['attachment_duration'] > 0){
+                            $this_battle->battle_attachments[$static_key][$key2] = $attachment;
+                        } else {
+                            unset($this_battle->battle_attachments[$static_key][$key2]);
+                        }
                         $battle_has_updated = true;
                     }
                 }

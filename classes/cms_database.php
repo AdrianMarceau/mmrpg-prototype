@@ -577,8 +577,8 @@ class cms_database {
         if (!empty($_SESSION['CACHE']['CMS_TABLE_LIST'])){
             $this->TABLES = $_SESSION['CACHE']['CMS_TABLE_LIST'];
         } else {
-            $raw_table_names = $this->get_array_list("SELECT table_name FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
-            if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['table_name']; }, $raw_table_names); }
+            $raw_table_names = $this->get_array_list("SELECT TABLE_NAME FROM information_schema.tables WHERE table_schema = '{$this->DBNAME}';");
+            if (!empty($raw_table_names)){ $this->TABLES = array_map(function($a){ return $a['TABLE_NAME']; }, $raw_table_names); }
             $_SESSION['CACHE']['CMS_TABLE_LIST'] = $this->TABLES;
         }
         // Return the list of cached table names

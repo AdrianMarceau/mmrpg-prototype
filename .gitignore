@@ -27,6 +27,7 @@
 /blank.php
 /xxx.php
 *.bak.php
+*.bak*.php
 .project
 .htaccess-current
 test/

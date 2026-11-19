@@ -16,11 +16,12 @@ $menu_frame_content_unseen = rpg_prototype::get_menu_frame_content_unseen($frame
 //error_log('$menu_frame_content_unseen = '.print_r($menu_frame_content_unseen, true));
 //rpg_prototype::clear_menu_frame_content_unseen($frame_token); // do not clear these here we will extract individual tokens later
 
-// Loop through the allowed edit data for all players
+// Loop through the allowed edit data for all allowed players
 $key_counter = 0;
 $player_counter = 0;
 $player_keys = array_keys($allowed_edit_data);
 foreach($allowed_edit_data AS $player_token => $player_info){
+    if (mmrpg_prototype_limit_hearts_earned($player_token) < 1){ continue; }
 
     // Increment the player counter
     $player_counter++;

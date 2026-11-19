@@ -1281,13 +1281,13 @@ class rpg_item_damage extends rpg_damage {
             $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
             $temp_event_body = str_replace('{this_robot}', $this_robot->print_name(), $temp_event_body);
             $temp_event_body = str_replace('{target_robot}', $target_robot->print_name(), $temp_event_body);
-            $this_robot->battle->events_create($target_robot, $this_robot, $this_item->damage_options['damage_header'], $this_item->item_results['this_text'], $event_options);
+            $this_robot->battle->events_create($target_robot, $this_robot, $this_item->damage_options['damage_header'], $temp_event_body, $event_options);
         } else {
             $event_options['console_show_target'] = false;
             $event_options['this_item_target'] = $this_robot->robot_id.'_'.$this_robot->robot_token;
             $temp_event_body = str_replace('{this_robot}', $target_robot->print_name(), $temp_event_body);
             $temp_event_body = str_replace('{target_robot}', $this_robot->print_name(), $temp_event_body);
-            $this_robot->battle->events_create($this_robot, $target_robot, $this_item->damage_options['damage_header'], $this_item->item_results['this_text'], $event_options);
+            $this_robot->battle->events_create($this_robot, $target_robot, $this_item->damage_options['damage_header'], $temp_event_body, $event_options);
         }
 
         // Restore this and the target robot's frames to their backed up state
@@ -1359,8 +1359,8 @@ class rpg_item_damage extends rpg_damage {
                                 if ($attachment_destroy_info !== false){
                                     $attachment_info['flags']['is_attachment'] = true;
                                     if (!isset($attachment_info['attachment_token'])){ $attachment_info['attachment_token'] = $attachment_token; }
-                                    if (isset($attachment_info['ability_token'])){ $temp_attachment = rpg_game::get_ability($this_robot->battle, $this_robot->player, $this_robot, array('ability_token' => $attachment_info['ability_token'])); }
-                                    elseif (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
+                                    if (isset($attachment_info['item_token'])){ $temp_attachment = rpg_game::get_item($this_robot->battle, $this_robot->player, $this_robot, array('item_token' => $attachment_info['item_token'])); }
+                                    elseif (isset($attachment_info['skill_token'])){ $temp_attachment = rpg_game::get_skill($this_robot->battle, $this_robot->player, $this_robot, array('skill_token' => $attachment_info['skill_token'])); }
                                     else { continue; }
                                     $temp_trigger_type = !empty($attachment_destroy_info['trigger']) ? $attachment_destroy_info['trigger'] : 'damage';
                                     //$this_battle->events_create(false, false, 'DEBUG', 'checkpoint has attachments '.$attachment_token.' trigger '.$temp_trigger_type.'!');

@@ -18,7 +18,7 @@ function print_return_array($return_array, $return_markup = false){
     $new_return_array = array_merge($new_return_array, $return_array);
     $cache_file_markup = json_encode($new_return_array);
     if ($return_markup){ return $cache_file_markup; }
-    header('Content-type: text/json; charset=UTF-8');
+    header('Content-type: application/json; charset=UTF-8');
     echo($cache_file_markup);
     exit();
 }
@@ -32,7 +32,7 @@ function print_and_update_api_cache($cache_file_path, $return_array, $return_mar
         fclose($cache_file_handler);
     }
     if ($return_markup){ return $cache_file_markup; }
-    header('Content-type: text/json; charset=UTF-8');
+    header('Content-type: application/json; charset=UTF-8');
     echo($cache_file_markup);
     exit();
 }

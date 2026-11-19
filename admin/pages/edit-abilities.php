@@ -163,11 +163,11 @@
         $temp_ability_fields = rpg_ability::get_index_fields(true, 'abilities');
         $search_query = "SELECT
             {$temp_ability_fields},
-            groups.group_token AS ability_group,
+            `groups`.group_token AS ability_group,
             tokens.token_order AS ability_order
             FROM mmrpg_index_abilities AS abilities
             LEFT JOIN mmrpg_index_abilities_groups_tokens AS tokens ON tokens.ability_token = abilities.ability_token
-            LEFT JOIN mmrpg_index_abilities_groups AS groups ON groups.group_token = tokens.group_token AND groups.group_class = abilities.ability_class
+            LEFT JOIN mmrpg_index_abilities_groups AS `groups` ON `groups`.group_token = tokens.group_token AND `groups`.group_class = abilities.ability_class
             WHERE 1=1
             AND abilities.ability_token <> 'ability'
             ";
@@ -226,7 +226,7 @@
 
         // If the ability group was provided
         if (!empty($search_data['ability_group'])){
-            $search_query .= "AND groups.group_token = '{$search_data['ability_group']}' ";
+            $search_query .= "AND `groups`.group_token = '{$search_data['ability_group']}' ";
             $search_results_limit = false;
         }
 
@@ -610,11 +610,7 @@
             }
 
             // Update cache timestamp if changes were successful
-            if ($form_success){
-                list($date, $time) = explode('-', date('Ymd-Hi'));
-                $db->update('mmrpg_config', array('config_value' => $date), "config_group = 'global' AND config_name = 'cache_date'");
-                $db->update('mmrpg_config', array('config_value' => $time), "config_group = 'global' AND config_name = 'cache_time'");
-            }
+            if ($form_success){ cms_admin::refresh_global_cache(); }
 
             // If the ability tokens have changed, we must move the entire folder
             if ($form_success

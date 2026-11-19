@@ -360,7 +360,9 @@ if (true){
     // Loop through the allowed edit data for all players
     $key_counter = 0;
     $player_counter = 0;
-    foreach($allowed_edit_data AS $player_token => $player_info){
+    foreach($mmrpg_database_players AS $player_token => $player_index_info){
+        if (!isset($allowed_edit_data[$player_token])){ continue; }
+        $player_info = $allowed_edit_data[$player_token];
         $player_counter++;
         //echo '<td style="width: '.floor(100 / $allowed_edit_player_count).'%;">'."\n";
             echo '<div class="wrapper wrapper_'.($player_counter % 2 != 0 ? 'left' : 'right').' wrapper_'.$player_token.'" data-select="players" data-player="'.$player_info['player_token'].'">'."\n";
@@ -410,7 +412,9 @@ if (true){
 
     // Predefine the player options markup
     $player_options_markup = '';
-    foreach($allowed_edit_data AS $player_token => $player_info){
+    foreach($mmrpg_database_players AS $player_token => $player_index_info){
+        if (!isset($allowed_edit_data[$player_token])){ continue; }
+        $player_info = $allowed_edit_data[$player_token];
         $temp_player_battles = mmrpg_prototype_battles_complete($player_token);
         $temp_player_transfer = $temp_player_battles >= 1 ? true : false;
         $player_options_markup .= '<option value="'.$player_info['player_token'].'" data-label="'.$player_info['player_token'].'" title="'.$player_info['player_name'].'" '.(!$temp_player_transfer ? 'disabled="disabled"' : '').'>'.$player_info['player_name'].'</option>';
@@ -426,7 +430,9 @@ if (true){
     }
 
     // Loop through the players in the field edit data
-    foreach($allowed_edit_data AS $player_token => $player_info){
+    foreach($mmrpg_database_players AS $player_token => $player_index_info){
+        if (!isset($allowed_edit_data[$player_token])){ continue; }
+        $player_info = $allowed_edit_data[$player_token];
 
         // Collect the rewards for this player
         $player_rewards = mmrpg_prototype_player_rewards($player_token);
@@ -544,6 +550,7 @@ if (true){
 <link type="text/css" href=".libs/fontawesome/v5.6.3/css/fontawesome.css" rel="stylesheet" />
 <link type="text/css" href="styles/style.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/prototype.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
+<link type="text/css" href="styles/events.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <link type="text/css" href="styles/edit_players.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
 <?if($flag_wap):?>
 <link type="text/css" href="styles/style-mobile.css?<?=MMRPG_CONFIG_CACHE_DATE?>" rel="stylesheet" />
@@ -560,15 +567,15 @@ if (true){
         </div>
 
     </div>
-<script type="text/javascript" src=".libs/jquery/jquery-<?= MMRPG_CONFIG_JQUERY_VERSION ?>.min.js"></script>
-<script type="text/javascript" src="scripts/script.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/prototype.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
-<script type="text/javascript" src="scripts/edit_players.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? $game_sortingRequired = true; ?>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamescripts.prototype.php'); ?>
+    <script type="text/javascript" src="scripts/edit_players.js?<?=MMRPG_CONFIG_CACHE_DATE?>"></script>
+    <? require(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.all.php'); ?>
 <script type="text/javascript">
 // Update game settings for this page
-<? require_once(MMRPG_CONFIG_ROOTDIR.'scripts/gamesettings.js.php'); ?>
-gameSettings.autoScrollTop = false;
 gameSettings.allowEditing = <?= isset($_GET['edit']) ? $_GET['edit'] : 'true' ?>;
+</script>
+<script type="text/javascript">
 // Wait until the document is ready
 $(document).ready(function(){
     // Append the markup after load to prevent halting display and waiting players
@@ -577,13 +584,35 @@ $(document).ready(function(){
     // Update the player and player count by counting elements
     thisEditorData.playerTotal = $('#canvas .wrapper[data-player]', thisEditor).length;
     thisEditorData.playerTotal = $('#canvas .sprite[data-player]', thisEditor).length;
-    // Find the first player and make sure we automaticallu show them in the ready-room onload
-    if (typeof gameCanvas !== 'undefined'
-        && typeof showPlayerInReadyRoom !== 'undefined'){
-        var $firstPlayer = $('.sprite[data-token]', gameCanvas).first();
-        if ($firstPlayer.length){
-            var firstPlayerToken = $firstPlayer.attr('data-player');
-            showPlayerInReadyRoom(firstPlayerToken);
+    if (typeof gameCanvas !== 'undefined' && typeof showPlayerInReadyRoom !== 'undefined'){
+        // Check local storage for the last selected player
+        var lastSelectedPlayer = localStorage.getItem('mmrpgPrototype_lastSelectedPlayer');
+        var $targetPlayer = false;
+        if (lastSelectedPlayer){
+            $targetPlayer = $('.sprite[data-player="' + lastSelectedPlayer + '"]', gameCanvas);
+            }
+        // Fallback to the first player if no valid player was found in storage
+        if (!$targetPlayer || !$targetPlayer.length){
+            $targetPlayer = $('.sprite[data-token]', gameCanvas).first();
+            }
+        if ($targetPlayer.length){
+            var targetPlayerToken = $targetPlayer.attr('data-player');
+            if (!$targetPlayer.hasClass('sprite_player_current')){
+                // Instantly swap the visible player without the 250ms animation delay
+                var $dataParent = $targetPlayer.closest('.wrapper');
+                var dataSelect = $dataParent.attr('data-select');
+                // Update Canvas Classes
+                $('.sprite[data-token]', gameCanvas).removeClass('sprite_player_current sprite_player_dr-light_current sprite_player_dr-wily_current sprite_player_dr-cossack_current');
+                $targetPlayer.addClass('sprite_player_current sprite_player_' + targetPlayerToken + '_current');
+                $dataParent.css({display: 'block'});
+                // Update Console Classes
+                var dataSelectorCurrent = '#' + dataSelect + ' .event_visible';
+                var dataSelectorNext = '#' + dataSelect + ' .event[data-token=' + targetPlayerToken + ']';
+                $(dataSelectorCurrent, gameConsole).removeClass('event_visible').addClass('event_hidden').css({opacity: 1});
+                $(dataSelectorNext, gameConsole).removeClass('event_hidden').addClass('event_visible').css({opacity: 1});
+                }
+            // 3. Show in ready room
+            showPlayerInReadyRoom(targetPlayerToken);
             }
         }
 });

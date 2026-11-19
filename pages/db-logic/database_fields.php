@@ -42,10 +42,10 @@ ob_start();
                 // Define the SEO variables for this page
                 $this_seo_title_backup = $this_seo_title;
                 $this_seo_title = $field_info['field_name'].' | '.$this_seo_title;
-                $this_seo_description = $field_info['field_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_seo_description;
+                $this_seo_description = $field_info['field_name'].', one of the battle fields in the Mega Man RPG Prototype. '.$this_seo_description;
                 // Define the Open Graph variables for this page
                 $this_graph_data['title'] .= ' | '.$field_info['field_name'];
-                $this_graph_data['description'] = $field_info['field_name'].', one of the playable characters in the Mega Man RPG Prototype. '.$this_graph_data['description'];
+                $this_graph_data['description'] = $field_info['field_name'].', one of the battle fields in the Mega Man RPG Prototype. '.$this_graph_data['description'];
                 $this_graph_data['image'] = MMRPG_CONFIG_ROOTURL.'images/fields/'.$field_info['field_token'].'/mug_right_80x80.png?'.MMRPG_CONFIG_CACHE_DATE;
 
             }

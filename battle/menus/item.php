@@ -2,6 +2,8 @@
 
 // Define all the available player items in a handy index array
 $current_player_items = !empty($_SESSION['GAME']['values']['battle_items']) ? $_SESSION['GAME']['values']['battle_items'] : array();
+$current_player_robots = mmrpg_prototype_robots_unlocked($this_player->player_token, true, true);
+//error_log('$current_player_robots = '.print_r($current_player_robots, true));
 
 // Require the item database page for sorting purposes
 //require(MMRPG_CONFIG_ROOTDIR.'database/types.php');
@@ -23,6 +25,9 @@ $allow_inventory_access = $this_battle->allow_inventory_access();
 // Count the number of items the player has and determine pages
 $current_player_items_count = count($current_player_items);
 $current_player_items_pages = ceil($current_player_items_count / 8);
+
+// Count the number of robots the player has in case we need it
+$current_player_robots_count = count($current_player_robots);
 
 // Generate the markup for the action item panel
 ob_start();
@@ -46,7 +51,11 @@ ob_start();
             $unequip_button_markup = '';
             if ($allow_inventory_access && !empty($this_robot->robot_item)){
                 $temp_iteminfo = $mmrpg_database_items[$this_robot->robot_item];
-                $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item]) ? $_SESSION['GAME']['values']['battle_items'][$this_robot->robot_item] : 0;
+                $temp_item_token = $this_robot->robot_item;
+                $temp_equipped_token = $this_robot->robot_item.'__equipped';
+                $temp_owned = !empty($_SESSION['GAME']['values']['battle_items'][$temp_item_token]) ? $_SESSION['GAME']['values']['battle_items'][$temp_item_token] : 0;
+                $temp_equipped = !empty($_SESSION['GAME']['values']['battle_items'][$temp_equipped_token]) ? $_SESSION['GAME']['values']['battle_items'][$temp_equipped_token] : 0;
+                $temp_quantity_displayed = $temp_owned - $temp_equipped;
                 $temp_allowed = $temp_owned < MMRPG_SETTINGS_ITEMS_MAXQUANTITY ? true : false;
                 ob_start();
                 echo '<a class="button'.(!$temp_allowed ? ' button_disabled' : '').'" data-action="ability_11_action-unequipitem">';
@@ -54,7 +63,7 @@ ob_start();
                     echo '<span class="sprite sprite_40x40 sprite_40x40_base sprite_40x40_item" style="background-image: url(images/items/'.$this_robot->robot_item.'/icon_right_40x40.png?'.MMRPG_CONFIG_CACHE_DATE.');"></span>';
                     if ($temp_allowed){ echo 'Unequip Item'; }
                     else { echo '<del>Unequip Item</del>'; }
-                    echo ' ('.$temp_owned.' &rsaquo; '.($temp_owned + 1).')';
+                    echo ' ('.$temp_quantity_displayed.' &rsaquo; '.($temp_quantity_displayed + 1).')';
                     echo '<span class="info color" data-click-tooltip="Unequip the '.$temp_iteminfo['item_name'].' and return it to the inventory?" data-tooltip-type="empty">';
                         echo '<i class="fa fas fa-info-circle color empty"></i>';
                     echo '</span>';
@@ -106,7 +115,7 @@ ob_start();
             // Define special sorting rules for the in-game item select menu
             $sticky_item_order = array(
                 'energy-pellet', 'energy-capsule', 'energy-tank', 'extra-life',
-                'weapon-pellet', 'weapon-capsule', 'weapon-tank', 'yashichi'
+                'weapon-pellet', 'weapon-capsule', 'weapon-tank', 'mecha-whistle'
                 );
             $item_token_list = array_merge($sticky_item_order, $item_token_list);
             $item_token_list = array_unique($item_token_list);
@@ -122,7 +131,9 @@ ob_start();
                 $temp_iteminfo = $mmrpg_database_items[$item_token];
 
                 // Define the amount of weapon energy for this item
-                $temp_item_quantity = !empty($_SESSION['GAME']['values']['battle_items'][$item_token]) ? $_SESSION['GAME']['values']['battle_items'][$item_token] : 0;
+                $temp_item_real_quantity = !empty($_SESSION['GAME']['values']['battle_items'][$item_token]) ? $_SESSION['GAME']['values']['battle_items'][$item_token] : 0;
+                $temp_item_equipped = !empty($_SESSION['GAME']['values']['battle_items'][$item_token.'__equipped']) ? $_SESSION['GAME']['values']['battle_items'][$item_token.'__equipped'] : 0;
+                $temp_item_quantity = $temp_item_real_quantity - $temp_item_equipped;
                 $temp_item_cost = 1;
 
                 // If this player has never aquired this item, do not display it
@@ -274,9 +285,10 @@ ob_start();
 
                 // Define whether or not this item button should be enabled
                 if ($temp_item_quantity < $temp_item_cost){ $temp_button_enabled = false; }
-                //$temp_button_enabled = $temp_item_quantity >= $temp_item_cost ? true : false;
-                // If this button is enabled, add it to the global item options array
-                //if ($temp_button_enabled){ $temp_player_item_actions[] = $temp_item->item_token; }
+
+                // If this is a Mecha Whistle, make sure we don't allow if storage too full
+                $max_robot_storage = MMRPG_SETTINGS_BATTLEROBOTS_STORAGE_MAX;
+                if ($item_token === 'mecha-whistle' && $current_player_robots_count >= $max_robot_storage){ $temp_button_enabled = false; }
 
                 // All items appear in YELLOW
                 //$temp_item_type_backup = $temp_item->item_type;

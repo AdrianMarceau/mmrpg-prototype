@@ -77,6 +77,12 @@ class rpg_target {
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_ability, 'target');
 
+        // If any event camera actions were supplies we should apply them now too
+        if (isset($trigger_options['event_flag_camera_action'])){ $event_options['event_flag_camera_action'] = $trigger_options['event_flag_camera_action']; }
+        if (isset($trigger_options['event_flag_camera_side'])){ $event_options['event_flag_camera_side'] = $trigger_options['event_flag_camera_side']; }
+        if (isset($trigger_options['event_flag_camera_focus'])){ $event_options['event_flag_camera_focus'] = $trigger_options['event_flag_camera_focus']; }
+        if (isset($trigger_options['event_flag_camera_depth'])){ $event_options['event_flag_camera_depth'] = $trigger_options['event_flag_camera_depth']; }
+
         // If sound effects were supplied in the trigger options, apply them now
         //error_log('$trigger_options = '.print_r($trigger_options, true));
         $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
@@ -184,6 +190,12 @@ class rpg_target {
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_item, 'target');
 
+        // If any event camera actions were supplies we should apply them now too
+        if (isset($trigger_options['event_flag_camera_action'])){ $event_options['event_flag_camera_action'] = $trigger_options['event_flag_camera_action']; }
+        if (isset($trigger_options['event_flag_camera_side'])){ $event_options['event_flag_camera_side'] = $trigger_options['event_flag_camera_side']; }
+        if (isset($trigger_options['event_flag_camera_focus'])){ $event_options['event_flag_camera_focus'] = $trigger_options['event_flag_camera_focus']; }
+        if (isset($trigger_options['event_flag_camera_depth'])){ $event_options['event_flag_camera_depth'] = $trigger_options['event_flag_camera_depth']; }
+
         // If sound effects were supplied in the trigger options, apply them now
         $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
 
@@ -273,6 +285,12 @@ class rpg_target {
 
         // Apply appropriate camera action flags to the event options
         rpg_canvas::apply_camera_action_flags($event_options, $this_robot, $this_skill, 'target');
+
+        // If any event camera actions were supplies we should apply them now too
+        if (isset($trigger_options['event_flag_camera_action'])){ $event_options['event_flag_camera_action'] = $trigger_options['event_flag_camera_action']; }
+        if (isset($trigger_options['event_flag_camera_side'])){ $event_options['event_flag_camera_side'] = $trigger_options['event_flag_camera_side']; }
+        if (isset($trigger_options['event_flag_camera_focus'])){ $event_options['event_flag_camera_focus'] = $trigger_options['event_flag_camera_focus']; }
+        if (isset($trigger_options['event_flag_camera_depth'])){ $event_options['event_flag_camera_depth'] = $trigger_options['event_flag_camera_depth']; }
 
         // If sound effects were supplied in the trigger options, apply them now
         $event_options['event_flag_sound_effects'] = !empty($trigger_options['event_flag_sound_effects']) ? $trigger_options['event_flag_sound_effects'] : false;
